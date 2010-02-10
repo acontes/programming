@@ -39,15 +39,17 @@ import org.objectweb.fractal.api.Component;
 
 
 /**
- * An implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
+ * Extension of the
+ * {@link ProActiveSuperControllerImpl} class for non functional components.
  *
  * @author The ProActive Team
  */
 public class ProActiveNFSuperControllerImpl extends ProActiveSuperControllerImpl {
 
     /**
-     * Constructor for ProActiveNFSuperController
-     * @param owner The Component owner object
+     * Constructor for ProActiveNFSuperController.
+     *
+     * @param owner The owner component.
      */
     public ProActiveNFSuperControllerImpl(Component owner) {
         super(owner);

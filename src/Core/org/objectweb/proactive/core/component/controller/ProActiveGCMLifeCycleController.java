@@ -35,42 +35,36 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import java.util.List;
-
+import org.etsi.uri.gcm.api.control.GCMLifeCycleController;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.representative.ItfID;
 
 
 /**
- * A controller for managing gathercast interfaces, notably bindings and invocations on gathercast interfaces
+ * This interface defines an extension of the {@link GCMLifeCycleController}, which
+ * is able to handle prioritized requests.
+ *<p>
+ * (Under development)
+ * </p>
  *
  * @author The ProActive Team
- *
+ * @see GCMLifeCycleController
  */
 @PublicAPI
-public interface GathercastController extends CollectiveInterfaceController {
+public interface ProActiveGCMLifeCycleController extends GCMLifeCycleController {
 
     /**
-     * Notifies this component that a binding has been performed to one of its gathercast interfaces
-     * @param serverItfName the name of the gathercast interface
-     * @param sender a reference on the component connecting to the gathercast interface
-     * @param clientItfName the name of the interface connecting to the gathercast interface
+     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
      */
-    public void addedBindingOnServerItf(String serverItfName, ProActiveComponent sender, String clientItfName);
+    public String getFcState(short priority);
 
     /**
-     * Notifies this component that a binding has been removed from one of its gathercast interfaces
-     * @param serverItfName the name of the gathercast interface
-     * @param owner a reference on the component connected to the gathercast interface
-     * @param clientItfName the name of the interface connected to the gathercast interface
+     * @see org.objectweb.fractal.api.control.LifeCycleController#startFc()
      */
-    public void removedBindingOnServerItf(String serverItfName, ProActiveComponent owner, String clientItfName);
+    public void startFc(short priority) throws IllegalLifeCycleException;
 
     /**
-     * Returns a list of references to the interfaces connected to a given gathercast interface of this component
-     * @param serverItfName name of a gathercast interface
-     * @return the list of interfaces connected to this gathercast interface
+     * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
      */
-    public List<ItfID> getConnectedClientItfs(String serverItfName);
+    public void stopFc(short priority) throws IllegalLifeCycleException;
 }

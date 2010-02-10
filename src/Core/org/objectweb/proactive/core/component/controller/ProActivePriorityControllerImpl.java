@@ -38,25 +38,26 @@ package org.objectweb.proactive.core.component.controller;
 import java.util.Hashtable;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.control.PriorityController;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
  * @author The ProActive Team
- *
  */
-public class PriorityControllerImpl extends AbstractProActiveController implements PriorityController {
+public class ProActivePriorityControllerImpl extends AbstractProActiveController implements
+        PriorityController {
     private static final String ANY_PARAMETERS = "any-parameters";
     private Map<String, Object> nf2s;
     private Map<String, Object> nf3s;
 
-    public PriorityControllerImpl(Component owner) {
+    public ProActivePriorityControllerImpl(Component owner) {
         super(owner);
         nf2s = new Hashtable<String, Object>(2);
         nf2s.put("setPriorityNF2", ANY_PARAMETERS);
@@ -67,9 +68,9 @@ public class PriorityControllerImpl extends AbstractProActiveController implemen
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(
-                    Constants.REQUEST_PRIORITY_CONTROLLER, PriorityController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.PRIORITY_CONTROLLER,
+                    PriorityController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), e);
         }
@@ -79,27 +80,7 @@ public class PriorityControllerImpl extends AbstractProActiveController implemen
     // PriorityController IMPLEMENTATION //
     ///////////////////////////////////////
     // TODO_C for a NF? priority check that the method is in a controller
-    public void setPriority(String interfaceName, String methodName, RequestPriority priority) {
-        switch (priority) {
-            case NF1:
-                nf2s.remove(methodName);
-                nf3s.remove(methodName);
-                break;
-            case NF2:
-                nf3s.remove(methodName);
-                nf2s.put(methodName, ANY_PARAMETERS);
-                break;
-            case NF3:
-                nf2s.remove(methodName);
-                nf3s.put(methodName, ANY_PARAMETERS);
-                break;
-            default:
-                break;
-        }
-    }
-
-    // TODO_C for a NF? priority check that the method is in a controller
-    public void setPriority(String interfaceName, String methodName, Class<?>[] parametersTypes,
+    public void setGCMPriority(String itfName, String methodName, Class<?>[] parameterTypes,
             RequestPriority priority) {
         switch (priority) {
             case NF1:
@@ -108,23 +89,23 @@ public class PriorityControllerImpl extends AbstractProActiveController implemen
                 break;
             case NF2:
                 nf3s.remove(methodName);
-                nf2s.put(methodName, parametersTypes);
+                nf2s.put(methodName, parameterTypes);
                 break;
             case NF3:
                 nf2s.remove(methodName);
-                nf3s.put(methodName, parametersTypes);
+                nf3s.put(methodName, parameterTypes);
                 break;
             default:
                 break;
         }
     }
 
-    public RequestPriority getPriority(String interfaceName, String methodName, Class<?>[] parametersTypes) {
+    public RequestPriority getGCMPriority(String itfName, String methodName, Class<?>[] parameterTypes) {
         if (nf2s.get(methodName) != null) {
             return RequestPriority.NF2;
         } else if (nf3s.get(methodName) != null) {
             return RequestPriority.NF3;
-        } else if (Utils.isControllerInterfaceName(interfaceName)) {
+        } else if (Utils.isControllerInterfaceName(itfName)) {
             return RequestPriority.NF1;
         } else {
             return RequestPriority.F;

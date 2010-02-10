@@ -37,30 +37,31 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.net.URL;
 
+import org.etsi.uri.gcm.api.control.MigrationException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 
-public class MigrationControllerImpl extends AbstractProActiveController implements MigrationController {
-    public MigrationControllerImpl(Component owner) {
+public class ProActiveMigrationControllerImpl extends AbstractProActiveController implements
+        ProActiveMigrationController {
+    public ProActiveMigrationControllerImpl(Component owner) {
         super(owner);
     }
 
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MIGRATION_CONTROLLER,
-                    MigrationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MIGRATION_CONTROLLER,
+                    ProActiveMigrationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type for controller " +
@@ -68,25 +69,29 @@ public class MigrationControllerImpl extends AbstractProActiveController impleme
         }
     }
 
-    public void migrateTo(Node node) throws MigrationException {
+    public void migrateGCMComponentTo(Object node) throws MigrationException {
         // need to migrate gathercast futures handlers active objects first
-        ((ProActiveComponentImpl) owner).migrateControllersDependentActiveObjectsTo(node);
-        PAMobileAgent.migrateTo(node);
-    }
-
-    public void migrateTo(URL url) throws MigrationException {
         try {
-            migrateTo(NodeFactory.getNode(url.toString()));
-        } catch (NodeException e) {
-            throw new MigrationException("Cannot find node with URL " + url);
+            ((ProActiveComponentImpl) owner).migrateControllersDependentActiveObjectsTo((Node) node);
+            PAMobileAgent.migrateTo((Node) node);
+        } catch (org.objectweb.proactive.core.body.migration.MigrationException e) {
+            throw new MigrationException("Cannot migrate component to the given node", e);
         }
     }
 
-    public void migrateTo(String stringUrl) throws MigrationException {
+    public void migrateGCMComponentTo(URL nodeUrl) throws MigrationException {
         try {
-            migrateTo(NodeFactory.getNode(stringUrl));
+            migrateGCMComponentTo(NodeFactory.getNode(nodeUrl.toString()));
         } catch (NodeException e) {
-            throw new MigrationException("Cannot find node with URL " + stringUrl);
+            throw new MigrationException("Cannot find node with URL " + nodeUrl);
+        }
+    }
+
+    public void migrateGCMComponentTo(String nodeUrl) throws MigrationException {
+        try {
+            migrateGCMComponentTo(NodeFactory.getNode(nodeUrl));
+        } catch (NodeException e) {
+            throw new MigrationException("Cannot find node with URL " + nodeUrl);
         }
     }
 }

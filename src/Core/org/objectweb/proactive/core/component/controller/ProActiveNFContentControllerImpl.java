@@ -39,16 +39,18 @@ import org.objectweb.fractal.api.Component;
 
 
 /**
- * Implementation of {@link org.objectweb.fractal.api.control.ContentController content controller}
+ * Extension of the
+ * {@link ProActiveContentControllerImpl} class for non functional components.
  *
  * @author The ProActive Team
- *
  */
 public class ProActiveNFContentControllerImpl extends ProActiveContentControllerImpl {
 
     /**
      * Constructor for ProActiveNFContentController.
-     */
+     *
+     * @param owner The owner component.
+    */
     public ProActiveNFContentControllerImpl(Component owner) {
         super(owner);
     }

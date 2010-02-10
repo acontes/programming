@@ -35,38 +35,19 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.fractal.api.control.LifeCycleController;
+import org.etsi.uri.gcm.api.control.MigrationController;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.body.migration.MigrationException;
+import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * This interface defines an extension of the @see org.objectweb.fractal.api.control.LifeCycleController, which
- * is able to handle prioritized requests.
- *<p>
- * (Under development)
- * </p>
- *
- * @see org.objectweb.fractal.api.control.LifeCycleController
+  * This interface defines an extension of the {@link MigrationController}.
  *
  * @author The ProActive Team
- *
+ * @see MigrationController
  */
 @PublicAPI
-public interface ProActiveLifeCycleController extends LifeCycleController {
-
-    /**
-     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
-     */
-    public String getFcState(short priority);
-
-    /**
-     * @see org.objectweb.fractal.api.control.LifeCycleController#startFc()
-     */
-    public void startFc(short priority) throws IllegalLifeCycleException;
-
-    /**
-     * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
-     */
-    public void stopFc(short priority) throws IllegalLifeCycleException;
+public interface ProActiveMigrationController extends MigrationController {
+    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
 }

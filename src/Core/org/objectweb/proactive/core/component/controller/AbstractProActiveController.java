@@ -57,7 +57,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Base class for all component controllers.
  *
  * @author The ProActive Team
- *
  */
 public abstract class AbstractProActiveController implements ProActiveController, Serializable {
     private boolean isInternal = true;

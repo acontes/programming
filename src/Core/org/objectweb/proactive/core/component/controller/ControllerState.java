@@ -40,8 +40,8 @@ import java.io.Serializable;
 
 /**
  * This class is a container for the state object of a controller
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class ControllerState implements Serializable {
     private Serializable state;

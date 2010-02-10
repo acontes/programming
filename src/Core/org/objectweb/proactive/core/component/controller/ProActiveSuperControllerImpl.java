@@ -42,13 +42,14 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
- * An implementation of the {@link org.objectweb.fractal.api.control.SuperController} interface.
+ * Implementation of the {@link ProActiveSuperController} interface.
  *
  * @author The ProActive Team
+ * @see ProActiveSuperController
  */
 public class ProActiveSuperControllerImpl extends AbstractProActiveController implements Serializable,
         ProActiveSuperController, ControllerStateDuplication {
@@ -59,7 +60,7 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController im
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.SUPER_CONTROLLER,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.SUPER_CONTROLLER,
                     ProActiveSuperController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

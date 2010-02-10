@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -68,7 +68,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * Implementation of {@link org.objectweb.fractal.api.control.ContentController content controller}
  *
  * @author The ProActive Team
- *
  */
 public class ProActiveContentControllerImpl extends AbstractProActiveController implements
         ProActiveContentController, Serializable, ControllerStateDuplication {
@@ -86,7 +85,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
                     ProActiveContentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
  * Abstract parent class for controllers of collective interfaces
  *
  * @author The ProActive Team
- *
  */
 public abstract class AbstractCollectiveInterfaceController extends AbstractProActiveController {
 

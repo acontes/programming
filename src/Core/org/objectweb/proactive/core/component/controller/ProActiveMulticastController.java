@@ -37,23 +37,21 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.util.List;
 
-import org.objectweb.fractal.api.Interface;
+import org.etsi.uri.gcm.api.control.MulticastController;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
 /**
- * A controller for managing multicast interfaces, notably bindings and invocations on multicast interfaces
- *
+ * This interface defines an extension of the {@link MulticastController}.
  *
  * @author The ProActive Team
- *
+ * @see MulticastController
  */
 @PublicAPI
-public interface MulticastController extends CollectiveInterfaceController {
+public interface ProActiveMulticastController extends MulticastController {
     /**
      * Transforms an invocation on a multicast interface into a list of invocations which will be
      * transferred to client interfaces. These invocations are inferred from the annotations of the
@@ -82,30 +80,5 @@ public interface MulticastController extends CollectiveInterfaceController {
      * @param serverItf
      *            reference on a server interface
      */
-    public void bindFcMulticast(String clientItfName, ProActiveInterface serverItf);
-
-    /**
-     * Removes a binding between a multicast client interface and a server interface
-     *
-     * @param itfName name of a multicast client interface
-     * @param itfRef reference on a server interface
-     */
-    public void unbindFcMulticast(String itfName, ProActiveInterface itfRef);
-
-    /**
-     * Check if the given multicast interface is bound to one of the given server interfaces
-     *
-     * @param clientItfName name of the multicast interface
-     * @param serverItfs array of server interfaces
-     * @return true if the given multicast interface of the component is bound on a component
-     */
-    public Boolean isBoundTo(Interface clientItfName, Interface[] serverItfs);
-
-    /**
-     * Returns a reference on a multicast interface
-     *
-     * @param multicastItfName name of a multicast interface
-     * @return a reference on this multicast interface
-     */
-    public ProxyForComponentInterfaceGroup<?> lookupFcMulticast(String multicastItfName);
+    public void bindGCMMulticast(String multicastItfName, Object serverItf);
 }

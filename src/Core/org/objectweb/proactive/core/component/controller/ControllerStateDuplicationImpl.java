@@ -41,7 +41,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
@@ -60,7 +60,7 @@ public class ControllerStateDuplicationImpl extends AbstractProActiveController 
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
                     Constants.CONTROLLER_STATE_DUPLICATION, ControllerStateDuplication.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {

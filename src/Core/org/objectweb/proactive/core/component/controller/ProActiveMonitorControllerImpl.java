@@ -49,6 +49,9 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.control.MonitorController;
+import org.etsi.uri.gcm.api.type.GCMInterfaceType;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -61,8 +64,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
@@ -70,10 +72,9 @@ import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
-public class MonitorControllerImpl extends AbstractProActiveController implements MonitorController,
+public class ProActiveMonitorControllerImpl extends AbstractProActiveController implements MonitorController,
         NotificationListener {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
@@ -81,18 +82,18 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 
     private boolean started;
 
-    private Map<String, MethodStatistics> statistics;
+    private Map<String, Object> statistics;
 
     private Map<String, String> keysList;
 
-    public MonitorControllerImpl(Component owner) {
+    public ProActiveMonitorControllerImpl(Component owner) {
         super(owner);
         jmxNotificationManager = JMXNotificationManager.getInstance();
     }
 
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
                     MonitorController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -106,7 +107,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                 (new Class<?>[] {}).getClass() });
         PAActiveObject.setImmediateService("getAllStatistics");
 
-        statistics = Collections.synchronizedMap(new HashMap<String, MethodStatistics>());
+        statistics = Collections.synchronizedMap(new HashMap<String, Object>());
         keysList = new HashMap<String, String>();
         NameController nc = null;
         try {
@@ -124,15 +125,15 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     List<MonitorController> subcomponentMonitors = new ArrayList<MonitorController>();
                     if (isComposite()) {
                         Iterator<Component> bindedComponentsIterator = null;
-                        if (!((ProActiveInterfaceType) itfType).isFcMulticastItf()) {
+                        if (!((GCMInterfaceType) itfType).isGCMMulticastItf()) {
                             List<Component> bindedComponent = new ArrayList<Component>();
                             bindedComponent.add(((ProActiveInterface) ((ProActiveInterface) itf)
                                     .getFcItfImpl()).getFcItfOwner());
                             bindedComponentsIterator = bindedComponent.iterator();
                         } else {
                             try {
-                                MulticastControllerImpl multicastController = (MulticastControllerImpl) ((ProActiveInterface) owner
-                                        .getFcInterface(Constants.MULTICAST_CONTROLLER)).getFcItfImpl();
+                                ProActiveMulticastControllerImpl multicastController = (ProActiveMulticastControllerImpl) ((ProActiveInterface) GCM
+                                        .getMulticastController(owner)).getFcItfImpl();
                                 Iterator<ProActiveInterface> delegatee = multicastController.getDelegatee(
                                         itf.getFcItfName()).iterator();
                                 List<Component> bindedComponents = new ArrayList<Component>();
@@ -148,7 +149,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                             while (bindedComponentsIterator.hasNext()) {
                                 MonitorController monitor = (MonitorController) bindedComponentsIterator
                                         .next().getFcInterface(Constants.MONITOR_CONTROLLER);
-                                monitor.startMonitoring();
+                                monitor.startGCMMonitoring();
                                 subcomponentMonitors.add(monitor);
                             }
                         } catch (NoSuchInterfaceException e) {
@@ -161,8 +162,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     Method[] methods = klass.getDeclaredMethods();
                     for (Method m : methods) {
                         Class<?>[] parametersTypes = m.getParameterTypes();
-                        String key = MonitorControllerHelper.generateKey(itf.getFcItfName(), m.getName(),
-                                parametersTypes);
+                        String key = ProActiveMonitorControllerHelper.generateKey(itf.getFcItfName(), m
+                                .getName(), parametersTypes);
                         keysList.put(m.getName(), key);
                         if (subcomponentMonitors.isEmpty()) {
                             statistics.put(key, new MethodStatisticsPrimitiveImpl(itf.getFcItfName(), m
@@ -181,8 +182,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
 
-    public BooleanWrapper isMonitoringStarted() {
-        return new BooleanWrapper(started);
+    public boolean isGCMMonitoringStarted() {
+        return started;
     }
 
     private void initMethodStatistics() {
@@ -192,7 +193,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
 
-    public void startMonitoring() {
+    public void startGCMMonitoring() {
         if (statistics == null) {
             registerMethods();
         }
@@ -210,7 +211,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
 
-    public void stopMonitoring() {
+    public void stopGCMMonitoring() {
         if (started) {
             jmxNotificationManager.unsubscribe(FactoryName.createActiveObjectName(PAActiveObject
                     .getBodyOnThis().getID()), this);
@@ -218,23 +219,19 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         }
     }
 
-    public void resetMonitoring() {
-        stopMonitoring();
-        startMonitoring();
+    public void resetGCMMonitoring() {
+        stopGCMMonitoring();
+        startGCMMonitoring();
     }
 
-    public MethodStatistics getStatistics(String itfName, String methodName) throws ProActiveRuntimeException {
-        return getStatistics(itfName, methodName, new Class<?>[] {});
-    }
-
-    public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes)
-            throws ProActiveRuntimeException {
-        String supposedCorrespondingKey = MonitorControllerHelper.generateKey(itfName, methodName,
-                parametersTypes);
-        MethodStatistics methodStats = statistics.get(supposedCorrespondingKey);
+    public Object getGCMStatistics(String itfName, String methodName, Class<?>[] parameterTypes)
+            throws NoSuchMethodException {
+        String supposedCorrespondingKey = ProActiveMonitorControllerHelper.generateKey(itfName, methodName,
+                parameterTypes);
+        MethodStatistics methodStats = (MethodStatistics) statistics.get(supposedCorrespondingKey);
         if (methodStats != null) {
             return methodStats;
-        } else if (parametersTypes.length == 0) {
+        } else if ((parameterTypes == null) || (parameterTypes.length == 0)) {
             String correspondingKey = null;
             String[] keys = statistics.keySet().toArray(new String[] {});
             for (int i = 0; i < keys.length; i++) {
@@ -242,7 +239,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
                     if (correspondingKey == null) {
                         correspondingKey = keys[i];
                     } else {
-                        throw new ProActiveRuntimeException("The method name: " + methodName +
+                        throw new NoSuchMethodException("The method name: " + methodName +
                             " of the interface " + itfName + " is ambiguous: more than 1 method found");
                     }
                 }
@@ -250,23 +247,23 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
             if (correspondingKey != null) {
                 return statistics.get(correspondingKey);
             } else {
-                throw new ProActiveRuntimeException("The method: " + methodName + "() of the interface " +
+                throw new NoSuchMethodException("The method: " + methodName + "() of the interface " +
                     itfName + " cannot be found so no statistics are available");
             }
         } else {
             String msg = "The method: " + methodName + "(";
-            for (int i = 0; i < parametersTypes.length; i++) {
-                msg += parametersTypes[i].getName();
-                if (i + 1 < parametersTypes.length) {
+            for (int i = 0; i < parameterTypes.length; i++) {
+                msg += parameterTypes[i].getName();
+                if (i + 1 < parameterTypes.length) {
                     msg += ", ";
                 }
             }
             msg += ") of the interface " + itfName + " cannot be found so no statistics are available";
-            throw new ProActiveRuntimeException(msg);
+            throw new NoSuchMethodException(msg);
         }
     }
 
-    public Map<String, MethodStatistics> getAllStatistics() {
+    public Map<String, Object> getAllGCMStatistics() {
         return statistics;
     }
 

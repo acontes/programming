@@ -35,26 +35,23 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.fractal.api.Component;
 
 
 /**
- * A collective interface controller is able to check compatibility between
- * @author The ProActive Team
+ * Extension of the
+ * {@link ProActiveGCMLifeCycleControllerImpl} class for non functional components.
  *
+ * @author The ProActive Team
  */
-@PublicAPI
-public interface CollectiveInterfaceController {
+public class ProActiveNFGCMLifeCycleControllerImpl extends ProActiveGCMLifeCycleControllerImpl {
 
     /**
-     * Ensure the type compatibility between <code>itfType</code> type and interface <code>itf</code>.
+     * Constructor for ProActiveNFLifeCycleController.
      *
-     * @param itfType an interface type
-     * @param itf a component interface
-     * @throws org.objectweb.fractal.api.control.IllegalBindingException
+     * @param owner The owner component.
      */
-    public void ensureCompatibility(ProActiveInterfaceType itfType, ProActiveInterface itf)
-            throws org.objectweb.fractal.api.control.IllegalBindingException;
+    public ProActiveNFGCMLifeCycleControllerImpl(Component owner) {
+        super(owner);
+    }
 }

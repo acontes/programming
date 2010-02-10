@@ -44,10 +44,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.control.GathercastController;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
-import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -61,19 +62,25 @@ import org.objectweb.proactive.core.component.exceptions.ParameterDispatchExcept
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 
 
-public class GathercastControllerImpl extends AbstractCollectiveInterfaceController implements
+/**
+ * Implementation of the {@link GathercastController} interface.<br>
+ *
+ * @author The ProActive Team
+ * @see GathercastController
+ */
+public class ProActiveGathercastControllerImpl extends AbstractCollectiveInterfaceController implements
         GathercastController, ControllerStateDuplication {
 
-    private Map<String, List<ItfID>> bindingsOnServerItfs = new HashMap<String, List<ItfID>>();
+    private Map<String, List<Object>> bindingsOnServerItfs = new HashMap<String, List<Object>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
     private GatherRequestsQueues gatherRequestsHandler;
 
-    public GathercastControllerImpl(Component owner) {
+    public ProActiveGathercastControllerImpl(Component owner) {
         super(owner);
     }
 
@@ -98,9 +105,9 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
             return false;
         }
 
-        ProActiveInterfaceType itfType = (ProActiveInterfaceType) itf.getFcItfType();
+        ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) itf.getFcItfType();
 
-        if (itfType.isFcGathercastItf()) {
+        if (itfType.isGCMGathercastItf()) {
             gatherItfs.put(itf.getFcItfName(), itf);
         } else {
             return false;
@@ -116,7 +123,8 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
+     * @seeorg.objectweb.proactive.core.component.controller.AbstractCollectiveInterfaceController#
+     * searchMatchingMethod(java.lang.reflect.Method, java.lang.reflect.Method[])
      */
     protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
             boolean clientItfIsMulticast) {
@@ -132,14 +140,15 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.controller.AbstractProActiveController#setControllerItfType()
+     * @seeorg.objectweb.proactive.core.component.controller.AbstractProActiveController#
+     * setControllerItfType()
      */
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.GATHERCAST_CONTROLLER,
-                    GathercastController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
+                    Constants.GATHERCAST_CONTROLLER, GathercastController.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type for controller " +
                 this.getClass().getName());
@@ -158,45 +167,50 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
 
     /*
      * TODO : throw exception when binding already exists? (this would make the method synchronous)
-     * @see org.objectweb.proactive.core.component.controller.ProActiveBindingController#addedBindingOnServerItf(org.objectweb.proactive.core.component.ProActiveInterface, org.objectweb.proactive.core.component.ProActiveInterface)
+     * 
+     * @seeorg.objectweb.proactive.core.component.controller.ProActiveBindingController#
+     * addedBindingOnServerItf(org.objectweb.proactive.core.component.ProActiveInterface,
+     * org.objectweb.proactive.core.component.ProActiveInterface)
      */
-    public void addedBindingOnServerItf(String serverItfName, ProActiveComponent sender, String clientItfName) {
-        ItfID itfID = new ItfID(clientItfName, sender.getID());
-        if (bindingsOnServerItfs.containsKey(serverItfName)) {
-            if (bindingsOnServerItfs.get(serverItfName).contains(itfID)) {
+    public void notifyAddedGCMBinding(String gathercastItfName, Component owner, String clientItfName) {
+        ItfID itfID = new ItfID(clientItfName, ((ProActiveComponent) owner).getID());
+        if (bindingsOnServerItfs.containsKey(gathercastItfName)) {
+            if (bindingsOnServerItfs.get(gathercastItfName).contains(itfID)) {
                 throw new ProActiveRuntimeException("trying to add twice the binding of client interface " +
-                    clientItfName + " on server interface " + serverItfName);
+                    clientItfName + " on server interface " + gathercastItfName);
             }
-            bindingsOnServerItfs.get(serverItfName).add(itfID);
+            bindingsOnServerItfs.get(gathercastItfName).add(itfID);
         } else {
-            List<ItfID> connectedClientItfs = new ArrayList<ItfID>();
+            List<Object> connectedClientItfs = new ArrayList<Object>();
             connectedClientItfs.add(itfID);
-            bindingsOnServerItfs.put(serverItfName, connectedClientItfs);
+            bindingsOnServerItfs.put(gathercastItfName, connectedClientItfs);
         }
     }
 
     /*
-     *
-     * @see org.objectweb.proactive.core.component.controller.ProActiveBindingController#removedBindingOnServerItf(java.lang.String, org.objectweb.proactive.core.component.identity.ProActiveComponent, java.lang.String)
+     * 
+     * @seeorg.objectweb.proactive.core.component.controller.ProActiveBindingController#
+     * removedBindingOnServerItf(java.lang.String,
+     * org.objectweb.proactive.core.component.identity.ProActiveComponent, java.lang.String)
      */
-    public void removedBindingOnServerItf(String serverItfName, ProActiveComponent owner, String clientItfName) {
-        ItfID itfID = new ItfID(clientItfName, owner.getID());
-        if (bindingsOnServerItfs.containsKey(serverItfName)) {
-            List<ItfID> connectedClientItfs = bindingsOnServerItfs.get(serverItfName);
+    public void notifyRemovedGCMBinding(String gathercastItfName, Component owner, String clientItfName) {
+        ItfID itfID = new ItfID(clientItfName, ((ProActiveComponent) owner).getID());
+        if (bindingsOnServerItfs.containsKey(gathercastItfName)) {
+            List<Object> connectedClientItfs = bindingsOnServerItfs.get(gathercastItfName);
             if (connectedClientItfs.contains(itfID)) {
                 connectedClientItfs.remove(itfID);
             } else {
-                controllerLogger.error("could not remove binding on server interface " + serverItfName +
+                controllerLogger.error("could not remove binding on server interface " + gathercastItfName +
                     " because owner component is not listed as connected components");
             }
         } else {
-            controllerLogger.error("could not remove binding on server interface " + serverItfName +
+            controllerLogger.error("could not remove binding on server interface " + gathercastItfName +
                 " because there is no component listed as connected on this server interface");
         }
     }
 
-    public List<ItfID> getConnectedClientItfs(String serverItfName) {
-        return bindingsOnServerItfs.get(serverItfName);
+    public List<Object> getGCMConnectedClients(String gathercastItfName) {
+        return bindingsOnServerItfs.get(gathercastItfName);
     }
 
     @Override
@@ -206,8 +220,7 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
         }
     }
 
-    public void ensureCompatibility(ProActiveInterfaceType clientItfType, ProActiveInterface itf)
-            throws IllegalBindingException {
+    public void ensureGCMCompatibility(InterfaceType itfType, Interface itf) {
         // nothing to do in this version
     }
 
@@ -237,16 +250,16 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
     public ControllerState getState() {
 
         return new ControllerState(new GatherCastItfState(
-            (HashMap<String, List<ItfID>>) bindingsOnServerItfs,
+            (HashMap<String, List<Object>>) bindingsOnServerItfs,
             (HashMap<String, ProActiveInterface>) gatherItfs, gatherRequestsHandler));
     }
 
     class GatherCastItfState implements Serializable {
-        private HashMap<String, List<ItfID>> bindingsOnServerItfs;
+        private HashMap<String, List<Object>> bindingsOnServerItfs;
         private HashMap<String, ProActiveInterface> gatherItfs;
         private GatherRequestsQueues gatherRequestsHandler;
 
-        public GatherCastItfState(HashMap<String, List<ItfID>> bindingsOnServerItfs,
+        public GatherCastItfState(HashMap<String, List<Object>> bindingsOnServerItfs,
                 HashMap<String, ProActiveInterface> gatherItfs, GatherRequestsQueues gatherRequestsHandler) {
 
             this.bindingsOnServerItfs = bindingsOnServerItfs;
@@ -254,11 +267,11 @@ public class GathercastControllerImpl extends AbstractCollectiveInterfaceControl
             this.gatherRequestsHandler = gatherRequestsHandler;
         }
 
-        public HashMap<String, List<ItfID>> getBindingsOnServerItfs() {
+        public HashMap<String, List<Object>> getBindingsOnServerItfs() {
             return bindingsOnServerItfs;
         }
 
-        public void setBindingsOnServerItfs(HashMap<String, List<ItfID>> bindingsOnServerItfs) {
+        public void setBindingsOnServerItfs(HashMap<String, List<Object>> bindingsOnServerItfs) {
             this.bindingsOnServerItfs = bindingsOnServerItfs;
         }
 

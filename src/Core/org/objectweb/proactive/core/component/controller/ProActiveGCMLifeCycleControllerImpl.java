@@ -39,6 +39,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMInterfaceType;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -50,41 +52,38 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.representative.ItfID;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of the {@link org.objectweb.fractal.api.control.LifeCycleController} interface.<br>
+ * Implementation of the {@link ProActiveGCMLifeCycleController} interface.<br>
  *
  * @author The ProActive Team
- *
+ * @see ProActiveGCMLifeCycleController
  */
-public class ProActiveLifeCycleControllerImpl extends AbstractProActiveController implements
-        ProActiveLifeCycleController, Serializable, ControllerStateDuplication {
+public class ProActiveGCMLifeCycleControllerImpl extends AbstractProActiveController implements
+        ProActiveGCMLifeCycleController, Serializable, ControllerStateDuplication {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     protected String fcState = LifeCycleController.STOPPED;
 
-    public ProActiveLifeCycleControllerImpl(Component owner) {
+    public ProActiveGCMLifeCycleControllerImpl(Component owner) {
         super(owner);
     }
 
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
-                    ProActiveLifeCycleController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+                    ProActiveGCMLifeCycleController.class.getName(), TypeFactory.SERVER,
+                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
@@ -139,11 +138,11 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                                 }
                             }
                         }
-                    } else if (((ProActiveInterfaceType) itfTypes[i]).isFcMulticastItf() &&
+                    } else if (((GCMInterfaceType) itfTypes[i]).isGCMMulticastItf() &&
                         !itfTypes[i].isFcOptionalItf()) {
-                        ProxyForComponentInterfaceGroup<?> delegatee = Fractive.getMulticastController(
-                                getFcItfOwner()).lookupFcMulticast(itfTypes[i].getFcItfName()).getDelegatee();
-                        if ((delegatee == null) || delegatee.isEmpty()) {
+                        Object[] bindedServerItf = Fractive.getMulticastController(getFcItfOwner())
+                                .lookupGCMMulticast(itfTypes[i].getFcItfName());
+                        if ((bindedServerItf == null) || (bindedServerItf.length == 0)) {
                             if (itfTypes[i].isFcClientItf()) {
                                 throw new IllegalLifeCycleException("compulsory multicast client interface " +
                                     itfTypes[i].getFcItfName() + " in component " +
@@ -155,9 +154,9 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                                     " is not bound to any sub component.");
                             }
                         }
-                    } else if ((((ProActiveInterfaceType) itfTypes[i]).getFcCardinality().equals(
-                            ProActiveTypeFactory.SINGLETON_CARDINALITY) || ((ProActiveInterfaceType) itfTypes[i])
-                            .getFcCardinality().equals(ProActiveTypeFactory.GATHER_CARDINALITY)) &&
+                    } else if ((((GCMInterfaceType) itfTypes[i]).getGCMCardinality().equals(
+                            GCMTypeFactory.SINGLETON_CARDINALITY) || ((GCMInterfaceType) itfTypes[i])
+                            .getGCMCardinality().equals(GCMTypeFactory.GATHERCAST_CARDINALITY)) &&
                         (Fractal.getBindingController(getFcItfOwner()).lookupFc(itfTypes[i].getFcItfName()) == null)) {
                         if (itfTypes[i].isFcClientItf()) {
                             throw new IllegalLifeCycleException("compulsory client interface " +
@@ -175,10 +174,10 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                     if (isComposite() && itfTypes[i].isFcClientItf() && !itfTypes[i].isFcOptionalItf()) {
                         if (itfTypes[i].isFcCollectionItf()) {
                             // TODO Check binding
-                        } else if (((ProActiveInterfaceType) itfTypes[i]).getFcCardinality().equals(
-                                ProActiveTypeFactory.GATHER_CARDINALITY)) {
-                            List<ItfID> connectedClientItfs = Fractive.getGathercastController(
-                                    getFcItfOwner()).getConnectedClientItfs(itfTypes[i].getFcItfName());
+                        } else if (((GCMInterfaceType) itfTypes[i]).getGCMCardinality().equals(
+                                GCMTypeFactory.GATHERCAST_CARDINALITY)) {
+                            List<Object> connectedClientItfs = Fractive.getGathercastController(
+                                    getFcItfOwner()).getGCMConnectedClients(itfTypes[i].getFcItfName());
                             if ((connectedClientItfs == null) || connectedClientItfs.isEmpty()) {
                                 throw new IllegalLifeCycleException(
                                     "compulsory gathercast client interface " + itfTypes[i].getFcItfName() +
@@ -195,9 +194,9 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                                     String[] subComponentItfs = Fractal
                                             .getBindingController(subComponents[j]).listFc();
                                     for (int k = 0; k < subComponentItfs.length; k++) {
-                                        if (((ProActiveInterfaceType) ((Interface) subComponents[j]
+                                        if (((GCMInterfaceType) ((Interface) subComponents[j]
                                                 .getFcInterface(subComponentItfs[k])).getFcItfType())
-                                                .isFcMulticastItf()) {
+                                                .isGCMMulticastItf()) {
                                             isBound = true;
                                             break;
                                             //                                            ProxyForComponentInterfaceGroup<?> delegatee = Fractive
@@ -253,7 +252,7 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
             //try {
             //   ProActiveInterface it = (ProActiveInterface) Fractive.getMembraneController(getFcItfOwner());
             //   Object obj = it.getFcItfImpl();
-            //   ((MembraneControllerImpl) obj).checkInternalInterfaces();
+            //   ((ProActiveMembraneControllerImpl) obj).checkInternalInterfaces();
             //} catch (NoSuchInterfaceException nsie) {
             //Nothing to do, if the component does not have any membrane controller
             //}
@@ -267,12 +266,12 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                     for (int i = 0; i < inner_components.length; i++) {
                         try {
                             if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
-                                    .equals(MembraneController.MEMBRANE_STOPPED)) {
+                                    .equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
                                 throw new IllegalLifeCycleException(
                                     "Before starting all subcomponents, make sure that the membrane of all of them is started");
                             }
                         } catch (NoSuchInterfaceException e) {
-                            //the subComponent doesn't have a MembraneController, no need to check what's is in the previous try block
+                            //the subComponent doesn't have a ProActiveMembraneController, no need to check what's is in the previous try block
                         }
                         ((LifeCycleController) inner_components[i]
                                 .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).startFc();
@@ -306,12 +305,12 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
                     for (int i = 0; i < inner_components.length; i++) {
                         try {
                             if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
-                                    .equals(MembraneController.MEMBRANE_STOPPED)) {
+                                    .equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
                                 throw new IllegalLifeCycleException(
                                     "Before stopping all subcomponents, make sure that the membrane of all them is started");
                             }
                         } catch (NoSuchInterfaceException e) {
-                            //the subComponent doesn't have a MembraneController, no need to check what's is in the previous try block
+                            //the subComponent doesn't have a ProActiveMembraneController, no need to check what's is in the previous try block
                         }
                         ((LifeCycleController) inner_components[i]
                                 .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).stopFc();
@@ -331,22 +330,34 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
         }
     }
 
+    public void terminateGCMComponent() throws IllegalLifeCycleException {
+        if (fcState.equals(LifeCycleController.STOPPED)) {
+            PAActiveObject.terminateActiveObject(true);
+        } else {
+            throw new IllegalLifeCycleException(
+                "Cannot terminate component because the component is not stopped");
+        }
+    }
+
     /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController#getFcState(short)
+     * @see
+     * org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController#getFcState
+     * (short)
      */
     public String getFcState(short priority) {
         return getFcState();
     }
 
     /**
-     * @see org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController#startFc(short)
+     * @see org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController#startFc(short)
      */
     public void startFc(short priority) throws IllegalLifeCycleException {
         startFc();
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController#stopFc(short)
+     * @see
+     * org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController#stopFc(short)
      */
     public void stopFc(short priority) {
         stopFc();
@@ -358,14 +369,12 @@ public class ProActiveLifeCycleControllerImpl extends AbstractProActiveControlle
 
         } else {
             throw new ProActiveRuntimeException(
-                "ProActiveLifeCycleControllerImpl : Impossible to duplicate the controller " + this +
+                "ProActiveGCMLifeCycleControllerImpl : Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
-
     }
 
     public ControllerState getState() {
-
         return new ControllerState(fcState);
     }
 }

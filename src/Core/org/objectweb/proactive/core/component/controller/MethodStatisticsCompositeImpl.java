@@ -39,8 +39,15 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.Vector;
 
+import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.control.MonitorController;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+
 
 public class MethodStatisticsCompositeImpl extends MethodStatisticsAbstract implements Serializable {
+    private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private List<MonitorController> subcomponentMonitors;
 
     public MethodStatisticsCompositeImpl(String itfName, String methodName, Class<?>[] parametersTypes,
@@ -56,8 +63,16 @@ public class MethodStatisticsCompositeImpl extends MethodStatisticsAbstract impl
     public long getLatestServiceTime() {
         long latestServiceTime = 0;
         for (int i = 0; i < subcomponentMonitors.size(); i++) {
-            latestServiceTime = Math.max(latestServiceTime, subcomponentMonitors.get(i).getStatistics(
-                    itfName, methodName, parametersTypes).getLatestServiceTime());
+            try {
+                latestServiceTime = Math.max(latestServiceTime, ((MethodStatistics) subcomponentMonitors.get(
+                        i).getGCMStatistics(itfName, methodName, parametersTypes)).getLatestServiceTime());
+            } catch (NoSuchInterfaceException e) { // Should never append
+                logger.error("The method: " + methodName + "() of the interface " + itfName +
+                    " cannot be found", e);
+            } catch (NoSuchMethodException e) { // Should never append
+                logger.error("The method: " + methodName + "() of the interface " + itfName +
+                    " cannot be found", e);
+            }
         }
         return latestServiceTime;
     }
@@ -65,8 +80,17 @@ public class MethodStatisticsCompositeImpl extends MethodStatisticsAbstract impl
     public double getAverageServiceTime() {
         double averageServiceTime = 0;
         for (int i = 0; i < subcomponentMonitors.size(); i++) {
-            averageServiceTime = Math.max(averageServiceTime, subcomponentMonitors.get(i).getStatistics(
-                    itfName, methodName, parametersTypes).getAverageServiceTime());
+            try {
+                averageServiceTime = Math.max(averageServiceTime, ((MethodStatistics) subcomponentMonitors
+                        .get(i).getGCMStatistics(itfName, methodName, parametersTypes))
+                        .getAverageServiceTime());
+            } catch (NoSuchInterfaceException e) { // Should never append
+                logger.error("The method: " + methodName + "() of the interface " + itfName +
+                    " cannot be found", e);
+            } catch (NoSuchMethodException e) { // Should never append
+                logger.error("The method: " + methodName + "() of the interface " + itfName +
+                    " cannot be found", e);
+            }
         }
         return averageServiceTime;
     }
@@ -75,8 +99,17 @@ public class MethodStatisticsCompositeImpl extends MethodStatisticsAbstract impl
         if (lastNRequest != 0) {
             double averageServiceTime = 0;
             for (int i = 0; i < subcomponentMonitors.size(); i++) {
-                averageServiceTime = Math.max(averageServiceTime, subcomponentMonitors.get(i).getStatistics(
-                        itfName, methodName, parametersTypes).getAverageServiceTime(lastNRequest));
+                try {
+                    averageServiceTime = Math.max(averageServiceTime,
+                            ((MethodStatistics) subcomponentMonitors.get(i).getGCMStatistics(itfName,
+                                    methodName, parametersTypes)).getAverageServiceTime(lastNRequest));
+                } catch (NoSuchInterfaceException e) { // Should never append
+                    logger.error("The method: " + methodName + "() of the interface " + itfName +
+                        " cannot be found", e);
+                } catch (NoSuchMethodException e) { // Should never append
+                    logger.error("The method: " + methodName + "() of the interface " + itfName +
+                        " cannot be found", e);
+                }
             }
             return averageServiceTime;
         } else {
@@ -87,8 +120,17 @@ public class MethodStatisticsCompositeImpl extends MethodStatisticsAbstract impl
     public double getAverageServiceTime(long pastXMilliseconds) {
         double averageServiceTime = 0;
         for (int i = 0; i < subcomponentMonitors.size(); i++) {
-            averageServiceTime = Math.max(averageServiceTime, subcomponentMonitors.get(i).getStatistics(
-                    itfName, methodName, parametersTypes).getAverageServiceTime(pastXMilliseconds));
+            try {
+                averageServiceTime = Math.max(averageServiceTime, ((MethodStatistics) subcomponentMonitors
+                        .get(i).getGCMStatistics(itfName, methodName, parametersTypes))
+                        .getAverageServiceTime(pastXMilliseconds));
+            } catch (NoSuchInterfaceException e) { // Should never append
+                logger.error("The method: " + methodName + "() of the interface " + itfName +
+                    " cannot be found", e);
+            } catch (NoSuchMethodException e) { // Should never append
+                logger.error("The method: " + methodName + "() of the interface " + itfName +
+                    " cannot be found", e);
+            }
         }
         return averageServiceTime;
     }

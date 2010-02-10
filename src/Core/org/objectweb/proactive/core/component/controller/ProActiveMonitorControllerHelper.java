@@ -35,23 +35,38 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import java.net.URL;
-
+import org.etsi.uri.gcm.api.control.MonitorController;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * The migration controller allows to move a component to another node.
+ * Useful methods for the monitor controller.
+ * 
+ * @author The ProActive Team
+ * @see MonitorController
  */
 @PublicAPI
-public interface MigrationController {
-    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
+public class ProActiveMonitorControllerHelper {
+    private static final String KEY_INFO_SEPARATOR = "-";
 
-    public void migrateTo(URL url) throws MigrationException;
+    /**
+     * Generate an unique key according to the name of the server interface, the name of the method
+     * and the class names of the parameters of the method.
+     *
+     * @param itfName Name of the server interface where the method is exposed.
+     * @param methodName Name of the method.
+     * @param parametersTypes Types of the parameters of the method.
+     * @return Key built like this itfName-MethodName-ClassNameParam1-ClassNameParam2-...
+     */
+    public static String generateKey(String itfName, String methodName, Class<?>[] parametersTypes) {
+        String key = itfName + KEY_INFO_SEPARATOR + methodName;
 
-    public void migrateTo(String stringUrl) throws MigrationException;
+        if (parametersTypes != null) {
+            for (int i = 0; i < parametersTypes.length; i++) {
+                key += KEY_INFO_SEPARATOR + parametersTypes[i].getName();
+            }
+        }
 
-    public void migrateTo(Node node) throws MigrationException;
+        return key;
+    }
 }

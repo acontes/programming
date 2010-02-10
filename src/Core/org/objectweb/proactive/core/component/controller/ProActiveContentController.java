@@ -50,7 +50,6 @@ import org.objectweb.proactive.core.component.exceptions.ContentControllerExcept
  *
  *
  * @author The ProActive Team
- *
  */
 @PublicAPI
 public interface ProActiveContentController extends ContentController {

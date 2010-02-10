@@ -44,7 +44,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Extension of the standard Fractal {@link org.objectweb.fractal.api.control.BindingController BindingController }
  *
  * @author The ProActive Team
- *
  */
 @PublicAPI
 public interface ProActiveBindingController extends BindingController {

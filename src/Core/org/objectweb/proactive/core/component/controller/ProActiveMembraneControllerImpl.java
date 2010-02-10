@@ -67,8 +67,8 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
 import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -78,14 +78,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  *
  */
-public class MembraneControllerImpl extends AbstractProActiveController implements MembraneController,
-        Serializable, ControllerStateDuplication {
+public class ProActiveMembraneControllerImpl extends AbstractProActiveController implements
+        ProActiveMembraneController, Serializable, ControllerStateDuplication {
     private Map<String, Component> nfcomponents;
     private String membraneState;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private NFBindings nfBindings;//TODO : This structure has to be updated every time a with the membrane is added or removed
 
-    public MembraneControllerImpl(Component owner) {
+    public ProActiveMembraneControllerImpl(Component owner) {
         super(owner);
         nfcomponents = new HashMap<String, Component>();
         membraneState = MEMBRANE_STOPPED;
@@ -95,8 +95,8 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                    MembraneController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MEMBRANE_CONTROLLER,
+                    ProActiveMembraneController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type : " +
@@ -104,7 +104,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
         }
     }
 
-    private void checkCompatibility(ProActiveInterfaceType client, ProActiveInterfaceType server)
+    private void checkCompatibility(ProActiveGCMInterfaceType client, ProActiveGCMInterfaceType server)
             throws IllegalBindingException {
         try {
             Class<?> cl = Class.forName(client.getFcItfSignature());
@@ -121,7 +121,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
     public void addNFSubComponent(Component component) throws IllegalContentException,
             IllegalLifeCycleException {
         try {
-            if (membraneState.equals(MembraneController.MEMBRANE_STARTED) ||
+            if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED) ||
                 Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "To perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
@@ -174,7 +174,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
                 try {
                     try {
                         if (Fractive.getMembraneController(c).getMembraneState().equals(
-                                MembraneController.MEMBRANE_STOPPED)) {
+                                ProActiveMembraneController.MEMBRANE_STOPPED)) {
                             throw new IllegalLifeCycleException(
                                 "While iterating on functional components, it apprears that one of them has its membranje in a stopped state. It should be started.");
                         }
@@ -332,9 +332,9 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
         ComponentAndInterface client = getComponentAndInterface(clientItf);
         ComponentAndInterface server = getComponentAndInterface(serverItf);
         ProActiveInterface clItf = (ProActiveInterface) client.getInterface();
-        ProActiveInterfaceType clItfType = (ProActiveInterfaceType) clItf.getFcItfType();
+        ProActiveGCMInterfaceType clItfType = (ProActiveGCMInterfaceType) clItf.getFcItfType();
         ProActiveInterface srItf = (ProActiveInterface) server.getInterface();
-        ProActiveInterfaceType srItfType = (ProActiveInterfaceType) srItf.getFcItfType();
+        ProActiveGCMInterfaceType srItfType = (ProActiveGCMInterfaceType) srItf.getFcItfType();
 
         if (client.getComponent() == null) { //The client interface belongs to the membrane
             if (!clItfType.isFcClientItf()) { //the client interface is a server one (internal or external) belonging to the membrane
@@ -490,13 +490,13 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
         serverItf = PAFuture.getFutureValue(serverItf);
         ComponentAndInterface client = getComponentAndInterface(clientItf);
         ProActiveInterface clItf = (ProActiveInterface) client.getInterface();
-        ProActiveInterfaceType clItfType = (ProActiveInterfaceType) clItf.getFcItfType();
+        ProActiveGCMInterfaceType clItfType = (ProActiveGCMInterfaceType) clItf.getFcItfType();
         ProActiveInterface srItf = (ProActiveInterface) serverItf;
-        ProActiveInterfaceType srItfType = (ProActiveInterfaceType) srItf.getFcItfType();
+        ProActiveGCMInterfaceType srItfType = (ProActiveGCMInterfaceType) srItf.getFcItfType();
         if (!clItfType.isFcClientItf()) {
             throw new IllegalBindingException("This method only binds NF client interfaces");
         } else {//OK for binding, but first check that types are compatible
-            if (membraneState.equals(MembraneController.MEMBRANE_STARTED)) {
+            if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
                 throw new IllegalLifeCycleException(
                     "Membrane should be stopped while binding non-functional client interface.");
             }
@@ -538,10 +538,10 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
     public Object lookupNFc(String itfname) throws NoSuchInterfaceException, NoSuchComponentException {
         ComponentAndInterface itf = getComponentAndInterface(itfname);
         ProActiveInterface theItf = (ProActiveInterface) itf.getInterface();
-        ProActiveInterfaceType theType = (ProActiveInterfaceType) theItf.getFcItfType();
+        ProActiveGCMInterfaceType theType = (ProActiveGCMInterfaceType) theItf.getFcItfType();
         if (itf.getComponent() == null) {//The interface has to belong to the membrane and has to be client!!
             theItf = (ProActiveInterface) itf.getInterface();
-            theType = (ProActiveInterfaceType) theItf.getFcItfType();
+            theType = (ProActiveGCMInterfaceType) theItf.getFcItfType();
             if (theType.isFcClientItf()) {//OK, We can return its implementation
 
                 return theItf.getFcItfImpl();
@@ -621,7 +621,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
 
     public void setControllerObject(String itf, Object controllerclass) throws NoSuchInterfaceException {
         try {
-            if (membraneState.equals(MembraneController.MEMBRANE_STARTED) ||
+            if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED) ||
                 Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "For the moment, to perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
@@ -657,13 +657,13 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
     public void unbindNFc(String clientItf) throws NoSuchInterfaceException, IllegalLifeCycleException,
             IllegalBindingException, NoSuchComponentException {//Unbinds client interfaces exposed by the membrane, of client interfaces of non-functional components.
 
-        if (membraneState.equals(MembraneController.MEMBRANE_STARTED)) {
+        if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
             throw new IllegalLifeCycleException(
                 "The membrane should be stopped while unbinding non-functional interfaces");
         }
         ComponentAndInterface theItf = getComponentAndInterface(clientItf);
         ProActiveInterface it = (ProActiveInterface) theItf.getInterface();
-        ProActiveInterfaceType clItfType = (ProActiveInterfaceType) it.getFcItfType();
+        ProActiveGCMInterfaceType clItfType = (ProActiveGCMInterfaceType) it.getFcItfType();
         if (theItf.getComponent() == null) {// Unbind a client interface exposed by the membrane, update the structure
             it.setFcItfImpl(null);
             nfBindings.removeNormalBinding("membrane", it.getFcItfName());//Here, we deal only with singleton bindings
@@ -804,11 +804,11 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
     }
 
     public void duplicateController(Object c) {
-        if (c instanceof HashMap) {
+        if (c instanceof HashMap<?, ?>) {
             nfcomponents = (HashMap<String, Component>) c;
         } else {
             throw new ProActiveRuntimeException(
-                "MembraneControllerImpl : Impossible to duplicate the controller " + this +
+                "ProActiveMembraneControllerImpl : Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
     }
@@ -865,7 +865,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
     }
 
     private void checkMembraneIsStopped() throws IllegalLifeCycleException {
-        if (membraneState.equals(MembraneController.MEMBRANE_STARTED)) {
+        if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
             throw new IllegalLifeCycleException("The membrane should be stopped");
         }
     }
@@ -874,7 +874,7 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
 
         try {
             if (Fractive.getMembraneController(comp).getMembraneState().equals(
-                    MembraneController.MEMBRANE_STOPPED)) {
+                    ProActiveMembraneController.MEMBRANE_STOPPED)) {
                 throw new IllegalLifeCycleException(
                     "The desired operation can not be performed. The membrane of a non-functional component is stopped. It should be started.");
             }
@@ -888,9 +888,9 @@ public class MembraneControllerImpl extends AbstractProActiveController implemen
 
         InterfaceType[] itfTypes = ((ComponentType) ((ProActiveComponentImpl) getFcItfOwner()).getNFType())
                 .getFcInterfaceTypes();
-        ProActiveInterfaceType paItfT;
+        ProActiveGCMInterfaceType paItfT;
         for (InterfaceType itfT : itfTypes) {
-            paItfT = (ProActiveInterfaceType) itfT;
+            paItfT = (ProActiveGCMInterfaceType) itfT;
             if (!itfT.isFcOptionalItf() && paItfT.isInternal()) {
 
                 ProActiveInterface paItf;

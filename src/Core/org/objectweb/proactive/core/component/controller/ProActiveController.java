@@ -45,7 +45,6 @@ import org.objectweb.proactive.core.node.Node;
  * This interface defines some basic services offered by a component controller in the ProActive implementation of the Fractal model.
  *
  * @author The ProActive Team
- *
  */
 @PublicAPI
 public interface ProActiveController extends Interface {

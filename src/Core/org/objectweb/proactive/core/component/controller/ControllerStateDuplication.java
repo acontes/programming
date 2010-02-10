@@ -37,8 +37,8 @@ package org.objectweb.proactive.core.component.controller;
 
 /**
  * The interface provides means to retrieve and set the state of a controller
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public interface ControllerStateDuplication {
 
