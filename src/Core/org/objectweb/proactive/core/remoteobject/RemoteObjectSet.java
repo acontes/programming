@@ -42,8 +42,11 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.lang.reflect.TypeVariable;
 import java.net.URI;
+import java.rmi.dgc.VMID;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Observable;
+import java.util.Observer;
 
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -51,20 +54,22 @@ import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.util.URIBuilder;
 
 
-public class RemoteObjectSet implements Serializable {
+public class RemoteObjectSet implements Serializable, Observer {
 
     private HashMap<URI, RemoteRemoteObject> rros;
     private HashSet<RemoteRemoteObject> unreliables;
     private RemoteRemoteObject _default;
     private static Method getURI;
-    private String[] order = null;
-    private String[] urls;
+    private String[] order = new String[] {};
+    private String[] remoteRuntimeUrls;
     private String forcedProtocol = null;
+    // Almost same as in term of speed UniqueID.getCurrentVMID() but more readable 
+    private static VMID vmid = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getVMID();
 
     static {
         try {
@@ -83,35 +88,43 @@ public class RemoteObjectSet implements Serializable {
         this();
         try {
             this._default = rro;
-            this.urls = getPARuntimeUrls(rro);
+            this.add(rro);
+            this.remoteRuntimeUrls = getPARuntimeUrls(rro);
             this.updateOrder();
-        } catch (NotReliableRemoteRemoteObjectException e) {
+        } catch (RemoteRemoteObjectException e) {
             this.unreliables.add(rro);
         }
     }
 
-    public void forceProtocol(String protocol) {
-        this.forcedProtocol = protocol;
+    public void forceProtocol(String protocol) throws UnknownProtocolException {
+        // Protocol factories can be added dynamically, so the only way to        
+        // check a protocol existence is to check if it have a factory
+        if (RemoteObjectProtocolFactoryRegistry.get(protocol) != null) {
+            this.forcedProtocol = protocol;
+        } else {
+            throw new UnknownProtocolException();
+        }
     }
 
     public void add(RemoteRemoteObject rro) {
         // If an older same rro is present, it will be updated
         try {
             this.rros.put(getURI(rro), rro);
-            // Update ?
-        } catch (NotReliableRemoteRemoteObjectException e) {
+            this.remoteRuntimeUrls = getPARuntimeUrls(rro);
+            this.updateOrder();
+        } catch (RemoteRemoteObjectException e) {
             this.unreliables.add(rro);
         }
     }
 
-    private Pair internalGet(int i) throws UnaccessibleRemoteRemoteObjectException,
-            ArrayIndexOutOfBoundsException {
+    private Pair internalGet(int i) throws RemoteRemoteObjectException, ArrayIndexOutOfBoundsException {
         String protocol = order[i];
         for (URI uri : rros.keySet()) {
             if (protocol.equalsIgnoreCase(uri.getScheme()))
                 return new Pair(uri, rros.get(uri));
         }
-        throw new UnaccessibleRemoteRemoteObjectException();
+        throw new RemoteRemoteObjectException(
+            "RemoteObjectSet: can't found RemoteRemoteObject for protocol " + protocol);
     }
 
     /**
@@ -123,7 +136,7 @@ public class RemoteObjectSet implements Serializable {
      *          
      * @throws UnaccessibleRemoteRemoteObjectException
      */
-    public RemoteRemoteObject get(int i) throws UnaccessibleRemoteRemoteObjectException {
+    public RemoteRemoteObject get(int i) throws RemoteRemoteObjectException {
         if (forcedProtocol != null) {
             for (URI uri : rros.keySet()) {
                 if (forcedProtocol.equalsIgnoreCase(uri.getScheme()))
@@ -138,10 +151,10 @@ public class RemoteObjectSet implements Serializable {
         }
     }
 
-    private URI getURI(RemoteRemoteObject rro) throws NotReliableRemoteRemoteObjectException {
-        // Retrying the uri from here will ensure that accessing this rro
-        // doesn't throw any exception, so it could be use quite safely
-        // in the future.
+    /**
+     * Send a non-functional internal request to get the URI of the RemoteRemoteObject
+     */
+    private URI getURI(RemoteRemoteObject rro) throws RemoteRemoteObjectException {
         try {
             MethodCall mc = MethodCall.getMethodCall(getURI, new Object[0],
                     new HashMap<TypeVariable<?>, Class<?>>());
@@ -149,29 +162,38 @@ public class RemoteObjectSet implements Serializable {
             Reply rep = rro.receiveMessage(r);
             return (URI) rep.getResult().getResult();
         } catch (ProActiveException e) {
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException(
+                "RemoteObjectSet: can't access RemoteObject through " + rro, e);
         } catch (IOException e) {
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException(
+                "RemoteObjectSet: can't access RemoteObject through " + rro, e);
         } catch (ProActiveRuntimeException e) {
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException(
+                "RemoteObjectSet: can't access RemoteObject through " + rro, e);
         } catch (RenegotiateSessionException e) {
             e.printStackTrace();
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException(e);
         }
     }
 
-    private String[] getPARuntimeUrls(RemoteRemoteObject rro) throws NotReliableRemoteRemoteObjectException {
+    /**
+     * Send a non-functional internal request to get the urls of all exposure of the remote ProActiveRuntime 
+     * in order to know which protocols are exposed.
+     */
+    private String[] getPARuntimeUrls(RemoteRemoteObject rro) throws RemoteRemoteObjectException {
         try {
             Request r = new PARuntimeUrlsRequest();
             Reply rep = rro.receiveMessage(r);
             return (String[]) rep.getResult().getResult();
         } catch (ProActiveException e) {
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException("RemoteObjectSet: can't get ProActiveRuntime urls from " +
+                rro, e);
         } catch (IOException e) {
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException("RemoteObjectSet: can't get ProActiveRuntime urls from " +
+                rro, e);
         } catch (RenegotiateSessionException e) {
             e.printStackTrace();
-            throw new NotReliableRemoteRemoteObjectException();
+            throw new RemoteRemoteObjectException(e);
         }
     }
 
@@ -193,10 +215,18 @@ public class RemoteObjectSet implements Serializable {
         }
     }
 
-    private class NotReliableRemoteRemoteObjectException extends Exception {
-    }
+    public class RemoteRemoteObjectException extends Exception {
+        RemoteRemoteObjectException(Exception e) {
+            super(e);
+        }
 
-    public class UnaccessibleRemoteRemoteObjectException extends Exception {
+        RemoteRemoteObjectException(String m) {
+            super(m);
+        }
+
+        RemoteRemoteObjectException(String m, Exception e) {
+            super(m, e);
+        }
     }
 
     public int size() {
@@ -218,19 +248,22 @@ public class RemoteObjectSet implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.updateUnreliable();
-        this.updateOrder();
+        VMID testLocal = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getVMID();
+        if (!vmid.equals(testLocal)) {
+            this.updateUnreliable();
+            this.updateOrder();
+        }
     }
 
     private void updateUnreliable() {
-        if (unreliables.size() != 0){
+        if (unreliables.size() != 0) {
             new Thread(new CheckReliability()).start();
         }
     }
 
     private class CheckReliability implements Runnable {
         public void run() {
-            for (RemoteRemoteObject rro : unreliables){
+            for (RemoteRemoteObject rro : unreliables) {
                 add(rro);
             }
         }
@@ -241,7 +274,13 @@ public class RemoteObjectSet implements Serializable {
     }
 
     private void updateOrder() {
-        order = ProActiveRuntimeImpl.getProActiveRuntime().getProtocolOrder(
-                URIBuilder.getNameFromURI(urls[0]), urls);
+        ProActiveRuntimeImpl.getProActiveRuntime().subscribeAsObserver(this, remoteRuntimeUrls);
+    }
+
+    /**
+     * Notification from a BenchmarkMonitorThread created by the local ProActiveRuntime  
+     */
+    public void update(Observable o, Object arg) {
+        order = (String[]) arg;
     }
 }

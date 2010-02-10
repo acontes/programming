@@ -51,10 +51,10 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
-import org.objectweb.proactive.core.remoteobject.RemoteObjectSet.UnaccessibleRemoteRemoteObjectException;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectSet.RemoteRemoteObjectException;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityContext;
@@ -165,17 +165,12 @@ public class RemoteObjectAdapter implements RemoteObject {
         this.getActiveProtocols(ro);
     }
 
-    public RemoteObjectAdapter(RemoteRemoteObject[] ros) throws ProActiveException {
-        for (RemoteRemoteObject rro : ros) {
-            this.remoteObjectSet.add(rro);
-        }
-    }
-
-    public void AddRemoteRemoteObject(RemoteRemoteObject rro) throws ProActiveException {
+    public void addRemoteRemoteObject(RemoteRemoteObject rro) throws ProActiveException {
         this.remoteObjectSet.add(rro);
+        this.getActiveProtocols(rro);
     }
 
-    public void forceProtocol(String protocol) {
+    public void forceProtocol(String protocol) throws UnknownProtocolException {
         this.remoteObjectSet.forceProtocol(protocol);
     }
 
@@ -186,25 +181,25 @@ public class RemoteObjectAdapter implements RemoteObject {
                 // for each RRO ordered from faster to slower
                 // try to connect
                 return remoteObjectSet.get(i).receiveMessage(message);
-            } catch (UnaccessibleRemoteRemoteObjectException e) {
+            } catch (RemoteRemoteObjectException e) {
                 // try another one
-                LOGGER_RO.warn("unable to contact remote object when calling " + message.getMethodName() +
-                        "with protocol " + remoteObjectSet.getProtocol(i) +
-                        ". Trying an other protocol if available. ");
+                LOGGER_RO.warn("unable to contact remote object when calling method " +
+                    message.getMethodName() + " with protocol " + remoteObjectSet.getProtocol(i) +
+                    ". Trying an other protocol if available. ");
                 continue;
             } catch (EOFException e) {
                 LOGGER_RO.debug("EOFException while calling method " + message.getMethodName());
                 return new SynchronousReplyImpl();
             } catch (ProActiveException e) {
                 // Can be thrown by pamr protocol if server/client is unreachable
-                LOGGER_RO.warn("unable to contact remote object when calling " + message.getMethodName() +
-                        "with protocol " + remoteObjectSet.getProtocol(i) +
-                        ". Trying an other protocol if available. ");
+                LOGGER_RO.warn("unable to contact remote object when calling method " +
+                    message.getMethodName() + " with protocol " + remoteObjectSet.getProtocol(i) +
+                    ". Trying an other protocol if available. ");
                 continue;
             } catch (IOException e) {
                 // Log for keeping a trace
-                LOGGER_RO.warn("unable to contact remote object when calling " + message.getMethodName() +
-                    "with protocol " + remoteObjectSet.getProtocol(i) +
+                LOGGER_RO.warn("unable to contact remote object when calling method " +
+                    message.getMethodName() + " with protocol " + remoteObjectSet.getProtocol(i) +
                     ". Trying an other protocol if available. ");
                 continue;
             }

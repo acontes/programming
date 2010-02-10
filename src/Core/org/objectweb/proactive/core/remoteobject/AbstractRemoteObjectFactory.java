@@ -130,7 +130,6 @@ public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory
      * @throws UnknownProtocolException if the default communication protocol is not known
      */
     public static RemoteObjectFactory getDefaultRemoteObjectFactory() throws UnknownProtocolException {
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
-        return getRemoteObjectFactory(protocol);
+        return getRemoteObjectFactory(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
     }
 }

@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
@@ -64,7 +65,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *         more protocols.
  */
 public class RemoteObjectExposer<T> implements Serializable {
-
     static final Logger LOGGER_RO = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
 
     protected Hashtable<URI, InternalRemoteRemoteObject> activeRemoteRemoteObjects;
@@ -161,11 +161,38 @@ public class RemoteObjectExposer<T> implements Serializable {
         }
     }
 
+    /**
+     * By default, expose remote object with all available protocols specified by the property 
+     * PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+     */
     public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind)
             throws ProActiveException {
+        // Must be created before additionals one in order to avoid an AlreadyBoundException 
+        RemoteRemoteObject ret = createRemoteObject(name, rebind, PAProperties.PA_COMMUNICATION_PROTOCOL
+                .getValue());
+        multiExposeRemoteObject(name, rebind);
+        return ret;
+    }
+
+    /**
+     * Only expose remote object as the specifed protocol
+     * 
+     * @param name
+     *           Specify a remote object name
+     *
+     * @throws ProActiveException
+     */
+    public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind, String protocol)
+            throws ProActiveException {
+        return internalCreateRemoteObject(name, rebind, protocol);
+    }
+
+    private synchronized RemoteRemoteObject internalCreateRemoteObject(String name, boolean rebind,
+            String protocol) throws ProActiveException {
         try {
             // select the factory matching the required protocol
-            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getDefaultRemoteObjectFactory();
+            // here is an implicit check for protocol validity
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
             URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, rof
                     .getProtocolId(), rof.getPort());
             InternalRemoteRemoteObject irro = activeRemoteRemoteObjects.get(uri);
@@ -174,64 +201,49 @@ public class RemoteObjectExposer<T> implements Serializable {
                 irro.setRemoteObjectExposer(this);
                 this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
                 // Expose the remote object using all specified communication protocol
-                if (PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.isSet()) {
-                    for (String protocol : PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue()
-                            .split(";")) {
-                        if (!protocol.isEmpty()) {
-                            try {
-                                // Create and store RRO in hashtable
-                                createRemoteObject(name, false, protocol);
-                                if (LOGGER_RO.isDebugEnabled()) {
-                                    LOGGER_RO.debug("Object expose with additionnal protocol : " + protocol);
-                                }
-                            } catch (AlreadyBoundException abe) {
-                                // Do nothing, here, we try to expose the object with extra protocol,
-                                // error here won't cause trouble
-                            } catch (ProActiveException pae) {
-                                // this protocol throw exception, so we remove it from the candidate list for multi exposure
-                                LOGGER_RO
-                                        .warn("Protocol " + protocol +
-                                            " seems invalid for this runtime, this is not a critical error, the protocol will be dismiss.");
-                                // First position
-                                PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
-                                        .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
-                                                .getValue().replace(protocol + ";", ""));
-                                // Or whatever position except first
-                                PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
-                                        .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
-                                                .getValue().replace(protocol, ""));
-                                // Suppress double occurence of ';'
-                                PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
-                                        .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
-                                                .getValue().replace(";;", ";"));
-                            }
-                        }
-                    }
-                }
             }
             return irro.getRemoteRemoteObject();
-        } catch (Exception e) {
+        } catch (ProActiveException e) {
+            throw new ProActiveException("Failed to create remote object (name=" + name + ")", e);
+        } catch (IOException e) {
             throw new ProActiveException("Failed to create remote object (name=" + name + ")", e);
         }
     }
 
-    public synchronized RemoteRemoteObject createRemoteObject(String name, boolean rebind, String protocol)
-            throws ProActiveException {
-        try {
-            //        select the factory matching the required protocol
-            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
-            URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, protocol, rof
-                    .getPort());
-            InternalRemoteRemoteObject irro = activeRemoteRemoteObjects.get(uri);
-            if (irro == null) {
-                irro = rof.createRemoteObject(this.remoteObject, name, rebind);
-                irro.setRemoteObjectExposer(this);
-                this.activeRemoteRemoteObjects.put(irro.getURI(), irro);
+    private synchronized void multiExposeRemoteObject(String name, boolean rebind) {
+        // Expose the remote object using all specified communication protocol
+        if (PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.isSet()) {
+            for (String protocol : PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue().split(";")) {
+                if (!protocol.isEmpty()) {
+                    try {
+                        // Create and store RRO in hashtable
+                        internalCreateRemoteObject(name, rebind, protocol);
+                        if (LOGGER_RO.isDebugEnabled()) {
+                            LOGGER_RO.debug("Object expose with additionnal protocol : " + protocol);
+                        }
+                    } catch (AlreadyBoundException abe) {
+                        // Do nothing, here, we try to expose the object with extra protocol,
+                        // error here won't cause trouble
+                    } catch (ProActiveException pae) {
+                        // this protocol throw exception, so we remove it from the candidate list for multi exposure
+                        LOGGER_RO
+                                .warn("Protocol " + protocol +
+                                    " seems invalid for this runtime, this is not a critical error, the protocol will be dismiss.");
+                        // First position
+                        PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue()
+                                        .replace(protocol + ";", ""));
+                        // Or whatever position except first
+                        PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue()
+                                        .replace(protocol, ""));
+                        // Suppress double occurence of ';'
+                        PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS
+                                .setValue(PAProperties.PA_COMMUNICATION_ADDITIONAL_PROTOCOLS.getValue()
+                                        .replace(";;", ";"));
+                    }
+                }
             }
-            return irro.getRemoteRemoteObject();
-        } catch (Exception e) {
-            throw new ProActiveException("Failed to create remote object (name=" + name +
-                ") for protocol : " + protocol, e);
         }
     }
 
@@ -286,7 +298,7 @@ public class RemoteObjectExposer<T> implements Serializable {
 
         while (e.hasMoreElements()) {
             URI url = e.nextElement();
-            if (protocol.equals(url.getScheme())) {
+            if (protocol.equalsIgnoreCase(url.getScheme())) {
                 return url.toString();
             }
         }

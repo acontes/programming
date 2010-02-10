@@ -40,12 +40,16 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.mop.MOP;
+import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.mop.Proxy;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
+import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -128,5 +132,36 @@ public class PARemoteObject {
         RemoteRemoteObject rro = roe
                 .createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet(), false);
         return (T) new RemoteObjectAdapter(rro).getObjectProxy();
+    }
+
+    // -----------------------
+    // = Multi-Protocol part =
+    // -----------------------
+    /**
+     * Force usage of a specific protocol to contact an active object.
+     *
+     * @param obj
+     *          Should be a RemoteObject
+     *
+     * @param protocol
+     *          Can be rmi, http, pamr, rmissh, rmissl
+     * @throws UnknownProtocolException 
+     *
+     * @throws IllegalArgumentException
+     *          If obj isn't an RemoteObject
+     */
+    public static void forceProtocol(Object obj, String protocol) throws UnknownProtocolException {
+        if (obj instanceof StubObject) {
+            Proxy proxy = ((StubObject) obj).getProxy();
+            if (proxy instanceof SynchronousProxy) {
+                ((SynchronousProxy) proxy).forceProtocol(protocol);
+            } else {
+                throw new IllegalArgumentException("The object " + obj + " isn't a RemoteObject");
+            }
+        }
+    }
+
+    public static void forceToDefault(Object obj) throws UnknownProtocolException {
+        forceProtocol(obj, PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
     }
 }

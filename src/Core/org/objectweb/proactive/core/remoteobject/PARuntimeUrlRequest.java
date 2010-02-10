@@ -42,11 +42,9 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 
-/**
- *  Get all the urls for contacting a ProActive Runtime 
- */
-public class PARuntimeUrlsRequest extends RemoteObjectRequest {
-    public PARuntimeUrlsRequest() {
+
+public class PARuntimeUrlRequest extends RemoteObjectRequest {
+    public PARuntimeUrlRequest() {
     };
 
     public Object execute(Object unused) {

@@ -45,6 +45,7 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 
 
 /**
@@ -159,7 +160,7 @@ public class SynchronousProxy implements Proxy, Serializable {
         return true;
     }
 
-    public void forceProtocol(String protocol) {
+    public void forceProtocol(String protocol) throws UnknownProtocolException {
         if (this.remoteObject instanceof RemoteObjectAdapter) {
             ((RemoteObjectAdapter) this.remoteObject).forceProtocol(protocol);
         } else {

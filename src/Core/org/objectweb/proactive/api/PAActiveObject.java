@@ -58,9 +58,11 @@ import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.UniversalBodyRemoteObjectAdapter;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
+import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
@@ -72,6 +74,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
+import org.objectweb.proactive.core.remoteobject.SynchronousProxy;
+import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.util.NonFunctionalServices;
@@ -1715,4 +1719,47 @@ public class PAActiveObject {
         UniversalBody body = myBodyProxy.getBody().getRemoteAdapter();
         return body;
     }
+
+    // -----------------------
+    // = Multi-Protocol part =
+    // -----------------------
+
+    /**
+     * Force usage of a specific protocol to contact an active object.
+     *
+     * @param obj
+     *          Could be remote or local parts of the ActiveObject
+     *
+     * @param protocol
+     *          Can be rmi, http, pamr, rmissh, rmissl
+     *
+     * @throws UnknownProtocolException 
+     *
+     * @throws IllegalArgumentException
+     *          If obj isn't an ActiveObject
+     */
+    public static void forceProtocol(Object obj, String protocol) throws UnknownProtocolException {
+        if (!(obj instanceof StubObject)) {
+            throw new IllegalArgumentException("This method must be call on an ActiveObject");
+        }
+
+        UniversalBodyProxy ubp = (UniversalBodyProxy) ((StubObject) obj).getProxy();
+        UniversalBody ub = ubp.getBody();
+        // Object is a stub which point to a remote Body
+        if (ub instanceof UniversalBodyRemoteObjectAdapter) {
+            UniversalBodyRemoteObjectAdapter ubroa = (UniversalBodyRemoteObjectAdapter) ubp.getBody();
+            SynchronousProxy sp = (SynchronousProxy) ((StubObject) ubroa).getProxy();
+            sp.forceProtocol(protocol);
+        } else {
+            // Object is a local body
+            if (ub instanceof Body) {
+                ((AbstractBody) ub).getRemoteObjectExposer().forceProtocol(protocol);
+            }
+        }
+    }
+
+    public static void forceToDefault(Object obj) throws UnknownProtocolException {
+        forceProtocol(obj, PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+    }
+
 }

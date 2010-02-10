@@ -37,7 +37,6 @@ package org.objectweb.proactive.core.remoteobject.http;
 import java.io.IOException;
 import java.net.URI;
 
-import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
@@ -45,8 +44,6 @@ import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
 import org.objectweb.proactive.core.remoteobject.http.message.HTTPRemoteObjectRequest;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class HttpRemoteObjectImpl implements HTTPRemoteObject {
