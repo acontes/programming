@@ -279,7 +279,8 @@ public class UniversalBodyWrapper implements UniversalBody, Runnable {
         return this.wrappedBody.registerByName(name, rebind);
     }
 
-    public String registerByName(String name, boolean rebind, String protocol) throws IOException, ProActiveException {
+    public String registerByName(String name, boolean rebind, String protocol) throws IOException,
+            ProActiveException {
         return this.wrappedBody.registerByName(name, rebind, protocol);
     }
 
