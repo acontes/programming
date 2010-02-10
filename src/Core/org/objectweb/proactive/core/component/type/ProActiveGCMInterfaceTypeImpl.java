@@ -40,6 +40,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.core.component.StreamInterface;
@@ -50,12 +51,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of InterfaceType (@see org.objectweb.fractal.api.type.InterfaceType)
+ * Implementation of {@link ProActiveGCMInterfaceType}.
  *
  * @author The ProActive Team
- *
  */
-public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Serializable {
+public class ProActiveGCMInterfaceTypeImpl implements ProActiveGCMInterfaceType, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -76,7 +76,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     /**
      * Constructor for ProActiveInterfaceTypeImpl.
      */
-    public ProActiveInterfaceTypeImpl() {
+    public ProActiveGCMInterfaceTypeImpl() {
         super();
     }
 
@@ -100,7 +100,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     /**
      * Constructor for ProActiveInterfaceTypeImpl.
      */
-    public ProActiveInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
+    public ProActiveGCMInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
             String cardinality) throws InstantiationException {
         this.name = name;
         this.signature = signature;
@@ -111,7 +111,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         checkMethodSignatures(signature, cardinality);
     }
 
-    public ProActiveInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
+    public ProActiveGCMInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
             String cardinality, boolean isInternal) throws InstantiationException {
         this(name, signature, isClient, isOptional, cardinality);
         this.isInternal = isInternal;
@@ -156,7 +156,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
 
     private void checkMethodCardinalities(String signature, String cardinality) throws InstantiationException {
         try {
-            if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality)) {
+            if (GCMTypeFactory.GATHERCAST_CARDINALITY.equals(cardinality)) {
                 Class<?> c = Class.forName(signature);
                 Method[] methods = c.getMethods();
                 for (Method m : methods) {
@@ -171,7 +171,7 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
                                     signature);
                     }
                 }
-            } else if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
+            } else if (GCMTypeFactory.MULTICAST_CARDINALITY.equals(cardinality)) {
                 Class<?> c = Class.forName(signature);
                 Method[] methods = c.getMethods();
                 for (Method m : methods) {
@@ -222,6 +222,13 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     }
 
     /**
+     * @see org.objectweb.fractal.api.type.InterfaceType#isFcCollectionItf()
+     */
+    public boolean isFcCollectionItf() {
+        return GCMTypeFactory.COLLECTION_CARDINALITY.equals(cardinality);
+    }
+
+    /**
      * @see org.objectweb.fractal.api.type.InterfaceType#isFcOptionalItf()
      */
     public boolean isFcOptionalItf() {
@@ -236,36 +243,33 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
         throw new RuntimeException("Not yet implemented.");
     }
 
-    public boolean isFcStreamItf() {
-        return isStream;
-    }
-
-    public String getFcCardinality() {
+    public String getGCMCardinality() {
         return cardinality;
     }
 
-    public boolean isFcCollective() {
-        return (ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality) || (ProActiveTypeFactory.MULTICAST_CARDINALITY
+    public boolean isGCMSingletonItf() {
+        return GCMTypeFactory.SINGLETON_CARDINALITY.equals(cardinality);
+    }
+
+    public boolean isGCMCollectionItf() {
+        return GCMTypeFactory.COLLECTION_CARDINALITY.equals(cardinality);
+    }
+
+    public boolean isGCMGathercastItf() {
+        return GCMTypeFactory.GATHERCAST_CARDINALITY.equals(cardinality);
+    }
+
+    public boolean isGCMMulticastItf() {
+        return GCMTypeFactory.MULTICAST_CARDINALITY.equals(cardinality);
+    }
+
+    public boolean isGCMCollectiveItf() {
+        return (GCMTypeFactory.GATHERCAST_CARDINALITY.equals(cardinality) || (GCMTypeFactory.MULTICAST_CARDINALITY
                 .equals(cardinality)));
     }
 
-    public boolean isFcGathercastItf() {
-        return ProActiveTypeFactory.GATHER_CARDINALITY.equals(cardinality);
-    }
-
-    public boolean isFcMulticastItf() {
-        return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cardinality);
-    }
-
-    public boolean isFcSingletonItf() {
-        return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(cardinality);
-    }
-
-    /*
-     * @see org.objectweb.fractal.api.type.InterfaceType#isFcCollectionItf()
-     */
-    public boolean isFcCollectionItf() {
-        return ProActiveTypeFactory.COLLECTION_CARDINALITY.equals(cardinality);
+    public boolean isGCMStreamItf() {
+        return isStream;
     }
 
     public boolean isInternal() {
@@ -275,25 +279,25 @@ public class ProActiveInterfaceTypeImpl implements ProActiveInterfaceType, Seria
     @Override
     public int hashCode() {
         return (this.getFcItfName() + this.getFcItfSignature() + this.isFcClientItf() +
-            this.isFcOptionalItf() + this.isFcStreamItf() + this.isFcCollectionItf() +
-            this.isFcGathercastItf() + this.isFcMulticastItf() + this.isFcSingletonItf()).hashCode();
+            this.isFcOptionalItf() + this.isGCMStreamItf() + this.isFcCollectionItf() +
+            this.isGCMGathercastItf() + this.isGCMMulticastItf() + this.isGCMSingletonItf()).hashCode();
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProActiveInterfaceType) {
-            ProActiveInterfaceType itf = (ProActiveInterfaceType) obj;
+        if (obj instanceof ProActiveGCMInterfaceType) {
+            ProActiveGCMInterfaceType itf = (ProActiveGCMInterfaceType) obj;
             return this.getFcItfName().equals(itf.getFcItfName()) &&
                 this.getFcItfSignature().equals(itf.getFcItfSignature()) &&
                 (this.isFcClientItf() == itf.isFcClientItf()) &&
                 (this.isFcOptionalItf() == itf.isFcOptionalItf()) &&
-                (this.isFcStreamItf() == itf.isFcStreamItf()) &&
+                (this.isGCMStreamItf() == itf.isGCMStreamItf()) &&
                 (this.isFcCollectionItf() == itf.isFcCollectionItf()) &&
-                (this.isFcGathercastItf() == itf.isFcGathercastItf()) &&
-                (this.isFcMulticastItf() == itf.isFcMulticastItf()) &&
-                (this.isFcSingletonItf() == itf.isFcSingletonItf()) && this.isInternal() == itf.isInternal();
+                (this.isGCMGathercastItf() == itf.isGCMGathercastItf()) &&
+                (this.isGCMMulticastItf() == itf.isGCMMulticastItf()) &&
+                (this.isGCMSingletonItf() == itf.isGCMSingletonItf()) &&
+                this.isInternal() == itf.isInternal();
         } else
             return false;
     }
-
 }

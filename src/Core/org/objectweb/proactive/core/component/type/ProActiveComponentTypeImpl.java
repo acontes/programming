@@ -38,6 +38,7 @@ package org.objectweb.proactive.core.component.type;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -49,12 +50,11 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of ComponentType (@see org.objectweb.fractal.api.type.ComponentType)
+ * Implementation of {@link ComponentType}.
  *
  * @author The ProActive Team
- *
  */
-public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInterfaceType, Serializable {
+public class ProActiveComponentTypeImpl implements ComponentType, ProActiveGCMInterfaceType, Serializable {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
@@ -172,24 +172,32 @@ public class ProActiveComponentTypeImpl implements ComponentType, ProActiveInter
         return false;
     }
 
-    public boolean isFcStreamItf() {
-        return false;
-    }
-
-    public String getFcCardinality() {
-        return ProActiveTypeFactory.SINGLETON_CARDINALITY;
-    }
-
-    public boolean isFcGathercastItf() {
-        return false;
-    }
-
-    public boolean isFcMulticastItf() {
-        return false;
-    }
-
-    public boolean isFcSingletonItf() {
+    public boolean isGCMSingletonItf() {
         return true;
+    }
+
+    public boolean isGCMCollectionItf() {
+        return false;
+    }
+
+    public String getGCMCardinality() {
+        return GCMTypeFactory.SINGLETON_CARDINALITY;
+    }
+
+    public boolean isGCMGathercastItf() {
+        return false;
+    }
+
+    public boolean isGCMMulticastItf() {
+        return false;
+    }
+
+    public boolean isGCMCollectiveItf() {
+        return false;
+    }
+
+    public boolean isGCMStreamItf() {
+        return false;
     }
 
     public boolean isInternal() {

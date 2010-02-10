@@ -35,46 +35,41 @@
  */
 package org.objectweb.proactive.core.component.type;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.StreamInterface;
 
 
 /**
- * The ProActiveTypeFactory extends the
- * <code>org.objectweb.fractal.api.type.InterfaceType</code> to support the stream and
- * cardinality parameters.
+ * The ProActiveGCMTypeFactory extends the {@link GCMTypeFactory} to support the internal parameter.
  *
- * @see org.objectweb.fractal.api.type.InterfaceType
+ * @author The ProActive Team
+ * @see GCMTypeFactory
  */
 @PublicAPI
-public interface ProActiveInterfaceType extends InterfaceType {
+public interface ProActiveGCMTypeFactory extends GCMTypeFactory {
+    public static final boolean INTERNAL = true;
+    public static final boolean EXTERNAL = false;
 
     /**
-     * Returns true if this interface extends the {@link StreamInterface} interface, false otherwise.
-     * 
-     * @return true if this interface extends the {@link StreamInterface} interface, false otherwise
-     */
-    public boolean isFcStreamItf();
-
-    /**
-     * Returns the cardinality of this interface. The possible cardinalities are :
-     * <ul>
-     *  <li> {@link ProActiveTypeFactory#SINGLETON_CARDINALITY singleton}</li>
-     *  <li> {@link ProActiveTypeFactory#COLLECTION_CARDINALITY collection}</li>
-     *  <li> {@link ProActiveTypeFactory#MULTICAST_CARDINALITY multicast}</li>
-     *  <li> {@link ProActiveTypeFactory#GATHER_CARDINALITY gathercast}</li>
-     *  </ul>
+     * Creates an interface type.
      *
-     * @return the cardinality of the interface
+     * @param name the name of interfaces of this type (see {@link
+     *       InterfaceType#getFcItfName getFcItfName}).
+     * @param signature signatures of the methods of interfaces of this type. In
+     *       Java this "signature" is the fully qualified name of a Java interface
+     *       corresponding to these method signatures.
+     * @param isClient <tt>true</tt> if component interfaces of this type are
+     *      client interfaces.
+     * @param isOptional <tt>true</tt> if component interfaces of this type are
+     *      optional interfaces.
+     * @param cardinality see { @link ProActiveInterfaceType#getFcCardinality() }
+     * for a description of cardinalities
+     * @param isInternal boolean value, indicating whether the interface is internal
+     * @return an interface type initialized with the given values.
+     * @throws InstantiationException if the interface type cannot be created.
      */
-    public String getFcCardinality();
-
-    public boolean isFcSingletonItf();
-
-    public boolean isFcMulticastItf();
-
-    public boolean isFcGathercastItf();
-
-    public boolean isInternal();
+    public InterfaceType createGCMItfType(String name, String signature, boolean isClient,
+            boolean isOptional, String cardinality, boolean isInternal) throws InstantiationException;
 }

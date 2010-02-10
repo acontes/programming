@@ -36,6 +36,7 @@
 package org.objectweb.proactive.core.component.type;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -44,29 +45,26 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of TypeFactory (@see org.objectweb.fractal.api.type.TypeFactory)
- *
- * Implements the Singleton pattern.
+ * Implementation of {@link ProActiveGCMTypeFactory}. Implements the Singleton pattern.
  *
  * @author The ProActive Team
- *
  */
-public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
+public class ProActiveGCMTypeFactoryImpl implements ProActiveGCMTypeFactory {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     // SINGLETON implementation
-    static private ProActiveTypeFactoryImpl instance = null;
+    static private ProActiveGCMTypeFactoryImpl instance = null;
 
     /**
      * Constructor for ProActiveTypeFactoryImpl.
      */
-    private ProActiveTypeFactoryImpl() {
+    private ProActiveGCMTypeFactoryImpl() {
         super();
     }
 
-    static public ProActiveTypeFactoryImpl instance() {
+    static public ProActiveGCMTypeFactoryImpl instance() {
         if (instance == null) {
-            instance = new ProActiveTypeFactoryImpl();
+            instance = new ProActiveGCMTypeFactoryImpl();
         }
 
         return instance;
@@ -77,9 +75,8 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
      */
     public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
             boolean isCollection) throws InstantiationException {
-        return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional,
-            (isCollection ? ProActiveTypeFactory.COLLECTION_CARDINALITY
-                    : ProActiveTypeFactory.SINGLETON_CARDINALITY));
+        return new ProActiveGCMInterfaceTypeImpl(name, signature, isClient, isOptional,
+            (isCollection ? GCMTypeFactory.COLLECTION_CARDINALITY : GCMTypeFactory.SINGLETON_CARDINALITY));
     }
 
     /*
@@ -103,13 +100,14 @@ public class ProActiveTypeFactoryImpl implements ProActiveTypeFactory {
     /*
      * @see org.objectweb.proactive.core.component.type.ProActiveTypeFactory#createFcItfType(java.lang.String, java.lang.String, boolean, boolean, java.lang.String)
      */
-    public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
-            String cardinality) throws InstantiationException {
-        return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality);
+    public InterfaceType createGCMItfType(String name, String signature, boolean isClient,
+            boolean isOptional, String cardinality) throws InstantiationException {
+        return new ProActiveGCMInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality);
     }
 
-    public InterfaceType createFcItfType(String name, String signature, boolean isClient, boolean isOptional,
-            String cardinality, boolean isInternal) throws InstantiationException {
-        return new ProActiveInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality, isInternal);
+    public InterfaceType createGCMItfType(String name, String signature, boolean isClient,
+            boolean isOptional, String cardinality, boolean isInternal) throws InstantiationException {
+        return new ProActiveGCMInterfaceTypeImpl(name, signature, isClient, isOptional, cardinality,
+            isInternal);
     }
 }
