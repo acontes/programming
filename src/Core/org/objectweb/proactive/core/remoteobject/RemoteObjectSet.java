@@ -1,12 +1,13 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of
- *                         Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,7 +24,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2.
+ * If needed, contact us to obtain a release under GPL Version 2
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -119,8 +121,6 @@ public class RemoteObjectSet implements Serializable {
      * @param i Index are used like in Arrays
      *          0 represent the first object
      *          
-     * @return Never return null, if there is no order, or no available RemoteRemoteObject 
-     * in the specified protocol order list, return the default protocol associated, RemoteRemoteObject 
      * @throws UnaccessibleRemoteRemoteObjectException
      */
     public RemoteRemoteObject get(int i) throws UnaccessibleRemoteRemoteObjectException {
@@ -218,7 +218,22 @@ public class RemoteObjectSet implements Serializable {
      */
     private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
+        this.updateUnreliable();
         this.updateOrder();
+    }
+
+    private void updateUnreliable() {
+        if (unreliables.size() != 0){
+            new Thread(new CheckReliability()).start();
+        }
+    }
+
+    private class CheckReliability implements Runnable {
+        public void run() {
+            for (RemoteRemoteObject rro : unreliables){
+                add(rro);
+            }
+        }
     }
 
     private void writeObject(ObjectOutputStream out) throws IOException {

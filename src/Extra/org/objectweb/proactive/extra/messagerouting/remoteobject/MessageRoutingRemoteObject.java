@@ -81,7 +81,6 @@ public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializa
     }
 
     public Reply receiveMessage(Request message) throws ProActiveException {
-
         MessageRoutingRemoteObjectRequest req = new MessageRoutingRemoteObjectRequest(message,
             this.remoteObjectURL, getAgent());
         req.send();

@@ -1,12 +1,13 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of 
- * 						   Nice-Sophia Antipolis/ActiveEon
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -23,7 +24,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2. 
+ * If needed, contact us to obtain a release under GPL Version 2
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -397,8 +399,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
         // hierarchical search or not, look if we know the pad
         if (pad != null) {
-            // if pad found and hierarchy search return pad with no mainrmi://tagada.activeeon.com:2016/PA_JVM344364580
-
+            // if pad found and hierarchy search return pad with no main
             if (isHierarchicalSearch) {
                 return RefactorPAD.buildNoMainPAD(pad);
             } else {
