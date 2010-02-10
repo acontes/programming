@@ -35,11 +35,6 @@
  */
 package org.objectweb.proactive.core.component.representative;
 
-import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.api.control.NameController;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.ControllerDescription;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.TypeVariable;
@@ -55,13 +50,18 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
+import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
@@ -70,7 +70,7 @@ import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGe
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -152,7 +152,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
     }
 
     private boolean specialCasesForNfType(Class<?> controllerItf, boolean isPrimitive,
-            ProActiveInterfaceType itfType, ComponentParameters componentParam) throws Exception {
+            ProActiveGCMInterfaceType itfType, ComponentParameters componentParam) throws Exception {
         if (ContentController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) {
             if (isPrimitive) {
@@ -192,22 +192,22 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
 
-        ProActiveInterfaceType itfType = (ProActiveInterfaceType) type_factory
+        ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) type_factory
                 .createFcItfType(
                         Constants.LIFECYCLE_CONTROLLER,
-                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
+                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
         Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
-                itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
+                itfType.getFcItfName(), this, itfType, itfType.isInternal(), false);
 
         nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
 
-        itfType = (ProActiveInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
+        itfType = (ProActiveGCMInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
         /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
                 TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
 
         interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
-                itfType.getFcItfName(), this, (ProActiveInterfaceType) itfType, itfType.isInternal(), false);
+                itfType.getFcItfName(), this, itfType, itfType.isInternal(), false);
 
         nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
     }
@@ -215,7 +215,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
     private void addControllers(ComponentType nfType, ComponentParameters params) {
         nfInterfaceReferences = new HashMap<String, Interface>();
         InterfaceType[] tmp = nfType.getFcInterfaceTypes();
-        ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
+        ProActiveGCMInterfaceType[] interface_types = new ProActiveGCMInterfaceType[tmp.length];
         System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
         Class<?> controllerItf = null;
 
@@ -229,8 +229,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                         // itfs members of collection itfs are dynamically generated
                         Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                                 .generateInterface(interface_types[j].getFcItfName(), this,
-                                        (ProActiveInterfaceType) interface_types[j],
-                                        interface_types[j].isInternal(), false);
+                                        interface_types[j], interface_types[j].isInternal(), false);
 
                         // all calls are to be reified
                         nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
@@ -258,7 +257,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                     // itfs members of collection itfs are dynamically generated
                     Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                             .generateFunctionalInterface(interface_types[j].getFcItfName(), this,
-                                    (ProActiveInterfaceType) interface_types[j]);
+                                    (ProActiveGCMInterfaceType) interface_types[j]);
 
                     // all calls are to be reified
                     if (interface_reference != null) {
@@ -312,7 +311,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                         .newInstance(new Object[] { this });
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
                         .generateControllerInterface(currentController.getFcItfName(), this,
-                                (ProActiveInterfaceType) currentController.getFcItfType());
+                                (ProActiveGCMInterfaceType) currentController.getFcItfType());
                 ((StubObject) currentInterface).setProxy(proxy);
 
             } catch (Exception e) {
@@ -403,7 +402,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                     // generate the corresponding interface locally
                     Interface interface_reference = RepresentativeInterfaceClassGenerator.instance()
                             .generateFunctionalInterface(interfaceName, this,
-                                    (ProActiveInterfaceType) itfType);
+                                    (ProActiveGCMInterfaceType) itfType);
 
                     ((StubObject) interface_reference).setProxy(proxy);
                     // keep it in the list of functional interfaces

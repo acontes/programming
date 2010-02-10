@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -56,7 +56,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is the parent of classes for generating component interfaces. It provides utility methods that are used in subclasses.
  *
  * @author The ProActive Team
- *
  */
 public abstract class AbstractInterfaceClassGenerator {
     protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS);
@@ -68,17 +67,19 @@ public abstract class AbstractInterfaceClassGenerator {
     }
 
     public ProActiveInterface generateControllerInterface(final String controllerInterfaceName,
-            Component owner, ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+            Component owner, ProActiveGCMInterfaceType interfaceType)
+            throws InterfaceGenerationFailedException {
         return generateInterface(controllerInterfaceName, owner, interfaceType, false, false);
     }
 
     public ProActiveInterface generateFunctionalInterface(final String functionalInterfaceName,
-            Component owner, ProActiveInterfaceType interfaceType) throws InterfaceGenerationFailedException {
+            Component owner, ProActiveGCMInterfaceType interfaceType)
+            throws InterfaceGenerationFailedException {
         return generateInterface(functionalInterfaceName, owner, interfaceType, false, true);
     }
 
     public abstract ProActiveInterface generateInterface(final String interfaceName, Component owner,
-            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException;
 
     /**

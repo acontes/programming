@@ -35,13 +35,6 @@
  */
 package org.objectweb.proactive.core.component.identity;
 
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
-import org.objectweb.proactive.core.component.controller.ControllerState;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -58,11 +51,16 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.ContentController;
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.migration.MigrationException;
@@ -74,15 +72,21 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
-import org.objectweb.proactive.core.component.controller.MembraneController;
+import org.objectweb.proactive.core.component.controller.ControllerState;
+import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
 import org.objectweb.proactive.core.component.controller.ProActiveController;
+import org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController;
+import org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleControllerImpl;
+import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
+import org.objectweb.proactive.core.component.controller.ProActiveMembraneControllerImpl;
+import org.objectweb.proactive.core.component.controller.ProActiveNameController;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
@@ -138,14 +142,14 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         ControllerDescription ctrlDesc = componentParameters.getControllerDescription();
 
         // 2. control interfaces
-        if (nfType != null) { /*The nf type is specified*/
-            if (!ctrlDesc.configFileIsSpecified()) { /*There is no file containing the nf configuration*/
+        if (nfType != null) { // The nf type is specified
+            if (!ctrlDesc.configFileIsSpecified()) { // There is no file containing the nf configuration
                 generateNfType(nfType, component_is_primitive);
-            } else { /*The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file*/
+            } else { // The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file
                 checkCompatibility();
                 addControllers(component_is_primitive);
             }
-        } else { /*No NFTYpe, means that it has to be generated from the config file*/
+        } else { // No NFTYpe, means that it has to be generated from the config file
             addControllers(component_is_primitive);
         }
 
@@ -170,26 +174,21 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     }
 
     private void addMandatoryControllers(Vector<InterfaceType> nftype) throws Exception {
-        Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
+        Component boot = Fractal.getBootstrapComponent(); // Getting the Fractal-Proactive bootstrap component
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
 
-        ProActiveInterfaceType itfType = (ProActiveInterfaceType) type_factory
-                .createFcItfType(
-                        Constants.LIFECYCLE_CONTROLLER,
-                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveLifeCycleController.class
-                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        ProActiveInterface controller = createController(
-                itfType,
-                Class
-                        .forName("org.objectweb.proactive.core.component.controller.ProActiveLifeCycleControllerImpl"));
+        ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) type_factory.createFcItfType(
+                Constants.LIFECYCLE_CONTROLLER,
+                /* LIFECYCLE CONTROLLER */ProActiveGCMLifeCycleController.class.getName(),
+                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        ProActiveInterface controller = createController(itfType, ProActiveGCMLifeCycleControllerImpl.class);
         controlItfs.put(controller.getFcItfName(), controller);
         nftype.add((InterfaceType) controller.getFcItfType());
 
-        itfType = (ProActiveInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
-        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
-                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        controller = createController(itfType, Class
-                .forName("org.objectweb.proactive.core.component.controller.ProActiveNameController"));
+        itfType = (ProActiveGCMInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
+        /* NAME CONTROLLER */NameController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                TypeFactory.SINGLE);
+        controller = createController(itfType, ProActiveNameController.class);
         ((NameController) controller).setFcName(componentParameters.getName());
         controlItfs.put(controller.getFcItfName(), controller);
         nftype.add((InterfaceType) controller.getFcItfType());
@@ -197,7 +196,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
     private void generateNfType(ComponentType nfType, boolean isPrimitive) {
         InterfaceType[] tmp = nfType.getFcInterfaceTypes();
-        ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
+        ProActiveGCMInterfaceType[] interface_types = new ProActiveGCMInterfaceType[tmp.length];
         System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
         ProActiveInterface itf_ref = null;
         Class<?> controllerItf = null;
@@ -206,7 +205,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             Vector<InterfaceType> nftype = new Vector<InterfaceType>();
             addMandatoryControllers(nftype);
             for (int i = 0; i < interface_types.length; i++) {
-                /*Component parameters and name controller have to be managed when the controller is actually added*/
+                // Component parameters and name controller have to be managed when the controller is actually added
                 controllerItf = Class.forName(interface_types[i].getFcItfSignature());
 
                 if (!specialCasesForNfType(controllerItf, isPrimitive, interface_types[i],
@@ -215,7 +214,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                         // members of collection itfs are created dynamically
                         continue;
                     }
-                    if (interface_types[i].isFcMulticastItf() && interface_types[i].isFcClientItf()) {//TODO : This piece of code has to be tested
+                    if (interface_types[i].isGCMMulticastItf() && interface_types[i].isFcClientItf()) {//TODO : This piece of code has to be tested
                         itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
                     } else {
                         itf_ref = MetaObjectInterfaceClassGenerator.instance().generateInterface(
@@ -248,13 +247,12 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     }
 
     private boolean specialCasesForNfType(Class<?> controllerItf, boolean isPrimitive,
-            ProActiveInterfaceType itfType, ComponentParameters componentParam, Vector<InterfaceType> nftype)
-            throws Exception {
+            ProActiveGCMInterfaceType itfType, ComponentParameters componentParam,
+            Vector<InterfaceType> nftype) throws Exception {
 
-        if (MembraneController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+        if (ProActiveMembraneController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) {
-            ProActiveInterface controller = createController(itfType, Class
-                    .forName("org.objectweb.proactive.core.component.controller.MembraneControllerImpl"));
+            ProActiveInterface controller = createController(itfType, ProActiveMembraneControllerImpl.class);
             controlItfs.put(controller.getFcItfName(), controller);
             nftype.add((InterfaceType) controller.getFcItfType());
             return true; // The membrane controller is a very special case. As soon as the interface is included inside the non-functional type, 
@@ -285,18 +283,18 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         }
 
         if (NameController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
-            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            !itfType.isInternal()) { /* Mandatory controller, we don't have to recreate it */
             return true;
         }
 
         if (LifeCycleController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
-            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            !itfType.isInternal()) { /* Mandatory controller, we don't have to recreate it */
             return true;
         }
         return false;
     }
 
-    private ProActiveInterface createController(ProActiveInterfaceType itfType, Class<?> controllerClass)
+    private ProActiveInterface createController(ProActiveGCMInterfaceType itfType, Class<?> controllerClass)
             throws Exception {
         ProActiveInterface itfToReturn = null;
         AbstractProActiveController currentController = null;
@@ -310,7 +308,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         return itfToReturn;
     }
 
-    private void checkCompatibility() { /*TODO : This method is called when a nfType is given with a config file. It has to check that both correspond*/
+    private void checkCompatibility() { // TODO : This method is called when a nfType is given with a config file. It has to check that both correspond
     }
 
     /**
@@ -319,7 +317,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
      */
     private void addFunctionalInterfaces(boolean component_is_primitive) {
         InterfaceType[] tmp = componentParameters.getComponentType().getFcInterfaceTypes();
-        ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
+        ProActiveGCMInterfaceType[] interface_types = new ProActiveGCMInterfaceType[tmp.length];
         System.arraycopy(tmp, 0, interface_types, 0, tmp.length);
 
         try {
@@ -330,7 +328,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                     // members of collection itfs are created dynamically
                     continue;
                 }
-                if (interface_types[i].isFcMulticastItf()) {
+                if (interface_types[i].isGCMMulticastItf()) {
                     itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
                 } else {
                     // no interface generated for client itfs of primitive
@@ -426,8 +424,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                         .getConstructor(new Class[] { Component.class });
                 currentController = (AbstractProActiveController) controllerClassConstructor
                         .newInstance(new Object[] { this });
-                theController = createController((ProActiveInterfaceType) currentController.getFcItfType(),
-                        controllerClass);
+                theController = createController(
+                        (ProActiveGCMInterfaceType) currentController.getFcItfType(), controllerClass);
 
                 // add interceptor
                 if (InputInterceptor.class.isAssignableFrom(controllerClass)) {
@@ -509,7 +507,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
     // returns a generated interface reference, whose impl field is a group
     // It is able to handle multiple bindings
-    private ProActiveInterface createInterfaceOnGroupOfDelegatees(ProActiveInterfaceType itfType)
+    private ProActiveInterface createInterfaceOnGroupOfDelegatees(ProActiveGCMInterfaceType itfType)
             throws Exception {
         ProActiveInterface itf_ref = MetaObjectInterfaceClassGenerator.instance()
                 .generateFunctionalInterface(itfType.getFcItfName(), this, itfType);
@@ -555,7 +553,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                         try {
                             Interface clientItf = MetaObjectInterfaceClassGenerator.instance()
                                     .generateFunctionalInterface(interfaceName, this,
-                                            (ProActiveInterfaceType) itfTypes[i]);
+                                            (ProActiveGCMInterfaceType) itfTypes[i]);
                             collectionItfsMembers.put(interfaceName, clientItf);
                             return clientItf;
                         } catch (InterfaceGenerationFailedException e1) {
@@ -678,7 +676,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
         } else {
             Class<?> controllerClass = Class.forName((String) classToCreate);
 
-            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) itf_ref.getFcItfType();
+            ProActiveGCMInterfaceType itf_type = (ProActiveGCMInterfaceType) itf_ref.getFcItfType();
             Class<?> interfaceClass = Class.forName(itf_type.getFcItfSignature());
             if (interfaceClass.isAssignableFrom(controllerClass)) { //Check that the class implements the specified interface
                 ProActiveInterface controller = createController(itf_type, controllerClass);
@@ -712,7 +710,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 }
 
                 controlItfs.put(controller.getFcItfName(), controller);
-            } else { /*The controller class does not implement the specified interface*/
+            } else { /* The controller class does not implement the specified interface */
                 throw new IllegalBindingException("The class " + classToCreate + " does not implement the " +
                     itf_type.getFcItfSignature() + " interface");
             }
@@ -758,9 +756,10 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     }
 
     public void migrateControllersDependentActiveObjectsTo(Node node) throws MigrationException {
-        /* for (ProActiveController controller : controlItfs.values()) {
-             controller.migrateDependentActiveObjectsTo(node);
-         }*/
+        /*
+         * for (ProActiveController controller : controlItfs.values()) {
+         * controller.migrateDependentActiveObjectsTo(node); }
+         */
         for (Interface controller : controlItfs.values()) {
             Object c = ((ProActiveInterface) controller).getFcItfImpl();
             if (c instanceof ProActiveController) { // Object Controller
@@ -785,5 +784,4 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     public void setImmediateServices() {
         PAActiveObject.setImmediateService("getComponentParameters");
     }
-
 }

@@ -37,13 +37,13 @@ package org.objectweb.proactive.core.component.adl.types;
 
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeErrors;
 import org.objectweb.fractal.adl.types.TypeInterface;
 import org.objectweb.fractal.adl.types.TypeLoader;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
@@ -86,9 +86,10 @@ public class ProActiveTypeLoader extends TypeLoader {
 
                 String cardinality = ((TypeInterface) itf).getCardinality();
                 if (cardinality != null) {
-                    if (!cardinality.equals("singleton") && !cardinality.equals("collection") &&
-                        !cardinality.equals(ProActiveTypeFactory.MULTICAST_CARDINALITY) &&
-                        !cardinality.equals(ProActiveTypeFactory.GATHER_CARDINALITY)) {
+                    if (!GCMTypeFactory.SINGLETON_CARDINALITY.equals(cardinality) &&
+                        !GCMTypeFactory.COLLECTION_CARDINALITY.equals(cardinality) &&
+                        !GCMTypeFactory.MULTICAST_CARDINALITY.equals(cardinality) &&
+                        !GCMTypeFactory.GATHERCAST_CARDINALITY.equals(cardinality)) {
                         throw new ADLException(TypeErrors.INVALID_CARDINALITY, itf, cardinality);
                     }
                 }

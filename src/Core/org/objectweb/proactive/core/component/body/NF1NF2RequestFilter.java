@@ -35,10 +35,11 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import org.etsi.uri.gcm.api.control.PriorityController;
+import org.etsi.uri.gcm.api.control.PriorityController.RequestPriority;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.component.controller.PriorityController;
-import org.objectweb.proactive.core.component.controller.PriorityController.RequestPriority;
 
 
 /**
@@ -46,7 +47,6 @@ import org.objectweb.proactive.core.component.controller.PriorityController.Requ
  * (experimental)
  *
  * @author The ProActive Team
- *
  */
 public class NF1NF2RequestFilter implements RequestFilter {
     PriorityController pc = null;
@@ -59,9 +59,15 @@ public class NF1NF2RequestFilter implements RequestFilter {
     }
 
     public boolean acceptRequest(Request request) {
-        if (nfRequestFilter.acceptRequest(request) ||
-            pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF2)) {
-            return true;
+        try {
+            if (nfRequestFilter.acceptRequest(request) ||
+                pc.getGCMPriority(null, request.getMethodName(), null).equals(RequestPriority.NF2)) {
+                return true;
+            }
+        } catch (NoSuchMethodException e) {
+            // ignore
+        } catch (NoSuchInterfaceException e) {
+            // ignore
         }
         return false;
     }

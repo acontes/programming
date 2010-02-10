@@ -112,13 +112,13 @@ public class ActiveBody extends ComponentBodyImpl implements Runnable, java.io.S
         // TODO_M read some flag before doing this?
         if (getProActiveComponentImpl() != null) {
             try {
-                getProActiveComponentImpl().getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                getProActiveComponentImpl().getFcInterface(Constants.PRIORITY_CONTROLLER);
                 getProActiveComponentImpl().getFcInterface(Constants.MEMBRANE_CONTROLLER);
                 activity = new ComponentMembraneActivityPriority(activity, reifiedObject);
 
             } catch (NoSuchInterfaceException e) {
                 try {
-                    getProActiveComponentImpl().getFcInterface(Constants.REQUEST_PRIORITY_CONTROLLER);
+                    getProActiveComponentImpl().getFcInterface(Constants.PRIORITY_CONTROLLER);
                     activity = new ComponentActivityPriority(activity, reifiedObject);
                 } catch (NoSuchInterfaceException priorityExc) {
                     activity = new ComponentActivity(activity, reifiedObject);

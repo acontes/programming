@@ -47,12 +47,10 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
-import org.objectweb.proactive.core.component.group.ProxyForComponentGroup;
-import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
 import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentativeImpl;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfProxyObjectFailedException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -82,7 +80,7 @@ public class ProActiveComponentGroup {
      * @throws ClassNotFoundException
      * @throws ClassNotReifiableException
      */
-    public static ProActiveInterface newComponentInterfaceGroup(ProActiveInterfaceType interfaceType,
+    public static ProActiveInterface newComponentInterfaceGroup(ProActiveGCMInterfaceType interfaceType,
             Component owner) throws ClassNotFoundException, ClassNotReifiableException {
         try {
             Object result = MOP.newInstance(ProActiveInterfaceImpl.class.getName(), null, null,

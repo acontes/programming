@@ -39,20 +39,20 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Iterator;
 
+import org.etsi.uri.gcm.api.type.GCMInterfaceType;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 
 
 /**
  * Utility methods
  *
  * @author The ProActive Team
- *
  */
 public class Utils {
 
@@ -75,8 +75,8 @@ public class Utils {
     public static boolean hasSingleCardinality(String itfName, Component owner) {
         Iterator<Interface> it = Arrays.<Interface> asList((Interface[]) owner.getFcInterfaces()).iterator();
         while (it.hasNext()) {
-            ProActiveInterfaceType itfType = (ProActiveInterfaceType) it.next().getFcItfType();
-            if (itfType.getFcItfName().equals(itfName) && itfType.isFcSingletonItf()) {
+            ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) it.next().getFcItfType();
+            if (itfType.getFcItfName().equals(itfName) && itfType.isGCMSingletonItf()) {
                 return true;
             }
         }
@@ -85,7 +85,7 @@ public class Utils {
 
     public static boolean isMulticastItf(String itfName, Component owner) {
         try {
-            return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(getCardinality(itfName, owner));
+            return GCMTypeFactory.MULTICAST_CARDINALITY.equals(getCardinality(itfName, owner));
         } catch (NoSuchInterfaceException e) {
             return false;
         }
@@ -95,12 +95,12 @@ public class Utils {
         if (!(itf instanceof ProActiveInterface)) {
             return false;
         }
-        return ((ProActiveInterfaceType) itf.getFcItfType()).isFcGathercastItf();
+        return ((GCMInterfaceType) itf.getFcItfType()).isGCMGathercastItf();
     }
 
     public static boolean isSingletonItf(String itfName, Component owner) {
         try {
-            return ProActiveTypeFactory.SINGLETON_CARDINALITY.equals(getCardinality(itfName, owner));
+            return GCMTypeFactory.SINGLETON_CARDINALITY.equals(getCardinality(itfName, owner));
         } catch (NoSuchInterfaceException e) {
             return false;
         }
@@ -111,7 +111,7 @@ public class Utils {
 
         for (InterfaceType type : itfTypes) {
             if (type.getFcItfName().equals(itfName)) {
-                return ((ProActiveInterfaceType) type).getFcCardinality();
+                return ((GCMInterfaceType) type).getGCMCardinality();
             }
         }
         throw new NoSuchInterfaceException(itfName);

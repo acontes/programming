@@ -35,6 +35,7 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import org.etsi.uri.gcm.api.control.PriorityController;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
@@ -43,14 +44,13 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.controller.MembraneController;
-import org.objectweb.proactive.core.component.controller.PriorityController;
+import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
 
 
 /**
  * The class for the activity of a component having the membrane and the priority controller inside its membrane
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class ComponentMembraneActivityPriority extends ComponentActivityPriority {
 
@@ -93,15 +93,14 @@ public class ComponentMembraneActivityPriority extends ComponentActivityPriority
                      * While the membrane is stopped, serve calls only on the Membrane Controller
                      */
                     while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
-                            .getMembraneState().equals(MembraneController.MEMBRANE_STOPPED)) {
+                            .getMembraneState().equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
                         componentService.blockingServeOldest(memRequestFilter);
                     }
 
                     while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
                             componentBody.getProActiveComponentImpl()).getFcState())) {
                         PriorityController pc = (PriorityController) componentBody
-                                .getProActiveComponentImpl().getFcInterface(
-                                        Constants.REQUEST_PRIORITY_CONTROLLER);
+                                .getProActiveComponentImpl().getFcInterface(Constants.PRIORITY_CONTROLLER);
                         NF3RequestFilter nf3RequestFilter = new NF3RequestFilter(pc);
                         if (componentService.getOldest(nf3RequestFilter) != null) {
                             // NF3 bypass all other request 
@@ -139,13 +138,13 @@ public class ComponentMembraneActivityPriority extends ComponentActivityPriority
                     }
 
                     /*
-                     * While the membrane is started, serve non-functional calls with priority (the same as for Lifecycle Stopped)
+                     * While the membrane is started, serve non-functional calls with priority (the
+                     * same as for Lifecycle Stopped)
                      */
                     while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
-                            .getMembraneState().equals(MembraneController.MEMBRANE_STARTED)) {
+                            .getMembraneState().equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
                         PriorityController pc = (PriorityController) componentBody
-                                .getProActiveComponentImpl().getFcInterface(
-                                        Constants.REQUEST_PRIORITY_CONTROLLER);
+                                .getProActiveComponentImpl().getFcInterface(Constants.PRIORITY_CONTROLLER);
                         NF3RequestFilter nf3RequestFilter = new NF3RequestFilter(pc);
                         if (componentService.getOldest(nf3RequestFilter) != null) {
                             // NF3 bypass all other request 

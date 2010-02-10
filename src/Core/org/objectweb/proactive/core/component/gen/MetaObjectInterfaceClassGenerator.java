@@ -56,7 +56,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ClassDataCache;
@@ -78,7 +78,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * - For a parallel component, the impl field will be a group of component representatives.<br>
  *
  *  @author The ProActive Team
- *
  */
 public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGenerator {
     protected static final String IMPL_FIELD_NAME = "impl"; //delegatee
@@ -97,7 +96,7 @@ public class MetaObjectInterfaceClassGenerator extends AbstractInterfaceClassGen
 
     @Override
     public ProActiveInterface generateInterface(final String interfaceName, Component owner,
-            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException {
         try {
             if (ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS).isDebugEnabled()) {

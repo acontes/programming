@@ -35,10 +35,11 @@
  */
 package org.objectweb.proactive.core.component.body;
 
+import org.etsi.uri.gcm.api.control.PriorityController;
+import org.etsi.uri.gcm.api.control.PriorityController.RequestPriority;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.component.controller.PriorityController;
-import org.objectweb.proactive.core.component.controller.PriorityController.RequestPriority;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 
 
@@ -47,7 +48,6 @@ import org.objectweb.proactive.core.component.request.ComponentRequest;
  * (experimental)
  *
  * @author The ProActive Team
- *
  */
 public class NF1RequestFilter implements RequestFilter {
     private PriorityController pc;
@@ -58,9 +58,18 @@ public class NF1RequestFilter implements RequestFilter {
 
     public boolean acceptRequest(Request request) {
         if (request instanceof ComponentRequest) {
-            return ((ComponentRequest) request).isControllerRequest() &&
-                !pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF2) &&
-                !pc.getPriority(null, request.getMethodName(), null).equals(RequestPriority.NF3);
+            try {
+                return ((ComponentRequest) request).isControllerRequest() &&
+                    !pc.getGCMPriority(null, request.getMethodName(), null).equals(RequestPriority.NF2) &&
+                    !pc.getGCMPriority(null, request.getMethodName(), null).equals(RequestPriority.NF3);
+            } catch (NoSuchInterfaceException e) {
+                // ignore
+                return false;
+            } catch (NoSuchMethodException e) {
+                // ignore
+                return false;
+            }
+
         } else {
             // standard requests cannot be component controller requests
             return false;

@@ -57,7 +57,7 @@ import org.objectweb.proactive.core.component.ItfStubObject;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ClassDataCache;
@@ -67,9 +67,7 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  * This class generates output interceptors for intercepting outgoing functional invocations.
  * We could also use a dynamic proxy, but the current way keeps homogeneity with other generators for ProActive components.
  *
- *
  * @author The ProActive Team
- *
  */
 public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGenerator {
     List<?> outputInterceptors;
@@ -87,14 +85,14 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
             throws InterfaceGenerationFailedException {
         this.outputInterceptors = outputInterceptors;
         ProActiveInterface generated = generateInterface(representative.getFcItfName(), representative
-                .getFcItfOwner(), (ProActiveInterfaceType) representative.getFcItfType(), false, true);
+                .getFcItfOwner(), (ProActiveGCMInterfaceType) representative.getFcItfType(), false, true);
         ((StubObject) generated).setProxy(((StubObject) representative).getProxy());
         return generated;
     }
 
     @Override
     public ProActiveInterface generateInterface(final String interfaceName, Component owner,
-            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException {
         try {
             String representativeClassName = org.objectweb.proactive.core.component.gen.Utils

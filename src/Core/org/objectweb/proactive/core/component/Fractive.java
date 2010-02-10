@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.control.GathercastController;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -70,12 +71,11 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.controller.GathercastController;
-import org.objectweb.proactive.core.component.controller.MembraneController;
-import org.objectweb.proactive.core.component.controller.MigrationController;
-import org.objectweb.proactive.core.component.controller.MulticastController;
 import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
 import org.objectweb.proactive.core.component.controller.ProActiveContentController;
+import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
+import org.objectweb.proactive.core.component.controller.ProActiveMigrationController;
+import org.objectweb.proactive.core.component.controller.ProActiveMulticastController;
 import org.objectweb.proactive.core.component.exceptions.InstantiationExceptionListException;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
@@ -83,8 +83,8 @@ import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -109,7 +109,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @PublicAPI
 public class Fractive implements ProActiveGenericFactory, Component, Factory {
     private static Fractive instance = null;
-    private TypeFactory typeFactory = ProActiveTypeFactoryImpl.instance();
+    private TypeFactory typeFactory = ProActiveGCMTypeFactoryImpl.instance();
     private Type type = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
@@ -138,17 +138,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.MulticastController MulticastController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveMulticastController MulticastController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.MulticastController MulticastController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveMulticastController MulticastController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static MulticastController getMulticastController(final Component component)
+    public static ProActiveMulticastController getMulticastController(final Component component)
             throws NoSuchInterfaceException {
-        return (MulticastController) component.getFcInterface(Constants.MULTICAST_CONTROLLER);
+        return (ProActiveMulticastController) component.getFcInterface(Constants.MULTICAST_CONTROLLER);
     }
 
     /**
@@ -160,29 +160,29 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static ProActiveContentController getProActiveContentController(final Component component)
+    public static ProActiveContentController getContentController(final Component component)
             throws NoSuchInterfaceException {
         return (ProActiveContentController) component.getFcInterface(Constants.CONTENT_CONTROLLER);
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.MembraneController MembraneController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveMembraneController MembraneController}
      * interface of the given component.
      * @param component omponent a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.MembraneController MembraneController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveMembraneController MembraneController}
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static MembraneController getMembraneController(final Component component)
+    public static ProActiveMembraneController getMembraneController(final Component component)
             throws NoSuchInterfaceException {
-        return (MembraneController) component.getFcInterface(Constants.MEMBRANE_CONTROLLER);
+        return (ProActiveMembraneController) component.getFcInterface(Constants.MEMBRANE_CONTROLLER);
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.GathercastController GatherController}
+     * Returns the {@link org.etsi.uri.gcm.api.control.GathercastController GatherController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.GathercastController GatherController}
+     * @return the {@link org.etsi.uri.gcm.api.control.GathercastController GatherController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
@@ -192,17 +192,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.MigrationController MigrationController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveMigrationController MigrationController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.MigrationController MigrationController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveMigrationController MigrationController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static MigrationController getMigrationController(final Component component)
+    public static ProActiveMigrationController getMigrationController(final Component component)
             throws NoSuchInterfaceException {
-        return (MigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
+        return (ProActiveMigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
     }
 
     /**
@@ -218,9 +218,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature,
             Component owner) throws ProActiveRuntimeException {
         try {
-            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
-                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.COLLECTION);
+            ProActiveGCMInterfaceType itf_type = (ProActiveGCMInterfaceType) ProActiveGCMTypeFactoryImpl
+                    .instance().createFcItfType(itfName, itfSignature, TypeFactory.CLIENT,
+                            TypeFactory.MANDATORY, TypeFactory.COLLECTION);
             ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
                     owner);
             return itf_ref_group;

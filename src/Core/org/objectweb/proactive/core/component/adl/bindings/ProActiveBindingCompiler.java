@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingBuilder;
@@ -56,7 +57,6 @@ import org.objectweb.fractal.task.core.TaskMap;
 import org.objectweb.fractal.task.core.TaskMap.TaskHole;
 import org.objectweb.fractal.task.deployment.api.InstanceProviderTask;
 import org.objectweb.fractal.task.deployment.lib.AbstractRequireInstanceProviderTask;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 public class ProActiveBindingCompiler extends BindingCompiler {
@@ -120,7 +120,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
                         for (int j = 0; j < itfs.length; j++) {
                             TypeInterface itf = (TypeInterface) itfs[j];
                             if (clientItf.equals(itf.getName())) {
-                                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(itf.getCardinality())) {
+                                if (GCMTypeFactory.MULTICAST_CARDINALITY.equals(itf.getCardinality())) {
                                     throw new NoSuchElementException(clientItf);
                                 }
                             }
@@ -131,7 +131,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
                         for (int j = 0; j < itfs.length; j++) {
                             TypeInterface itf = (TypeInterface) itfs[j];
                             if (clientItf.equals(itf.getName())) {
-                                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(itf.getCardinality())) {
+                                if (GCMTypeFactory.MULTICAST_CARDINALITY.equals(itf.getCardinality())) {
                                     throw new NoSuchElementException(clientItf);
                                 }
                             }
@@ -191,7 +191,7 @@ public class ProActiveBindingCompiler extends BindingCompiler {
         for (int j = 0; j < itfs.length; j++) {
             TypeInterface itf = (TypeInterface) itfs[j];
             if (clientItf.equals(itf.getName())) {
-                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(itf.getCardinality())) {
+                if (GCMTypeFactory.MULTICAST_CARDINALITY.equals(itf.getCardinality())) {
                     // ok, this is a multicast interface => multiple bindings allowed from this interface
                     // ==> need to create several tasks
                     int multicastIndex = 1;

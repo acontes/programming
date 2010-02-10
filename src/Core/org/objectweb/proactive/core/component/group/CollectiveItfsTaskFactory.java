@@ -46,7 +46,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceTypeImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.group.AbstractProcessForGroup;
 import org.objectweb.proactive.core.group.BasicTaskFactory;
 import org.objectweb.proactive.core.group.Dispatch;
@@ -65,7 +65,7 @@ public class CollectiveItfsTaskFactory extends BasicTaskFactory {
     @Override
     public List<MethodCall> generateMethodCalls(MethodCall mc) throws InvocationTargetException {
         ProxyForComponentInterfaceGroup parent = ((ProxyForComponentInterfaceGroup) groupProxy).getParent();
-        if (parent != null && (((ProActiveInterfaceTypeImpl) parent.getInterfaceType()).isFcCollective())) {
+        if (parent != null && (((ProActiveGCMInterfaceType) parent.getInterfaceType()).isGCMCollectiveItf())) {
             // ok we are dealing with a delegation proxy for a collective
             // interface
             // use helper class

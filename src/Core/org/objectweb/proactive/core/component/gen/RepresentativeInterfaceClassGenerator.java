@@ -54,6 +54,7 @@ import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.api.PAGroup;
@@ -61,9 +62,8 @@ import org.objectweb.proactive.core.component.ItfStubObject;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -74,9 +74,8 @@ import org.objectweb.proactive.core.util.ClassDataCache;
  * This class generates representative interfaces objects, which are created on
  * the client side along with the component representative object (@see
  * org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl).
- * 
+ *
  * @author The ProActive Team
- * 
  */
 public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClassGenerator {
     private static RepresentativeInterfaceClassGenerator instance;
@@ -97,7 +96,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
 
     @Override
     public ProActiveInterface generateInterface(final String interfaceName, Component owner,
-            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException {
         try {
             Class<?> generated_class = generateInterfaceClass(interfaceType, isFunctionalInterface);
@@ -116,15 +115,16 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         }
     }
 
-    public Class<?> generateInterfaceClass(ProActiveInterfaceType itfType, boolean isFunctionalInterface)
+    public Class<?> generateInterfaceClass(ProActiveGCMInterfaceType itfType, boolean isFunctionalInterface)
             throws NotFoundException, CannotCompileException, IOException {
-        if (ProActiveTypeFactory.GATHER_CARDINALITY.equals(itfType.getFcCardinality())) {
+        if (GCMTypeFactory.GATHERCAST_CARDINALITY.equals(itfType.getGCMCardinality())) {
             // modify signature in type
             try {
                 Class<?> gatherProxyItf = GatherInterfaceGenerator.generateInterface(itfType);
-                itfType = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance().createFcItfType(
-                        itfType.getFcItfName(), gatherProxyItf.getName(), itfType.isFcClientItf(),
-                        itfType.isFcOptionalItf(), itfType.getFcCardinality());
+                itfType = (ProActiveGCMInterfaceType) ProActiveGCMTypeFactoryImpl.instance()
+                        .createGCMItfType(itfType.getFcItfName(), gatherProxyItf.getName(),
+                                itfType.isFcClientItf(), itfType.isFcOptionalItf(),
+                                itfType.getGCMCardinality());
             } catch (InterfaceGenerationFailedException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -158,15 +158,15 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
     }
 
     public synchronized static byte[] generateInterfaceByteCode(String representativeClassName,
-            ProActiveInterfaceType itfType) {
+            ProActiveGCMInterfaceType itfType) {
         try {
             if (itfType == null) {
                 // infer a mock type from signature of representative
                 String name = Utils.getInterfaceNameFromRepresentativeClassName(representativeClassName);
                 String signature = Utils
                         .getInterfaceSignatureFromRepresentativeClassName(representativeClassName);
-                itfType = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance().createFcItfType(name,
-                        signature, false, false, false);
+                itfType = (ProActiveGCMInterfaceType) ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
+                        name, signature, false, false, false);
             }
             String interfaceName = Utils.getMetaObjectComponentRepresentativeClassName(
                     itfType.getFcItfName(), itfType.getFcItfSignature());
@@ -316,7 +316,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
     }
 
     protected static void createReifiedMethods(CtClass generatedClass, CtMethod[] reifiedMethods,
-            ProActiveInterfaceType itfType) throws NotFoundException, CannotCompileException,
+            ProActiveGCMInterfaceType itfType) throws NotFoundException, CannotCompileException,
             ClassNotFoundException, SecurityException, NoSuchMethodException {
 
         Class<?> itfClass = Class.forName(itfType.getFcItfSignature());
@@ -340,7 +340,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
             String reduction = "";
 
             if (returnType != CtClass.voidType) {
-                if ((itfType != null) && itfType.isFcMulticastItf()) {
+                if ((itfType != null) && itfType.isGCMMulticastItf()) {
                     body += "Object result = null;\n";
 
                     // look for reduction closure

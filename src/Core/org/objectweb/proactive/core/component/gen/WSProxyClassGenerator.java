@@ -53,7 +53,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
+import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.WSComponent;
 import org.objectweb.proactive.core.component.webservices.ProActiveWSCaller;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
@@ -106,7 +106,7 @@ public class WSProxyClassGenerator extends AbstractInterfaceClassGenerator {
      * @see WSComponent
      */
     public ProActiveInterface generateInterface(String interfaceName, Component owner,
-            ProActiveInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException {
         try {
             WSInfo wsInfo = ((WSComponent) owner).getWSInfo();

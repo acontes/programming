@@ -42,13 +42,13 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
  * The class implementing the host component setter
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class HostComponentSetterImpl extends AbstractProActiveController implements HostComponentSetter {
 
@@ -60,9 +60,9 @@ public class HostComponentSetterImpl extends AbstractProActiveController impleme
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveTypeFactoryImpl.instance().createFcItfType(Constants.HOST_SETTER_CONTROLLER,
-                    HostComponentSetter.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                    TypeFactory.SINGLE));
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
+                    Constants.HOST_SETTER_CONTROLLER, HostComponentSetter.class.getName(),
+                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
 
             throw new ProActiveRuntimeException("cannot create controller type : " +
@@ -77,5 +77,4 @@ public class HostComponentSetterImpl extends AbstractProActiveController impleme
         reified_Object.setHostComponent(hostComponent);
 
     }
-
 }

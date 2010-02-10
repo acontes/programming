@@ -39,6 +39,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.bindings.Binding;
 import org.objectweb.fractal.adl.bindings.BindingContainer;
@@ -49,7 +50,6 @@ import org.objectweb.fractal.adl.components.ComponentContainer;
 import org.objectweb.fractal.adl.interfaces.Interface;
 import org.objectweb.fractal.adl.interfaces.InterfaceContainer;
 import org.objectweb.fractal.adl.types.TypeInterface;
-import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 
 
 /**
@@ -69,7 +69,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
         final String fromCompName = from.substring(0, i);
         final String fromItfName = from.substring(i + 1);
         final Interface fromItf = getInterface(fromCompName, fromItfName, binding, itfMap);
-        return ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(((TypeInterface) fromItf).getCardinality());
+        return GCMTypeFactory.MULTICAST_CARDINALITY.equals(((TypeInterface) fromItf).getCardinality());
     }
 
     @Override
@@ -131,7 +131,7 @@ public class ProActiveTypeBindingLoader extends TypeBindingLoader {
                     sItf.getSignature(), context);
             if (!clientSideItfClass.isAssignableFrom(serverSideItfClass)) {
                 // check if multicast interface
-                if (ProActiveTypeFactory.MULTICAST_CARDINALITY.equals(cItf.getCardinality())) {
+                if (GCMTypeFactory.MULTICAST_CARDINALITY.equals(cItf.getCardinality())) {
                     Method[] clientSideItfMethods = clientSideItfClass.getMethods();
                     Method[] serverSideItfMethods = serverSideItfClass.getMethods();
 
