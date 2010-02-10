@@ -37,24 +37,11 @@ package org.objectweb.proactive.extensions.webservices.cxf;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.List;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-import org.apache.cxf.frontend.ServerFactoryBean;
-import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.interceptor.LoggingOutInterceptor;
-import org.apache.cxf.transport.servlet.CXFServlet;
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.mortbay.jetty.servlet.ServletHolder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
-import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
-import org.objectweb.proactive.core.config.PAProperties;
-import org.objectweb.proactive.core.httpserver.HTTPServer;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServices;
@@ -161,7 +148,7 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
             Interface interface_ = (Interface) o;
             String interfaceName = interface_.getFcItfName();
             if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
-                !((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                !((InterfaceType) interface_.getFcItfType()).isFcClientItf()) {
 
                 logger.debug("The component interface '" + interfaceName + "' has been deployed on " +
                     this.url + WSConstants.SERVICES_PATH + componentName + "_" + interfaceName + "?wsdl");
@@ -186,7 +173,7 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
             Interface interface_ = (Interface) o;
             String interfaceName = interface_.getFcItfName();
             if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
-                !((ProActiveInterfaceType) interface_.getFcItfType()).isFcClientItf()) {
+                !((InterfaceType) interface_.getFcItfType()).isFcClientItf()) {
                 logger.debug("The component interface '" + interfaceName + "' previously deployed on " +
                     this.url + WSConstants.SERVICES_PATH + componentName + "_" + interfaceName +
                     "?wsdl has been undeployed");
