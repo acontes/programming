@@ -48,32 +48,12 @@ public class BenchmarkMonitorThread extends Observable {
 
     public class BenchmarkThread implements Runnable {
         public void run() {
-            finished = false;
-            Method method = null;
-            try {
-                method = ProActiveRuntimeImpl.class.getDeclaredMethod("getBenchmarkRemoteObjectUrl",
-                        new Class<?>[] { String.class, String.class });
-            } catch (SecurityException e1) {
-                e1.printStackTrace();
-            } catch (NoSuchMethodException e1) {
-                e1.printStackTrace();
-            }
-
+            finished = false;            
             for (String partUrl : remoteRTurls) {
-                try {
-                    String proto = URIBuilder.getProtocol(partUrl);
-                    RemoteObjectAdapter adapter = (RemoteObjectAdapter) RemoteObjectHelper.lookup(new URI(
-                        partUrl));
-                    UniqueID uid = new UniqueID();
-                    MethodCall mc = MethodCall.getMethodCall(method, new Object[] {
-                            "__benchmark__" + proto + "__" + uid.shortString(), proto },
-                            new HashMap<TypeVariable<?>, Class<?>>());
-                    Request message = new RequestImpl(mc, true);
-                    String bmoUrl = (String) ((SynchronousReplyImpl) adapter.receiveMessage(message))
-                            .getResult().getResult();
+                try {                    
                     Request bmoMessage = new BenchmarkRequest();
                     RemoteObjectAdapter bmoAdapter = (RemoteObjectAdapter) RemoteObjectHelper.lookup(new URI(
-                        bmoUrl));
+                        partUrl));
 
                     int count = 0;
                     long time = System.currentTimeMillis();
@@ -81,6 +61,7 @@ public class BenchmarkMonitorThread extends Observable {
                     while (System.currentTimeMillis() - time < limit) {
                         count += (Integer) bmoAdapter.receiveMessage(bmoMessage).getResult().getResult();
                     }
+                    System.out.println("Benchmark for "+partUrl+ " is "+count);
                     Pair pair = new Pair(URIBuilder.getProtocol(partUrl), count);
                     addAndSort(pair);
                 } catch (NullPointerException npe) {

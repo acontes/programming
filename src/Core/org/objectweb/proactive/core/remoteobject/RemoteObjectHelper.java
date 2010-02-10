@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 public class RemoteObjectHelper {
     static final private Logger logger = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
-
+   
     /**
      * returns an url for a object to be exposed on the current host for a given
      * protocol and name
@@ -192,5 +192,5 @@ public class RemoteObjectHelper {
         } catch (Exception e) {
             throw new ProActiveException(e);
         }
-    }
+    }   
 }

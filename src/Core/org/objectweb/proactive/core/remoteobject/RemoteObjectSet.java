@@ -268,7 +268,7 @@ public class RemoteObjectSet implements Serializable, Observer {
     }
 
     private void updateOrder() {
-        ProActiveRuntimeImpl.getProActiveRuntime().subscribeAsObserver(this, remoteRuntimeUrls);
+        RemoteObjectBenchmark.getInstance().subscribeAsObserver(this, remoteRuntimeUrls);
     }
 
     /**

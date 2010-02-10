@@ -207,9 +207,6 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     private ProActiveRuntimeWrapperMBean mbean;
 
     private long gcmNodes;
-
-    transient private java.util.Hashtable<String, BenchmarkMonitorThread> benchmarkMonitors;
-
     //
     // -- CONSTRUCTORS
     // -----------------------------------------------------------
@@ -222,8 +219,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             this.proActiveRuntimeMap = new java.util.Hashtable<String, ProActiveRuntime>();
             this.virtualNodesMap = new java.util.Hashtable<String, VirtualNodeInternal>();
             this.descriptorMap = new java.util.Hashtable<String, ProActiveDescriptorInternal>();
-            this.nodeMap = new java.util.Hashtable<String, LocalNode>();
-            this.benchmarkMonitors = new java.util.Hashtable<String, BenchmarkMonitorThread>();
+            this.nodeMap = new java.util.Hashtable<String, LocalNode>();            
 
             try {
                 String file = PAProperties.PA_RUNTIME_SECURITY.getValue();
@@ -1578,31 +1574,5 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
 
     public void setVMName(String vmName) {
         vmInformation.vmName = vmName;
-    }
-
-    public void subscribeAsObserver(RemoteObjectSet ros, String[] runtimeUrls) {
-        String runtimeName = URIBuilder.getNameFromURI(runtimeUrls[0]);
-        BenchmarkMonitorThread bmt;
-        if ((bmt = this.benchmarkMonitors.get(runtimeName)) != null) {
-            // Benchmark are already running
-            bmt.addObserver(ros);
-            bmt.notifyAdd();
-        } else {
-            bmt = new BenchmarkMonitorThread(runtimeUrls);
-            this.benchmarkMonitors.put(runtimeName, bmt);
-            bmt.addObserver(ros);
-            bmt.launchBenchmark();
-        }
-    }
-
-    public String getBenchmarkRemoteObjectUrl(String name, String protocol) {
-        Object bo = new Object();
-        RemoteObjectExposer<Object> roe = PARemoteObject.newRemoteObject(Object.class.getName(), bo);
-        try {
-            bo = roe.createRemoteObject(name, false, protocol);
-        } catch (ProActiveException e) {
-            e.printStackTrace();
-        }
-        return roe.getURL(protocol);
-    }
+    }   
 }
