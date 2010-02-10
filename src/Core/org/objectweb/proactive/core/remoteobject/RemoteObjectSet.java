@@ -257,12 +257,6 @@ public class RemoteObjectSet implements Serializable, Observer {
 
     private void updateUnreliable() {
         if (unreliables.size() != 0) {
-            new Thread(new CheckReliability()).start();
-        }
-    }
-
-    private class CheckReliability implements Runnable {
-        public void run() {
             for (RemoteRemoteObject rro : unreliables) {
                 add(rro);
             }
