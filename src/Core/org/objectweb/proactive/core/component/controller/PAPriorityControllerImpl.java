@@ -35,71 +35,79 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.util.Hashtable;
+import java.util.Map;
+
+import org.etsi.uri.gcm.api.control.PriorityController;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
- * Implementation of the {@link org.objectweb.fractal.api.control.NameController}
- *
  * @author The ProActive Team
- *
  */
-public class ProActiveNameController extends AbstractProActiveController implements NameController,
-        ControllerStateDuplication {
-    // FIXME coherency between this value and the one in component parameters controller
-    String name;
+public class PAPriorityControllerImpl extends AbstractPAController implements PriorityController {
+    private static final String ANY_PARAMETERS = "any-parameters";
+    private Map<String, Object> nf2s;
+    private Map<String, Object> nf3s;
 
-    /**
-     * @param owner
-     */
-    public ProActiveNameController(Component owner) {
+    public PAPriorityControllerImpl(Component owner) {
         super(owner);
+        nf2s = new Hashtable<String, Object>(2);
+        nf2s.put("setPriorityNF2", ANY_PARAMETERS);
+        nf3s = new Hashtable<String, Object>(3);
+        nf3s.put("setPriorityNF3", ANY_PARAMETERS);
     }
 
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.NAME_CONTROLLER,
-                    NameController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.PRIORITY_CONTROLLER,
+                    PriorityController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), e);
         }
     }
 
-    /*
-     * @see org.objectweb.fractal.api.control.NameController#getFcName()
-     */
-    public String getFcName() {
-        return name;
-    }
-
-    /*
-     * @see org.objectweb.fractal.api.control.NameController#setFcName(java.lang.String)
-     */
-    public void setFcName(String name) {
-        this.name = name;
-    }
-
-    public void duplicateController(Object c) {
-        if (c instanceof String) {
-            name = (String) c;
-
-        } else {
-            throw new ProActiveRuntimeException(
-                "ProActiveNameController : Impossible to duplicate the controller " + this +
-                    " from the controller" + c);
+    ///////////////////////////////////////
+    // PriorityController IMPLEMENTATION //
+    ///////////////////////////////////////
+    // TODO_C for a NF? priority check that the method is in a controller
+    public void setGCMPriority(String itfName, String methodName, Class<?>[] parameterTypes,
+            RequestPriority priority) {
+        switch (priority) {
+            case NF1:
+                nf2s.remove(methodName);
+                nf3s.remove(methodName);
+                break;
+            case NF2:
+                nf3s.remove(methodName);
+                nf2s.put(methodName, parameterTypes);
+                break;
+            case NF3:
+                nf2s.remove(methodName);
+                nf3s.put(methodName, parameterTypes);
+                break;
+            default:
+                break;
         }
-
     }
 
-    public ControllerState getState() {
-        return new ControllerState(name);
+    public RequestPriority getGCMPriority(String itfName, String methodName, Class<?>[] parameterTypes) {
+        if (nf2s.get(methodName) != null) {
+            return RequestPriority.NF2;
+        } else if (nf3s.get(methodName) != null) {
+            return RequestPriority.NF3;
+        } else if (Utils.isControllerInterfaceName(itfName)) {
+            return RequestPriority.NF1;
+        } else {
+            return RequestPriority.F;
+        }
     }
 }

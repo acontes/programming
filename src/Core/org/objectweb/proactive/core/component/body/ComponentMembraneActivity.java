@@ -47,13 +47,13 @@ import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
+import org.objectweb.proactive.core.component.controller.PAMembraneController;
 
 
 /**
  * The class for the component activity, having the membrane controller inside the membrane
- * @author The ProActive Team
  *
+ * @author The ProActive Team
  */
 public class ComponentMembraneActivity extends ComponentActivity implements RunActive, InitActive, EndActive,
         Serializable {
@@ -96,7 +96,7 @@ public class ComponentMembraneActivity extends ComponentActivity implements RunA
                      * While the membrane is stopped, serve calls only on the Membrane Controller
                      */
                     while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
-                            .getMembraneState().equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                            .getMembraneState().equals(PAMembraneController.MEMBRANE_STOPPED)) {
                         componentService.blockingServeOldest(memRequestFilter);
                     }
 
@@ -133,7 +133,7 @@ public class ComponentMembraneActivity extends ComponentActivity implements RunA
                      * serve all non functional calls
                      * */
                     while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
-                            .getMembraneState().equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
+                            .getMembraneState().equals(PAMembraneController.MEMBRANE_STARTED)) {
                         componentService.blockingServeOldest(nfRequestFilter);
                         if (!body.isActive()) {//Don't know if this is OK
                             // in case of a migration 

@@ -64,17 +64,17 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of the {@link ProActiveGCMLifeCycleController} interface.<br>
+ * Implementation of the {@link PAGCMLifeCycleController} interface.<br>
  *
  * @author The ProActive Team
- * @see ProActiveGCMLifeCycleController
+ * @see PAGCMLifeCycleController
  */
-public class ProActiveGCMLifeCycleControllerImpl extends AbstractProActiveController implements
-        ProActiveGCMLifeCycleController, Serializable, ControllerStateDuplication {
+public class PAGCMLifeCycleControllerImpl extends AbstractPAController implements
+        PAGCMLifeCycleController, Serializable, ControllerStateDuplication {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     protected String fcState = LifeCycleController.STOPPED;
 
-    public ProActiveGCMLifeCycleControllerImpl(Component owner) {
+    public PAGCMLifeCycleControllerImpl(Component owner) {
         super(owner);
     }
 
@@ -82,8 +82,8 @@ public class ProActiveGCMLifeCycleControllerImpl extends AbstractProActiveContro
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
-                    ProActiveGCMLifeCycleController.class.getName(), TypeFactory.SERVER,
-                    TypeFactory.MANDATORY, TypeFactory.SINGLE));
+                    PAGCMLifeCycleController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
@@ -266,7 +266,7 @@ public class ProActiveGCMLifeCycleControllerImpl extends AbstractProActiveContro
                     for (int i = 0; i < inner_components.length; i++) {
                         try {
                             if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
-                                    .equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                                    .equals(PAMembraneController.MEMBRANE_STOPPED)) {
                                 throw new IllegalLifeCycleException(
                                     "Before starting all subcomponents, make sure that the membrane of all of them is started");
                             }
@@ -305,7 +305,7 @@ public class ProActiveGCMLifeCycleControllerImpl extends AbstractProActiveContro
                     for (int i = 0; i < inner_components.length; i++) {
                         try {
                             if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
-                                    .equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                                    .equals(PAMembraneController.MEMBRANE_STOPPED)) {
                                 throw new IllegalLifeCycleException(
                                     "Before stopping all subcomponents, make sure that the membrane of all them is started");
                             }
@@ -349,7 +349,7 @@ public class ProActiveGCMLifeCycleControllerImpl extends AbstractProActiveContro
     }
 
     /**
-     * @see org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController#startFc(short)
+     * @see org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController#startFc(short)
      */
     public void startFc(short priority) throws IllegalLifeCycleException {
         startFc();

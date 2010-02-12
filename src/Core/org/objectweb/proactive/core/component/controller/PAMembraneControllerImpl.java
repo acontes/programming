@@ -78,14 +78,14 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  *
  */
-public class ProActiveMembraneControllerImpl extends AbstractProActiveController implements
-        ProActiveMembraneController, Serializable, ControllerStateDuplication {
+public class PAMembraneControllerImpl extends AbstractPAController implements PAMembraneController,
+        Serializable, ControllerStateDuplication {
     private Map<String, Component> nfcomponents;
     private String membraneState;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private NFBindings nfBindings;//TODO : This structure has to be updated every time a with the membrane is added or removed
 
-    public ProActiveMembraneControllerImpl(Component owner) {
+    public PAMembraneControllerImpl(Component owner) {
         super(owner);
         nfcomponents = new HashMap<String, Component>();
         membraneState = MEMBRANE_STOPPED;
@@ -96,7 +96,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                    ProActiveMembraneController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    PAMembraneController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type : " +
@@ -121,7 +121,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
     public void addNFSubComponent(Component component) throws IllegalContentException,
             IllegalLifeCycleException {
         try {
-            if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED) ||
+            if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED) ||
                 Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "To perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
@@ -174,7 +174,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
                 try {
                     try {
                         if (Fractive.getMembraneController(c).getMembraneState().equals(
-                                ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                                PAMembraneController.MEMBRANE_STOPPED)) {
                             throw new IllegalLifeCycleException(
                                 "While iterating on functional components, it apprears that one of them has its membranje in a stopped state. It should be started.");
                         }
@@ -196,7 +196,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
             }
         } /* end of case with composite */
         try {
-            ((ProActiveSuperController) Fractal.getSuperController(component)).addParent(ownerRepresentative);
+            ((PASuperController) Fractal.getSuperController(component)).addParent(ownerRepresentative);
         } catch (NoSuchInterfaceException e) {
 
             /*
@@ -496,7 +496,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
         if (!clItfType.isFcClientItf()) {
             throw new IllegalBindingException("This method only binds NF client interfaces");
         } else {//OK for binding, but first check that types are compatible
-            if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
+            if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED)) {
                 throw new IllegalLifeCycleException(
                     "Membrane should be stopped while binding non-functional client interface.");
             }
@@ -598,8 +598,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
         Component toRemove = nfcomponents.get(componentname);
 
         try {
-            if (((ProActiveBindingController) Fractal.getBindingController(toRemove)).isBound()
-                    .booleanValue()) {
+            if (((PABindingController) Fractal.getBindingController(toRemove)).isBound().booleanValue()) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external interfaces");
             }
@@ -608,8 +607,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
         }
 
         try {
-            ((ProActiveSuperController) Fractal.getSuperController(toRemove))
-                    .removeParent(ownerRepresentative);
+            ((PASuperController) Fractal.getSuperController(toRemove)).removeParent(ownerRepresentative);
         } catch (NoSuchInterfaceException e) {
 
             /* No superController */
@@ -621,7 +619,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
 
     public void setControllerObject(String itf, Object controllerclass) throws NoSuchInterfaceException {
         try {
-            if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED) ||
+            if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED) ||
                 Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "For the moment, to perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
@@ -657,7 +655,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
     public void unbindNFc(String clientItf) throws NoSuchInterfaceException, IllegalLifeCycleException,
             IllegalBindingException, NoSuchComponentException {//Unbinds client interfaces exposed by the membrane, of client interfaces of non-functional components.
 
-        if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
+        if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED)) {
             throw new IllegalLifeCycleException(
                 "The membrane should be stopped while unbinding non-functional interfaces");
         }
@@ -865,7 +863,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
     }
 
     private void checkMembraneIsStopped() throws IllegalLifeCycleException {
-        if (membraneState.equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
+        if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED)) {
             throw new IllegalLifeCycleException("The membrane should be stopped");
         }
     }
@@ -874,7 +872,7 @@ public class ProActiveMembraneControllerImpl extends AbstractProActiveController
 
         try {
             if (Fractive.getMembraneController(comp).getMembraneState().equals(
-                    ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                    PAMembraneController.MEMBRANE_STOPPED)) {
                 throw new IllegalLifeCycleException(
                     "The desired operation can not be performed. The membrane of a non-functional component is stopped. It should be started.");
             }

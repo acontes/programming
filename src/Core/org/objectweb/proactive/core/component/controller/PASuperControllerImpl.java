@@ -46,14 +46,14 @@ import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
 /**
- * Implementation of the {@link ProActiveSuperController} interface.
+ * Implementation of the {@link PASuperController} interface.
  *
  * @author The ProActive Team
- * @see ProActiveSuperController
+ * @see PASuperController
  */
-public class ProActiveSuperControllerImpl extends AbstractProActiveController implements Serializable,
-        ProActiveSuperController, ControllerStateDuplication {
-    public ProActiveSuperControllerImpl(Component owner) {
+public class PASuperControllerImpl extends AbstractPAController implements Serializable,
+        PASuperController, ControllerStateDuplication {
+    public PASuperControllerImpl(Component owner) {
         super(owner);
     }
 
@@ -61,7 +61,7 @@ public class ProActiveSuperControllerImpl extends AbstractProActiveController im
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.SUPER_CONTROLLER,
-                    ProActiveSuperController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    PASuperController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());

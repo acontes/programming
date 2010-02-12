@@ -69,15 +69,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team
  */
-public class ProActiveContentControllerImpl extends AbstractProActiveController implements
-        ProActiveContentController, Serializable, ControllerStateDuplication {
+public class PAContentControllerImpl extends AbstractPAController implements PAContentController,
+        Serializable, ControllerStateDuplication {
     protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     protected List<Component> fcSubComponents;
 
     /**
      * Constructor for ProActiveContentController.
      */
-    public ProActiveContentControllerImpl(Component owner) {
+    public PAContentControllerImpl(Component owner) {
         super(owner);
         fcSubComponents = new ArrayList<Component>();
     }
@@ -86,7 +86,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
-                    ProActiveContentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    PAContentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
@@ -209,7 +209,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
         try {
             Object itf = subComponent.getFcInterface(Constants.SUPER_CONTROLLER);
 
-            ((ProActiveSuperController) itf).addParent(ref_on_this_component);
+            ((PASuperController) itf).addParent(ref_on_this_component);
         } catch (NoSuchInterfaceException e) {
             IllegalContentException ice = new IllegalContentException(
                 "Cannot add component : cannot find super-controller interface.");
@@ -225,20 +225,19 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
             IllegalContentException {
         checkLifeCycleIsStopped();
         try {
-            if (((ProActiveBindingController) Fractal.getBindingController(getFcItfOwner()))
-                    .isBoundTo(subComponent)) {
+            if (((PABindingController) Fractal.getBindingController(getFcItfOwner())).isBoundTo(subComponent)) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external server interfaces");
             }
             Component[] subComponents = getFcSubComponents();
             for (int i = 0; i < subComponents.length; i++) {
-                if (((ProActiveBindingController) Fractal.getBindingController(subComponents[i]))
+                if (((PABindingController) Fractal.getBindingController(subComponents[i]))
                         .isBoundTo(subComponent)) {
                     throw new IllegalContentException(
                         "cannot remove a sub component that holds bindings on its external server interfaces");
                 }
             }
-            if (((ProActiveBindingController) Fractal.getBindingController(subComponent)).isBound()) {
+            if (((PABindingController) Fractal.getBindingController(subComponent)).isBound()) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external client interfaces");
             }
@@ -249,7 +248,7 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
             throw new IllegalContentException("not a sub component : " + subComponent);
         }
         try {
-            ((ProActiveSuperController) Fractal.getSuperController(subComponent)).removeParent(subComponent);
+            ((PASuperController) Fractal.getSuperController(subComponent)).removeParent(subComponent);
         } catch (NoSuchInterfaceException e) {
             fcSubComponents.add(subComponent);
             IllegalContentException ice = new IllegalContentException(
@@ -328,11 +327,11 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
 
     private static class AddSubComponentTask implements Runnable {
         ContentControllerExceptionListException exceptions;
-        ProActiveContentControllerImpl controller;
+        PAContentControllerImpl controller;
         Component component;
 
         public AddSubComponentTask(ContentControllerExceptionListException exceptions,
-                ProActiveContentControllerImpl controller, Component component) {
+                PAContentControllerImpl controller, Component component) {
             this.exceptions = exceptions;
             this.controller = controller;
             this.component = component;
@@ -353,11 +352,11 @@ public class ProActiveContentControllerImpl extends AbstractProActiveController 
 
     private static class RemoveSubComponentTask implements Runnable {
         ContentControllerExceptionListException exceptions;
-        ProActiveContentControllerImpl controller;
+        PAContentControllerImpl controller;
         Component component;
 
         public RemoveSubComponentTask(ContentControllerExceptionListException exceptions,
-                ProActiveContentControllerImpl controller, Component component) {
+                PAContentControllerImpl controller, Component component) {
             this.exceptions = exceptions;
             this.controller = controller;
             this.component = component;

@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
  * @see MulticastController
  */
 @PublicAPI
-public interface ProActiveMulticastController extends MulticastController {
+public interface PAMulticastController extends MulticastController {
     /**
      * Transforms an invocation on a multicast interface into a list of invocations which will be
      * transferred to client interfaces. These invocations are inferred from the annotations of the

@@ -73,14 +73,14 @@ import org.objectweb.proactive.core.node.Node;
  * @author The ProActive Team
  * @see GathercastController
  */
-public class ProActiveGathercastControllerImpl extends AbstractCollectiveInterfaceController implements
+public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceController implements
         GathercastController, ControllerStateDuplication {
 
     private Map<String, List<Object>> bindingsOnServerItfs = new HashMap<String, List<Object>>();
     private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
     private GatherRequestsQueues gatherRequestsHandler;
 
-    public ProActiveGathercastControllerImpl(Component owner) {
+    public PAGathercastControllerImpl(Component owner) {
         super(owner);
     }
 

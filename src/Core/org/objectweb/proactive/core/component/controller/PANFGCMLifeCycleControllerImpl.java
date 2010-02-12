@@ -35,19 +35,23 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.etsi.uri.gcm.api.control.MigrationController;
-import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.node.Node;
+import org.objectweb.fractal.api.Component;
 
 
 /**
-  * This interface defines an extension of the {@link MigrationController}.
+ * Extension of the
+ * {@link PAGCMLifeCycleControllerImpl} class for non functional components.
  *
  * @author The ProActive Team
- * @see MigrationController
  */
-@PublicAPI
-public interface ProActiveMigrationController extends MigrationController {
-    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
+public class PANFGCMLifeCycleControllerImpl extends PAGCMLifeCycleControllerImpl {
+
+    /**
+     * Constructor for ProActiveNFLifeCycleController.
+     *
+     * @param owner The owner component.
+     */
+    public PANFGCMLifeCycleControllerImpl(Component owner) {
+        super(owner);
+    }
 }

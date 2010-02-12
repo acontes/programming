@@ -5,36 +5,36 @@
  <!--  This is the default configuration file for the controllers and interceptors of a component in the proactive implementation.-->
     <controllers>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveBindingController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.PABindingController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.PABindingControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveContentController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.PAContentController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.PAContentControllerImpl</implementation>
         </controller>
         <!-- implementation missing for the GCMLifeCycleController interface -->
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController</interface>
+            <interface>org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController</interface>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveSuperController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.PASuperController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.PASuperControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.fractal.api.control.NameController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveNameController</implementation>
+            <implementation>org.objectweb.proactive.core.component.controller.PANameController</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveMulticastController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveMulticastControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.PAMulticastController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.PAMulticastControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.etsi.uri.gcm.api.control.GathercastController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveGathercastControllerImpl</implementation>
+            <implementation>org.objectweb.proactive.core.component.controller.PAGathercastControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.controller.ProActiveMigrationController</interface>
-            <implementation>org.objectweb.proactive.core.component.controller.ProActiveMigrationControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.controller.PAMigrationController</interface>
+            <implementation>org.objectweb.proactive.core.component.controller.PAMigrationControllerImpl</implementation>
         </controller>
     </controllers>
     

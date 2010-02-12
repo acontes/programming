@@ -39,11 +39,11 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
 
-public class ControllerImplementation extends AbstractProActiveController implements ControllerItf {
+public class ControllerImplementation extends AbstractPAController implements ControllerItf {
 
     //@snippet-start component_userguide_11
     public ControllerImplementation(Component owner) {

@@ -85,14 +85,14 @@ import org.objectweb.proactive.core.component.webservices.WSInfo;
  *
  * @author The ProActive Team
  */
-public class ProActiveBindingControllerImpl extends AbstractProActiveController implements
-        ProActiveBindingController, Serializable, ControllerStateDuplication {
+public class PABindingControllerImpl extends AbstractPAController implements PABindingController,
+        Serializable, ControllerStateDuplication {
     protected Bindings bindings; // key = clientInterfaceName ; value = Binding
 
     //    private Map<String, Map<ProActiveComponent, List<String>>> bindingsOnServerItfs = new HashMap<String, Map<ProActiveComponent,List<String>>>(0);
 
     // Map(serverItfName, Map(owner, clientItfName))
-    public ProActiveBindingControllerImpl(Component owner) {
+    public PABindingControllerImpl(Component owner) {
         super(owner);
         bindings = new Bindings();
     }
@@ -101,7 +101,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.BINDING_CONTROLLER,
-                    ProActiveBindingController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    PABindingController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type for controller " +
@@ -364,13 +364,13 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 //                Fractive.getMulticastController(owner)
                 //                .bindFcMulticast(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // no adaptor here
-                ((ProActiveMulticastControllerImpl) ((ProActiveInterface) Fractive
-                        .getMulticastController(owner)).getFcItfImpl()).bindFc(clientItfName, sItf);
+                ((PAMulticastControllerImpl) ((ProActiveInterface) Fractive.getMulticastController(owner))
+                        .getFcItfImpl()).bindFc(clientItfName, sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
                 try {
                     if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
-                            ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                            PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The membrane of the owner of the server interface should be started");
                     }
@@ -380,10 +380,9 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 Fractive.getGathercastController((sItf).getFcItfOwner()).notifyAddedGCMBinding(
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
             } else {
-                ProActiveMulticastController mc = Fractive.getMulticastController(owner);
+                PAMulticastController mc = Fractive.getMulticastController(owner);
                 ProActiveInterface pitf = (ProActiveInterface) mc;
-                ProActiveMulticastControllerImpl impl = (ProActiveMulticastControllerImpl) pitf
-                        .getFcItfImpl();
+                PAMulticastControllerImpl impl = (PAMulticastControllerImpl) pitf.getFcItfImpl();
                 impl.bindFc(clientItfName, sItf);
                 //((MulticastControllerImpl) Fractive.getMulticastController(owner))
                 // .bindFc(clientItfName, sItf);
@@ -400,7 +399,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 // TODO should throw a binding event
                 try {
                     if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
-                            ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                            PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The membrane of the owner of the server interface should be started");
                     }
@@ -428,7 +427,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 // TODO should throw a binding event
                 try {
                     if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
-                            ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                            PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The membrane of the owner of the server interface should be started");
                     }
@@ -542,7 +541,7 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
 
                 try {
                     if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
-                            ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                            PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The client interface is bound to a component that has its membrane in a stopped state. It should be strated, as this method could interact with its controllers.");
                     }
@@ -705,8 +704,8 @@ public class ProActiveBindingControllerImpl extends AbstractProActiveController 
                 }
             } else {
                 try {
-                    ProActiveMulticastController mc = (ProActiveMulticastController) getFcItfOwner()
-                            .getFcInterface(Constants.MULTICAST_CONTROLLER);
+                    PAMulticastController mc = (PAMulticastController) getFcItfOwner().getFcInterface(
+                            Constants.MULTICAST_CONTROLLER);
                     if (mc.isBoundTo(curItf.getFcItfName(), serverItfsComponent))
                         return Boolean.valueOf(true);
                 } catch (NoSuchInterfaceException e) {

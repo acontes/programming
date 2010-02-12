@@ -65,7 +65,7 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
@@ -195,7 +195,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) type_factory
                 .createFcItfType(
                         Constants.LIFECYCLE_CONTROLLER,
-                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController.class
+                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
         Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
                 itfType.getFcItfName(), this, itfType, itfType.isInternal(), false);
@@ -296,7 +296,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
         //Enumeration controllersInterfaces = controllersConfiguration.propertyNames();
         Iterator<String> iteratorOnControllers = controllersConfiguration.keySet().iterator();
         Class<?> controllerClass = null;
-        AbstractProActiveController currentController;
+        AbstractPAController currentController;
         ProActiveInterface currentInterface = null;
         Class<?> controllerItf;
         Vector<InterfaceType> nfType = new Vector<InterfaceType>();
@@ -307,7 +307,7 @@ public class ProActiveComponentRepresentativeImpl implements ProActiveComponentR
                 controllerClass = Class.forName(controllersConfiguration.get(controllerItf.getName()));
                 Constructor<?> controllerClassConstructor = controllerClass
                         .getConstructor(new Class<?>[] { Component.class });
-                currentController = (AbstractProActiveController) controllerClassConstructor
+                currentController = (AbstractPAController) controllerClassConstructor
                         .newInstance(new Object[] { this });
                 currentInterface = RepresentativeInterfaceClassGenerator.instance()
                         .generateControllerInterface(currentController.getFcItfName(), this,

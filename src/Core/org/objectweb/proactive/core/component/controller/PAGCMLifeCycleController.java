@@ -35,23 +35,36 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.fractal.api.Component;
+import org.etsi.uri.gcm.api.control.GCMLifeCycleController;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Extension of the
- * {@link ProActiveContentControllerImpl} class for non functional components.
+ * This interface defines an extension of the {@link GCMLifeCycleController}, which
+ * is able to handle prioritized requests.
+ *<p>
+ * (Under development)
+ * </p>
  *
  * @author The ProActive Team
+ * @see GCMLifeCycleController
  */
-public class ProActiveNFContentControllerImpl extends ProActiveContentControllerImpl {
+@PublicAPI
+public interface PAGCMLifeCycleController extends GCMLifeCycleController {
 
     /**
-     * Constructor for ProActiveNFContentController.
-     *
-     * @param owner The owner component.
-    */
-    public ProActiveNFContentControllerImpl(Component owner) {
-        super(owner);
-    }
+     * @see org.objectweb.fractal.api.control.LifeCycleController#getFcState()
+     */
+    public String getFcState(short priority);
+
+    /**
+     * @see org.objectweb.fractal.api.control.LifeCycleController#startFc()
+     */
+    public void startFc(short priority) throws IllegalLifeCycleException;
+
+    /**
+     * @see org.objectweb.fractal.api.control.LifeCycleController#stopFc()
+     */
+    public void stopFc(short priority) throws IllegalLifeCycleException;
 }

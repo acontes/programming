@@ -35,33 +35,38 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
-import org.objectweb.fractal.api.Interface;
+import org.etsi.uri.gcm.api.control.MonitorController;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.body.migration.MigrationException;
-import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * This interface defines some basic services offered by a component controller in the ProActive implementation of the Fractal model.
- *
+ * Useful methods for the monitor controller.
+ * 
  * @author The ProActive Team
+ * @see MonitorController
  */
 @PublicAPI
-public interface ProActiveController extends Interface {
+public class PAMonitorControllerHelper {
+    private static final String KEY_INFO_SEPARATOR = "-";
 
     /**
-     * This method is called after creation of all functional and non-functional(controller) 
-     * interfaces. Controllers requiring initialization *after* all interfaces are instantiated
-     * can override this method.
+     * Generate an unique key according to the name of the server interface, the name of the method
+     * and the class names of the parameters of the method.
+     *
+     * @param itfName Name of the server interface where the method is exposed.
+     * @param methodName Name of the method.
+     * @param parametersTypes Types of the parameters of the method.
+     * @return Key built like this itfName-MethodName-ClassNameParam1-ClassNameParam2-...
      */
-    public void initController();
+    public static String generateKey(String itfName, String methodName, Class<?>[] parametersTypes) {
+        String key = itfName + KEY_INFO_SEPARATOR + methodName;
 
-    /**
-     * If a controller holds references to active objects which are dependent on it, it needs to
-     * trigger the migration of these active objects. This is done by overriding this method.
-     * 
-     * @param node
-     * @throws MigrationException
-     */
-    public void migrateDependentActiveObjectsTo(Node node) throws MigrationException;
+        if (parametersTypes != null) {
+            for (int i = 0; i < parametersTypes.length; i++) {
+                key += KEY_INFO_SEPARATOR + parametersTypes[i].getName();
+            }
+        }
+
+        return key;
+    }
 }

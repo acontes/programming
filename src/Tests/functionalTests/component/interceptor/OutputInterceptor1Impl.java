@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
 import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.mop.MethodCall;
 import functionalTests.component.controller.DummyController;
 
 
-public class OutputInterceptor1Impl extends AbstractProActiveController implements OutputInterceptor1,
+public class OutputInterceptor1Impl extends AbstractPAController implements OutputInterceptor1,
         OutputInterceptor {
 
     /**

@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
  * @author The ProActive Team
  *
  */
-public class ControllerStateDuplicationImpl extends AbstractProActiveController implements
+public class ControllerStateDuplicationImpl extends AbstractPAController implements
         ControllerStateDuplication {
 
     public ControllerStateDuplicationImpl(Component owner) {

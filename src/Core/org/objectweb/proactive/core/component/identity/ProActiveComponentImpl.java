@@ -71,15 +71,15 @@ import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.controller.ControllerState;
 import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
-import org.objectweb.proactive.core.component.controller.ProActiveController;
-import org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController;
-import org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleControllerImpl;
-import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
-import org.objectweb.proactive.core.component.controller.ProActiveMembraneControllerImpl;
-import org.objectweb.proactive.core.component.controller.ProActiveNameController;
+import org.objectweb.proactive.core.component.controller.PAController;
+import org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController;
+import org.objectweb.proactive.core.component.controller.PAGCMLifeCycleControllerImpl;
+import org.objectweb.proactive.core.component.controller.PAMembraneController;
+import org.objectweb.proactive.core.component.controller.PAMembraneControllerImpl;
+import org.objectweb.proactive.core.component.controller.PANameController;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
@@ -158,7 +158,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
         for (Interface itf : controlItfs.values()) {
             // TODO Check with component controller
-            ProActiveController itfImpl = (ProActiveController) ((ProActiveInterfaceImpl) itf).getFcItfImpl();
+            PAController itfImpl = (PAController) ((ProActiveInterfaceImpl) itf).getFcItfImpl();
             if (itfImpl != null) { // due to non-functional interface implemented using component
                 itfImpl.initController();
             }
@@ -179,16 +179,16 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
         ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) type_factory.createFcItfType(
                 Constants.LIFECYCLE_CONTROLLER,
-                /* LIFECYCLE CONTROLLER */ProActiveGCMLifeCycleController.class.getName(),
-                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
-        ProActiveInterface controller = createController(itfType, ProActiveGCMLifeCycleControllerImpl.class);
+                /* LIFECYCLE CONTROLLER */PAGCMLifeCycleController.class.getName(), TypeFactory.SERVER,
+                TypeFactory.MANDATORY, TypeFactory.SINGLE);
+        ProActiveInterface controller = createController(itfType, PAGCMLifeCycleControllerImpl.class);
         controlItfs.put(controller.getFcItfName(), controller);
         nftype.add((InterfaceType) controller.getFcItfType());
 
         itfType = (ProActiveGCMInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
         /* NAME CONTROLLER */NameController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                 TypeFactory.SINGLE);
-        controller = createController(itfType, ProActiveNameController.class);
+        controller = createController(itfType, PANameController.class);
         ((NameController) controller).setFcName(componentParameters.getName());
         controlItfs.put(controller.getFcItfName(), controller);
         nftype.add((InterfaceType) controller.getFcItfType());
@@ -250,9 +250,9 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
             ProActiveGCMInterfaceType itfType, ComponentParameters componentParam,
             Vector<InterfaceType> nftype) throws Exception {
 
-        if (ProActiveMembraneController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
+        if (PAMembraneController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) {
-            ProActiveInterface controller = createController(itfType, ProActiveMembraneControllerImpl.class);
+            ProActiveInterface controller = createController(itfType, PAMembraneControllerImpl.class);
             controlItfs.put(controller.getFcItfName(), controller);
             nftype.add((InterfaceType) controller.getFcItfType());
             return true; // The membrane controller is a very special case. As soon as the interface is included inside the non-functional type, 
@@ -297,10 +297,10 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     private ProActiveInterface createController(ProActiveGCMInterfaceType itfType, Class<?> controllerClass)
             throws Exception {
         ProActiveInterface itfToReturn = null;
-        AbstractProActiveController currentController = null;
+        AbstractPAController currentController = null;
         Constructor<?> controllerClassConstructor = controllerClass
                 .getConstructor(new Class[] { Component.class });
-        currentController = (AbstractProActiveController) controllerClassConstructor
+        currentController = (AbstractPAController) controllerClassConstructor
                 .newInstance(new Object[] { this });
         itfToReturn = MetaObjectInterfaceClassGenerator.instance().generateInterface(itfType.getFcItfName(),
                 this, itfType, itfType.isInternal(), false);
@@ -388,7 +388,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
         while (iteratorOnControllers.hasNext()) {
             Class<?> controllerClass = null;
-            AbstractProActiveController currentController = null;
+            AbstractPAController currentController = null;
             ProActiveInterface theController = null;
             String controllerItfName = iteratorOnControllers.next();
 
@@ -422,7 +422,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
                 Constructor<?> controllerClassConstructor = controllerClass
                         .getConstructor(new Class[] { Component.class });
-                currentController = (AbstractProActiveController) controllerClassConstructor
+                currentController = (AbstractPAController) controllerClassConstructor
                         .newInstance(new Object[] { this });
                 theController = createController(
                         (ProActiveGCMInterfaceType) currentController.getFcItfType(), controllerClass);
@@ -682,7 +682,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
                 ProActiveInterface controller = createController(itf_type, controllerClass);
 
                 if (itf_ref.getFcItfImpl() != null) { // Dealing with first initialization
-                    if (itf_ref.getFcItfImpl() instanceof AbstractProActiveController) { //In this case, itf_ref is implemented by a controller object
+                    if (itf_ref.getFcItfImpl() instanceof AbstractPAController) { //In this case, itf_ref is implemented by a controller object
                         if (controller.getFcItfImpl() instanceof ControllerStateDuplication) { //Duplicate the state of the existing controller
                             Object ob = itf_ref.getFcItfImpl();
                             if (ob instanceof ControllerStateDuplication) {
@@ -762,8 +762,8 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
          */
         for (Interface controller : controlItfs.values()) {
             Object c = ((ProActiveInterface) controller).getFcItfImpl();
-            if (c instanceof ProActiveController) { // Object Controller
-                ((ProActiveController) c).migrateDependentActiveObjectsTo(node);
+            if (c instanceof PAController) { // Object Controller
+                ((PAController) c).migrateDependentActiveObjectsTo(node);
             } else {
                 //TODO : Case of migration of component controllers
             }

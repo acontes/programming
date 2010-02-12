@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.component.exceptions.NoSuchComponentExceptio
  * @author The ProActive Team
  */
 @PublicAPI
-public interface ProActiveMembraneController {
+public interface PAMembraneController {
 
     public final static String MEMBRANE_STOPPED = "MEMBRANE_STOPPED";
     public final static String MEMBRANE_STARTED = "MEMBRANE_STARTED";

@@ -44,7 +44,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
+import org.objectweb.proactive.core.component.controller.PAMembraneController;
 
 
 /**
@@ -93,7 +93,7 @@ public class ComponentMembraneActivityPriority extends ComponentActivityPriority
                      * While the membrane is stopped, serve calls only on the Membrane Controller
                      */
                     while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
-                            .getMembraneState().equals(ProActiveMembraneController.MEMBRANE_STOPPED)) {
+                            .getMembraneState().equals(PAMembraneController.MEMBRANE_STOPPED)) {
                         componentService.blockingServeOldest(memRequestFilter);
                     }
 
@@ -142,7 +142,7 @@ public class ComponentMembraneActivityPriority extends ComponentActivityPriority
                      * same as for Lifecycle Stopped)
                      */
                     while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
-                            .getMembraneState().equals(ProActiveMembraneController.MEMBRANE_STARTED)) {
+                            .getMembraneState().equals(PAMembraneController.MEMBRANE_STARTED)) {
                         PriorityController pc = (PriorityController) componentBody
                                 .getProActiveComponentImpl().getFcInterface(Constants.PRIORITY_CONTROLLER);
                         NF3RequestFilter nf3RequestFilter = new NF3RequestFilter(pc);

@@ -54,12 +54,12 @@ import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
-import org.objectweb.proactive.core.component.controller.ProActiveContentController;
-import org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController;
-import org.objectweb.proactive.core.component.controller.ProActiveMigrationController;
-import org.objectweb.proactive.core.component.controller.ProActiveMulticastController;
-import org.objectweb.proactive.core.component.controller.ProActiveSuperController;
+import org.objectweb.proactive.core.component.controller.PABindingController;
+import org.objectweb.proactive.core.component.controller.PAContentController;
+import org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController;
+import org.objectweb.proactive.core.component.controller.PAMigrationController;
+import org.objectweb.proactive.core.component.controller.PAMulticastController;
+import org.objectweb.proactive.core.component.controller.PASuperController;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.conform.components.I;
@@ -69,21 +69,21 @@ public abstract class Conformtest extends ComponentTest {
     // FcItfName/FcItfSignature/isFcClientItf ^ internal, isFcOptionalItf, isFcCollectionItf
     protected final static String COMP = "component/org.objectweb.proactive.core.component.identity.ProActiveComponent/false,false,false";
     protected final static String BC = Constants.BINDING_CONTROLLER + "/" +
-        ProActiveBindingController.class.getCanonicalName() + "/false,false,false";
+        PABindingController.class.getCanonicalName() + "/false,false,false";
     protected final static String CC = Constants.CONTENT_CONTROLLER + "/" +
-        ProActiveContentController.class.getCanonicalName() + "/false,false,false";
+        PAContentController.class.getCanonicalName() + "/false,false,false";
     protected final static String NC = Constants.NAME_CONTROLLER + "/" +
         NameController.class.getCanonicalName() + "/false,false,false";
     //protected final static String NC = "name-controller/org.objectweb.proactive.core.component.controller.ProActiveNameController/false,false,false";
     protected final static String LC = Constants.LIFECYCLE_CONTROLLER + "/" +
-        ProActiveGCMLifeCycleController.class.getCanonicalName() + "/false,false,false";
+        PAGCMLifeCycleController.class.getCanonicalName() + "/false,false,false";
     protected final static String SC = Constants.SUPER_CONTROLLER + "/" +
-        ProActiveSuperController.class.getCanonicalName() + "/false,false,false";
+        PASuperController.class.getCanonicalName() + "/false,false,false";
     protected final static String F = "factory/org.objectweb.proactive.core.component.Fractive/false,false,false"; //org.objectweb.proactive.core.component.factory.ProActiveGenericFactory
     protected final static String MC = Constants.MIGRATION_CONTROLLER + "/" +
-        ProActiveMigrationController.class.getCanonicalName() + "/false,false,false";
+        PAMigrationController.class.getCanonicalName() + "/false,false,false";
     protected final static String MCC = Constants.MULTICAST_CONTROLLER + "/" +
-        ProActiveMulticastController.class.getCanonicalName() + "/false,false,false";
+        PAMulticastController.class.getCanonicalName() + "/false,false,false";
     protected final static String GC = Constants.GATHERCAST_CONTROLLER + "/" +
         GathercastController.class.getCanonicalName() + "/false,false,false";
     //protected final static String CP = "component-parameters-controller/org.objectweb.proactive.core.component.controller.ComponentParametersController/false,false,false";

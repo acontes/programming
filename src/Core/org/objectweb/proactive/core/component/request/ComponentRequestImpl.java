@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
-import org.objectweb.proactive.core.component.controller.ProActiveGathercastControllerImpl;
+import org.objectweb.proactive.core.component.controller.PAGathercastControllerImpl;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.representative.ItfID;
@@ -137,7 +137,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
-                    result = ((ProActiveGathercastControllerImpl) ((ProActiveInterface) Fractive
+                    result = ((PAGathercastControllerImpl) ((ProActiveInterface) Fractive
                             .getGathercastController(actualComponent)).getFcItfImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
@@ -158,7 +158,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
-                    result = ((ProActiveGathercastControllerImpl) ((ProActiveInterface) Fractive
+                    result = ((PAGathercastControllerImpl) ((ProActiveInterface) Fractive
                             .getGathercastController(actualComponent)).getFcItfImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (hierarchical_type.equals(Constants.COMPOSITE)) {

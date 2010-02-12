@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  * @author The ProActive Team
  */
-public abstract class AbstractProActiveController implements ProActiveController, Serializable {
+public abstract class AbstractPAController implements PAController, Serializable {
     private boolean isInternal = true;
     private InterfaceType interfaceType;
     final protected static Logger controllerLogger = ProActiveLogger
@@ -71,7 +71,7 @@ public abstract class AbstractProActiveController implements ProActiveController
      * 
      * @param owner the component that wants this controller is in the {@link Constants} class.
      */
-    public AbstractProActiveController(Component owner) {
+    public AbstractPAController(Component owner) {
         this.owner = (ProActiveComponent) owner;
         setControllerItfType();
     }
@@ -80,7 +80,7 @@ public abstract class AbstractProActiveController implements ProActiveController
      * Default void implementation of the the initController method. A controller requiring 
      * initialization *after* all interfaces are instantiated have to override this method.
      * 
-     * @see org.objectweb.proactive.core.component.controller.ProActiveController#initController()
+     * @see org.objectweb.proactive.core.component.controller.PAController#initController()
      */
     public void initController() {
     }

@@ -51,9 +51,8 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
 
 
-public class ProActiveMigrationControllerImpl extends AbstractProActiveController implements
-        ProActiveMigrationController {
-    public ProActiveMigrationControllerImpl(Component owner) {
+public class PAMigrationControllerImpl extends AbstractPAController implements PAMigrationController {
+    public PAMigrationControllerImpl(Component owner) {
         super(owner);
     }
 
@@ -61,7 +60,7 @@ public class ProActiveMigrationControllerImpl extends AbstractProActiveControlle
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MIGRATION_CONTROLLER,
-                    ProActiveMigrationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    PAMigrationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type for controller " +

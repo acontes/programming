@@ -52,7 +52,7 @@ import org.objectweb.proactive.core.component.exceptions.ContentControllerExcept
  * @author The ProActive Team
  */
 @PublicAPI
-public interface ProActiveContentController extends ContentController {
+public interface PAContentController extends ContentController {
 
     /**
      * Adds a list of sub components, possibly in parallel. This method delegates the addition

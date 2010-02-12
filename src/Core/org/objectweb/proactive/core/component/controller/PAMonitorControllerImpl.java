@@ -74,7 +74,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class ProActiveMonitorControllerImpl extends AbstractProActiveController implements MonitorController,
+public class PAMonitorControllerImpl extends AbstractPAController implements MonitorController,
         NotificationListener {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
@@ -86,7 +86,7 @@ public class ProActiveMonitorControllerImpl extends AbstractProActiveController 
 
     private Map<String, String> keysList;
 
-    public ProActiveMonitorControllerImpl(Component owner) {
+    public PAMonitorControllerImpl(Component owner) {
         super(owner);
         jmxNotificationManager = JMXNotificationManager.getInstance();
     }
@@ -132,7 +132,7 @@ public class ProActiveMonitorControllerImpl extends AbstractProActiveController 
                             bindedComponentsIterator = bindedComponent.iterator();
                         } else {
                             try {
-                                ProActiveMulticastControllerImpl multicastController = (ProActiveMulticastControllerImpl) ((ProActiveInterface) GCM
+                                PAMulticastControllerImpl multicastController = (PAMulticastControllerImpl) ((ProActiveInterface) GCM
                                         .getMulticastController(owner)).getFcItfImpl();
                                 Iterator<ProActiveInterface> delegatee = multicastController.getDelegatee(
                                         itf.getFcItfName()).iterator();
@@ -162,8 +162,8 @@ public class ProActiveMonitorControllerImpl extends AbstractProActiveController 
                     Method[] methods = klass.getDeclaredMethods();
                     for (Method m : methods) {
                         Class<?>[] parametersTypes = m.getParameterTypes();
-                        String key = ProActiveMonitorControllerHelper.generateKey(itf.getFcItfName(), m
-                                .getName(), parametersTypes);
+                        String key = PAMonitorControllerHelper.generateKey(itf.getFcItfName(), m.getName(),
+                                parametersTypes);
                         keysList.put(m.getName(), key);
                         if (subcomponentMonitors.isEmpty()) {
                             statistics.put(key, new MethodStatisticsPrimitiveImpl(itf.getFcItfName(), m
@@ -226,7 +226,7 @@ public class ProActiveMonitorControllerImpl extends AbstractProActiveController 
 
     public Object getGCMStatistics(String itfName, String methodName, Class<?>[] parameterTypes)
             throws NoSuchMethodException {
-        String supposedCorrespondingKey = ProActiveMonitorControllerHelper.generateKey(itfName, methodName,
+        String supposedCorrespondingKey = PAMonitorControllerHelper.generateKey(itfName, methodName,
                 parameterTypes);
         MethodStatistics methodStats = (MethodStatistics) statistics.get(supposedCorrespondingKey);
         if (methodStats != null) {

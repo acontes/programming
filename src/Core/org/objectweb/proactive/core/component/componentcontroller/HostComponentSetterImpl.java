@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.controller.AbstractProActiveController;
+import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
 
@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
  *
  * @author The ProActive Team
  */
-public class HostComponentSetterImpl extends AbstractProActiveController implements HostComponentSetter {
+public class HostComponentSetterImpl extends AbstractPAController implements HostComponentSetter {
 
     public HostComponentSetterImpl(Component owner) {
         super(owner);

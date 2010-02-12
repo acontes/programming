@@ -40,18 +40,18 @@ import org.objectweb.fractal.api.Component;
 
 /**
  * Extension of the
- * {@link ProActiveBindingControllerImpl} class for non functional components.
+ * {@link PAContentControllerImpl} class for non functional components.
  *
  * @author The ProActive Team
  */
-public class ProActiveNFBindingControllerImpl extends ProActiveBindingControllerImpl {
+public class PANFContentControllerImpl extends PAContentControllerImpl {
 
     /**
-     * Constructor for ProActiveNFBindingController.
+     * Constructor for ProActiveNFContentController.
      *
      * @param owner The owner component.
-     */
-    public ProActiveNFBindingControllerImpl(Component owner) {
+    */
+    public PANFContentControllerImpl(Component owner) {
         super(owner);
     }
 }

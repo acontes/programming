@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.ProActiveInterface;
  *
  * @author The ProActive Team
  */
-public abstract class AbstractCollectiveInterfaceController extends AbstractProActiveController {
+public abstract class AbstractCollectiveInterfaceController extends AbstractPAController {
 
     public AbstractCollectiveInterfaceController(Component owner) {
         super(owner);

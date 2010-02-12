@@ -48,7 +48,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
+import org.objectweb.proactive.core.component.controller.PAMembraneController;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
 import org.objectweb.proactive.core.node.Node;
@@ -91,25 +91,25 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.BINDING_CONTROLLER,
-                                        /*BINDING CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveBindingController.class
+                                        /*BINDING CONTROLLER*/org.objectweb.proactive.core.component.controller.PABindingController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.CONTENT_CONTROLLER,
-                                        /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveContentController.class
+                                        /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.controller.PAContentController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.LIFECYCLE_CONTROLLER,
-                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController.class
+                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveSuperController.class
+                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.controller.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
@@ -117,8 +117,8 @@ public class Test extends ComponentTest {
                                 TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
 
                         type_factory.createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                        /*MEMBRANE CONTROLLER*/ProActiveMembraneController.class.getName(),
-                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        /*MEMBRANE CONTROLLER*/PAMembraneController.class.getName(), TypeFactory.SERVER,
+                                TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         "dummy-controller",
@@ -138,7 +138,7 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.controller.ProActiveSuperController.class
+                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.controller.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
@@ -146,8 +146,8 @@ public class Test extends ComponentTest {
                                 TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
 
                         type_factory.createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                        /*MEMBRANE CONTROLLER*/ProActiveMembraneController.class.getName(),
-                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        /*MEMBRANE CONTROLLER*/PAMembraneController.class.getName(), TypeFactory.SERVER,
+                                TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         "dummy-controller",
@@ -161,19 +161,16 @@ public class Test extends ComponentTest {
                     Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
         //Filling the membrane with object  controllers
-        ProActiveMembraneController memController = Fractive.getMembraneController(componentA);
+        PAMembraneController memController = Fractive.getMembraneController(componentA);
 
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl.class
-                        .getName());
+                org.objectweb.proactive.core.component.controller.PABindingControllerImpl.class.getName());
         memController.setControllerObject(Constants.CONTENT_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ProActiveContentControllerImpl.class
-                        .getName());
+                org.objectweb.proactive.core.component.controller.PAContentControllerImpl.class.getName());
         memController.setControllerObject(Constants.SUPER_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl.class
-                        .getName());
+                org.objectweb.proactive.core.component.controller.PASuperControllerImpl.class.getName());
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ProActiveNameController.class.getName());
+                org.objectweb.proactive.core.component.controller.PANameController.class.getName());
 
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
         Map context = new HashMap();
@@ -189,10 +186,9 @@ public class Test extends ComponentTest {
                 .getName(), new Object[] { "tata" }), new ControllerDescription("componentB",
             Constants.PRIMITIVE, !Constants.SYNCHRONOUS, Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
-        ProActiveMembraneController memControllerB = Fractive.getMembraneController(componentB);
+        PAMembraneController memControllerB = Fractive.getMembraneController(componentB);
         memControllerB.setControllerObject(Constants.SUPER_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.ProActiveSuperControllerImpl.class
-                        .getName());
+                org.objectweb.proactive.core.component.controller.PASuperControllerImpl.class.getName());
 
         Component dummyController = (Component) f.newComponent(
                 "functionalTests.component.nonfunctional.adl.dummyPrimitive", context);

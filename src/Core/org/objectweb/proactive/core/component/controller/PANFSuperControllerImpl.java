@@ -36,30 +36,22 @@
 package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Extension of the standard Fractal {@link org.objectweb.fractal.api.control.BindingController BindingController }
+ * Extension of the
+ * {@link PASuperControllerImpl} class for non functional components.
  *
  * @author The ProActive Team
  */
-@PublicAPI
-public interface ProActiveBindingController extends BindingController {
+public class PANFSuperControllerImpl extends PASuperControllerImpl {
 
     /**
-     * Check if the current component's client interfaces are bounded.
+     * Constructor for ProActiveNFSuperController.
      *
-     * @return true if this component is bound on a client interface
+     * @param owner The owner component.
      */
-    public Boolean isBound();
-
-    /**
-     * Check if the current component is bound to an interface belonged to the given component.
-     *
-     * @param component A component
-     * @return true if the current component is bound on this other component
-     */
-    public Boolean isBoundTo(Component component);
+    public PANFSuperControllerImpl(Component owner) {
+        super(owner);
+    }
 }

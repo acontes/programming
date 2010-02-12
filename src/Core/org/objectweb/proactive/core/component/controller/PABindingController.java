@@ -36,30 +36,30 @@
 package org.objectweb.proactive.core.component.controller;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.SuperController;
+import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Extension of the {@link SuperController} interface.
+ * Extension of the standard Fractal {@link org.objectweb.fractal.api.control.BindingController BindingController }
  *
  * @author The ProActive Team
- * @see SuperController
  */
 @PublicAPI
-public interface ProActiveSuperController extends SuperController {
+public interface PABindingController extends BindingController {
 
     /**
-     * Add a parent component.
+     * Check if the current component's client interfaces are bounded.
      *
-     * @param parent
+     * @return true if this component is bound on a client interface
      */
-    public abstract void addParent(final Component parent);
+    public Boolean isBound();
 
     /**
-     * Remove a parent component.
+     * Check if the current component is bound to an interface belonged to the given component.
      *
-     * @param parent
+     * @param component A component
+     * @return true if the current component is bound on this other component
      */
-    public abstract void removeParent(final Component parent);
+    public Boolean isBoundTo(Component component);
 }

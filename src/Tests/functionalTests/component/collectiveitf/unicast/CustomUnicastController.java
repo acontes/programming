@@ -36,11 +36,11 @@
 package functionalTests.component.collectiveitf.unicast;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.proactive.core.component.controller.ProActiveMulticastControllerImpl;
+import org.objectweb.proactive.core.component.controller.PAMulticastControllerImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
-public class CustomUnicastController extends ProActiveMulticastControllerImpl {
+public class CustomUnicastController extends PAMulticastControllerImpl {
 
     public CustomUnicastController(Component owner) {
         super(owner);

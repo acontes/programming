@@ -79,8 +79,8 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-public class ProActiveMulticastControllerImpl extends AbstractCollectiveInterfaceController implements
-        ProActiveMulticastController, Serializable, ControllerStateDuplication {
+public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceController implements
+        PAMulticastController, Serializable, ControllerStateDuplication {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     private static Logger multicastLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST);
     private Map<String, ProActiveInterface> multicastItfs = new HashMap<String, ProActiveInterface>();
@@ -89,7 +89,7 @@ public class ProActiveMulticastControllerImpl extends AbstractCollectiveInterfac
     // Map<clientSideItfName, Map<serverSideItfSignature, Map<clientSideMethod, serverSideMethod>>>
     private Map<String, Map<String, Map<SerializableMethod, SerializableMethod>>> matchingMethods = new HashMap<String, Map<String, Map<SerializableMethod, SerializableMethod>>>();
 
-    public ProActiveMulticastControllerImpl(Component owner) {
+    public PAMulticastControllerImpl(Component owner) {
         super(owner);
     }
 
@@ -201,7 +201,7 @@ public class ProActiveMulticastControllerImpl extends AbstractCollectiveInterfac
     protected void setControllerItfType() {
         try {
             setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MULTICAST_CONTROLLER,
-                    ProActiveMulticastController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    PAMulticastController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type for controller " +

@@ -71,11 +71,11 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.controller.ProActiveBindingController;
-import org.objectweb.proactive.core.component.controller.ProActiveContentController;
-import org.objectweb.proactive.core.component.controller.ProActiveMembraneController;
-import org.objectweb.proactive.core.component.controller.ProActiveMigrationController;
-import org.objectweb.proactive.core.component.controller.ProActiveMulticastController;
+import org.objectweb.proactive.core.component.controller.PABindingController;
+import org.objectweb.proactive.core.component.controller.PAContentController;
+import org.objectweb.proactive.core.component.controller.PAMembraneController;
+import org.objectweb.proactive.core.component.controller.PAMigrationController;
+import org.objectweb.proactive.core.component.controller.PAMulticastController;
 import org.objectweb.proactive.core.component.exceptions.InstantiationExceptionListException;
 import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
 import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
@@ -132,49 +132,49 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         return instance;
     }
 
-    public static ProActiveBindingController getBindingController(final Component component)
+    public static PABindingController getBindingController(final Component component)
             throws NoSuchInterfaceException {
-        return (ProActiveBindingController) component.getFcInterface(Constants.BINDING_CONTROLLER);
+        return (PABindingController) component.getFcInterface(Constants.BINDING_CONTROLLER);
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveMulticastController MulticastController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.PAMulticastController MulticastController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveMulticastController MulticastController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.PAMulticastController MulticastController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static ProActiveMulticastController getMulticastController(final Component component)
+    public static PAMulticastController getMulticastController(final Component component)
             throws NoSuchInterfaceException {
-        return (ProActiveMulticastController) component.getFcInterface(Constants.MULTICAST_CONTROLLER);
+        return (PAMulticastController) component.getFcInterface(Constants.MULTICAST_CONTROLLER);
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveContentController ProActiveContentController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.PAContentController ProActiveContentController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveContentController ProActiveContentController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.PAContentController ProActiveContentController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static ProActiveContentController getContentController(final Component component)
+    public static PAContentController getContentController(final Component component)
             throws NoSuchInterfaceException {
-        return (ProActiveContentController) component.getFcInterface(Constants.CONTENT_CONTROLLER);
+        return (PAContentController) component.getFcInterface(Constants.CONTENT_CONTROLLER);
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveMembraneController MembraneController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.PAMembraneController MembraneController}
      * interface of the given component.
      * @param component omponent a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveMembraneController MembraneController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.PAMembraneController MembraneController}
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static ProActiveMembraneController getMembraneController(final Component component)
+    public static PAMembraneController getMembraneController(final Component component)
             throws NoSuchInterfaceException {
-        return (ProActiveMembraneController) component.getFcInterface(Constants.MEMBRANE_CONTROLLER);
+        return (PAMembraneController) component.getFcInterface(Constants.MEMBRANE_CONTROLLER);
     }
 
     /**
@@ -192,17 +192,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.ProActiveMigrationController MigrationController}
+     * Returns the {@link org.objectweb.proactive.core.component.controller.PAMigrationController MigrationController}
      * interface of the given component.
      *
      * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.ProActiveMigrationController MigrationController}
+     * @return the {@link org.objectweb.proactive.core.component.controller.PAMigrationController MigrationController}
      *         interface of the given component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static ProActiveMigrationController getMigrationController(final Component component)
+    public static PAMigrationController getMigrationController(final Component component)
             throws NoSuchInterfaceException {
-        return (ProActiveMigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
+        return (PAMigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
     }
 
     /**

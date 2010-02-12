@@ -8,18 +8,18 @@
 		<!-- need to add the factory itf -->
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.ProActiveBindingController
+				org.objectweb.proactive.core.component.controller.PABindingController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.ProActiveBindingControllerImpl
+				org.objectweb.proactive.core.component.controller.PABindingControllerImpl
 			</implementation>
 		</controller>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController
+				org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleControllerImpl
+				org.objectweb.proactive.core.component.controller.PAGCMLifeCycleControllerImpl
 			</implementation>
 		</controller>
 		<controller>
@@ -27,15 +27,15 @@
 				org.objectweb.fractal.api.control.NameController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.ProActiveNameController
+				org.objectweb.proactive.core.component.controller.PANameController
 			</implementation>
 		</controller>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.ProActiveMulticastController
+				org.objectweb.proactive.core.component.controller.PAMulticastController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.ProActiveMulticastControllerImpl
+				org.objectweb.proactive.core.component.controller.PAMulticastControllerImpl
 			</implementation>
 		</controller>
 		<controller>
@@ -43,15 +43,15 @@
 				org.etsi.uri.gcm.api.control.GathercastController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.ProActiveGathercastControllerImpl
+				org.objectweb.proactive.core.component.controller.PAGathercastControllerImpl
 			</implementation>
 		</controller>
         <controller>
             <interface>
-            	org.objectweb.proactive.core.component.controller.ProActiveMigrationController
+            	org.objectweb.proactive.core.component.controller.PAMigrationController
             </interface>
             <implementation>
-            	org.objectweb.proactive.core.component.controller.ProActiveMigrationControllerImpl
+            	org.objectweb.proactive.core.component.controller.PAMigrationControllerImpl
             </implementation>
         </controller>
 	</controllers>
