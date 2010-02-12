@@ -44,7 +44,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.ComponentTestDefaultNodes;
@@ -73,7 +73,7 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
     public void primitiveCreation() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
 
         Node remoteNode = super.getANode();
         String remoteHost = remoteNode.getVMInformation().getHostName();
@@ -100,7 +100,7 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
     public void compositeCreation() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
 
         Node remoteNode = super.getANode();
         String remoteHost = remoteNode.getVMInformation().getHostName();

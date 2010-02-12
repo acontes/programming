@@ -55,13 +55,13 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.SerializableMethod;
@@ -88,9 +88,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class GatherRequestsQueues implements Serializable {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
     Map<String, Map<SerializableMethod, List<GatherRequestsQueue>>> queues = new HashMap<String, Map<SerializableMethod, List<GatherRequestsQueue>>>();
-    ProActiveComponent owner;
+    PAComponent owner;
     List<Object> gatherItfs = new ArrayList<Object>();
-    ProActiveGCMInterfaceType[] itfTypes;
+    PAGCMInterfaceType[] itfTypes;
     GatherFuturesHandlerPool gatherFuturesHandlerPool;
 
     /**
@@ -115,12 +115,12 @@ public class GatherRequestsQueues implements Serializable {
         }
     }
 
-    public GatherRequestsQueues(ProActiveComponent owner) {
+    public GatherRequestsQueues(PAComponent owner) {
         this.owner = owner;
         InterfaceType[] untypedItfs = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
-        itfTypes = new ProActiveGCMInterfaceType[untypedItfs.length];
+        itfTypes = new PAGCMInterfaceType[untypedItfs.length];
         for (int i = 0; i < itfTypes.length; i++) {
-            itfTypes[i] = (ProActiveGCMInterfaceType) untypedItfs[i];
+            itfTypes[i] = (PAGCMInterfaceType) untypedItfs[i];
         }
 
         for (int i = 0; i < itfTypes.length; i++) {
@@ -242,7 +242,7 @@ public class GatherRequestsQueues implements Serializable {
                     gatherMethodParamTypes[i] = List.class;
                 }
 
-                Class<?> gatherItfClass = Class.forName(((InterfaceType) ((ProActiveInterface) owner
+                Class<?> gatherItfClass = Class.forName(((InterfaceType) ((PAInterface) owner
                         .getFcInterface(serverItfName)).getFcItfType()).getFcItfSignature());
 
                 Method gatherMethod = gatherItfClass
@@ -304,7 +304,7 @@ public class GatherRequestsQueues implements Serializable {
         }
     }
 
-    private ProActiveGCMInterfaceType getItfType(String name) {
+    private PAGCMInterfaceType getItfType(String name) {
         for (int i = 0; i < itfTypes.length; i++) {
             if (name.equals(itfTypes[i].getFcItfName())) {
                 return itfTypes[i];

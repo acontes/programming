@@ -56,9 +56,9 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -69,8 +69,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  * @see PAGCMLifeCycleController
  */
-public class PAGCMLifeCycleControllerImpl extends AbstractPAController implements
-        PAGCMLifeCycleController, Serializable, ControllerStateDuplication {
+public class PAGCMLifeCycleControllerImpl extends AbstractPAController implements PAGCMLifeCycleController,
+        Serializable, ControllerStateDuplication {
     static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     protected String fcState = LifeCycleController.STOPPED;
 
@@ -81,7 +81,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.LIFECYCLE_CONTROLLER,
                     PAGCMLifeCycleController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -226,7 +226,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                                                         nsie);
                                             }
                                             if (subComponentItfImpl != null) {
-                                                if (((ProActiveComponent) ((ProActiveInterface) subComponentItfImpl)
+                                                if (((PAComponent) ((PAInterface) subComponentItfImpl)
                                                         .getFcItfOwner()).getID().equals(owner.getID())) {
                                                     isBound = true;
                                                     break;

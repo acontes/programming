@@ -54,15 +54,15 @@ import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.controller.PAGathercastControllerImpl;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.representative.ItfID;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -110,7 +110,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
         Object result = null;
         Throwable exception = null;
 
-        ProActiveComponentImpl actualComponent = ((ComponentBody) targetBody).getProActiveComponentImpl();
+        PAComponentImpl actualComponent = ((ComponentBody) targetBody).getProActiveComponentImpl();
         if (logger.isDebugEnabled()) {
             try {
                 logger.debug("invocation on method [" + methodCall.getName() + "] of interface [" +
@@ -129,7 +129,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
 
             Interface targetItf = (Interface) actualComponent.getFcInterface(methodCall
                     .getComponentMetadata().getComponentInterfaceName());
-            ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) targetItf.getFcItfType();
+            PAGCMInterfaceType itfType = (PAGCMInterfaceType) targetItf.getFcItfType();
 
             if (isControllerRequest()) {
                 // Serving non-functional request
@@ -137,7 +137,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
-                    result = ((PAGathercastControllerImpl) ((ProActiveInterface) Fractive
+                    result = ((PAGathercastControllerImpl) ((PAInterface) Fractive
                             .getGathercastController(actualComponent)).getFcItfImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
@@ -158,7 +158,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
-                    result = ((PAGathercastControllerImpl) ((ProActiveInterface) Fractive
+                    result = ((PAGathercastControllerImpl) ((PAInterface) Fractive
                             .getGathercastController(actualComponent)).getFcItfImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (hierarchical_type.equals(Constants.COMPOSITE)) {

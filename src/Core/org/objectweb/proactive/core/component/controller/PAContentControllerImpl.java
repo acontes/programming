@@ -57,8 +57,8 @@ import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -85,7 +85,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.CONTENT_CONTROLLER,
                     PAContentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -99,7 +99,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
      * in this implementation, the external interfaces are also internal interfaces
      */
     public Object[] getFcInternalInterfaces() {
-        Object[] itfs = ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterfaces();
+        Object[] itfs = ((PAComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterfaces();
         List<Object> internalItfs = new ArrayList<Object>();
 
         for (int i = 0; i < itfs.length; i++) {
@@ -119,7 +119,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
      * in this implementation, the external interfaces are also internal interfaces
      */
     public Object getFcInternalInterface(String interfaceName) throws NoSuchInterfaceException {
-        return ((ProActiveComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
+        return ((PAComponent) getFcItfOwner()).getRepresentativeOnThis().getFcInterface(interfaceName);
     }
 
     /*
@@ -180,7 +180,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
                         e);
         }
 
-        ProActiveComponent this_component = ((ProActiveComponent) getFcItfOwner());
+        PAComponent this_component = ((PAComponent) getFcItfOwner());
         Component ref_on_this_component = this_component.getRepresentativeOnThis();
 
         // check whether the subComponent is the component itself

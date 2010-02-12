@@ -41,7 +41,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**
@@ -65,7 +65,7 @@ public class PANameController extends AbstractPAController implements NameContro
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.NAME_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.NAME_CONTROLLER,
                     NameController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

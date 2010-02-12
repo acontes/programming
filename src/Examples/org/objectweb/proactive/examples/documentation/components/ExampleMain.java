@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -129,7 +129,7 @@ public class ExampleMain {
         //@snippet-end component_examples_9
 
         //@snippet-start component_examples_10
-        ProActiveGenericFactory componentFactory = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+        PAGenericFactory componentFactory = (PAGenericFactory) Fractal.getGenericFactory(boot);
         Component component = componentFactory.newFcInstance(aType, // type of the component (defining the client and server interfaces)
                 controllerDesc, // implementation-specific description for the controller
                 contentDesc, // implementation-specific description for the content

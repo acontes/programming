@@ -39,7 +39,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 
 
 /**
@@ -128,7 +128,7 @@ public class ControllerDescription implements Serializable {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
+        controllersSignatures = PAComponentImpl.loadControllerConfiguration(
                 this.controllersConfigFileLocation).getControllers();
     }
 
@@ -153,7 +153,7 @@ public class ControllerDescription implements Serializable {
             this.controllersConfigFileLocation = null;
         } else {
             this.controllersConfigFileLocation = DEFAULT_COMPONENT_CONFIG_FILE_LOCATION;
-            controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
+            controllersSignatures = PAComponentImpl.loadControllerConfiguration(
                     this.controllersConfigFileLocation).getControllers();
         }
     }

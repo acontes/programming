@@ -46,8 +46,8 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
 import functionalTests.ComponentTestDefaultNodes;
 import functionalTests.component.nonfunctional.creation.DummyControllerComponentImpl;
@@ -86,7 +86,7 @@ public class Test extends ComponentTestDefaultNodes {
          * Fractal-ProActive generic
          * factory
          */
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot);
+        PAGenericFactory cf = Fractive.getGenericFactory(boot);
 
         ComponentType fcType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "fitness-controller-membrane", DummyControllerItf.class.getName(), TypeFactory.SERVER,
@@ -110,7 +110,7 @@ public class Test extends ComponentTestDefaultNodes {
 
     @After
     public void postConditions() throws Exception {
-        Assert.assertTrue(dummyNFComponent instanceof ProActiveNFComponentRepresentative);
+        Assert.assertTrue(dummyNFComponent instanceof PANFComponentRepresentative);
     }
 
 }

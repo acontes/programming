@@ -42,7 +42,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.interception.OutputInterceptor;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 import functionalTests.component.controller.DummyController;
@@ -61,7 +61,7 @@ public class OutputInterceptor1Impl extends AbstractPAController implements Outp
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(OUTPUT_INTERCEPTOR_1_NAME,
                     OutputInterceptor1.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

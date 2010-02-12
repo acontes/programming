@@ -45,9 +45,9 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.controller.PAMembraneController;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.ComponentTest;
@@ -75,7 +75,7 @@ public class Test extends ComponentTest {
         //Thread.sleep(2000);
         Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
         TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -154,7 +154,7 @@ public class Test extends ComponentTest {
                 componentB.getFcInterface("componentInfo"));
 
         System.out.println("Parameters are : " +
-            ((ProActiveComponent) componentA).getComponentParameters().getHierarchicalType());
+            ((PAComponent) componentA).getComponentParameters().getHierarchicalType());
         System.out.println("Lifecycle state is : " + Fractal.getLifeCycleController(componentA).getFcState());
 
         System.out.println("Name is :" + Fractal.getNameController(componentA).getFcName());
@@ -182,7 +182,7 @@ public class Test extends ComponentTest {
                 componentB.getFcInterface("componentInfo"));
 
         System.out.println("Parameters are : " +
-            ((ProActiveComponent) componentA).getComponentParameters().getHierarchicalType());
+            ((PAComponent) componentA).getComponentParameters().getHierarchicalType());
         System.out.println("Lifecycle state is : " + Fractal.getLifeCycleController(componentA).getFcState());
         System.out.println("Name of the composte is :" + Fractal.getNameController(componentA).getFcName());
 
@@ -210,6 +210,6 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        return (componentA instanceof ProActiveComponentRepresentative);
+        return (componentA instanceof PAComponentRepresentative);
     }
 }

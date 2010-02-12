@@ -49,7 +49,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.node.Node;
@@ -63,7 +63,7 @@ public class Setup {
     private static ComponentType d_type = null;
     private static ComponentType A_TYPE = null;
     private static ComponentType B_TYPE = null;
-    private static ProActiveGenericFactory gf = null;
+    private static PAGenericFactory gf = null;
     private static GCMTypeFactory tf = null;
 
     private static void createTypes() throws Exception {
@@ -81,7 +81,7 @@ public class Setup {
             }
 
             if (gf == null) {
-                gf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+                gf = (PAGenericFactory) Fractal.getGenericFactory(boot);
             }
         }
     }

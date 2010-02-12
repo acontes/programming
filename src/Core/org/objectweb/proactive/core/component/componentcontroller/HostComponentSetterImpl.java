@@ -41,8 +41,8 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.controller.AbstractPAController;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**
@@ -60,9 +60,9 @@ public class HostComponentSetterImpl extends AbstractPAController implements Hos
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
-                    Constants.HOST_SETTER_CONTROLLER, HostComponentSetter.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.HOST_SETTER_CONTROLLER,
+                    HostComponentSetter.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
 
             throw new ProActiveRuntimeException("cannot create controller type : " +
@@ -72,7 +72,7 @@ public class HostComponentSetterImpl extends AbstractPAController implements Hos
     }
 
     public void setHostComponent(Component hostComponent) {
-        HostComponentSetter reified_Object = (HostComponentSetter) ((ProActiveComponent) getFcItfOwner())
+        HostComponentSetter reified_Object = (HostComponentSetter) ((PAComponent) getFcItfOwner())
                 .getReferenceOnBaseObject();
         reified_Object.setHostComponent(hostComponent);
 

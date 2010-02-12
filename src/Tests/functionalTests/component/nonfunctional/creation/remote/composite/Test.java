@@ -45,8 +45,8 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
 import functionalTests.ComponentTestDefaultNodes;
 import functionalTests.component.nonfunctional.creation.DummyControllerComponentImpl;
@@ -78,7 +78,7 @@ public class Test extends ComponentTestDefaultNodes {
          * Getting the Fractal-ProActive
          * type factory
          */
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*
+        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*
          * Getting the
          * Fractal-ProActive generic
          * factory
@@ -107,7 +107,7 @@ public class Test extends ComponentTestDefaultNodes {
         name = ref.dummyMethodWithResult();
         System.out.println(name);
         ref.dummyVoidMethod("Message to a composite");
-        Assert.assertTrue(dummyNFComposite instanceof ProActiveNFComponentRepresentative);
+        Assert.assertTrue(dummyNFComposite instanceof PANFComponentRepresentative);
         Fractal.getLifeCycleController(dummyNFComposite).stopFc();
     }
 }

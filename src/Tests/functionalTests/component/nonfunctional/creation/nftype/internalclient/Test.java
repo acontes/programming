@@ -45,9 +45,9 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
 import org.objectweb.proactive.core.node.Node;
 
 import functionalTests.ComponentTest;
@@ -73,7 +73,7 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
         TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -124,13 +124,12 @@ public class Test extends ComponentTest {
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
 
-                        ((ProActiveGCMTypeFactory) type_factory)
+                        ((PAGCMTypeFactory) type_factory)
                                 .createGCMItfType(
                                         "dummy-internal-client-controller",
                                         /*DUMMY CONTROLLER*/functionalTests.component.nonfunctional.creation.DummyControllerItf.class
                                                 .getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                                        GCMTypeFactory.SINGLETON_CARDINALITY,
-                                        ProActiveGCMTypeFactory.INTERNAL) });
+                                        GCMTypeFactory.SINGLETON_CARDINALITY, PAGCMTypeFactory.INTERNAL) });
 
         componentA = cf.newFcInstance(fType, nfType, (ContentDescription) null,//The component is composite
                 new ControllerDescription("componentA", Constants.COMPOSITE, !Constants.SYNCHRONOUS,
@@ -152,6 +151,6 @@ public class Test extends ComponentTest {
     }
 
     public boolean postConditions() throws Exception {
-        return (componentA instanceof ProActiveComponentRepresentative);
+        return (componentA instanceof PAComponentRepresentative);
     }
 }

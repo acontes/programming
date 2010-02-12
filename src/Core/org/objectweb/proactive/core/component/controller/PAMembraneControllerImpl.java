@@ -60,15 +60,15 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.NFBinding;
 import org.objectweb.proactive.core.component.NFBindings;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.componentcontroller.HostComponentSetter;
 import org.objectweb.proactive.core.component.exceptions.NoSuchComponentException;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl;
-import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeImpl;
+import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -95,7 +95,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MEMBRANE_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.MEMBRANE_CONTROLLER,
                     PAMembraneController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -104,7 +104,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
     }
 
-    private void checkCompatibility(ProActiveGCMInterfaceType client, ProActiveGCMInterfaceType server)
+    private void checkCompatibility(PAGCMInterfaceType client, PAGCMInterfaceType server)
             throws IllegalBindingException {
         try {
             Class<?> cl = Class.forName(client.getFcItfSignature());
@@ -134,9 +134,9 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
              */
         }
         checkMembraneIsStarted(component);
-        ProActiveComponent ownerRepresentative = owner.getRepresentativeOnThis();
+        PAComponent ownerRepresentative = owner.getRepresentativeOnThis();
         String name = null;
-        if (!(component instanceof ProActiveNFComponentRepresentative)) {
+        if (!(component instanceof PANFComponentRepresentative)) {
             throw new IllegalContentException(
                 "Only non-functional components should be added to the membrane");
         }
@@ -154,7 +154,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 "The name of the component is already assigned to an existing non functional component");
         }
 
-        if (!((ProActiveComponentRepresentativeImpl) ownerRepresentative).isPrimitive()) { /*
+        if (!((PAComponentRepresentativeImpl) ownerRepresentative).isPrimitive()) { /*
          * The host component is composite
          */
             Component[] fcomponents = null;
@@ -218,11 +218,10 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         nfcomponents.put(name, component);
     }
 
-    private void bindNfServerWithNfClient(String clItf, ProActiveInterface srItf)
-            throws IllegalBindingException {
-        ProActiveInterface cl = null;
+    private void bindNfServerWithNfClient(String clItf, PAInterface srItf) throws IllegalBindingException {
+        PAInterface cl = null;
         try {
-            cl = (ProActiveInterface) owner.getFcInterface(clItf);
+            cl = (PAInterface) owner.getFcInterface(clItf);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -236,9 +235,8 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
     }
 
-    private void bindNfServerWithNfCServer(String clItf, ProActiveInterface srItf)
-            throws IllegalBindingException {
-        ProActiveInterface cl = null;
+    private void bindNfServerWithNfCServer(String clItf, PAInterface srItf) throws IllegalBindingException {
+        PAInterface cl = null;
         Component srOwner = srItf.getFcItfOwner();
         try {
             if (nfBindings.hasBinding("membrane", clItf, Fractal.getNameController(srOwner).getFcName(),
@@ -252,7 +250,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
 
         try {
-            cl = (ProActiveInterface) owner.getFcInterface(clItf);
+            cl = (PAInterface) owner.getFcInterface(clItf);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -264,8 +262,8 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             if (ob instanceof ControllerStateDuplication) {//The controller is implemented with an object
                 dup.duplicateController(((ControllerStateDuplication) ob).getState().getStateObject());
             } else {//The controller is implemented with a NF component??
-                if (ob instanceof ProActiveInterface) {
-                    Component cmp = ((ProActiveInterface) ob).getFcItfOwner();
+                if (ob instanceof PAInterface) {
+                    Component cmp = ((PAInterface) ob).getFcItfOwner();
                     ControllerStateDuplication duplicated = (ControllerStateDuplication) cmp
                             .getFcInterface(Constants.CONTROLLER_STATE_DUPLICATION);
                     dup.duplicateController(duplicated.getState().getStateObject());
@@ -287,13 +285,12 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
     }
 
-    private void bindNfClientWithFCServer(String clItf, ProActiveInterface srItf)
-            throws IllegalBindingException {
+    private void bindNfClientWithFCServer(String clItf, PAInterface srItf) throws IllegalBindingException {
 
-        ProActiveInterface cl = null;
+        PAInterface cl = null;
         Component srOwner = null;
         try {
-            cl = (ProActiveInterface) owner.getFcInterface(clItf);
+            cl = (PAInterface) owner.getFcInterface(clItf);
         } catch (NoSuchInterfaceException e) {
 
             e.printStackTrace();
@@ -321,7 +318,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
     }
 
-    private void bindClientNFWithInternalServerNF(String clItf, ProActiveInterface srItf)
+    private void bindClientNFWithInternalServerNF(String clItf, PAInterface srItf)
             throws IllegalBindingException {
         bindNfServerWithNfClient(clItf, srItf);
     }
@@ -331,10 +328,10 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
         ComponentAndInterface client = getComponentAndInterface(clientItf);
         ComponentAndInterface server = getComponentAndInterface(serverItf);
-        ProActiveInterface clItf = (ProActiveInterface) client.getInterface();
-        ProActiveGCMInterfaceType clItfType = (ProActiveGCMInterfaceType) clItf.getFcItfType();
-        ProActiveInterface srItf = (ProActiveInterface) server.getInterface();
-        ProActiveGCMInterfaceType srItfType = (ProActiveGCMInterfaceType) srItf.getFcItfType();
+        PAInterface clItf = (PAInterface) client.getInterface();
+        PAGCMInterfaceType clItfType = (PAGCMInterfaceType) clItf.getFcItfType();
+        PAInterface srItf = (PAInterface) server.getInterface();
+        PAGCMInterfaceType srItfType = (PAGCMInterfaceType) srItf.getFcItfType();
 
         if (client.getComponent() == null) { //The client interface belongs to the membrane
             if (!clItfType.isFcClientItf()) { //the client interface is a server one (internal or external) belonging to the membrane
@@ -369,7 +366,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 } else { //The server interface belongs to a component. Possible bindings : External/Internal NF server with a server of a NF component
                     checkMembraneIsStarted(server.getComponent());
                     if (srItfType.isFcClientItf() ||
-                        !(server.getComponent() instanceof ProActiveNFComponentRepresentative) ||
+                        !(server.getComponent() instanceof PANFComponentRepresentative) ||
                         srItfType.getFcItfName().endsWith("-controller")) {
                         throw new IllegalBindingException(
                             "NF server interfaces can be bound only to server F interfaces of NF components");
@@ -394,7 +391,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                     }
 
                 } else {
-                    if ((server.getComponent() instanceof ProActiveNFComponentRepresentative) ||
+                    if ((server.getComponent() instanceof PANFComponentRepresentative) ||
                         !(srItfType.getFcItfName().endsWith("-controller"))) {
                         throw new IllegalBindingException(
                             "With this method, an internal client NF interface can only be bound to a NF interface of a F inner component");
@@ -410,7 +407,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             if (!clItfType.isFcClientItf()) { //Check that a client interface of a F/NF component is bound
                 throw new IllegalBindingException("Only a client interface of a NF/F can be bound");
             } else {
-                if (client.getComponent() instanceof ProActiveNFComponentRepresentative) { //All possible bindings for client interfaces of NF components 
+                if (client.getComponent() instanceof PANFComponentRepresentative) { //All possible bindings for client interfaces of NF components 
                     if (server.getComponent() == null) { //A client interface of a NF component to a NF external/internal client
                         if (srItfType.isFcClientItf() && srItfType.getFcItfName().endsWith("-controller")) { //Connection to any (internal/external) client NF interface
                             checkMembraneIsStopped();
@@ -435,7 +432,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                                 "A NF component can only be bound to client NF interfaces of the membrane");
                         }
                     } else { //Binding of 2 NF components
-                        if (!(server.getComponent() instanceof ProActiveNFComponentRepresentative)) { //The server component has to be a NF one
+                        if (!(server.getComponent() instanceof PANFComponentRepresentative)) { //The server component has to be a NF one
                             throw new IllegalBindingException(
                                 "A NF component can only be bound to another NF (not F) component");
                         } else { //Last verification before binding
@@ -489,10 +486,10 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         checkMembraneIsStopped();
         serverItf = PAFuture.getFutureValue(serverItf);
         ComponentAndInterface client = getComponentAndInterface(clientItf);
-        ProActiveInterface clItf = (ProActiveInterface) client.getInterface();
-        ProActiveGCMInterfaceType clItfType = (ProActiveGCMInterfaceType) clItf.getFcItfType();
-        ProActiveInterface srItf = (ProActiveInterface) serverItf;
-        ProActiveGCMInterfaceType srItfType = (ProActiveGCMInterfaceType) srItf.getFcItfType();
+        PAInterface clItf = (PAInterface) client.getInterface();
+        PAGCMInterfaceType clItfType = (PAGCMInterfaceType) clItf.getFcItfType();
+        PAInterface srItf = (PAInterface) serverItf;
+        PAGCMInterfaceType srItfType = (PAGCMInterfaceType) srItf.getFcItfType();
         if (!clItfType.isFcClientItf()) {
             throw new IllegalBindingException("This method only binds NF client interfaces");
         } else {//OK for binding, but first check that types are compatible
@@ -505,7 +502,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                     "--> external NF interface already exists");
             }
             checkCompatibility(clItfType, srItfType);
-            ProActiveInterface cl = (ProActiveInterface) owner.getFcInterface(clientItf);
+            PAInterface cl = (PAInterface) owner.getFcInterface(clientItf);
             cl.setFcItfImpl(serverItf);
             nfBindings.addNormalBinding(new NFBinding(clItf, clientItf, srItf, "membrane", null));
         }
@@ -537,11 +534,11 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
     public Object lookupNFc(String itfname) throws NoSuchInterfaceException, NoSuchComponentException {
         ComponentAndInterface itf = getComponentAndInterface(itfname);
-        ProActiveInterface theItf = (ProActiveInterface) itf.getInterface();
-        ProActiveGCMInterfaceType theType = (ProActiveGCMInterfaceType) theItf.getFcItfType();
+        PAInterface theItf = (PAInterface) itf.getInterface();
+        PAGCMInterfaceType theType = (PAGCMInterfaceType) theItf.getFcItfType();
         if (itf.getComponent() == null) {//The interface has to belong to the membrane and has to be client!!
-            theItf = (ProActiveInterface) itf.getInterface();
-            theType = (ProActiveGCMInterfaceType) theItf.getFcItfType();
+            theItf = (PAInterface) itf.getInterface();
+            theType = (PAGCMInterfaceType) theItf.getFcItfType();
             if (theType.isFcClientItf()) {//OK, We can return its implementation
 
                 return theItf.getFcItfImpl();
@@ -552,7 +549,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             }
 
         } else {//The component is either functional or non-functional
-            if (itf.getComponent() instanceof ProActiveNFComponentRepresentative) {
+            if (itf.getComponent() instanceof PANFComponentRepresentative) {
                 return Fractal.getBindingController(itf.getComponent()).lookupFc(theItf.getFcItfName());
             } else {//The component is functional, and we are attempting to lookup on a client non-functional external interface
                 if (theType.getFcItfName().endsWith("-controller")) {
@@ -589,7 +586,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             ice.initCause(i);
             throw ice;
         }
-        ProActiveComponent ownerRepresentative = owner.getRepresentativeOnThis();
+        PAComponent ownerRepresentative = owner.getRepresentativeOnThis();
 
         if (!nfcomponents.containsKey(componentname)) {
             throw new NoSuchComponentException("There is no " + componentname + " inside the membrane");
@@ -624,7 +621,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 throw new IllegalLifeCycleException(
                     "For the moment, to perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
             }
-            ((ProActiveComponentImpl) owner).setControllerObject(itf, controllerclass);
+            ((PAComponentImpl) owner).setControllerObject(itf, controllerclass);
         } catch (NoSuchInterfaceException n) {
             throw n;
         } catch (Exception e) {
@@ -660,15 +657,15 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 "The membrane should be stopped while unbinding non-functional interfaces");
         }
         ComponentAndInterface theItf = getComponentAndInterface(clientItf);
-        ProActiveInterface it = (ProActiveInterface) theItf.getInterface();
-        ProActiveGCMInterfaceType clItfType = (ProActiveGCMInterfaceType) it.getFcItfType();
+        PAInterface it = (PAInterface) theItf.getInterface();
+        PAGCMInterfaceType clItfType = (PAGCMInterfaceType) it.getFcItfType();
         if (theItf.getComponent() == null) {// Unbind a client interface exposed by the membrane, update the structure
             it.setFcItfImpl(null);
             nfBindings.removeNormalBinding("membrane", it.getFcItfName());//Here, we deal only with singleton bindings
         } else {//Unbind the non-functional component's interface 
             Component theComp = theItf.getComponent();
             checkMembraneIsStarted(theComp);
-            if (theComp instanceof ProActiveNFComponentRepresentative) {
+            if (theComp instanceof PANFComponentRepresentative) {
                 if (clItfType.isFcClientItf()) {
                     Fractal.getBindingController(theComp).unbindFc(theItf.getInterface().getFcItfName());
                     nfBindings.removeClientAliasBinding(Fractal.getNameController(theComp).getFcName(), it
@@ -686,13 +683,12 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
     public void startMembrane() throws IllegalLifeCycleException {
 
-        InterfaceType[] itfTypes = ((ComponentType) ((ProActiveComponentImpl) getFcItfOwner()).getNFType())
+        InterfaceType[] itfTypes = ((ComponentType) ((PAComponentImpl) getFcItfOwner()).getNFType())
                 .getFcInterfaceTypes();
         for (InterfaceType itfT : itfTypes) {
             if (!itfT.isFcOptionalItf()) {//Are all mandatory interfaces bound??
                 try {
-                    ProActiveInterface paItf = (ProActiveInterface) getFcItfOwner().getFcInterface(
-                            itfT.getFcItfName());
+                    PAInterface paItf = (PAInterface) getFcItfOwner().getFcInterface(itfT.getFcItfName());
                     if (paItf.getFcItfImpl() == null) {
                         throw new IllegalLifeCycleException(
                             "To start the membrane, all mandatory non-functional interfaces have to be bound. The interface " +
@@ -884,16 +880,16 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
     public void checkInternalInterfaces() throws IllegalLifeCycleException {
 
-        InterfaceType[] itfTypes = ((ComponentType) ((ProActiveComponentImpl) getFcItfOwner()).getNFType())
+        InterfaceType[] itfTypes = ((ComponentType) ((PAComponentImpl) getFcItfOwner()).getNFType())
                 .getFcInterfaceTypes();
-        ProActiveGCMInterfaceType paItfT;
+        PAGCMInterfaceType paItfT;
         for (InterfaceType itfT : itfTypes) {
-            paItfT = (ProActiveGCMInterfaceType) itfT;
+            paItfT = (PAGCMInterfaceType) itfT;
             if (!itfT.isFcOptionalItf() && paItfT.isInternal()) {
 
-                ProActiveInterface paItf;
+                PAInterface paItf;
                 try {
-                    paItf = (ProActiveInterface) getFcItfOwner().getFcInterface(itfT.getFcItfName());
+                    paItf = (PAInterface) getFcItfOwner().getFcInterface(itfT.getFcItfName());
                     if (paItf.getFcItfImpl() == null) {
                         throw new IllegalLifeCycleException(
                             "When strating the component, all mandatory internal non-functional interfaces have to be bound. The interface " +

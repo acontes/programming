@@ -45,7 +45,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**
@@ -67,7 +67,7 @@ public class PAPriorityControllerImpl extends AbstractPAController implements Pr
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.PRIORITY_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.PRIORITY_CONTROLLER,
                     PriorityController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

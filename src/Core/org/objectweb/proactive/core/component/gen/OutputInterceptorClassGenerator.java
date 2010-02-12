@@ -54,10 +54,10 @@ import javassist.NotFoundException;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.component.ItfStubObject;
-import org.objectweb.proactive.core.component.ProActiveInterface;
-import org.objectweb.proactive.core.component.ProActiveInterfaceImpl;
+import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.PAInterfaceImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.mop.JavassistByteCodeStubBuilder;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.util.ClassDataCache;
@@ -81,18 +81,18 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
         }
     }
 
-    public ProActiveInterface generateInterface(ProActiveInterface representative, List<?> outputInterceptors)
+    public PAInterface generateInterface(PAInterface representative, List<?> outputInterceptors)
             throws InterfaceGenerationFailedException {
         this.outputInterceptors = outputInterceptors;
-        ProActiveInterface generated = generateInterface(representative.getFcItfName(), representative
-                .getFcItfOwner(), (ProActiveGCMInterfaceType) representative.getFcItfType(), false, true);
+        PAInterface generated = generateInterface(representative.getFcItfName(), representative
+                .getFcItfOwner(), (PAGCMInterfaceType) representative.getFcItfType(), false, true);
         ((StubObject) generated).setProxy(((StubObject) representative).getProxy());
         return generated;
     }
 
     @Override
-    public ProActiveInterface generateInterface(final String interfaceName, Component owner,
-            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+    public PAInterface generateInterface(final String interfaceName, Component owner,
+            PAGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException {
         try {
             String representativeClassName = org.objectweb.proactive.core.component.gen.Utils
@@ -132,7 +132,7 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
                 List<CtClass> interfacesToImplementAndSuperInterfaces = new ArrayList<CtClass>(
                     interfacesToImplement);
                 addSuperInterfaces(interfacesToImplementAndSuperInterfaces);
-                generatedCtClass.setSuperclass(pool.get(ProActiveInterfaceImpl.class.getName()));
+                generatedCtClass.setSuperclass(pool.get(PAInterfaceImpl.class.getName()));
                 JavassistByteCodeStubBuilder.createStubObjectMethods(generatedCtClass);
                 CtField interfaceNameField = new CtField(ClassPool.getDefault().get(String.class.getName()),
                     "interfaceName", generatedCtClass);
@@ -234,7 +234,7 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
                 generated_class = Utils.defineClass(representativeClassName, bytecode);
             }
 
-            ProActiveInterfaceImpl reference = (ProActiveInterfaceImpl) generated_class.newInstance();
+            PAInterfaceImpl reference = (PAInterfaceImpl) generated_class.newInstance();
             reference.setFcItfName(interfaceName);
             reference.setFcItfOwner(owner);
             reference.setFcType(interfaceType);

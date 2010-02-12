@@ -48,8 +48,8 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.migration.MigratableBody;
 import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -61,7 +61,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * component metaobject (ProActiveComponent).
  */
 public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
-    private ProActiveComponent componentIdentity = null;
+    private PAComponent componentIdentity = null;
     private Map<String, Shortcut> shortcutsOnThis = null; // key = functionalItfName, value = shortcut
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private boolean insideFunctionalActivity = false;
@@ -112,8 +112,8 @@ public class ComponentBodyImpl extends MigratableBody implements ComponentBody {
      * Returns the a reference on the Component meta object
      * @return the ProActiveComponent meta-object
      */
-    public ProActiveComponentImpl getProActiveComponentImpl() {
-        return (ProActiveComponentImpl) this.componentIdentity;
+    public PAComponentImpl getProActiveComponentImpl() {
+        return (PAComponentImpl) this.componentIdentity;
     }
 
     /**

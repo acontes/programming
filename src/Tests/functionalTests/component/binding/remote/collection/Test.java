@@ -46,7 +46,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 
 import functionalTests.ComponentTestDefaultNodes;
 import functionalTests.component.I1Multicast;
@@ -84,7 +84,7 @@ public class Test extends ComponentTestDefaultNodes {
     public void action() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
 
         ComponentType D_Type = type_factory.createFcType(new InterfaceType[] {
                 type_factory.createFcItfType("i1", I1Multicast.class.getName(), TypeFactory.SERVER,

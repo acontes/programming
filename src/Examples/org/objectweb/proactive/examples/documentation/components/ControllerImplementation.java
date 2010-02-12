@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractPAController;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 public class ControllerImplementation extends AbstractPAController implements ControllerItf {
@@ -55,7 +55,7 @@ public class ControllerImplementation extends AbstractPAController implements Co
     //@snippet-start component_userguide_12
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType("Name of the controller",
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType("Name of the controller",
                     ControllerItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

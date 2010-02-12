@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 
 
 /**
@@ -82,8 +82,8 @@ public class Bindings implements Serializable {
 
         // export bindings
         if (!client_itf_type.isFcClientItf()) {
-            if (((ProActiveComponent) (binding.getClientInterface().getFcItfOwner()))
-                    .getComponentParameters().getHierarchicalType().equals(Constants.PARALLEL)) {
+            if (((PAComponent) (binding.getClientInterface().getFcItfOwner())).getComponentParameters()
+                    .getHierarchicalType().equals(Constants.PARALLEL)) {
                 addCollectiveBindingOnInternalClientItf(binding);
             } else {
                 exportBindings.put(binding.getClientInterfaceName(), binding);

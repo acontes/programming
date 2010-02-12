@@ -45,9 +45,9 @@ import javassist.NotFoundException;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -66,20 +66,18 @@ public abstract class AbstractInterfaceClassGenerator {
         return Thread.currentThread().getContextClassLoader().loadClass(className);
     }
 
-    public ProActiveInterface generateControllerInterface(final String controllerInterfaceName,
-            Component owner, ProActiveGCMInterfaceType interfaceType)
-            throws InterfaceGenerationFailedException {
+    public PAInterface generateControllerInterface(final String controllerInterfaceName, Component owner,
+            PAGCMInterfaceType interfaceType) throws InterfaceGenerationFailedException {
         return generateInterface(controllerInterfaceName, owner, interfaceType, false, false);
     }
 
-    public ProActiveInterface generateFunctionalInterface(final String functionalInterfaceName,
-            Component owner, ProActiveGCMInterfaceType interfaceType)
-            throws InterfaceGenerationFailedException {
+    public PAInterface generateFunctionalInterface(final String functionalInterfaceName, Component owner,
+            PAGCMInterfaceType interfaceType) throws InterfaceGenerationFailedException {
         return generateInterface(functionalInterfaceName, owner, interfaceType, false, true);
     }
 
-    public abstract ProActiveInterface generateInterface(final String interfaceName, Component owner,
-            ProActiveGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+    public abstract PAInterface generateInterface(final String interfaceName, Component owner,
+            PAGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
             throws InterfaceGenerationFailedException;
 
     /**
@@ -99,8 +97,8 @@ public abstract class AbstractInterfaceClassGenerator {
             for (int j = 0; j < super_itfs.size(); j++) {
                 if (!interfaces.contains(super_itfs.get(j))) {
                     super_itf = super_itfs.get(j);
-                    if (!(super_itf.equals(pool.get(ProActiveInterface.class.getName())) || super_itf
-                            .equals(pool.get(Interface.class.getName())))) {
+                    if (!(super_itf.equals(pool.get(PAInterface.class.getName())) || super_itf.equals(pool
+                            .get(Interface.class.getName())))) {
                         interfaces.add(super_itfs.get(j));
                     }
                 }

@@ -77,14 +77,14 @@ import org.objectweb.proactive.core.component.controller.PAMembraneController;
 import org.objectweb.proactive.core.component.controller.PAMigrationController;
 import org.objectweb.proactive.core.component.controller.PAMulticastController;
 import org.objectweb.proactive.core.component.exceptions.InstantiationExceptionListException;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
-import org.objectweb.proactive.core.component.group.ProActiveComponentGroup;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.group.PAComponentGroup;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -107,9 +107,9 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  */
 @PublicAPI
-public class Fractive implements ProActiveGenericFactory, Component, Factory {
+public class Fractive implements PAGenericFactory, Component, Factory {
     private static Fractive instance = null;
-    private TypeFactory typeFactory = ProActiveGCMTypeFactoryImpl.instance();
+    private TypeFactory typeFactory = PAGCMTypeFactoryImpl.instance();
     private Type type = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
@@ -215,14 +215,13 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @return ProActiveInterface the resulting collective client interface
      * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
      */
-    public static ProActiveInterface createCollectiveClientInterface(String itfName, String itfSignature,
+    public static PAInterface createCollectiveClientInterface(String itfName, String itfSignature,
             Component owner) throws ProActiveRuntimeException {
         try {
-            ProActiveGCMInterfaceType itf_type = (ProActiveGCMInterfaceType) ProActiveGCMTypeFactoryImpl
-                    .instance().createFcItfType(itfName, itfSignature, TypeFactory.CLIENT,
-                            TypeFactory.MANDATORY, TypeFactory.COLLECTION);
-            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
-                    owner);
+            PAGCMInterfaceType itf_type = (PAGCMInterfaceType) PAGCMTypeFactoryImpl.instance()
+                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                            TypeFactory.COLLECTION);
+            PAInterface itf_ref_group = PAComponentGroup.newComponentInterfaceGroup(itf_type, owner);
             return itf_ref_group;
         } catch (Exception e) {
             throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
@@ -293,7 +292,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription)
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription)
      */
     public Component newNFcInstance(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc) throws InstantiationException {
@@ -744,7 +743,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
                     .error("Cannot get a component representative from the current object, because this object is not a component");
             return null;
         }
-        ProActiveComponent currentComponent = componentBody.getProActiveComponentImpl();
+        PAComponent currentComponent = componentBody.getProActiveComponentImpl();
         return currentComponent.getRepresentativeOnThis();
     }
 
@@ -761,7 +760,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      */
     @Deprecated
     public static void register(Component ref, String url) throws ProActiveException {
-        if (!(ref instanceof ProActiveComponentRepresentative)) {
+        if (!(ref instanceof PAComponentRepresentative)) {
             throw new IllegalArgumentException("This method can only register ProActive components");
         }
         PAActiveObject.register(ref, url);
@@ -781,7 +780,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      *             if the component cannot be registered
      */
     public static String registerByName(Component ref, String name) throws ProActiveException {
-        if (!(ref instanceof ProActiveComponentRepresentative)) {
+        if (!(ref instanceof PAComponentRepresentative)) {
             throw new IllegalArgumentException("This method can only register ProActive components");
         }
         return PAActiveObject.registerByName(ref, name);
@@ -797,7 +796,7 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @throws NamingException if a reference on a component could not be found at the
      *             specified URL
      */
-    public static ProActiveComponentRepresentative lookup(String url) throws IOException, NamingException {
+    public static PAComponentRepresentative lookup(String url) throws IOException, NamingException {
         UniversalBody b = null;
         RemoteObject<?> rmo;
         URI uri = RemoteObjectHelper.expandURI(URI.create(url));
@@ -807,11 +806,9 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
 
             b = (UniversalBody) RemoteObjectHelper.generatedObjectStub(rmo);
 
-            StubObject stub = (StubObject) MOP.createStubObject(ProActiveComponentRepresentative.class
-                    .getName(), b);
+            StubObject stub = (StubObject) MOP.createStubObject(PAComponentRepresentative.class.getName(), b);
 
-            return ProActiveComponentRepresentativeFactory.instance().createComponentRepresentative(
-                    stub.getProxy());
+            return PAComponentRepresentativeFactory.instance().createComponentRepresentative(stub.getProxy());
         } catch (Throwable t) {
             t.printStackTrace();
             logger.error("Could not perform lookup for component at URL: " + url +
@@ -822,17 +819,17 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
     }
 
     /**
-     * Returns the {@link ProActiveGenericFactory} interface of the given
+     * Returns the {@link PAGenericFactory} interface of the given
      * component.
      *
      * @param component the component to get the factory from
-     * @return the {@link ProActiveGenericFactory} interface of the given
+     * @return the {@link PAGenericFactory} interface of the given
      *         component.
      * @throws NoSuchInterfaceException if there is no such interface.
      */
-    public static ProActiveGenericFactory getGenericFactory(final Component component)
+    public static PAGenericFactory getGenericFactory(final Component component)
             throws NoSuchInterfaceException {
-        return (ProActiveGenericFactory) component.getFcInterface("generic-factory");
+        return (PAGenericFactory) component.getFcInterface("generic-factory");
     }
 
     /**
@@ -939,15 +936,14 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @param container The container containing objects for the generation of component representative
      * @return The created component
      */
-    private ProActiveComponentRepresentative fComponent(Type type,
-            ActiveObjectWithComponentParameters container) {
+    private PAComponentRepresentative fComponent(Type type, ActiveObjectWithComponentParameters container) {
         ComponentParameters componentParameters = container.getParameters();
         StubObject ao = container.getActiveObject();
         org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();
         if (myProxy == null) {
             throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + ao);
         }
-        ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
+        PAComponentRepresentative representative = PAComponentRepresentativeFactory.instance()
                 .createComponentRepresentative(componentParameters, myProxy);
         representative.setStubOnBaseObject(ao);
         return representative;
@@ -958,15 +954,14 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
      * @param container The container containing objects for the generation of component representative
      * @return The created component
      */
-    private ProActiveComponentRepresentative nfComponent(Type type,
-            ActiveObjectWithComponentParameters container) {
+    private PAComponentRepresentative nfComponent(Type type, ActiveObjectWithComponentParameters container) {
         ComponentParameters componentParameters = container.getParameters();
         StubObject ao = container.getActiveObject();
         org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();
         if (myProxy == null) {
             throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + ao);
         }
-        ProActiveComponentRepresentative representative = ProActiveComponentRepresentativeFactory.instance()
+        PAComponentRepresentative representative = PAComponentRepresentativeFactory.instance()
                 .createNFComponentRepresentative((ComponentType) type,
                         componentParameters.getHierarchicalType(), myProxy,
                         componentParameters.getControllerDescription().getControllersConfigFileLocation());
@@ -980,10 +975,10 @@ public class Fractive implements ProActiveGenericFactory, Component, Factory {
         try {
             Component components = null;
             if (isFunctional) { /* Functional components */
-                components = ProActiveComponentGroup.newComponentRepresentativeGroup((ComponentType) type,
+                components = PAComponentGroup.newComponentRepresentativeGroup((ComponentType) type,
                         controllerDesc);
             } else { /* Non functional components */
-                components = ProActiveComponentGroup.newNFComponentRepresentativeGroup((ComponentType) type,
+                components = PAComponentGroup.newNFComponentRepresentativeGroup((ComponentType) type,
                         controllerDesc);
             }
             List<Component> componentsList = PAGroup.getGroup(components);

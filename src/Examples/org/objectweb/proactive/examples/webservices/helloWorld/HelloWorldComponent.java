@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
@@ -124,7 +124,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
             boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
 
             TypeFactory tf = Fractal.getTypeFactory(boot);
-            ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+            PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
 
             // type of server component
             ComponentType sType = tf

@@ -56,7 +56,7 @@ import org.apache.axis2.rpc.receivers.RPCUtil;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -161,7 +161,7 @@ public class PAInOutMessageReceiver extends AbstractInOutMessageReceiver {
                 String actualName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
 
                 //get the interface
-                targetObject = ((ProActiveComponentRepresentative) component).getFcInterface(actualName);
+                targetObject = ((PAComponentRepresentative) component).getFcInterface(actualName);
             } else {
                 targetObject = HttpMarshaller.unmarshallObject(marshallObject);
             }

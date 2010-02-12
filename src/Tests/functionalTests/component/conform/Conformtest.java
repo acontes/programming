@@ -60,6 +60,7 @@ import org.objectweb.proactive.core.component.controller.PAGCMLifeCycleControlle
 import org.objectweb.proactive.core.component.controller.PAMigrationController;
 import org.objectweb.proactive.core.component.controller.PAMulticastController;
 import org.objectweb.proactive.core.component.controller.PASuperController;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.conform.components.I;
@@ -67,7 +68,7 @@ import functionalTests.component.conform.components.I;
 
 public abstract class Conformtest extends ComponentTest {
     // FcItfName/FcItfSignature/isFcClientItf ^ internal, isFcOptionalItf, isFcCollectionItf
-    protected final static String COMP = "component/org.objectweb.proactive.core.component.identity.ProActiveComponent/false,false,false";
+    protected final static String COMP = "component/" + PAComponent.class.getName() + "/false,false,false";
     protected final static String BC = Constants.BINDING_CONTROLLER + "/" +
         PABindingController.class.getCanonicalName() + "/false,false,false";
     protected final static String CC = Constants.CONTENT_CONTROLLER + "/" +

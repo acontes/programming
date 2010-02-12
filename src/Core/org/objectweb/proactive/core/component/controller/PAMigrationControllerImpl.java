@@ -44,8 +44,8 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.api.PAMobileAgent;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -59,7 +59,7 @@ public class PAMigrationControllerImpl extends AbstractPAController implements P
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MIGRATION_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.MIGRATION_CONTROLLER,
                     PAMigrationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -71,7 +71,7 @@ public class PAMigrationControllerImpl extends AbstractPAController implements P
     public void migrateGCMComponentTo(Object node) throws MigrationException {
         // need to migrate gathercast futures handlers active objects first
         try {
-            ((ProActiveComponentImpl) owner).migrateControllersDependentActiveObjectsTo((Node) node);
+            ((PAComponentImpl) owner).migrateControllersDependentActiveObjectsTo((Node) node);
             PAMobileAgent.migrateTo((Node) node);
         } catch (org.objectweb.proactive.core.body.migration.MigrationException e) {
             throw new MigrationException("Cannot migrate component to the given node", e);

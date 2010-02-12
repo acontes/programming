@@ -63,18 +63,18 @@ import org.objectweb.proactive.core.component.Bindings;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ItfStubObject;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.GatherItfAdapterProxy;
 import org.objectweb.proactive.core.component.gen.OutputInterceptorClassGenerator;
 import org.objectweb.proactive.core.component.gen.WSProxyClassGenerator;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.representative.ItfID;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceTypeImpl;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceTypeImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.component.type.WSComponent;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
 
@@ -100,7 +100,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.BINDING_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.BINDING_CONTROLLER,
                     PABindingController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -115,15 +115,15 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
 
     protected void checkBindability(String clientItfName, Interface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-        if (!(serverItf instanceof ProActiveInterface)) {
+        if (!(serverItf instanceof PAInterface)) {
             throw new IllegalBindingException("Can only bind interfaces of type ProActiveInterface");
         }
 
         //        if (((InterfaceType) serverItf.getFcItfType()).isFcClientItf())
         //            throw new IllegalBindingException("The provided server interface is a client interface");
 
-        ProActiveGCMInterfaceType clientItfType = (ProActiveGCMInterfaceType) ((ComponentType) owner
-                .getFcType()).getFcInterfaceType(clientItfName);
+        PAGCMInterfaceType clientItfType = (PAGCMInterfaceType) ((ComponentType) owner.getFcType())
+                .getFcInterfaceType(clientItfName);
 
         // TODO_M handle internal interfaces
         // if (server_itf_type.isFcClientItf()) {
@@ -189,8 +189,8 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             // removed the following checkings as they did not consider composite server itfs
             //            checkClientInterfaceName(clientItfName);
             if (existsBinding(clientItfName)) {
-                if (!((ProActiveGCMInterfaceTypeImpl) ((Interface) getFcItfOwner().getFcInterface(
-                        clientItfName)).getFcItfType()).isFcCollectionItf()) {
+                if (!((PAGCMInterfaceTypeImpl) ((Interface) getFcItfOwner().getFcInterface(clientItfName))
+                        .getFcItfType()).isFcCollectionItf()) {
                     // binding from a single client interface : only 1 binding
                     // is allowed
                     controllerLogger.warn(Fractal.getNameController(getFcItfOwner()).getFcName() + "." +
@@ -255,7 +255,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
     public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
         Object itf = null;
         if (isPrimitive()) {
-            itf = ((BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject())
+            itf = ((BindingController) ((PAComponent) getFcItfOwner()).getReferenceOnBaseObject())
                     .lookupFc(clientItfName);
         } else if (existsBinding(clientItfName)) {
             itf = ((Binding) getBinding(clientItfName)).getServerInterface();
@@ -276,9 +276,9 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         // get value of (eventual) future before casting
         serverItf = PAFuture.getFutureValue(serverItf);
 
-        ProActiveInterface sItf = null;
-        if (serverItf instanceof ProActiveInterface) {
-            sItf = (ProActiveInterface) serverItf;
+        PAInterface sItf = null;
+        if (serverItf instanceof PAInterface) {
+            sItf = (PAInterface) serverItf;
 
             //        if (controllerLogger.isDebugEnabled()) {
             //            String serverComponentName;
@@ -296,15 +296,15 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             checkBindability(clientItfName, (Interface) serverItf);
 
             ((ItfStubObject) serverItf).setSenderItfID(new ItfID(clientItfName,
-                ((ProActiveComponent) getFcItfOwner()).getID()));
+                ((PAComponent) getFcItfOwner()).getID()));
         }
         // binding on a web service
         else if (serverItf instanceof WSInfo) {
-            ProActiveGCMInterfaceType serverItfType = null;
+            PAGCMInterfaceType serverItfType = null;
             try {
-                serverItfType = new ProActiveGCMInterfaceTypeImpl(clientItfName, ((ComponentType) owner
-                        .getFcType()).getFcInterfaceType(clientItfName).getFcItfSignature(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY, GCMTypeFactory.SINGLETON_CARDINALITY);
+                serverItfType = new PAGCMInterfaceTypeImpl(clientItfName, ((ComponentType) owner.getFcType())
+                        .getFcInterfaceType(clientItfName).getFcItfSignature(), TypeFactory.SERVER,
+                    TypeFactory.MANDATORY, GCMTypeFactory.SINGLETON_CARDINALITY);
             } catch (InstantiationException e) {
                 // should never append
                 controllerLogger.error("could not generate ProActive interface type for " + clientItfName +
@@ -339,8 +339,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         // TODO_M check with groups : interception is here done at the beginning
         // of the group invocation,
         // not for each element of the group
-        List<Interface> outputInterceptors = ((ProActiveComponentImpl) getFcItfOwner())
-                .getOutputInterceptors();
+        List<Interface> outputInterceptors = ((PAComponentImpl) getFcItfOwner()).getOutputInterceptors();
 
         if (!outputInterceptors.isEmpty()) {
             try {
@@ -364,7 +363,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 //                Fractive.getMulticastController(owner)
                 //                .bindFcMulticast(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // no adaptor here
-                ((PAMulticastControllerImpl) ((ProActiveInterface) Fractive.getMulticastController(owner))
+                ((PAMulticastControllerImpl) ((PAInterface) Fractive.getMulticastController(owner))
                         .getFcItfImpl()).bindFc(clientItfName, sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
@@ -381,7 +380,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
             } else {
                 PAMulticastController mc = Fractive.getMulticastController(owner);
-                ProActiveInterface pitf = (ProActiveInterface) mc;
+                PAInterface pitf = (PAInterface) mc;
                 PAMulticastControllerImpl impl = (PAMulticastControllerImpl) pitf.getFcItfImpl();
                 impl.bindFc(clientItfName, sItf);
                 //((MulticastControllerImpl) Fractive.getMulticastController(owner))
@@ -442,8 +441,8 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         }
     }
 
-    private ProActiveInterface getGathercastAdaptor(String clientItfName, Object serverItf,
-            ProActiveInterface sItf) throws NoSuchInterfaceException {
+    private PAInterface getGathercastAdaptor(String clientItfName, Object serverItf, PAInterface sItf)
+            throws NoSuchInterfaceException {
         // add an adaptor proxy for matching interface types
         Class<?> clientItfClass = null;
         try {
@@ -463,16 +462,16 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             throw new ProActiveRuntimeException("cannot find client interface class for client interface : " +
                 clientItfName);
         }
-        ProActiveInterface itfProxy = (ProActiveInterface) Proxy.newProxyInstance(Thread.currentThread()
-                .getContextClassLoader(), new Class<?>[] { ProActiveInterface.class, clientItfClass },
+        PAInterface itfProxy = (PAInterface) Proxy.newProxyInstance(Thread.currentThread()
+                .getContextClassLoader(), new Class<?>[] { PAInterface.class, clientItfClass },
                 new GatherItfAdapterProxy(serverItf));
         return itfProxy;
     }
 
-    private void primitiveBindFc(String clientItfName, ProActiveInterface serverItf)
+    private void primitiveBindFc(String clientItfName, PAInterface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
         // delegate binding operation to the reified object
-        BindingController user_binding_controller = (BindingController) ((ProActiveComponent) getFcItfOwner())
+        BindingController user_binding_controller = (BindingController) ((PAComponent) getFcItfOwner())
                 .getReferenceOnBaseObject();
 
         // serverItf cannot be a Future (because it has to be casted) => make
@@ -494,8 +493,8 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
      */
     private void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-        ProActiveInterface clientItf = null;
-        clientItf = (ProActiveInterface) getFcItfOwner().getFcInterface(clientItfName);
+        PAInterface clientItf = null;
+        clientItf = (PAInterface) getFcItfOwner().getFcInterface(clientItfName);
         // TODO remove this as we should now use multicast interfaces for this purpose
         // if we have a collection interface, the impl object is actually a
         // group of references to interfaces
@@ -533,11 +532,10 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         if (isPrimitive()) {
             checkLifeCycleIsStopped();
             // delegate to primitive component
-            BindingController user_binding_controller = (BindingController) ((ProActiveComponent) getFcItfOwner())
+            BindingController user_binding_controller = (BindingController) ((PAComponent) getFcItfOwner())
                     .getReferenceOnBaseObject();
             if (Utils.isGathercastItf((Interface) user_binding_controller.lookupFc(clientItfName))) {
-                ProActiveInterface sItf = (ProActiveInterface) user_binding_controller
-                        .lookupFc(clientItfName);
+                PAInterface sItf = (PAInterface) user_binding_controller.lookupFc(clientItfName);
 
                 try {
                     if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
@@ -568,8 +566,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
      */
     public String[] listFc() {
         if (isPrimitive()) {
-            return ((BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject())
-                    .listFc();
+            return ((BindingController) ((PAComponent) getFcItfOwner()).getReferenceOnBaseObject()).listFc();
         }
 
         InterfaceType[] itfs_types = ((ComponentType) getFcItfOwner().getFcType()).getFcInterfaceTypes();
@@ -601,7 +598,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         if (isPrimitive() &&
             !(((GCMInterfaceType) ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName))
                     .isGCMMulticastItf())) {
-            return (((BindingController) ((ProActiveComponent) getFcItfOwner()).getReferenceOnBaseObject())
+            return (((BindingController) ((PAComponent) getFcItfOwner()).getReferenceOnBaseObject())
                     .lookupFc(clientItfName) != null);
         } else {
             return bindings.containsBindingOn(clientItfName);

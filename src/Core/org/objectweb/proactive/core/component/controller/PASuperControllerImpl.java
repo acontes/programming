@@ -42,7 +42,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**
@@ -51,8 +51,8 @@ import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
  * @author The ProActive Team
  * @see PASuperController
  */
-public class PASuperControllerImpl extends AbstractPAController implements Serializable,
-        PASuperController, ControllerStateDuplication {
+public class PASuperControllerImpl extends AbstractPAController implements Serializable, PASuperController,
+        ControllerStateDuplication {
     public PASuperControllerImpl(Component owner) {
         super(owner);
     }
@@ -60,7 +60,7 @@ public class PASuperControllerImpl extends AbstractPAController implements Seria
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.SUPER_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.SUPER_CONTROLLER,
                     PASuperController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {

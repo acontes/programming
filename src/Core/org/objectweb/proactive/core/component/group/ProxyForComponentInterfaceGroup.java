@@ -49,8 +49,8 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.exceptions.ReductionException;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ReduceBehavior;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ReduceMode;
@@ -74,9 +74,9 @@ import org.objectweb.proactive.core.mop.StubObject;
  */
 public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
 
-    protected ProActiveGCMInterfaceType interfaceType;
+    protected PAGCMInterfaceType interfaceType;
     protected Class<?> itfSignatureClass = null;
-    protected ProActiveComponent owner;
+    protected PAComponent owner;
     protected ProxyForComponentInterfaceGroup<E> delegatee = null;
     protected ProxyForComponentInterfaceGroup<E> parent = null; // for a delegatee
 
@@ -102,7 +102,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     /**
      * @return Returns the interfaceType.
      */
-    public ProActiveGCMInterfaceType getInterfaceType() {
+    public PAGCMInterfaceType getInterfaceType() {
         return interfaceType;
     }
 
@@ -157,7 +157,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
     @Override
     public Object getGroupByType() {
         try {
-            Interface result = ProActiveComponentGroup.newComponentInterfaceGroup(interfaceType, owner);
+            Interface result = PAComponentGroup.newComponentInterfaceGroup(interfaceType, owner);
 
             @SuppressWarnings("unchecked")
             ProxyForComponentInterfaceGroup<E> proxy = (ProxyForComponentInterfaceGroup<E>) ((StubObject) result)
@@ -301,14 +301,14 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
      *            The owner to set.
      */
     public void setOwner(Component owner) {
-        this.owner = (ProActiveComponent) owner;
+        this.owner = (PAComponent) owner;
     }
 
     /**
      * @param interfaceType
      *            The interfaceType to set.
      */
-    public void setInterfaceType(ProActiveGCMInterfaceType interfaceType) {
+    public void setInterfaceType(PAGCMInterfaceType interfaceType) {
         this.interfaceType = interfaceType;
         try {
             itfSignatureClass = Class.forName(interfaceType.getFcItfSignature());

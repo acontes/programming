@@ -43,7 +43,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.nonfunctional.creation.DummyControllerComponentImpl;
@@ -76,7 +76,7 @@ public class Test extends ComponentTest {
         // Thread.sleep(2000);
         Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
         TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        ProActiveGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
         dummyNFComponent = cf.newNFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
                 .createFcItfType("dummy-controller-membrane", DummyControllerItf.class.getName(),

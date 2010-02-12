@@ -46,7 +46,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 
 import functionalTests.ComponentTestDefaultNodes;
@@ -101,7 +101,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
     public void testCreationNewactiveComposite() throws Exception {
         Component boot = Fractal.getBootstrapComponent();
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        ProActiveGenericFactory cf = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                 type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),

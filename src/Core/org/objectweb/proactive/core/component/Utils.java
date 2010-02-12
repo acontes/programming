@@ -46,7 +46,7 @@ import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 
 
 /**
@@ -75,7 +75,7 @@ public class Utils {
     public static boolean hasSingleCardinality(String itfName, Component owner) {
         Iterator<Interface> it = Arrays.<Interface> asList((Interface[]) owner.getFcInterfaces()).iterator();
         while (it.hasNext()) {
-            ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) it.next().getFcItfType();
+            PAGCMInterfaceType itfType = (PAGCMInterfaceType) it.next().getFcItfType();
             if (itfType.getFcItfName().equals(itfName) && itfType.isGCMSingletonItf()) {
                 return true;
             }
@@ -92,7 +92,7 @@ public class Utils {
     }
 
     public static boolean isGathercastItf(Interface itf) {
-        if (!(itf instanceof ProActiveInterface)) {
+        if (!(itf instanceof PAInterface)) {
             return false;
         }
         return ((GCMInterfaceType) itf.getFcItfType()).isGCMGathercastItf();

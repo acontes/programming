@@ -42,7 +42,7 @@ import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.representative.ProActiveNFComponentRepresentative;
+import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.nonfunctional.creation.DummyControllerItf;
@@ -78,6 +78,6 @@ public class Test extends ComponentTest {
         String name = ref.dummyMethodWithResult();
         System.out.println("The string is : " + name);
         ref.dummyVoidMethod("Message");
-        Assert.assertTrue((root instanceof ProActiveNFComponentRepresentative));
+        Assert.assertTrue((root instanceof PANFComponentRepresentative));
     }
 }

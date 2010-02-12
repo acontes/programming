@@ -49,7 +49,7 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.exceptions.GathercastTimeoutException;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro;
@@ -89,7 +89,7 @@ public class GatherRequestsQueue implements Serializable {
     boolean resultsReturned = false;
     boolean oneWayCall = true;
 
-    public GatherRequestsQueue(ProActiveComponent owner, String serverItfName, Method itfTypeMethod,
+    public GatherRequestsQueue(PAComponent owner, String serverItfName, Method itfTypeMethod,
             List<Object> connectedClientItfs, GatherFuturesHandlerPool gatherFuturesHandlerPool) {
         //this.owner = owner;
         this.serverItfName = serverItfName;

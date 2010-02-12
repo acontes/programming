@@ -62,9 +62,9 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
@@ -93,7 +93,7 @@ public class PAMonitorControllerImpl extends AbstractPAController implements Mon
 
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.MONITOR_CONTROLLER,
                     MonitorController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -127,14 +127,14 @@ public class PAMonitorControllerImpl extends AbstractPAController implements Mon
                         Iterator<Component> bindedComponentsIterator = null;
                         if (!((GCMInterfaceType) itfType).isGCMMulticastItf()) {
                             List<Component> bindedComponent = new ArrayList<Component>();
-                            bindedComponent.add(((ProActiveInterface) ((ProActiveInterface) itf)
-                                    .getFcItfImpl()).getFcItfOwner());
+                            bindedComponent.add(((PAInterface) ((PAInterface) itf).getFcItfImpl())
+                                    .getFcItfOwner());
                             bindedComponentsIterator = bindedComponent.iterator();
                         } else {
                             try {
-                                PAMulticastControllerImpl multicastController = (PAMulticastControllerImpl) ((ProActiveInterface) GCM
+                                PAMulticastControllerImpl multicastController = (PAMulticastControllerImpl) ((PAInterface) GCM
                                         .getMulticastController(owner)).getFcItfImpl();
-                                Iterator<ProActiveInterface> delegatee = multicastController.getDelegatee(
+                                Iterator<PAInterface> delegatee = multicastController.getDelegatee(
                                         itf.getFcItfName()).iterator();
                                 List<Component> bindedComponents = new ArrayList<Component>();
                                 while (delegatee.hasNext()) {

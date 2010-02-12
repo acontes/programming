@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -64,7 +64,7 @@ public abstract class AbstractPAController implements PAController, Serializable
     final protected static Logger controllerLogger = ProActiveLogger
             .getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
-    protected ProActiveComponent owner;
+    protected PAComponent owner;
 
     /**
      * Constructor for AbstractProActiveController.
@@ -72,7 +72,7 @@ public abstract class AbstractPAController implements PAController, Serializable
      * @param owner the component that wants this controller is in the {@link Constants} class.
      */
     public AbstractPAController(Component owner) {
-        this.owner = (ProActiveComponent) owner;
+        this.owner = (PAComponent) owner;
         setControllerItfType();
     }
 

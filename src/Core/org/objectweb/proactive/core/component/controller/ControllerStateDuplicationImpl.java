@@ -40,8 +40,8 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**
@@ -60,7 +60,7 @@ public class ControllerStateDuplicationImpl extends AbstractPAController impleme
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(
                     Constants.CONTROLLER_STATE_DUPLICATION, ControllerStateDuplication.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
@@ -70,14 +70,14 @@ public class ControllerStateDuplicationImpl extends AbstractPAController impleme
     }
 
     public void duplicateController(Object c) {
-        ControllerStateDuplication reified_Object = (ControllerStateDuplication) ((ProActiveComponent) getFcItfOwner())
+        ControllerStateDuplication reified_Object = (ControllerStateDuplication) ((PAComponent) getFcItfOwner())
                 .getReferenceOnBaseObject();
         reified_Object.duplicateController(c);
 
     }
 
     public ControllerState getState() {
-        ControllerStateDuplication reified_Object = (ControllerStateDuplication) ((ProActiveComponent) getFcItfOwner())
+        ControllerStateDuplication reified_Object = (ControllerStateDuplication) ((PAComponent) getFcItfOwner())
                 .getReferenceOnBaseObject();
         return reified_Object.getState();
 

@@ -38,7 +38,7 @@ package org.objectweb.proactive.core.component.controller;
 import java.lang.reflect.Method;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 
 
 /**
@@ -53,5 +53,5 @@ public abstract class AbstractCollectiveInterfaceController extends AbstractPACo
     }
 
     protected abstract Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
-            boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf);
+            boolean clientItfIsMulticast, boolean serverItfIsGathercast, PAInterface serverSideItf);
 }

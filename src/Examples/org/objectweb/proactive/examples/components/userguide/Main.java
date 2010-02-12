@@ -51,7 +51,7 @@ import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.factory.ProActiveGenericFactory;
+import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
 import org.objectweb.proactive.core.node.Node;
@@ -173,7 +173,7 @@ public class Main {
         try {
             Component boot = Fractal.getBootstrapComponent();
             TypeFactory typeFact = Fractal.getTypeFactory(boot);
-            ProActiveGenericFactory genericFact = (ProActiveGenericFactory) Fractal.getGenericFactory(boot);
+            PAGenericFactory genericFact = (PAGenericFactory) Fractal.getGenericFactory(boot);
 
             ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Main.class
                     .getResource("deploymentDescriptor.xml").getPath());

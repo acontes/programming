@@ -41,7 +41,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.controller.AbstractPAController;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**
@@ -68,7 +68,7 @@ public class NF2ItfImpl extends AbstractPAController implements NF2Itf {
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(NF2Itf.CONTROLLER_NAME,
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(NF2Itf.CONTROLLER_NAME,
                     NF2Itf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             e.printStackTrace();

@@ -49,7 +49,7 @@ import org.apache.axis2.receivers.AbstractInMessageReceiver;
 import org.apache.axis2.rpc.receivers.RPCUtil;
 import org.apache.axis2.wsdl.WSDLConstants;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -115,7 +115,7 @@ public class PAInOnlyMessageReceiver extends AbstractInMessageReceiver {
                 String actualName = serviceName.substring(serviceName.lastIndexOf('_') + 1);
 
                 // Get the interface
-                targetObject = ((ProActiveComponentRepresentative) component).getFcInterface(actualName);
+                targetObject = ((PAComponentRepresentative) component).getFcInterface(actualName);
             } else {
                 targetObject = HttpMarshaller.unmarshallObject(marshallObject);
             }

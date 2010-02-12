@@ -35,7 +35,7 @@
  */
 package org.objectweb.proactive.core.component;
 
-import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 
 
 /**
@@ -127,7 +127,7 @@ public class NFControllerDescription extends ControllerDescription {
         } else {
             this.controllersConfigFileLocation = controllersConfigFileLocation;
         }
-        controllersSignatures = ProActiveComponentImpl.loadControllerConfiguration(
+        controllersSignatures = PAComponentImpl.loadControllerConfiguration(
                 this.controllersConfigFileLocation).getControllers();
     }
 

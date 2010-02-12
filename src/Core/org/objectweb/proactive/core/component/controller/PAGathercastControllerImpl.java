@@ -54,16 +54,16 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.collectiveitfs.GatherBindingChecker;
 import org.objectweb.proactive.core.component.collectiveitfs.GatherRequestsQueues;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
-import org.objectweb.proactive.core.component.type.ProActiveGCMInterfaceType;
-import org.objectweb.proactive.core.component.type.ProActiveGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
+import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -77,7 +77,7 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
         GathercastController, ControllerStateDuplication {
 
     private Map<String, List<Object>> bindingsOnServerItfs = new HashMap<String, List<Object>>();
-    private Map<String, ProActiveInterface> gatherItfs = new HashMap<String, ProActiveInterface>();
+    private Map<String, PAInterface> gatherItfs = new HashMap<String, PAInterface>();
     private GatherRequestsQueues gatherRequestsHandler;
 
     public PAGathercastControllerImpl(Component owner) {
@@ -95,17 +95,17 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
 
             // gather mechanism currently only offered for functional interfaces
             if (!Utils.isControllerInterfaceName(itf.getFcItfName())) {
-                addManagedInterface((ProActiveInterface) itf);
+                addManagedInterface((PAInterface) itf);
             }
         }
     }
 
-    private boolean addManagedInterface(ProActiveInterface itf) {
+    private boolean addManagedInterface(PAInterface itf) {
         if (gatherItfs.containsKey(itf.getFcItfName())) {
             return false;
         }
 
-        ProActiveGCMInterfaceType itfType = (ProActiveGCMInterfaceType) itf.getFcItfType();
+        PAGCMInterfaceType itfType = (PAGCMInterfaceType) itf.getFcItfType();
 
         if (itfType.isGCMGathercastItf()) {
             gatherItfs.put(itf.getFcItfName(), itf);
@@ -118,7 +118,7 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
 
     @Override
     protected Method searchMatchingMethod(Method clientSideMethod, Method[] serverSideMethods,
-            boolean clientItfIsMulticast, boolean serverItfIsGathercast, ProActiveInterface serverSideItf) {
+            boolean clientItfIsMulticast, boolean serverItfIsGathercast, PAInterface serverSideItf) {
         return searchMatchingMethod(clientSideMethod, serverSideMethods, clientItfIsMulticast);
     }
 
@@ -146,9 +146,9 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
     @Override
     protected void setControllerItfType() {
         try {
-            setItfType(ProActiveGCMTypeFactoryImpl.instance().createFcItfType(
-                    Constants.GATHERCAST_CONTROLLER, GathercastController.class.getName(),
-                    TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
+            setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.GATHERCAST_CONTROLLER,
+                    GathercastController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller type for controller " +
                 this.getClass().getName());
@@ -173,7 +173,7 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
      * org.objectweb.proactive.core.component.ProActiveInterface)
      */
     public void notifyAddedGCMBinding(String gathercastItfName, Component owner, String clientItfName) {
-        ItfID itfID = new ItfID(clientItfName, ((ProActiveComponent) owner).getID());
+        ItfID itfID = new ItfID(clientItfName, ((PAComponent) owner).getID());
         if (bindingsOnServerItfs.containsKey(gathercastItfName)) {
             if (bindingsOnServerItfs.get(gathercastItfName).contains(itfID)) {
                 throw new ProActiveRuntimeException("trying to add twice the binding of client interface " +
@@ -194,7 +194,7 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
      * org.objectweb.proactive.core.component.identity.ProActiveComponent, java.lang.String)
      */
     public void notifyRemovedGCMBinding(String gathercastItfName, Component owner, String clientItfName) {
-        ItfID itfID = new ItfID(clientItfName, ((ProActiveComponent) owner).getID());
+        ItfID itfID = new ItfID(clientItfName, ((PAComponent) owner).getID());
         if (bindingsOnServerItfs.containsKey(gathercastItfName)) {
             List<Object> connectedClientItfs = bindingsOnServerItfs.get(gathercastItfName);
             if (connectedClientItfs.contains(itfID)) {
@@ -250,17 +250,17 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
     public ControllerState getState() {
 
         return new ControllerState(new GatherCastItfState(
-            (HashMap<String, List<Object>>) bindingsOnServerItfs,
-            (HashMap<String, ProActiveInterface>) gatherItfs, gatherRequestsHandler));
+            (HashMap<String, List<Object>>) bindingsOnServerItfs, (HashMap<String, PAInterface>) gatherItfs,
+            gatherRequestsHandler));
     }
 
     class GatherCastItfState implements Serializable {
         private HashMap<String, List<Object>> bindingsOnServerItfs;
-        private HashMap<String, ProActiveInterface> gatherItfs;
+        private HashMap<String, PAInterface> gatherItfs;
         private GatherRequestsQueues gatherRequestsHandler;
 
         public GatherCastItfState(HashMap<String, List<Object>> bindingsOnServerItfs,
-                HashMap<String, ProActiveInterface> gatherItfs, GatherRequestsQueues gatherRequestsHandler) {
+                HashMap<String, PAInterface> gatherItfs, GatherRequestsQueues gatherRequestsHandler) {
 
             this.bindingsOnServerItfs = bindingsOnServerItfs;
             this.gatherItfs = gatherItfs;
@@ -275,11 +275,11 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
             this.bindingsOnServerItfs = bindingsOnServerItfs;
         }
 
-        public HashMap<String, ProActiveInterface> getGatherItfs() {
+        public HashMap<String, PAInterface> getGatherItfs() {
             return gatherItfs;
         }
 
-        public void setGatherItfs(HashMap<String, ProActiveInterface> gatherItfs) {
+        public void setGatherItfs(HashMap<String, PAInterface> gatherItfs) {
             this.gatherItfs = gatherItfs;
         }
 

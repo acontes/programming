@@ -77,8 +77,8 @@ public class ProxyForComponentGroup<E> extends ProxyForGroup<E> {
     @Override
     public Object getGroupByType() {
         try {
-            Component result = ProActiveComponentGroup.newComponentRepresentativeGroup(componentType,
-                    controllerDesc);
+            Component result = PAComponentGroup
+                    .newComponentRepresentativeGroup(componentType, controllerDesc);
 
             @SuppressWarnings("unchecked")
             ProxyForComponentGroup<E> proxy = (ProxyForComponentGroup<E>) ((StubObject) result).getProxy();

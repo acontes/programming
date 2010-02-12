@@ -41,7 +41,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 
@@ -69,8 +69,8 @@ public class MulticastHelper {
      * @throws ParameterDispatchException
      *             if there is an error in the dispatch of the parameters
      */
-    public static List<MethodCall> generateMethodCallsForMulticastDelegatee(ProActiveComponent owner,
-            MethodCall mc, ProxyForComponentInterfaceGroup<?> delegatee) throws ParameterDispatchException {
+    public static List<MethodCall> generateMethodCallsForMulticastDelegatee(PAComponent owner, MethodCall mc,
+            ProxyForComponentInterfaceGroup<?> delegatee) throws ParameterDispatchException {
         try {
             return Fractive.getMulticastController(owner).generateMethodCallsForMulticastDelegatee(mc,
                     delegatee);
