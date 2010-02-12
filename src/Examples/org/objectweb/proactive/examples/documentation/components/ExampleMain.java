@@ -37,6 +37,7 @@ package org.objectweb.proactive.examples.documentation.components;
 
 import java.io.File;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -102,7 +103,7 @@ public class ExampleMain {
         Node aNode = vn.getANode();
 
         //@snippet-start component_examples_5
-        Component boot = Fractal.getBootstrapComponent();
+        Component boot = GCM.getBootstrapComponent();
         //@snippet-end component_examples_5
 
         //@snippet-start component_examples_6
@@ -140,7 +141,7 @@ public class ExampleMain {
     }
 
     public void interfacesExamples() throws InstantiationException, NoSuchInterfaceException {
-        Component boot = Fractal.getBootstrapComponent();
+        Component boot = GCM.getBootstrapComponent();
 
         TypeFactory tf = (TypeFactory) boot.getFcInterface("type-factory");
 

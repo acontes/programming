@@ -67,7 +67,7 @@ public abstract class ComponentTest extends FunctionalTest {
                 "The components framework needs the automatic continuations (system property 'proactive.future.ac' set to 'true') to be operative");
         }
 
-        //-Dfractal.provider=org.objectweb.proactive.core.component.Fractive
-        PAProperties.FRACTAL_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
+        //-Dgcm.provider=org.objectweb.proactive.core.component.Fractive
+        PAProperties.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
     }
 }

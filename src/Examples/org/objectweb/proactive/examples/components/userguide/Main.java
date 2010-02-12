@@ -39,6 +39,7 @@ package org.objectweb.proactive.examples.components.userguide;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.LifeCycleController;
@@ -85,7 +86,7 @@ public class Main {
     //@snippet-start launch_first_primitive
     private static void launchFirstPrimitive() {
         try {
-            Component boot = Fractal.getBootstrapComponent();
+            Component boot = GCM.getBootstrapComponent();
             TypeFactory typeFact = Fractal.getTypeFactory(boot);
             GenericFactory genericFact = Fractal.getGenericFactory(boot);
             Component primitiveComputer = null;
@@ -120,7 +121,7 @@ public class Main {
     //@snippet-start launch_without_ADL
     private static void launchWithoutADL() {
         try {
-            Component boot = Fractal.getBootstrapComponent();
+            Component boot = GCM.getBootstrapComponent();
             TypeFactory typeFact = Fractal.getTypeFactory(boot);
             GenericFactory genericFact = Fractal.getGenericFactory(boot);
 
@@ -171,7 +172,7 @@ public class Main {
     //@snippet-end launch_without_ADL
     private static void launchAndDeployWithoutADL() {
         try {
-            Component boot = Fractal.getBootstrapComponent();
+            Component boot = GCM.getBootstrapComponent();
             TypeFactory typeFact = Fractal.getTypeFactory(boot);
             PAGenericFactory genericFact = (PAGenericFactory) Fractal.getGenericFactory(boot);
 

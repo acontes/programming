@@ -35,6 +35,7 @@
  */
 package functionalTests.component.nonfunctional.creation.local.primitive;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -43,7 +44,6 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
@@ -73,15 +73,15 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Thread.sleep(2000);
-        Component boot = Fractal.getBootstrapComponent(); /*
+        Component boot = GCM.getBootstrapComponent(); /*
          * Getting the Fractal-Proactive
          * bootstrap component
          */
-        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*
+        TypeFactory type_factory = GCM.getTypeFactory(boot); /*
          * Getting the Fractal-ProActive
          * type factory
          */
-        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*
+        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot); /*
          * Getting the
          * Fractal-ProActive generic
          * factory

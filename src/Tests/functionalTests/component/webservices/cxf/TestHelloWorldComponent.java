@@ -37,6 +37,7 @@ package functionalTests.component.webservices.cxf;
 
 import static org.junit.Assert.assertTrue;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -72,10 +73,10 @@ public class TestHelloWorldComponent extends FunctionalTest {
         try {
             url = AbstractWebServicesFactory.getLocalUrl();
 
-            Component boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
+            Component boot = GCM.getBootstrapComponent();
 
-            TypeFactory tf = Fractal.getTypeFactory(boot);
-            GenericFactory cf = Fractal.getGenericFactory(boot);
+            TypeFactory tf = GCM.getTypeFactory(boot);
+            GenericFactory cf = GCM.getGenericFactory(boot);
 
             ComponentType typeComp = tf.createFcType(new InterfaceType[] {
                     tf.createFcItfType("hello-world", HelloWorldItf.class.getName(), false, false, false),

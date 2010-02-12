@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Ignore;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
@@ -90,9 +91,9 @@ public class Test extends ComponentTest {
 
     @org.junit.Test
     public void testMulticastServerItfNotBound() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        GCMTypeFactory tf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
-        GenericFactory gf = Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
+        GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType ct = tf.createFcType(new InterfaceType[] { tf.createGCMItfType("serverMult",
                 MulticastTestItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                 GCMTypeFactory.MULTICAST_CARDINALITY) });
@@ -107,9 +108,9 @@ public class Test extends ComponentTest {
     @org.junit.Test
     @Ignore
     public void testStartCompositeWithInternalClientItfBoundOnMulticast() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        GCMTypeFactory ptf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
-        GenericFactory gf = Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        GCMTypeFactory ptf = GCM.getGCMTypeFactory(boot);
+        GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType rType = ptf.createFcType(new InterfaceType[] {
                 ptf.createFcItfType("server", ServerTestItf.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),

@@ -50,7 +50,7 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        PAProperties.FRACTAL_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
+        PAProperties.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
         GCMApplication gcma = PAGCMDeployment
                 .loadApplicationDescriptor(Main.class
                         .getResource("/org/objectweb/proactive/examples/components/userguide/starter/applicationDescriptor.xml"));

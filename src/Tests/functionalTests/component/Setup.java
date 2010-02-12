@@ -39,13 +39,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -74,14 +74,14 @@ public class Setup {
 
     private static void init() throws InstantiationException, NoSuchInterfaceException {
         if ((tf == null) || (gf == null)) {
-            PAProperties.FRACTAL_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
-            Component boot = Fractal.getBootstrapComponent();
+            PAProperties.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
+            Component boot = GCM.getBootstrapComponent();
             if (tf == null) {
-                tf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
+                tf = GCM.getGCMTypeFactory(boot);
             }
 
             if (gf == null) {
-                gf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+                gf = (PAGenericFactory) GCM.getGenericFactory(boot);
             }
         }
     }

@@ -35,6 +35,7 @@
  */
 package functionalTests.component.creation.remote.newactive;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.objectweb.fractal.api.Component;
@@ -71,9 +72,9 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
      */
     @org.junit.Test
     public void primitiveCreation() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot);
 
         Node remoteNode = super.getANode();
         String remoteHost = remoteNode.getVMInformation().getHostName();
@@ -98,9 +99,9 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
     @org.junit.Test
     @Ignore
     public void compositeCreation() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot);
 
         Node remoteNode = super.getANode();
         String remoteHost = remoteNode.getVMInformation().getHostName();

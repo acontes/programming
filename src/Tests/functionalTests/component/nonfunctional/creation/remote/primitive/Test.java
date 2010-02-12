@@ -35,6 +35,7 @@
  */
 package functionalTests.component.nonfunctional.creation.remote.primitive;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.After;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
@@ -45,7 +46,6 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
@@ -74,19 +74,19 @@ public class Test extends ComponentTestDefaultNodes {
         /*
          * Getting the Fractal-Proactive bootstrap component
          */
-        Component boot = Fractal.getBootstrapComponent();
+        Component boot = GCM.getBootstrapComponent();
 
         /*
          * Getting the Fractal-ProActive type factory
          */
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        TypeFactory type_factory = GCM.getTypeFactory(boot);
 
         /*
          * Getting the
          * Fractal-ProActive generic
          * factory
          */
-        PAGenericFactory cf = Fractive.getGenericFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot);
 
         ComponentType fcType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "fitness-controller-membrane", DummyControllerItf.class.getName(), TypeFactory.SERVER,

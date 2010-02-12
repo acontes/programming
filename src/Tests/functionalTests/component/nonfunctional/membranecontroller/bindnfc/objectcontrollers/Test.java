@@ -35,6 +35,7 @@
  */
 package functionalTests.component.nonfunctional.membranecontroller.bindnfc.objectcontrollers;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -73,8 +74,8 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         //Thread.sleep(2000);
-        Component boot = Fractal.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = Fractal.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
+        Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
+        TypeFactory type_factory = GCM.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
         PAGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(

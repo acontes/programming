@@ -41,6 +41,7 @@ package org.objectweb.proactive.examples.userguide.components.api.starter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -61,19 +62,19 @@ public class Main {
         // TODO: Get the Bootstrap Component
         //@tutorial-break
         //@snippet-break api_starter_Main_skeleton
-        Component boot = Fractal.getBootstrapComponent();
+        Component boot = GCM.getBootstrapComponent();
         //@snippet-resume api_starter_Main_skeleton
         //@tutorial-resume
         // TODO: Get the TypeFactory
         //@tutorial-break
         //@snippet-break api_starter_Main_skeleton
-        TypeFactory tf = Fractal.getTypeFactory(boot);
+        TypeFactory tf = GCM.getTypeFactory(boot);
         //@snippet-resume api_starter_Main_skeleton
         //@tutorial-resume
         // TODO: Get the GenericFactory
         //@tutorial-break
         //@snippet-break api_starter_Main_skeleton
-        GenericFactory gf = Fractal.getGenericFactory(boot);
+        GenericFactory gf = GCM.getGenericFactory(boot);
         //@snippet-resume api_starter_Main_skeleton
         //@tutorial-resume
         // TODO: Create the i1 Interface Type (org.objectweb.proactive.examples.userguide.components.api.starter.Itf1)

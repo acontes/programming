@@ -38,6 +38,7 @@ package org.objectweb.proactive.core.component.type;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -143,8 +144,8 @@ public class WSComponent implements Serializable, Component, NameController, Lif
 
     public Type getFcType() {
         try {
-            Component boot = Fractal.getBootstrapComponent();
-            TypeFactory tf = Fractal.getTypeFactory(boot);
+            Component boot = GCM.getBootstrapComponent();
+            TypeFactory tf = GCM.getTypeFactory(boot);
             return tf.createFcType(new InterfaceType[] { (InterfaceType) ((Interface) fcInterfaceImpl)
                     .getFcItfType() });
         } catch (InstantiationException e) {

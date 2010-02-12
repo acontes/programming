@@ -43,10 +43,10 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.fractal.adl.Factory;
-import org.objectweb.fractal.adl.FactoryFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.adl.FactoryFactory;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.conformADL.components.CAttributes;
@@ -57,7 +57,7 @@ public class TestAttributesComposite extends ComponentTest {
 
     @Before
     public void setUp() throws Exception {
-        factory = FactoryFactory.getFactory(FactoryFactory.FRACTAL_BACKEND);
+        factory = FactoryFactory.getFactory();
     }
 
     // -----------------------------------------------------------------------------------

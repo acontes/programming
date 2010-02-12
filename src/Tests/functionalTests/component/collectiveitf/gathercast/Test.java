@@ -41,6 +41,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
@@ -101,9 +102,9 @@ public class Test extends ComponentTest {
 
     @org.junit.Test
     public void testStartCompositeWithGathercastInternalClientItf() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        GCMTypeFactory ptf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
-        GenericFactory gf = Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        GCMTypeFactory ptf = (GCMTypeFactory) GCM.getTypeFactory(boot);
+        GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType rType = ptf.createFcType(new InterfaceType[] {
                 ptf.createFcItfType("server", GatherDummyItf.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),

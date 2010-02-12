@@ -40,6 +40,7 @@ package org.objectweb.proactive.examples.components.helloworld;
  * Author: Eric Bruneton
  * Modified by: The ProActive Team
  */
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -117,8 +118,8 @@ public class HelloWorld {
             // -------------------------------------------------------------------
             // OPTION 2 : DO NOT USE THE FRACTAL ADL
             // -------------------------------------------------------------------
-            Component boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
-            TypeFactory tf = Fractal.getTypeFactory(boot);
+            Component boot = GCM.getBootstrapComponent();
+            TypeFactory tf = GCM.getTypeFactory(boot);
             Component rComp = null;
 
             // type of root component

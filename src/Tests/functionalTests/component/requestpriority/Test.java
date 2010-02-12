@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.etsi.uri.gcm.api.control.PriorityController;
 import org.etsi.uri.gcm.api.control.PriorityController.RequestPriority;
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -71,9 +72,9 @@ public class Test extends ComponentTest {
      */
     @Before
     public void createComponent() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GenericFactory cf = GCM.getGenericFactory(boot);
 
         ControllerDescription myController = new ControllerDescription(P1_NAME, Constants.PRIMITIVE,
             "/functionalTests/component/requestpriority/my-component-config.xml", false);

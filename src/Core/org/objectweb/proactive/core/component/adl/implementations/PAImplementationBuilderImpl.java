@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
@@ -125,7 +126,7 @@ public class PAImplementationBuilderImpl implements PAImplementationBuilder, Bin
             bootstrap = (Component) context.get("bootstrap");
         }
         if (bootstrap == null) {
-            bootstrap = Fractal.getBootstrapComponent();
+            bootstrap = GCM.getBootstrapComponent();
         }
         if ((deploymentDescriptor != null) && (adlVN != null)) {
             // consider exported virtual nodes

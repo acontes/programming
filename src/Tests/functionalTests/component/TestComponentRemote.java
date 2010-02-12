@@ -37,6 +37,7 @@ package functionalTests.component;
 
 import java.util.Arrays;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -99,9 +100,9 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
      */
     @org.junit.Test
     public void testCreationNewactiveComposite() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {
                 type_factory.createFcItfType("i1", I1.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),

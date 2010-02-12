@@ -41,6 +41,7 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -79,9 +80,9 @@ public class TestBindingController extends Conformtest {
 
     @Before
     public void setUp() throws Exception {
-        boot = Fractal.getBootstrapComponent();
-        tf = Fractal.getTypeFactory(boot);
-        gf = Fractal.getGenericFactory(boot);
+        boot = GCM.getBootstrapComponent();
+        tf = GCM.getTypeFactory(boot);
+        gf = GCM.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("server", I.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                         TypeFactory.SINGLE),

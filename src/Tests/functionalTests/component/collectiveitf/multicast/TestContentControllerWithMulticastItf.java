@@ -36,6 +36,7 @@
 package functionalTests.component.collectiveitf.multicast;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -72,9 +73,9 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
 
     @Before
     public void setUp() throws Exception {
-        boot = Fractal.getBootstrapComponent();
-        tf = (GCMTypeFactory) Fractal.getTypeFactory(boot);
-        gf = Fractal.getGenericFactory(boot);
+        boot = GCM.getBootstrapComponent();
+        tf = GCM.getGCMTypeFactory(boot);
+        gf = GCM.getGenericFactory(boot);
         tRoot = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("tester", Tester.class.getName(), TypeFactory.SERVER,
                         TypeFactory.MANDATORY, TypeFactory.MANDATORY),

@@ -35,6 +35,7 @@
  */
 package org.objectweb.proactive.examples.documentation.webservices;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
@@ -75,10 +76,10 @@ public class Main {
             //@snippet-end webservices_AO_1
 
             //@snippet-start webservices_Component_1
-            Component boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
+            Component boot = GCM.getBootstrapComponent();
 
-            TypeFactory tf = Fractal.getTypeFactory(boot);
-            GenericFactory cf = Fractal.getGenericFactory(boot);
+            TypeFactory tf = GCM.getTypeFactory(boot);
+            GenericFactory cf = GCM.getGenericFactory(boot);
 
             // type of server component
             ComponentType sType = tf.createFcType(new InterfaceType[] { tf.createFcItfType("hello-world",

@@ -46,6 +46,7 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
@@ -104,8 +105,7 @@ public class Launcher {
             return ((Map) f.newComponent(pargs[1], new HashMap<Object, Object>())).get(pargs[2]);
         } else {
             Factory f;
-            if ("org.objectweb.proactive.core.component.Fractive".equals(PAProperties.FRACTAL_PROVIDER
-                    .getValue())) {
+            if (Fractive.class.getName().equals(PAProperties.GCM_PROVIDER.getValue())) {
                 // return the ProActive factory as defined in
                 // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();

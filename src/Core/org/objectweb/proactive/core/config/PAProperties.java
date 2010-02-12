@@ -78,6 +78,12 @@ public enum PAProperties {
     PREFER_IPV4_STACK("java.net.preferIPv4Stack", PAPropertiesType.BOOLEAN, true),
 
     /**
+     * Indicate the GCM provider class, to the ProActive implementation of
+     * Fractal/GCM set it to org.objectweb.proactive.core.component.Fractive
+     */
+    GCM_PROVIDER("gcm.provider", PAPropertiesType.STRING, true),
+
+    /**
      * Indicate the Fractal provider class, to the ProActive implementation of
      * Fractal/GCM set it to org.objectweb.proactive.core.component.Fractive
      */

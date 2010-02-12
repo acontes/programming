@@ -37,6 +37,7 @@ package org.objectweb.proactive.examples.webservices.helloWorld;
 
 import java.io.File;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
@@ -121,7 +122,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         Component boot = null;
         Component comp = null;
         try {
-            boot = org.objectweb.fractal.api.Fractal.getBootstrapComponent();
+            boot = GCM.getBootstrapComponent();
 
             TypeFactory tf = Fractal.getTypeFactory(boot);
             PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);

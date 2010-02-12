@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -174,7 +175,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
     }
 
     private void addMandatoryControllers(Vector<InterfaceType> nftype) throws Exception {
-        Component boot = Fractal.getBootstrapComponent(); // Getting the Fractal-Proactive bootstrap component
+        Component boot = GCM.getBootstrapComponent(); // Getting the Fractal-Proactive bootstrap component
         TypeFactory type_factory = Fractal.getTypeFactory(boot);
 
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory.createFcItfType(
@@ -228,7 +229,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
             }
 
             try {//Setting the real NF type, as some controllers may not be generated
-                Component boot = Fractal.getBootstrapComponent();
+                Component boot = GCM.getBootstrapComponent();
                 TypeFactory type_factory = Fractal.getTypeFactory(boot);
                 InterfaceType[] nf = new InterfaceType[nftype.size()];
                 nftype.toArray(nf);
@@ -465,7 +466,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
         }
 
         try {//Setting the real NF type, as some controllers may not be generated
-            Component boot = Fractal.getBootstrapComponent();
+            Component boot = GCM.getBootstrapComponent();
             TypeFactory type_factory = Fractal.getTypeFactory(boot);
             InterfaceType[] nf = new InterfaceType[nfType.size()];
             nfType.toArray(nf);

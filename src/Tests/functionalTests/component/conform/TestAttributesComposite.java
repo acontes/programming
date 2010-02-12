@@ -37,6 +37,7 @@ package functionalTests.component.conform;
 
 import static org.junit.Assert.assertEquals;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
@@ -60,9 +61,9 @@ public class TestAttributesComposite extends Conformtest {
 
     @Before
     public void setUp() throws Exception {
-        boot = Fractal.getBootstrapComponent();
-        tf = Fractal.getTypeFactory(boot);
-        gf = Fractal.getGenericFactory(boot);
+        boot = GCM.getBootstrapComponent();
+        tf = GCM.getTypeFactory(boot);
+        gf = GCM.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] { tf.createFcItfType("attribute-controller",
                 CAttributes.class.getName(), false, false, false) });
     }

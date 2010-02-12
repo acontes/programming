@@ -36,6 +36,7 @@
 package functionalTests.component.wsbindings;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.After;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -69,9 +70,9 @@ public abstract class CommonSetup extends ComponentTest {
     protected WebServices ws;
 
     public void setUpAndDeploy() throws Exception {
-        boot = Fractal.getBootstrapComponent();
-        tf = Fractal.getTypeFactory(boot);
-        gf = Fractal.getGenericFactory(boot);
+        boot = GCM.getBootstrapComponent();
+        tf = GCM.getTypeFactory(boot);
+        gf = GCM.getGenericFactory(boot);
 
         url = AbstractWebServicesFactory.getLocalUrl();
         ComponentType sType = tf.createFcType(new InterfaceType[] {

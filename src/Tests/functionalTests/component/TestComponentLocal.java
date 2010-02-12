@@ -37,6 +37,7 @@ package functionalTests.component;
 
 import java.util.Arrays;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
@@ -94,9 +95,9 @@ public class TestComponentLocal extends ComponentTest {
      */
     @org.junit.Test
     public void testCreationNewactiveComposite() throws Exception {
-        Component boot = Fractal.getBootstrapComponent();
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
-        GenericFactory cf = Fractal.getGenericFactory(boot);
+        Component boot = GCM.getBootstrapComponent();
+        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GenericFactory cf = GCM.getGenericFactory(boot);
 
         // check that composites with no functional interface can be instantiated
         ComponentType voidType = type_factory.createFcType(new InterfaceType[] {});
