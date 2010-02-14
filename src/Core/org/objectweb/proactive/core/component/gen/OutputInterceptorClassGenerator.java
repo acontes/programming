@@ -107,7 +107,7 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
                 CtClass generatedCtClass = pool.makeClass(representativeClassName);
 
                 //this.fcInterfaceName = fcInterfaceName;
-                //isPrimitive = ((ProActiveComponentRepresentativeImpl) owner).getHierarchicalType()
+                //isPrimitive = ((PAComponentRepresentativeImpl) owner).getHierarchicalType()
                 //                                                    .equals(ComponentParameters.PRIMITIVE);
                 List<CtClass> interfacesToImplement = new ArrayList<CtClass>();
 
@@ -170,7 +170,7 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
                 // now get the methods from implemented interfaces
                 Iterator<CtClass> it = interfacesToImplementAndSuperInterfaces.iterator();
                 while (it.hasNext()) {
-                    itf = (CtClass) it.next();
+                    itf = it.next();
                     if (!classesIndexer.contains(itf.getName())) {
                         classesIndexer.add(itf.getName());
                     }
@@ -194,7 +194,7 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
                     }
                 }
 
-                reifiedMethods = (CtMethod[]) (methodsToImplement.values()
+                reifiedMethods = (methodsToImplement.values()
                         .toArray(new CtMethod[methodsToImplement.size()]));
 
                 // Determines which reifiedMethods are valid for reification

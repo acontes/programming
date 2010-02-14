@@ -38,6 +38,7 @@ package org.objectweb.proactive.core.component.controller;
 import java.io.Serializable;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -67,7 +68,7 @@ public abstract class AbstractPAController implements PAController, Serializable
     protected PAComponent owner;
 
     /**
-     * Constructor for AbstractProActiveController.
+     * Constructor for AbstractPAController.
      * 
      * @param owner the component that wants this controller is in the {@link Constants} class.
      */
@@ -115,8 +116,8 @@ public abstract class AbstractPAController implements PAController, Serializable
      */
     protected void checkLifeCycleIsStopped() throws IllegalLifeCycleException {
         try {
-            if (!((LifeCycleController) getFcItfOwner().getFcInterface(Constants.LIFECYCLE_CONTROLLER))
-                    .getFcState().equals(LifeCycleController.STOPPED)) {
+            if (!(GCM.getGCMLifeCycleController(getFcItfOwner())).getFcState().equals(
+                    LifeCycleController.STOPPED)) {
                 throw new IllegalLifeCycleException(
                     "this control operation should be performed while the component is stopped");
             }

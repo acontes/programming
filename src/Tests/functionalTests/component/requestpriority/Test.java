@@ -39,6 +39,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.etsi.uri.gcm.api.control.PriorityController;
 import org.etsi.uri.gcm.api.control.PriorityController.RequestPriority;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.objectweb.fractal.api.Component;
@@ -46,7 +47,6 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -73,7 +73,7 @@ public class Test extends ComponentTest {
     @Before
     public void createComponent() throws Exception {
         Component boot = GCM.getBootstrapComponent();
-        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         ControllerDescription myController = new ControllerDescription(P1_NAME, Constants.PRIMITIVE,
@@ -85,10 +85,10 @@ public class Test extends ComponentTest {
         p1 = cf.newFcInstance(pc_type, myController, new ContentDescription(PriotirizedComponent.class
                 .getName(), new Object[] {}));
 
-        assertEquals(Fractal.getNameController(p1).getFcName(), P1_NAME);
+        assertEquals(GCM.getNameController(p1).getFcName(), P1_NAME);
 
         // start component
-        Fractal.getLifeCycleController(p1).startFc();
+        GCM.getGCMLifeCycleController(p1).startFc();
 
         // get interfaces
         functionnal_Itf = ((FItf) p1.getFcInterface(FItf.ITF_NAME));
@@ -97,7 +97,7 @@ public class Test extends ComponentTest {
         nonFunctionnal3_Itf = ((NF3Itf) p1.getFcInterface(NF3Itf.CONTROLLER_NAME));
 
         // set priorities functional 
-        PriorityController pc = (PriorityController) p1.getFcInterface(Constants.PRIORITY_CONTROLLER);
+        PriorityController pc = GCM.getPriorityController(p1);
         assertEquals(RequestPriority.NF1, pc.getGCMPriority(Constants.PRIORITY_CONTROLLER, "setPriority",
                 null));
         assertEquals(RequestPriority.NF2, pc.getGCMPriority(Constants.PRIORITY_CONTROLLER, "setPriorityNF2",
@@ -142,7 +142,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void test_stopped_NF1_F_NF3() throws Exception {
         String expectedOrder = NF1Itf.NF1_STR_CALL + NF3Itf.NF3_STR_CALL + FItf.F_STR_CALL;
-        Fractal.getLifeCycleController(p1).stopFc();
+        GCM.getGCMLifeCycleController(p1).stopFc();
         nonFunctionnal1_Itf.longNF1Call();
         Thread.sleep(500); //wait to be sure the first functionnalCall are processing, allowing us to enqueue request in the order we want
 
@@ -150,7 +150,7 @@ public class Test extends ComponentTest {
 
         nonFunctionnal3_Itf.NF3Call();
 
-        Fractal.getLifeCycleController(p1).startFc();
+        GCM.getGCMLifeCycleController(p1).startFc();
         assertEquals(expectedOrder, functionnal_Itf.getCallOrder());
     }
 
@@ -209,7 +209,7 @@ public class Test extends ComponentTest {
         String expectedOrder = NF1Itf.NF1_STR_CALL + NF3Itf.NF3_STR_CALL + NF1Itf.NF1_STR_CALL +
             NF2Itf.NF2_STR_CALL + FItf.F_STR_CALL + FItf.F_STR_CALL;
 
-        Fractal.getLifeCycleController(p1).stopFc();
+        GCM.getGCMLifeCycleController(p1).stopFc();
         nonFunctionnal1_Itf.longNF1Call();
         Thread.sleep(500);
         functionnal_Itf.functionalCall();
@@ -218,7 +218,7 @@ public class Test extends ComponentTest {
         nonFunctionnal2_Itf.NF2Call();
         nonFunctionnal3_Itf.NF3Call();
 
-        Fractal.getLifeCycleController(p1).startFc();
+        GCM.getGCMLifeCycleController(p1).startFc();
         assertEquals(expectedOrder, functionnal_Itf.getCallOrder());
     }
 
@@ -247,14 +247,14 @@ public class Test extends ComponentTest {
         String expectedOrder = NF1Itf.NF1_STR_CALL + NF2Itf.NF2_STR_CALL + NF2Itf.NF2_STR_CALL +
             NF1Itf.NF1_STR_CALL + FItf.F_STR_CALL + FItf.F_STR_CALL;
         nonFunctionnal1_Itf.longNF1Call();
-        Fractal.getLifeCycleController(p1).stopFc();
+        GCM.getGCMLifeCycleController(p1).stopFc();
         Thread.sleep(500);
         functionnal_Itf.functionalCall();
         nonFunctionnal2_Itf.NF2Call();
         functionnal_Itf.functionalCall();
         nonFunctionnal2_Itf.NF2Call();
         nonFunctionnal1_Itf.NF1Call();
-        Fractal.getLifeCycleController(p1).startFc();
+        GCM.getGCMLifeCycleController(p1).startFc();
         assertEquals(expectedOrder, functionnal_Itf.getCallOrder());
     }
 }

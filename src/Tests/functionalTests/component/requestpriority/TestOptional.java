@@ -37,6 +37,7 @@ package functionalTests.component.requestpriority;
 
 import static org.junit.Assert.assertEquals;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
@@ -45,7 +46,6 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -68,7 +68,7 @@ public class TestOptional extends ComponentTest {
     @Test
     public void testPriorityController() throws Exception {
         Component boot = GCM.getBootstrapComponent();
-        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         ControllerDescription myController = new ControllerDescription(P1_NAME, Constants.PRIMITIVE,
@@ -80,15 +80,15 @@ public class TestOptional extends ComponentTest {
         Component p1 = cf.newFcInstance(pc_type, myController, new ContentDescription(
             PriotirizedComponent.class.getName(), new Object[] {}));
 
-        assertEquals(Fractal.getNameController(p1).getFcName(), P1_NAME);
+        assertEquals(GCM.getNameController(p1).getFcName(), P1_NAME);
 
-        p1.getFcInterface(Constants.PRIORITY_CONTROLLER);
+        GCM.getPriorityController(p1);
     }
 
     @Test(expected = NoSuchInterfaceException.class)
     public void testNoPriorityController() throws Exception {
         Component boot = GCM.getBootstrapComponent();
-        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         ComponentType pc_type = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
@@ -97,8 +97,8 @@ public class TestOptional extends ComponentTest {
         Component p1 = cf.newFcInstance(pc_type, new ControllerDescription(P2_NAME, Constants.PRIMITIVE),
                 new ContentDescription(PriotirizedComponent.class.getName(), new Object[] {}));
 
-        assertEquals(Fractal.getNameController(p1).getFcName(), P2_NAME);
+        assertEquals(GCM.getNameController(p1).getFcName(), P2_NAME);
 
-        p1.getFcInterface(Constants.PRIORITY_CONTROLLER);
+        GCM.getPriorityController(p1);
     }
 }

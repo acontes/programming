@@ -38,7 +38,6 @@ package org.objectweb.proactive.core.component;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.List;
@@ -51,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 import javax.naming.NamingException;
 
 import org.apache.log4j.Logger;
-import org.etsi.uri.gcm.api.control.GathercastController;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
@@ -71,11 +70,6 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.component.controller.PABindingController;
-import org.objectweb.proactive.core.component.controller.PAContentController;
-import org.objectweb.proactive.core.component.controller.PAMembraneController;
-import org.objectweb.proactive.core.component.controller.PAMigrationController;
-import org.objectweb.proactive.core.component.controller.PAMulticastController;
 import org.objectweb.proactive.core.component.exceptions.InstantiationExceptionListException;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.group.PAComponentGroup;
@@ -83,7 +77,6 @@ import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MOP;
@@ -100,7 +93,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * This class is used for creating components. It acts as :
  * <ol>
  * <li> a bootstrap component</li>
- * <li> a specialized GenericFactory for instantiating new components on remote nodes (a ProActiveGenericFactory)</li>
+ * <li> a specialized GenericFactory for instantiating new components on remote nodes ({@link PAGenericFactory})</li>
  * <li> a utility class providing static methods to create collective interfaces</li>
  * </ol>
  *
@@ -109,13 +102,12 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 @PublicAPI
 public class Fractive implements PAGenericFactory, Component, Factory {
     private static Fractive instance = null;
-    private TypeFactory typeFactory = PAGCMTypeFactoryImpl.instance();
+    private GCMTypeFactory typeFactory = PAGCMTypeFactoryImpl.instance();
     private Type type = null;
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
      * no-arg constructor (used by Fractal to get a bootstrap component)
-     *
      */
     public Fractive() {
     }
@@ -132,157 +124,15 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         return instance;
     }
 
-    public static PABindingController getBindingController(final Component component)
-            throws NoSuchInterfaceException {
-        return (PABindingController) component.getFcInterface(Constants.BINDING_CONTROLLER);
-    }
-
-    /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.PAMulticastController MulticastController}
-     * interface of the given component.
-     *
-     * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.PAMulticastController MulticastController}
-     *         interface of the given component.
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static PAMulticastController getMulticastController(final Component component)
-            throws NoSuchInterfaceException {
-        return (PAMulticastController) component.getFcInterface(Constants.MULTICAST_CONTROLLER);
-    }
-
-    /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.PAContentController ProActiveContentController}
-     * interface of the given component.
-     *
-     * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.PAContentController ProActiveContentController}
-     *         interface of the given component.
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static PAContentController getContentController(final Component component)
-            throws NoSuchInterfaceException {
-        return (PAContentController) component.getFcInterface(Constants.CONTENT_CONTROLLER);
-    }
-
-    /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.PAMembraneController MembraneController}
-     * interface of the given component.
-     * @param component omponent a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.PAMembraneController MembraneController}
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static PAMembraneController getMembraneController(final Component component)
-            throws NoSuchInterfaceException {
-        return (PAMembraneController) component.getFcInterface(Constants.MEMBRANE_CONTROLLER);
-    }
-
-    /**
-     * Returns the {@link org.etsi.uri.gcm.api.control.GathercastController GatherController}
-     * interface of the given component.
-     *
-     * @param component a component.
-     * @return the {@link org.etsi.uri.gcm.api.control.GathercastController GatherController}
-     *         interface of the given component.
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static GathercastController getGathercastController(final Component component)
-            throws NoSuchInterfaceException {
-        return (GathercastController) component.getFcInterface(Constants.GATHERCAST_CONTROLLER);
-    }
-
-    /**
-     * Returns the {@link org.objectweb.proactive.core.component.controller.PAMigrationController MigrationController}
-     * interface of the given component.
-     *
-     * @param component a component.
-     * @return the {@link org.objectweb.proactive.core.component.controller.PAMigrationController MigrationController}
-     *         interface of the given component.
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static PAMigrationController getMigrationController(final Component component)
-            throws NoSuchInterfaceException {
-        return (PAMigrationController) component.getFcInterface(Constants.MIGRATION_CONTROLLER);
-    }
-
-    /**
-     * Returns a generated interface reference, whose impl field is a group It
-     * is able to handle multiple bindings, and automatically adds it to a given
-     *
-     * @param itfName the name of the interface
-     * @param itfSignature the signature of the interface
-     * @param owner the component to which this interface belongs
-     * @return ProActiveInterface the resulting collective client interface
-     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-     */
-    public static PAInterface createCollectiveClientInterface(String itfName, String itfSignature,
-            Component owner) throws ProActiveRuntimeException {
-        try {
-            PAGCMInterfaceType itf_type = (PAGCMInterfaceType) PAGCMTypeFactoryImpl.instance()
-                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.COLLECTION);
-            PAInterface itf_ref_group = PAComponentGroup.newComponentInterfaceGroup(itf_type, owner);
-            return itf_ref_group;
-        } catch (Exception e) {
-            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
-        }
-    }
-
-    //    /**
-    //     * Returns a generated interface reference, whose impl field is a group It
-    //     * is able to handle multiple bindings, and automatically adds it to a given
-    //     *
-    //     * @param itfName the name of the interface
-    //     * @param itfSignature the signature of the interface
-    //     * @param owner the component to which this interface belongs
-    //     * @return ProActiveInterface the resulting collective client interface
-    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-    //     */
-    //    public static ProActiveInterface createMulticastClientInterface(String itfName, String itfSignature,
-    //            Component owner) throws ProActiveRuntimeException {
-    //        try {
-    //            ProActiveInterfaceType itf_type = (ProActiveInterfaceType) ProActiveTypeFactoryImpl.instance()
-    //                    .createFcItfType(itfName, itfSignature, TypeFactory.CLIENT, TypeFactory.MANDATORY,
-    //                            ProActiveTypeFactory.MULTICAST_CARDINALITY);
-    //
-    //            ProActiveInterface itf_ref_group = ProActiveComponentGroup.newComponentInterfaceGroup(itf_type,
-    //                    owner);
-    //            return itf_ref_group;
-    //        } catch (Exception e) {
-    //            throw new ProActiveRuntimeException("Impossible to create a collective client interface ", e);
-    //        }
-
-    //    /**
-    //     * Returns a generated interface reference, whose impl field is a group It
-    //     * is able to handle multiple bindings
-    //     *
-    //     * @param itfName the name of the interface
-    //     * @param itfSignature the signature of the interface
-    //     * @return ProActiveInterface the resulting collective client interface
-    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-    //     */
-    //
-    //    public static ProActiveInterface createCollectiveClientInterface(
-    //        String itfName, String itfSignature) throws ProActiveRuntimeException {
-    //        return Fractive.createCollectiveClientInterface(itfName, itfSignature,
-    //            null);
-    //    }
-    //    /**
-    //     * Returns a generated interface reference, whose impl field is a group It
-    //     * is able to handle multiple bindings
-    //     *
-    //     * @param itfName the name of the interface
-    //     * @param itfSignature the signature of the interface
-    //     * @return ProActiveInterface the resulting collective client interface
-    //     * @throws ProActiveRuntimeException in case of a problem while creating the collective interface
-    //     */
-    //    public static ProActiveInterface createMulticastClientInterface(String itfName, String itfSignature)
-    //            throws ProActiveRuntimeException {
-    //        return Fractive.createMulticastClientInterface(itfName, itfSignature, null);
-    //    }
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.fractal.api.factory.Factory#newFcInstance()
+     */
+    public Component newFcInstance() throws InstantiationException {
+        return this;
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newFcInstance(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription)
      */
@@ -291,7 +141,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         return newFcInstance(type, controllerDesc, contentDesc, (Node) null);
     }
 
-    /**
+    /*
      * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription, org.objectweb.proactive.core.component.ContentDescription)
      */
     public Component newNFcInstance(Type type, ControllerDescription controllerDesc,
@@ -300,7 +150,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.Type,
      *      java.lang.Object, java.lang.Object)
      */
@@ -354,7 +203,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.factory.GenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
      *      java.lang.Object, java.lang.Object)
      */
@@ -408,8 +256,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newFcInstance(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.node.Node)
@@ -432,8 +279,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.node.Node)
@@ -455,94 +301,31 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         }
     }
 
+    public Component newFcInstance(Type type, Type nfType, ContentDescription contentDesc,
+            ControllerDescription controllerDesc, Node node) throws InstantiationException {
+        if (nfType == null) {
+            return newFcInstance(type, controllerDesc, contentDesc, node);
+        }
+        try {
+            ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
+                    contentDesc, node);
+            return fComponent(type, container);
+        } catch (ActiveObjectCreationException e) {
+            logger
+                    .info("Active object creation error while creating component; an exception occurs with the following message: " +
+                        e.getMessage());
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
+        } catch (NodeException e) {
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
+        }
+    }
+
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstance(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription,
-     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
-     */
-    //    public Component newFcInstance(Type type, ControllerDescription controllerDesc,
-    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-    //        if (virtualNode == null) {
-    //            return newFcInstance(type, controllerDesc, contentDesc, (Node) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //            if (virtualNode.getNodes().length == 0) {
-    //                throw new InstantiationException(
-    //                    "Cannot create component on virtual node as no node is associated with this virtual node");
-    //            }
-    //            return newFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
-    /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription,
-     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
-     */
-    //    public Component newNFcInstance(Type type, ControllerDescription controllerDesc,
-    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-    //        if (virtualNode == null) {
-    //            return newNFcInstance(type, controllerDesc, contentDesc, (Node) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //            if (virtualNode.getNodes().length == 0) {
-    //                throw new InstantiationException(
-    //                    "Cannot create component on virtual node as no node is associated with this virtual node");
-    //            }
-    //            return newNFcInstance(type, controllerDesc, contentDesc, virtualNode.getNode());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
-    /*
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription,
-     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
-     */
-    //    public List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-    //        if (virtualNode == null) {
-    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
-    /*
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription,
-     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
-     */
-    //    public List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-    //            ContentDescription contentDesc, VirtualNode virtualNode) throws InstantiationException {
-    //        if (virtualNode == null) {
-    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
-    /*
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.node.Node[])
@@ -555,7 +338,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription,
      *      org.objectweb.proactive.core.node.Node[])
@@ -568,8 +351,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription[],
      *      org.objectweb.proactive.core.node.Node[])
@@ -580,8 +362,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
      *      org.objectweb.proactive.core.component.ControllerDescription,
      *      org.objectweb.proactive.core.component.ContentDescription[],
      *      org.objectweb.proactive.core.node.Node[])
@@ -592,55 +373,12 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newFcInstanceAsList(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription[],
-     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
-     */
-    //    public List<Component> newFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-    //            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException {
-    //        if (virtualNode == null) {
-    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //
-    //            return newFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
-    /*
-     * 
-     * @see org.objectweb.proactive.core.component.factory.ProActiveGenericFactory#newNFcInstanceAsList(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription[],
-     *      org.objectweb.proactive.core.descriptor.data.VirtualNode)
-     */
-    //    public List<Component> newNFcInstanceAsList(Type type, ControllerDescription controllerDesc,
-    //            ContentDescription[] contentDesc, VirtualNode virtualNode) throws InstantiationException {
-    //        if (virtualNode == null) {
-    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
-    //        }
-    //        try {
-    //            virtualNode.activate();
-    //
-    //            return newNFcInstanceAsList(type, controllerDesc, contentDesc, virtualNode.getNodes());
-    //        } catch (NodeException e) {
-    //            throw new InstantiationException(
-    //                "could not instantiate components due to a deployment problem : " + e.getMessage());
-    //        }
-    //    }
-    /*
-     * 
      * @see org.objectweb.fractal.api.Component#getFcInterface(java.lang.String)
      */
     public Object getFcInterface(String itfName) throws NoSuchInterfaceException {
-        if ("generic-factory".equals(itfName)) {
+        if (Constants.GENERIC_FACTORY.equals(itfName)) {
             return this;
-        } else if ("type-factory".equals(itfName)) {
+        } else if (Constants.TYPE_FACTORY.equals(itfName)) {
             return typeFactory;
         } else {
             throw new NoSuchInterfaceException(itfName);
@@ -648,7 +386,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.Component#getFcInterfaces()
      */
     public Object[] getFcInterfaces() {
@@ -656,17 +393,16 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.Component#getFcType()
      */
     public Type getFcType() {
         if (type == null) {
             try {
                 return type = typeFactory.createFcType(new InterfaceType[] {
-                        typeFactory.createFcItfType("generic-factory", GenericFactory.class.getName(), false,
-                                false, false),
-                        typeFactory.createFcItfType("type-factory", TypeFactory.class.getName(), false,
-                                false, false) });
+                        typeFactory.createFcItfType(Constants.GENERIC_FACTORY,
+                                GenericFactory.class.getName(), false, false, false),
+                        typeFactory.createFcItfType(Constants.TYPE_FACTORY, TypeFactory.class.getName(),
+                                false, false, false) });
             } catch (InstantiationException e) {
                 ProActiveLogger.getLogger(Loggers.COMPONENTS).error(e.getMessage());
                 return null;
@@ -677,7 +413,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.factory.Factory#getFcContentDesc()
      */
     public Object getFcContentDesc() {
@@ -685,7 +420,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.factory.Factory#getFcControllerDesc()
      */
     public Object getFcControllerDesc() {
@@ -693,46 +427,17 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * 
      * @see org.objectweb.fractal.api.factory.Factory#getFcInstanceType()
      */
     public Type getFcInstanceType() {
         return null;
     }
 
-    /*
-     * 
-     * @see org.objectweb.fractal.api.factory.Factory#newFcInstance()
-     */
-    public Component newFcInstance() throws InstantiationException {
-        return this;
-    }
-
     /**
-     * Helper method for extracting the types of client interfaces from the type
-     * of a component
+     * Returns a component representative pointing to the component associated to the component whose active
+     * thread is calling this method. It can be used for a component to pass callback references to itself.
      *
-     * @param componentType a component type
-     * @return the types of client interfaces
-     */
-    public static InterfaceType[] getClientInterfaceTypes(ComponentType componentType) {
-        ArrayList<InterfaceType> client_interfaces = new ArrayList<InterfaceType>();
-        InterfaceType[] interfaceTypes = componentType.getFcInterfaceTypes();
-        for (int i = 0; i < interfaceTypes.length; i++) {
-            if (interfaceTypes[i].isFcClientItf()) {
-                client_interfaces.add(interfaceTypes[i]);
-            }
-        }
-        return client_interfaces.toArray(new InterfaceType[client_interfaces.size()]);
-    }
-
-    /**
-     * Returns a component representative pointing to the component associated
-     * to the component whose active thread is calling this method. It can be
-     * used for a component to pass callback references to itself.
-     *
-     * @return a component representative for the component in which the current
-     *         thread is running
+     * @return Component representative for the component in which the current thread is running.
      */
     public static Component getComponentRepresentativeOnThis() {
         ComponentBody componentBody;
@@ -743,7 +448,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
                     .error("Cannot get a component representative from the current object, because this object is not a component");
             return null;
         }
-        PAComponent currentComponent = componentBody.getProActiveComponentImpl();
+        PAComponent currentComponent = componentBody.getPAComponentImpl();
         return currentComponent.getRepresentativeOnThis();
     }
 
@@ -752,7 +457,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      *
      * @param ref
      *            a reference on a component (it should be an instance of
-     *            ProActiveComponentRepresentative)
+     *            PAComponentRepresentative)
      * @param url
      *            the registration address
      * @throws IOException
@@ -771,7 +476,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      *
      * @param ref
      *            a reference on a component (it should be an instance of
-     *            ProActiveComponentRepresentative)
+     *            PAComponentRepresentative)
      * @param name
      *            the name of the component
      * @return
@@ -816,20 +521,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
             throw new NamingException("Could not perform lookup for component at URL: " + url +
                 ", because construction of component representative failed.");
         }
-    }
-
-    /**
-     * Returns the {@link PAGenericFactory} interface of the given
-     * component.
-     *
-     * @param component the component to get the factory from
-     * @return the {@link PAGenericFactory} interface of the given
-     *         component.
-     * @throws NoSuchInterfaceException if there is no such interface.
-     */
-    public static PAGenericFactory getGenericFactory(final Component component)
-            throws NoSuchInterfaceException {
-        return (PAGenericFactory) component.getFcInterface("generic-factory");
     }
 
     /**
@@ -884,7 +575,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
                 // Check that the provided content class implements all defined interfaces (server, functional and not mandatory)
                 for (InterfaceType itfType : cType.getFcInterfaceTypes()) {
                     if (!itfType.isFcClientItf() && !itfType.isFcOptionalItf() &&
-                        !Utils.isControllerInterfaceName(itfType.getFcItfName())) {
+                        !Utils.isControllerItfName(itfType.getFcItfName())) {
                         try {
                             if (!Class.forName(itfType.getFcItfSignature()).isAssignableFrom(contentClass)) {
                                 throw new InstantiationException(
@@ -917,7 +608,72 @@ public class Fractive implements PAGenericFactory, Component, Factory {
             }
             contentDesc.setFactory(new ProActiveMetaObjectFactory(factory_params));
             // factory =
-            // ProActiveComponentMetaObjectFactory.newInstance(componentParameters);
+            // PAComponentMetaObjectFactory.newInstance(componentParameters);
+        }
+
+        // TODO_M : add controllers in the component metaobject factory?
+        Object ao = null;
+
+        // 3 possibilities : either the component is created on a node (or
+        // null), it is created on a virtual node, or on multiple nodes
+        ao = PAActiveObject.newActive(contentDesc.getClassName(), null, contentDesc
+                .getConstructorParameters(), node, contentDesc.getActivity(), contentDesc.getFactory());
+
+        return new ActiveObjectWithComponentParameters((StubObject) ao, componentParameters);
+    }
+
+    /**
+     * Common instantiation method called during creation both functional and non functional components.
+     *
+     * @param type
+     * @param controllerDesc
+     * @param contentDesc
+     * @param node
+     * @return A container object, containing objects for the generation of the component representative
+     * @throws InstantiationException
+     * @throws ActiveObjectCreationException
+     * @throws NodeException
+     */
+    private ActiveObjectWithComponentParameters commonInstanciation(Type type, Type nfType,
+            ControllerDescription controllerDesc, ContentDescription contentDesc, Node node)
+            throws InstantiationException, ActiveObjectCreationException, NodeException {
+        if (contentDesc == null) {
+            // either a parallel or a composite component, no
+            // activitiy/factory/node specified
+            if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
+                contentDesc = new ContentDescription(Composite.class.getName());
+            } else {
+                throw new InstantiationException(
+                    "Content can be null only if the hierarchical type of the component is composite");
+            }
+        }
+
+        // instantiate the component metaobject factory with parameters of
+        // the component
+
+        // type must be a component type
+        if (!(type instanceof ComponentType)) {
+            throw new InstantiationException("Argument type must be an instance of ComponentType");
+        }
+
+        if (!(nfType instanceof ComponentType)) {
+            throw new InstantiationException("Argument nftype must be an instance of ComponentType");
+        }
+        ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
+            (ComponentType) nfType, controllerDesc);
+        if (contentDesc.getFactory() == null) {
+            // first create a map with the parameters
+            Map<String, Object> factory_params = new Hashtable<String, Object>(1);
+
+            factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY, componentParameters);
+            if (controllerDesc.isSynchronous() &&
+                (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType()))) {
+                factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
+                        Constants.SYNCHRONOUS);
+            }
+            contentDesc.setFactory(new ProActiveMetaObjectFactory(factory_params));
+            // factory =
+            // PAComponentMetaObjectFactory.newInstance(componentParameters);
         }
 
         // TODO_M : add controllers in the component metaobject factory?
@@ -1124,93 +880,6 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         public Type getFcType() {
             return null;
         }
-    }
-
-    public Component newFcInstance(Type type, Type nfType, ContentDescription contentDesc,
-            ControllerDescription controllerDesc, Node node) throws InstantiationException {
-        if (nfType == null) {
-            return newFcInstance(type, controllerDesc, contentDesc, node);
-        }
-        try {
-            ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
-                    contentDesc, node);
-            return fComponent(type, container);
-        } catch (ActiveObjectCreationException e) {
-            logger
-                    .info("Active object creation error while creating component; an exception occurs with the following message: " +
-                        e.getMessage());
-            InstantiationException ie = new InstantiationException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
-        } catch (NodeException e) {
-            InstantiationException ie = new InstantiationException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
-        }
-    }
-
-    /**
-     * Common instanciation method called during creation both functional and non functional components
-     * @param type
-     * @param controllerDesc
-     * @param contentDesc
-     * @param node
-     * @return A container object, containing objects for the generation of the component representative
-     * @throws InstantiationException
-     * @throws ActiveObjectCreationException
-     * @throws NodeException
-     */
-    private ActiveObjectWithComponentParameters commonInstanciation(Type type, Type nfType,
-            ControllerDescription controllerDesc, ContentDescription contentDesc, Node node)
-            throws InstantiationException, ActiveObjectCreationException, NodeException {
-        if (contentDesc == null) {
-            // either a parallel or a composite component, no
-            // activitiy/factory/node specified
-            if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
-                contentDesc = new ContentDescription(Composite.class.getName());
-            } else {
-                throw new InstantiationException(
-                    "Content can be null only if the hierarchical type of the component is composite");
-            }
-        }
-
-        // instantiate the component metaobject factory with parameters of
-        // the component
-
-        // type must be a component type
-        if (!(type instanceof ComponentType)) {
-            throw new InstantiationException("Argument type must be an instance of ComponentType");
-        }
-
-        if (!(nfType instanceof ComponentType)) {
-            throw new InstantiationException("Argument nftype must be an instance of ComponentType");
-        }
-        ComponentParameters componentParameters = new ComponentParameters((ComponentType) type,
-            (ComponentType) nfType, controllerDesc);
-        if (contentDesc.getFactory() == null) {
-            // first create a map with the parameters
-            Map<String, Object> factory_params = new Hashtable<String, Object>(1);
-
-            factory_params.put(ProActiveMetaObjectFactory.COMPONENT_PARAMETERS_KEY, componentParameters);
-            if (controllerDesc.isSynchronous() &&
-                (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType()))) {
-                factory_params.put(ProActiveMetaObjectFactory.SYNCHRONOUS_COMPOSITE_COMPONENT_KEY,
-                        Constants.SYNCHRONOUS);
-            }
-            contentDesc.setFactory(new ProActiveMetaObjectFactory(factory_params));
-            // factory =
-            // ProActiveComponentMetaObjectFactory.newInstance(componentParameters);
-        }
-
-        // TODO_M : add controllers in the component metaobject factory?
-        Object ao = null;
-
-        // 3 possibilities : either the component is created on a node (or
-        // null), it is created on a virtual node, or on multiple nodes
-        ao = PAActiveObject.newActive(contentDesc.getClassName(), null, contentDesc
-                .getConstructorParameters(), node, contentDesc.getActivity(), contentDesc.getFactory());
-
-        return new ActiveObjectWithComponentParameters((StubObject) ao, componentParameters);
     }
 
     private static class ActiveObjectWithComponentParameters {

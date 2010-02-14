@@ -35,10 +35,10 @@
  */
 package org.objectweb.proactive.core.component.adl.bindings;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.bindings.FractalBindingBuilder;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.util.Fractal;
 
 
 /**
@@ -54,7 +54,7 @@ public class PABindingBuilder extends FractalBindingBuilder {
         if (type != WEBSERVICE_BINDING) {
             super.bindComponent(type, client, clientItf, server, serverItf, context);
         } else {
-            BindingController bc = Fractal.getBindingController((Component) client);
+            BindingController bc = GCM.getBindingController((Component) client);
             bc.bindFc(clientItf, serverItf);
         }
     }

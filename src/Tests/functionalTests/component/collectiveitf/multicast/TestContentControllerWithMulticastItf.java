@@ -47,8 +47,6 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.Fractive;
 
 import functionalTests.ComponentTest;
 
@@ -99,7 +97,7 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
         server2 = gf.newFcInstance(tServer, "primitive", ServerImpl.class.getName());
         server3 = gf.newFcInstance(tServer, "primitive", ServerImpl.class.getName());
         server4 = gf.newFcInstance(tServer, "primitive", ServerImpl.class.getName());
-        ContentController cc = Fractal.getContentController(root);
+        ContentController cc = GCM.getContentController(root);
         cc.addFcSubComponent(tester);
         cc.addFcSubComponent(server1);
         cc.addFcSubComponent(server2);
@@ -108,11 +106,11 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     }
 
     protected void setUpBindings() throws Exception {
-        Fractal.getBindingController(root).bindFc("serverMult", server1.getFcInterface("server"));
-        Fractal.getBindingController(root).bindFc("serverMult", server2.getFcInterface("server"));
-        Fractal.getBindingController(root).bindFc("tester", tester.getFcInterface("tester"));
-        Fractal.getBindingController(tester).bindFc("clientItf", server3.getFcInterface("server"));
-        Fractal.getBindingController(tester).bindFc("clientItf", server4.getFcInterface("server"));
+        GCM.getBindingController(root).bindFc("serverMult", server1.getFcInterface("server"));
+        GCM.getBindingController(root).bindFc("serverMult", server2.getFcInterface("server"));
+        GCM.getBindingController(root).bindFc("tester", tester.getFcInterface("tester"));
+        GCM.getBindingController(tester).bindFc("clientItf", server3.getFcInterface("server"));
+        GCM.getBindingController(tester).bindFc("clientItf", server4.getFcInterface("server"));
     }
 
     // -----------------------------------------------------------------------------------------
@@ -120,7 +118,7 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     // -----------------------------------------------------------------------------------------
     @Test(expected = IllegalContentException.class)
     public void testRemoveServer1AndFail() throws Exception {
-        ContentController cc = Fractal.getContentController(root);
+        ContentController cc = GCM.getContentController(root);
         cc.removeFcSubComponent(server1);
     }
 
@@ -129,7 +127,7 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     // -----------------------------------------------------------------------------------------
     @Test(expected = IllegalContentException.class)
     public void testRemoveTesterAndFail() throws Exception {
-        ContentController cc = Fractal.getContentController(root);
+        ContentController cc = GCM.getContentController(root);
         cc.removeFcSubComponent(tester);
     }
 
@@ -138,7 +136,7 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     // -----------------------------------------------------------------------------------------
     @Test(expected = IllegalContentException.class)
     public void testRemoveServer3AndFail() throws Exception {
-        ContentController cc = Fractal.getContentController(root);
+        ContentController cc = GCM.getContentController(root);
         cc.removeFcSubComponent(server3);
     }
 
@@ -148,9 +146,8 @@ public class TestContentControllerWithMulticastItf extends ComponentTest {
     @Test
     @Ignore
     public void testRemoveServer3() throws Exception {
-        ContentController cc = Fractal.getContentController(root);
-        Fractive.getMulticastController(tester).unbindGCMMulticast("clientItf",
-                server3.getFcInterface("server"));
+        ContentController cc = GCM.getContentController(root);
+        GCM.getMulticastController(tester).unbindGCMMulticast("clientItf", server3.getFcInterface("server"));
         cc.removeFcSubComponent(server3);
     }
 }

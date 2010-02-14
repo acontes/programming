@@ -37,13 +37,13 @@ package functionalTests.component.wsbindings;
 
 import junit.framework.Assert;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -68,17 +68,17 @@ public class TestCXFWSBindings extends CommonSetup {
     public void testCXFWebServicesBindingWithPrimitiveComponent() throws Exception {
         Component client = gf.newFcInstance(componentType, new ControllerDescription("Client",
             Constants.PRIMITIVE), new ContentDescription(Client.class.getName()));
-        Fractal.getBindingController(client).bindFc(
+        GCM.getBindingController(client).bindFc(
                 Client.SERVICES_NAME,
                 url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + "0_" + SERVER_SERVICES_NAME + "(" +
                     WSInfo.CXFWSCALLER_ID + ")");
         for (int i = 0; i < NUMBER_SERVERS; i++) {
-            Fractal.getBindingController(client).bindFc(
+            GCM.getBindingController(client).bindFc(
                     Client.SERVICEMULTICASTREAL_NAME,
                     url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + i + "_" +
                         SERVER_SERVICEMULTICAST_NAME + "(" + WSInfo.CXFWSCALLER_ID + ")");
         }
-        Fractal.getLifeCycleController(client).startFc();
+        GCM.getGCMLifeCycleController(client).startFc();
         Runner runner = (Runner) client.getFcInterface("Runner");
         Assert.assertTrue("Failed to invoke web services with primitive component", runner.execute()
                 .booleanValue());
@@ -93,11 +93,11 @@ public class TestCXFWSBindings extends CommonSetup {
                         TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) });
         Component client = gf.newFcInstance(cType, new ControllerDescription("Client", Constants.PRIMITIVE),
                 new ContentDescription(Client.class.getName()));
-        Fractal.getBindingController(client).bindFc(
+        GCM.getBindingController(client).bindFc(
                 Client.SERVICEERROR_NAME,
                 url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + "0_" + SERVER_SERVICES_NAME + "(" +
                     WSInfo.CXFWSCALLER_ID + ")");
-        Fractal.getLifeCycleController(client).startFc();
+        GCM.getGCMLifeCycleController(client).startFc();
         Runner runner = (Runner) client.getFcInterface("Runner");
         Assert.assertFalse("Successful access to a non existing method", runner.execute().booleanValue());
     }

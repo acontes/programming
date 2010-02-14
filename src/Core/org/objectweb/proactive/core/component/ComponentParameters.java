@@ -173,7 +173,7 @@ public class ComponentParameters implements Serializable {
      * @return the types of client interfacess
      */
     public InterfaceType[] getClientInterfaceTypes() {
-        return Fractive.getClientInterfaceTypes(componentType);
+        return Utils.getClientItfTypes(componentType);
     }
 
     /**

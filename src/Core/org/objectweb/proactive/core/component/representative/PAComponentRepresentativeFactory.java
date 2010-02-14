@@ -118,7 +118,7 @@ public class PAComponentRepresentativeFactory {
      */
     public PAComponentRepresentative createComponentRepresentative(Proxy proxy) throws Throwable {
         // set immediate service for getComponentParameters
-        System.out.println("ProActiveComponentRepresentativeFactory.createComponentRepresentative()");
+        System.out.println("PAComponentRepresentativeFactory.createComponentRepresentative()");
         proxy.reify(MethodCall.getComponentMethodCall(PAComponent.class.getDeclaredMethod(
                 "setImmediateServices", new Class[] {}), new Object[] {}, null, Constants.COMPONENT, null,
                 ComponentRequest.STRICT_FIFO_PRIORITY));

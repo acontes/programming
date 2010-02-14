@@ -62,7 +62,7 @@ public class WSInfo implements Serializable {
     /**
      * Name of the interface which must be implemented by the class in charge of calling the web service.
      */
-    public static final String PROACTIVEWSCALLER_ITF_NAME = PAWSCaller.class.getName();
+    public static final String PAWSCALLER_ITF_NAME = PAWSCaller.class.getName();
 
     /**
      * Shortcut ID to specify that Axis2 must be used to call the web service.
@@ -181,9 +181,9 @@ public class WSInfo implements Serializable {
     private String checkClassName(String className) throws IllegalBindingException {
         try {
             Class<?> c = Class.forName(className);
-            if (!Class.forName(PROACTIVEWSCALLER_ITF_NAME).isAssignableFrom(c)) {
+            if (!Class.forName(PAWSCALLER_ITF_NAME).isAssignableFrom(c)) {
                 throw new IllegalBindingException("The web service caller: " + className +
-                    " must implement the " + PROACTIVEWSCALLER_ITF_NAME + " interface");
+                    " must implement the " + PAWSCALLER_ITF_NAME + " interface");
             }
             return className;
         } catch (ClassNotFoundException e) {

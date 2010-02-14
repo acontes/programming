@@ -37,6 +37,7 @@ package functionalTests.component.conform;
 
 import static org.junit.Assert.fail;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Test;
@@ -45,8 +46,6 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 
 import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.ItfWithStream;
@@ -58,14 +57,14 @@ import functionalTests.component.conform.components.StreamImpl;
 
 public class TestStream extends Conformtest {
     protected Component boot;
-    protected TypeFactory tf;
+    protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected InterfaceType it;
 
     @Before
     public void setUp() throws Exception {
         boot = GCM.getBootstrapComponent();
-        tf = GCM.getTypeFactory(boot);
+        tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
     }
 
@@ -127,7 +126,7 @@ public class TestStream extends Conformtest {
             ComponentType t = tf.createFcType(new InterfaceType[] { tf.createFcItfType("server",
                     ItfWithStream.class.getName(), false, false, false) });
             Component c = gf.newFcInstance(t, parametricPrimitive, StreamImpl.class.getName());
-            Fractal.getLifeCycleController(c).startFc();
+            GCM.getGCMLifeCycleController(c).startFc();
             ItfWithStream iws = (ItfWithStream) c.getFcInterface("server");
             iws.hello();
             iws.hello("world");

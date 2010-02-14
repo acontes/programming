@@ -35,16 +35,16 @@
  */
 package functionalTests.component.nonfunctional.membranecontroller.bindnfc.objectcontrollers;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.controller.PAMembraneController;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.identity.PAComponent;
@@ -75,8 +75,8 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         //Thread.sleep(2000);
         Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = GCM.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot); /*Getting the GCM-ProActive type factory*/
+        PAGenericFactory cf = Utils.getPAGenericFactory(boot); /*Getting the GCM-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -121,7 +121,7 @@ public class Test extends ComponentTest {
                 new ControllerDescription("myComposite", Constants.COMPOSITE, !Constants.SYNCHRONOUS,
                     Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
-        PAMembraneController memController = Fractive.getMembraneController(componentA);
+        PAMembraneController memController = Utils.getPAMembraneController(componentA);
         //Setting the controllers by hand
 
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
@@ -136,13 +136,13 @@ public class Test extends ComponentTest {
         memController.startMembrane();//Starting the membrane, non-functional calls can be emitted on controllers
         //Emmiting calls on non-functional interfaces
 
-        System.out.println("Name of the composite is :" + Fractal.getNameController(componentA).getFcName());
+        System.out.println("Name of the composite is :" + GCM.getNameController(componentA).getFcName());
 
         Component componentB = cf.newFcInstance(fType, nfType, new ContentDescription(ComponentA.class
                 .getName(), new Object[] { "tata" }), new ControllerDescription("componentB",
             Constants.PRIMITIVE, !Constants.SYNCHRONOUS, Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
-        PAMembraneController componentBMembraneController = Fractive.getMembraneController(componentB);
+        PAMembraneController componentBMembraneController = Utils.getPAMembraneController(componentB);
 
         componentBMembraneController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.PASuperControllerImpl.class.getName());
@@ -150,19 +150,19 @@ public class Test extends ComponentTest {
                 org.objectweb.proactive.core.component.controller.PANameController.class.getName());
         componentBMembraneController.startMembrane();//Need to do this, otherwise, when adding this component to the composite one, there will be a suspension, because the addFcSubComponent method is calling the SuperController of the primitive component
 
-        Fractal.getContentController(componentA).addFcSubComponent(componentB);
-        Fractal.getBindingController(componentA).bindFc("componentInfo",
+        GCM.getContentController(componentA).addFcSubComponent(componentB);
+        GCM.getBindingController(componentA).bindFc("componentInfo",
                 componentB.getFcInterface("componentInfo"));
 
         System.out.println("Parameters are : " +
             ((PAComponent) componentA).getComponentParameters().getHierarchicalType());
-        System.out.println("Lifecycle state is : " + Fractal.getLifeCycleController(componentA).getFcState());
+        System.out.println("Lifecycle state is : " + GCM.getGCMLifeCycleController(componentA).getFcState());
 
-        System.out.println("Name is :" + Fractal.getNameController(componentA).getFcName());
-        Component[] tabComp = Fractal.getSuperController(componentB).getFcSuperComponents();
+        System.out.println("Name is :" + GCM.getNameController(componentA).getFcName());
+        Component[] tabComp = GCM.getSuperController(componentB).getFcSuperComponents();
         System.out.println("Super components of primitive: " + tabComp);
-        //tabComp=Fractal.getContentController(componentA).getFcSubComponents();
-        //Component[] tabComp2=Fractal.getSuperController(tabComp[0]).getFcSuperComponents();
+        //tabComp=GCM.getContentController(componentA).getFcSubComponents();
+        //Component[] tabComp2=GCM.getSuperController(tabComp[0]).getFcSuperComponents();
         //System.err.println("Super components of primitive: "+tabComp2);
 
         memController.stopMembrane();
@@ -176,22 +176,22 @@ public class Test extends ComponentTest {
                 org.objectweb.proactive.core.component.controller.PANameController.class.getName());
 
         memController.startMembrane();
-        Fractal.getBindingController(componentA).unbindFc("componentInfo");
-        Fractal.getContentController(componentA).removeFcSubComponent(componentB);
-        Fractal.getContentController(componentA).addFcSubComponent(componentB);
-        Fractal.getBindingController(componentA).bindFc("componentInfo",
+        GCM.getBindingController(componentA).unbindFc("componentInfo");
+        GCM.getContentController(componentA).removeFcSubComponent(componentB);
+        GCM.getContentController(componentA).addFcSubComponent(componentB);
+        GCM.getBindingController(componentA).bindFc("componentInfo",
                 componentB.getFcInterface("componentInfo"));
 
         System.out.println("Parameters are : " +
             ((PAComponent) componentA).getComponentParameters().getHierarchicalType());
-        System.out.println("Lifecycle state is : " + Fractal.getLifeCycleController(componentA).getFcState());
-        System.out.println("Name of the composte is :" + Fractal.getNameController(componentA).getFcName());
+        System.out.println("Lifecycle state is : " + GCM.getGCMLifeCycleController(componentA).getFcState());
+        System.out.println("Name of the composte is :" + GCM.getNameController(componentA).getFcName());
 
         componentBMembraneController.stopMembrane();
         componentBMembraneController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.PASuperControllerImpl.class.getName());
         componentBMembraneController.startMembrane();
-        tabComp = Fractal.getSuperController(componentB).getFcSuperComponents();
+        tabComp = GCM.getSuperController(componentB).getFcSuperComponents();
 
         System.out.println("Super components of composite: " + tabComp);
 
@@ -207,7 +207,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        Fractal.getLifeCycleController(componentA).stopFc();
+        GCM.getGCMLifeCycleController(componentA).stopFc();
     }
 
     public boolean postConditions() throws Exception {

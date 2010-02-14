@@ -111,7 +111,7 @@ public class PAMonitorControllerImpl extends AbstractPAController implements Mon
         keysList = new HashMap<String, String>();
         NameController nc = null;
         try {
-            nc = (NameController) owner.getFcInterface(Constants.NAME_CONTROLLER);
+            nc = GCM.getNameController(owner);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -121,7 +121,7 @@ public class PAMonitorControllerImpl extends AbstractPAController implements Mon
             Interface itf = (Interface) itfs[i];
             InterfaceType itfType = (InterfaceType) itf.getFcItfType();
             try {
-                if (!Utils.isControllerInterfaceName(itf.getFcItfName()) && (!itfType.isFcClientItf())) {
+                if (!Utils.isControllerItfName(itf.getFcItfName()) && (!itfType.isFcClientItf())) {
                     List<MonitorController> subcomponentMonitors = new ArrayList<MonitorController>();
                     if (isComposite()) {
                         Iterator<Component> bindedComponentsIterator = null;
@@ -147,8 +147,8 @@ public class PAMonitorControllerImpl extends AbstractPAController implements Mon
                         }
                         try {
                             while (bindedComponentsIterator.hasNext()) {
-                                MonitorController monitor = (MonitorController) bindedComponentsIterator
-                                        .next().getFcInterface(Constants.MONITOR_CONTROLLER);
+                                MonitorController monitor = GCM.getMonitorController(bindedComponentsIterator
+                                        .next());
                                 monitor.startGCMMonitoring();
                                 subcomponentMonitors.add(monitor);
                             }

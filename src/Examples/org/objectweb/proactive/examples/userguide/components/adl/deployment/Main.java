@@ -45,9 +45,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.adl.FactoryFactory;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
@@ -99,7 +99,7 @@ public class Main {
                         "org.objectweb.proactive.examples.userguide.components.adl.deployment.adl.Composite",
                         context);
 
-        Fractal.getLifeCycleController(composite).startFc();
+        GCM.getGCMLifeCycleController(composite).startFc();
 
         Runner runner = (Runner) composite.getFcInterface("runner");
         List<String> arg = new ArrayList<String>();
@@ -107,7 +107,7 @@ public class Main {
         arg.add("world");
         runner.run(arg);
 
-        Fractal.getLifeCycleController(composite).stopFc();
+        GCM.getGCMLifeCycleController(composite).stopFc();
 
         System.exit(0);
     }

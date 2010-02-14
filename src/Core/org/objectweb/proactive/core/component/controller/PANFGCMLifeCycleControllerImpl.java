@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.Component;
 public class PANFGCMLifeCycleControllerImpl extends PAGCMLifeCycleControllerImpl {
 
     /**
-     * Constructor for ProActiveNFLifeCycleController.
+     * Constructor for PANFLifeCycleController.
      *
      * @param owner The owner component.
      */

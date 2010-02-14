@@ -40,10 +40,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.group.Group;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -87,7 +87,7 @@ public class Registry {
             }
         } else {
             try {
-                String name = Fractal.getNameController(component).getFcName();
+                String name = GCM.getNameController(component).getFcName();
                 if (table.containsKey(name)) {
                     throw new ADLException(RegistryErrors.DUPLICATED_COMPONENT_NAME, name);
                 }

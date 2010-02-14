@@ -35,15 +35,14 @@
  */
 package org.objectweb.proactive.examples.components.c3d;
 
-import java.io.IOException;
 import java.util.Hashtable;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.ProActiveException;
@@ -51,7 +50,6 @@ import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentRunActive;
 import org.objectweb.proactive.core.component.body.NFRequestFilterImpl;
-import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.examples.c3d.C3DDispatcher;
@@ -130,8 +128,8 @@ public class DispatcherImpl extends C3DDispatcher implements Dispatcher, Dispatc
                 ComponentBody componentBody = (ComponentBody) body;
 
                 // treat non functional requests before component is started
-                while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
-                        componentBody.getProActiveComponentImpl()).getFcState())) {
+                while (LifeCycleController.STOPPED.equals(GCM.getGCMLifeCycleController(
+                        componentBody.getPAComponentImpl()).getFcState())) {
                     componentService.blockingServeOldest(nfRequestFilter);
                 }
 

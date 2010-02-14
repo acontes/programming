@@ -35,15 +35,16 @@
  */
 package functionalTests.component.nonfunctional.creation.local.primitive;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
@@ -77,13 +78,13 @@ public class Test extends ComponentTest {
          * Getting the Fractal-Proactive
          * bootstrap component
          */
-        TypeFactory type_factory = GCM.getTypeFactory(boot); /*
-         * Getting the Fractal-ProActive
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot); /*
+         * Getting the GCM-ProActive
          * type factory
          */
-        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot); /*
+        PAGenericFactory cf = Utils.getPAGenericFactory(boot); /*
          * Getting the
-         * Fractal-ProActive generic
+         * GCM-ProActive generic
          * factory
          */
 
@@ -93,12 +94,12 @@ public class Test extends ComponentTest {
                 new ControllerDescription("fitnessController", Constants.PRIMITIVE), new ContentDescription(
                     DummyControllerComponentImpl.class.getName()));
 
-        Fractal.getLifeCycleController(dummyNFComponent).startFc();
+        GCM.getGCMLifeCycleController(dummyNFComponent).startFc();
         DummyControllerItf ref = (DummyControllerItf) dummyNFComponent
                 .getFcInterface("fitness-controller-membrane");
         name = ref.dummyMethodWithResult();
         ref.dummyVoidMethod("Message");
         Assert.assertTrue(dummyNFComponent instanceof PANFComponentRepresentative);
-        Fractal.getLifeCycleController(dummyNFComponent).stopFc();
+        GCM.getGCMLifeCycleController(dummyNFComponent).stopFc();
     }
 }

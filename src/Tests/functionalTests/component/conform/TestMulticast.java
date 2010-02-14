@@ -52,7 +52,6 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.component.conform.components.BadSlaveMulticast;
@@ -133,14 +132,14 @@ public class TestMulticast extends Conformtest {
         Component slave1 = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
         Component slave2 = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
 
-        Fractal.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
+        GCM.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
                 slave1.getFcInterface("server-multicast"));
-        Fractal.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
+        GCM.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
                 slave2.getFcInterface("server-multicast"));
 
-        Fractal.getLifeCycleController(master).startFc();
-        Fractal.getLifeCycleController(slave1).startFc();
-        Fractal.getLifeCycleController(slave2).startFc();
+        GCM.getGCMLifeCycleController(master).startFc();
+        GCM.getGCMLifeCycleController(slave1).startFc();
+        GCM.getGCMLifeCycleController(slave2).startFc();
 
         Master masterItf = (Master) master.getFcInterface("server");
 
@@ -158,18 +157,18 @@ public class TestMulticast extends Conformtest {
             checkResult(stringList, "Asynchronous call", resultsAL);
             System.err.println("TM: async call" + results);
         }
-        for (List<String> stringList : listOfParameters) {
-            //FIXME
-            //List<GenericTypeWrapper<String>> results = masterItf.computeAsyncGenerics(stringList,
-            //        "Asynchronous call");
-            //System.err.println("TM: async gen call" + results);
-        }
-        for (List<String> stringList : listOfParameters) {
-            //FIXME
-            //List<String> results = masterItf.computeSync(stringList,
-            //        "With non reifiable return type call");
-            //System.err.println("TM: sync call" +  results);
-        }
+        //FIXME
+        //for (List<String> stringList : listOfParameters) {
+        //List<GenericTypeWrapper<String>> results = masterItf.computeAsyncGenerics(stringList,
+        //        "Asynchronous call");
+        //System.err.println("TM: async gen call" + results);
+        //}
+        //FIXME
+        //for (List<String> stringList : listOfParameters) {
+        //List<String> results = masterItf.computeSync(stringList,
+        //        "With non reifiable return type call");
+        //System.err.println("TM: sync call" +  results);
+        //}
     }
 
     @Test
@@ -178,14 +177,14 @@ public class TestMulticast extends Conformtest {
         Component slave1 = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
         Component slave2 = gf.newFcInstance(tSlave, "primitive", SlaveImpl.class.getName());
 
-        Fractal.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
+        GCM.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
                 slave1.getFcInterface("server-multicast"));
-        Fractal.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
+        GCM.getBindingController(master).bindFc(MasterImpl.ITF_CLIENTE_MULTICAST,
                 slave2.getFcInterface("server-multicast"));
 
-        Fractal.getLifeCycleController(master).startFc();
-        Fractal.getLifeCycleController(slave1).startFc();
-        Fractal.getLifeCycleController(slave2).startFc();
+        GCM.getGCMLifeCycleController(master).startFc();
+        GCM.getGCMLifeCycleController(slave1).startFc();
+        GCM.getGCMLifeCycleController(slave2).startFc();
 
         Master masterItf = (Master) master.getFcInterface("server");
 
@@ -209,18 +208,18 @@ public class TestMulticast extends Conformtest {
             checkResult(stringList, broadcastArgs, resultsAL);
             System.err.println("TM: async call" + results);
         }
-        for (List<String> stringList : listOfParameters) {
-            //FIXME
-            //List<GenericTypeWrapper<String>> results = masterItf.computeAsyncGenerics(stringList,
-            //        "Asynchronous call");
-            //System.err.println("TM: async gen call" + results);
-        }
-        for (List<String> stringList : listOfParameters) {
-            //FIXME
-            //List<String> results = masterItf.computeSync(stringList,
-            //        "With non reifiable return type call");
-            //System.err.println("TM: sync call" +  results);
-        }
+        //FIXME
+        //for (List<String> stringList : listOfParameters) {
+        //List<GenericTypeWrapper<String>> results = masterItf.computeAsyncGenerics(stringList,
+        //        "Asynchronous call");
+        //System.err.println("TM: async gen call" + results);
+        //}
+        //FIXME
+        //for (List<String> stringList : listOfParameters) {
+        //List<String> results = masterItf.computeSync(stringList,
+        //        "With non reifiable return type call");
+        //System.err.println("TM: sync call" +  results);
+        //}
     }
 
     private static List<List<String>> generateParameter() {

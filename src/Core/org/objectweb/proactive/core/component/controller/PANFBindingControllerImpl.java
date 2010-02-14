@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.Component;
 public class PANFBindingControllerImpl extends PABindingControllerImpl {
 
     /**
-     * Constructor for ProActiveNFBindingController.
+     * Constructor for PANFBindingController.
      *
      * @param owner The owner component.
      */

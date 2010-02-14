@@ -47,6 +47,7 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.etsi.uri.gcm.api.type.GCMInterfaceType;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -56,11 +57,9 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastBindingChecker;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
@@ -238,7 +237,7 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
 
     /*
      * @see
-     * org.objectweb.proactive.core.component.controller.ProActiveMulticastController#bindGCMMulticast
+     * org.objectweb.proactive.core.component.controller.PAMulticastController#bindGCMMulticast
      * (java.lang.String, org.objectweb.fractal.api.Interface)
      */
     public void bindGCMMulticast(String multicastItfName, Object serverItf) {
@@ -246,7 +245,7 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
             // bindFcMulticast is just a renaming of the bindFc method in the BindingController
             // this avoid to rewrite similar code
             // the specific part is in the bindFc method in this class
-            Fractive.getBindingController(owner).bindFc(multicastItfName, serverItf);
+            GCM.getBindingController(owner).bindFc(multicastItfName, serverItf);
         } catch (NoSuchInterfaceException e) {
             logger.warn("No such interface: " + multicastItfName, e);
         } catch (IllegalBindingException e) {
@@ -265,8 +264,8 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
     public void unbindGCMMulticast(String multicastItfName, Object serverItf) throws NoSuchInterfaceException {
         if (multicastItfs.containsKey(multicastItfName)) {
             Group<PAInterface> g = getDelegatee(multicastItfName);
-            //ProActiveInterface itf = multicastItfs.get(clientItfName);
-            //Group<ProActiveInterface> g = PAGroup.getGroup(itf);
+            //PAInterface itf = multicastItfs.get(clientItfName);
+            //Group<PAInterface> g = PAGroup.getGroup(itf);
             if (g.remove(serverItf)) {
                 logger.debug("removed connected interface from multicast interface : " + multicastItfName);
             } else {
@@ -447,7 +446,7 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
             try {
                 if (!PAGroup.isGroup(serverItf.getFcItfOwner())) {
                     logger.debug("multicast binding : " + clientItfName + " to : " +
-                        Fractal.getNameController(serverItf.getFcItfOwner()).getFcName() + "." +
+                        GCM.getNameController(serverItf.getFcItfOwner()).getFcName() + "." +
                         serverItf.getFcItfName());
                 }
             } catch (NoSuchInterfaceException e) {

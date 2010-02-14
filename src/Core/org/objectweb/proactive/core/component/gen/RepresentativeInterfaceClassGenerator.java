@@ -35,7 +35,6 @@
  */
 package org.objectweb.proactive.core.component.gen;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -73,7 +72,7 @@ import org.objectweb.proactive.core.util.ClassDataCache;
 /**
  * This class generates representative interfaces objects, which are created on
  * the client side along with the component representative object (@see
- * org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentativeImpl).
+ * org.objectweb.proactive.core.component.representative.PAComponentRepresentativeImpl).
  *
  * @author The ProActive Team
  */
@@ -115,8 +114,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
         }
     }
 
-    public Class<?> generateInterfaceClass(PAGCMInterfaceType itfType, boolean isFunctionalInterface)
-            throws NotFoundException, CannotCompileException, IOException {
+    public Class<?> generateInterfaceClass(PAGCMInterfaceType itfType, boolean isFunctionalInterface) {
         if (GCMTypeFactory.GATHERCAST_CARDINALITY.equals(itfType.getGCMCardinality())) {
             // modify signature in type
             try {
@@ -124,9 +122,6 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 itfType = (PAGCMInterfaceType) PAGCMTypeFactoryImpl.instance().createGCMItfType(
                         itfType.getFcItfName(), gatherProxyItf.getName(), itfType.isFcClientItf(),
                         itfType.isFcOptionalItf(), itfType.getGCMCardinality());
-            } catch (InterfaceGenerationFailedException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             } catch (InstantiationException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -270,8 +265,7 @@ public class RepresentativeInterfaceClassGenerator extends AbstractInterfaceClas
                 }
             }
 
-            reifiedMethods = (CtMethod[]) (methodsToImplement.values()
-                    .toArray(new CtMethod[methodsToImplement.size()]));
+            reifiedMethods = methodsToImplement.values().toArray(new CtMethod[methodsToImplement.size()]);
 
             // Determines which reifiedMethods are valid for reification
             // It is the responsibility of method checkMethod in class Utils

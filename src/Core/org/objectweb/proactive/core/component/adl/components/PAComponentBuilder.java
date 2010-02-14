@@ -35,9 +35,9 @@
  */
 package org.objectweb.proactive.core.component.adl.components;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.components.ComponentBuilder;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.util.Fractal;
 
 
 /**
@@ -53,14 +53,14 @@ public class PAComponentBuilder implements ComponentBuilder {
     // --------------------------------------------------------------------------
     public void addComponent(final Object superComponent, final Object subComponent, final String name,
             final Object context) throws Exception {
-        Fractal.getContentController((Component) superComponent).addFcSubComponent((Component) subComponent);
+        GCM.getContentController((Component) superComponent).addFcSubComponent((Component) subComponent);
         // as opposed  to the standard fractal implementation, we do not set
         // the name of the component here because :
         // 1. it is already name at instantiation time
         // 2. it could be a group of components, and we do not want to give the 
         // same name to all the elements of the group
         //    try {
-        //      Fractal.getNameController((Component)subComponent).setFcName(name);
+        //      GCM.getNameController((Component)subComponent).setFcName(name);
         //    } catch (NoSuchInterfaceException ignored) {
         //    }
     }

@@ -450,7 +450,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
             this.componentParameters = initialComponentParameters;
         }
 
-        public PAComponent newProActiveComponent(Body myBody) {
+        public PAComponent newPAComponent(Body myBody) {
             return new PAComponentImpl(this.componentParameters, myBody);
         }
     }

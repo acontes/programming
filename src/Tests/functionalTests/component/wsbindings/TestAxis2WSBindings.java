@@ -42,6 +42,7 @@ import java.util.Map;
 
 import junit.framework.Assert;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -51,7 +52,6 @@ import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -75,15 +75,15 @@ public class TestAxis2WSBindings extends CommonSetup {
     public void testAxis2WebServicesBindingWithPrimitiveComponent() throws Exception {
         Component client = gf.newFcInstance(componentType, new ControllerDescription("Client",
             Constants.PRIMITIVE), new ContentDescription(Client.class.getName()));
-        Fractal.getBindingController(client).bindFc(Client.SERVICES_NAME,
+        GCM.getBindingController(client).bindFc(Client.SERVICES_NAME,
                 url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + "0_" + SERVER_SERVICES_NAME);
         for (int i = 0; i < NUMBER_SERVERS; i++) {
-            Fractal.getBindingController(client).bindFc(
+            GCM.getBindingController(client).bindFc(
                     Client.SERVICEMULTICASTREAL_NAME,
                     url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + i + "_" +
                         SERVER_SERVICEMULTICAST_NAME);
         }
-        Fractal.getLifeCycleController(client).startFc();
+        GCM.getGCMLifeCycleController(client).startFc();
         Runner runner = (Runner) client.getFcInterface("Runner");
         Assert.assertTrue("Failed to invoke web services with primitive component", runner.execute()
                 .booleanValue());
@@ -95,21 +95,21 @@ public class TestAxis2WSBindings extends CommonSetup {
             Constants.COMPOSITE), null);
         Component client = gf.newFcInstance(componentType, new ControllerDescription("Client",
             Constants.PRIMITIVE), new ContentDescription(Client.class.getName()));
-        Fractal.getContentController(composite).addFcSubComponent(client);
-        Fractal.getBindingController(composite).bindFc("Runner", client.getFcInterface("Runner"));
-        Fractal.getBindingController(client).bindFc(Client.SERVICES_NAME,
+        GCM.getContentController(composite).addFcSubComponent(client);
+        GCM.getBindingController(composite).bindFc("Runner", client.getFcInterface("Runner"));
+        GCM.getBindingController(client).bindFc(Client.SERVICES_NAME,
                 composite.getFcInterface(Client.SERVICES_NAME));
-        //        Fractal.getBindingController(client).bindFc(Client.SERVICEMULTICASTFALSE_NAME,
+        //        GCM.getBindingController(client).bindFc(Client.SERVICEMULTICASTFALSE_NAME,
         //                composite.getFcInterface(Client.SERVICEMULTICASTREAL_NAME));
-        Fractal.getBindingController(composite).bindFc(Client.SERVICES_NAME,
+        GCM.getBindingController(composite).bindFc(Client.SERVICES_NAME,
                 url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + "0_" + SERVER_SERVICES_NAME);
         //        for (int i = 0; i < NUMBER_SERVERS; i++) {
-        //            Fractal.getBindingController(composite).bindFc(
+        //            GCM.getBindingController(composite).bindFc(
         //                    Client.SERVICEMULTICASTREAL_NAME,
         //                    url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + i + "_" +
         //                        SERVER_SERVICEMULTICAST_NAME);
         //        }
-        Fractal.getLifeCycleController(composite).startFc();
+        GCM.getGCMLifeCycleController(composite).startFc();
         Runner runner = (Runner) composite.getFcInterface("Runner");
         Assert.assertTrue("Failed to invoke web services with composite component", runner.execute()
                 .booleanValue());
@@ -122,7 +122,7 @@ public class TestAxis2WSBindings extends CommonSetup {
         Map<Object, Object> context = new HashMap<Object, Object>();
         Component composite = (Component) factory.newComponent(
                 "functionalTests.component.wsbindings.adl.Composite", context);
-        Fractal.getLifeCycleController(composite).startFc();
+        GCM.getGCMLifeCycleController(composite).startFc();
         Runner runner = (Runner) composite.getFcInterface("Runner");
         Assert.assertTrue("Failed to invoke web services with composite component", runner.execute()
                 .booleanValue());
@@ -133,7 +133,7 @@ public class TestAxis2WSBindings extends CommonSetup {
         Component client = gf.newFcInstance(componentType, new ControllerDescription("Client",
             Constants.PRIMITIVE), new ContentDescription(Client.class.getName()));
         try {
-            Fractal.getBindingController(client).bindFc(
+            GCM.getBindingController(client).bindFc(
                     Client.SERVICES_NAME,
                     url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + "0_" + SERVER_SERVICES_NAME +
                         "(WSCallerError)");
@@ -148,7 +148,7 @@ public class TestAxis2WSBindings extends CommonSetup {
         Component client = gf.newFcInstance(componentType, new ControllerDescription("Client",
             Constants.PRIMITIVE), new ContentDescription(Client.class.getName()));
         try {
-            Fractal.getBindingController(client).bindFc(Client.SERVICES_NAME, "ErrorURL");
+            GCM.getBindingController(client).bindFc(Client.SERVICES_NAME, "ErrorURL");
             fail();
         } catch (IllegalBindingException ibe) {
             ibe.printStackTrace();
@@ -164,9 +164,9 @@ public class TestAxis2WSBindings extends CommonSetup {
                         TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) });
         Component client = gf.newFcInstance(cType, new ControllerDescription("Client", Constants.PRIMITIVE),
                 new ContentDescription(Client.class.getName()));
-        Fractal.getBindingController(client).bindFc(Client.SERVICEERROR_NAME,
+        GCM.getBindingController(client).bindFc(Client.SERVICEERROR_NAME,
                 url + WSConstants.SERVICES_PATH + SERVER_DEFAULT_NAME + "0_" + SERVER_SERVICES_NAME);
-        Fractal.getLifeCycleController(client).startFc();
+        GCM.getGCMLifeCycleController(client).startFc();
         Runner runner = (Runner) client.getFcInterface("Runner");
         Assert.assertFalse("Successful access to a non existing method", runner.execute().booleanValue());
     }

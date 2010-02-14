@@ -38,7 +38,7 @@ package org.objectweb.proactive.core.component.collectiveitfs;
 import java.util.List;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
 import org.objectweb.proactive.core.component.identity.PAComponent;
@@ -72,7 +72,7 @@ public class MulticastHelper {
     public static List<MethodCall> generateMethodCallsForMulticastDelegatee(PAComponent owner, MethodCall mc,
             ProxyForComponentInterfaceGroup<?> delegatee) throws ParameterDispatchException {
         try {
-            return Fractive.getMulticastController(owner).generateMethodCallsForMulticastDelegatee(mc,
+            return Utils.getPAMulticastController(owner).generateMethodCallsForMulticastDelegatee(mc,
                     delegatee);
         } catch (NoSuchInterfaceException e) {
             throw new ParameterDispatchException("no multicast controller ", e);

@@ -42,7 +42,7 @@ import org.objectweb.proactive.core.node.Node;
 
 
 /**
- * This interface defines some basic services offered by a component controller in the ProActive implementation of the Fractal model.
+ * This interface defines some basic services offered by a component controller in the ProActive implementation of the GCM model.
  *
  * @author The ProActive Team
  */

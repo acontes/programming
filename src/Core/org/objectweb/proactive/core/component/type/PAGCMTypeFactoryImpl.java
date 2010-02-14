@@ -56,7 +56,7 @@ public class PAGCMTypeFactoryImpl implements PAGCMTypeFactory {
     static private PAGCMTypeFactoryImpl instance = null;
 
     /**
-     * Constructor for ProActiveTypeFactoryImpl.
+     * Constructor for PATypeFactoryImpl.
      */
     private PAGCMTypeFactoryImpl() {
         super();
@@ -98,7 +98,7 @@ public class PAGCMTypeFactoryImpl implements PAGCMTypeFactory {
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.type.ProActiveTypeFactory#createFcItfType(java.lang.String, java.lang.String, boolean, boolean, java.lang.String)
+     * @see org.objectweb.proactive.core.component.type.PATypeFactory#createFcItfType(java.lang.String, java.lang.String, boolean, boolean, java.lang.String)
      */
     public InterfaceType createGCMItfType(String name, String signature, boolean isClient,
             boolean isOptional, String cardinality) throws InstantiationException {

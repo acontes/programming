@@ -37,16 +37,16 @@ package org.objectweb.proactive.core.component.body;
 
 import java.io.Serializable;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.EndActive;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.RunActive;
 import org.objectweb.proactive.Service;
-import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.controller.PAMembraneController;
 
 
@@ -95,13 +95,13 @@ public class ComponentMembraneActivity extends ComponentActivity implements RunA
                     /*
                      * While the membrane is stopped, serve calls only on the Membrane Controller
                      */
-                    while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
+                    while (Utils.getPAMembraneController(componentBody.getPAComponentImpl())
                             .getMembraneState().equals(PAMembraneController.MEMBRANE_STOPPED)) {
                         componentService.blockingServeOldest(memRequestFilter);
                     }
 
-                    while (LifeCycleController.STOPPED.equals(Fractal.getLifeCycleController(
-                            componentBody.getProActiveComponentImpl()).getFcState())) {
+                    while (LifeCycleController.STOPPED.equals(GCM.getGCMLifeCycleController(
+                            componentBody.getPAComponentImpl()).getFcState())) {
                         componentService.blockingServeOldest(nfRequestFilter);
                         if (!body.isActive()) {
                             // in case of a migration 
@@ -132,7 +132,7 @@ public class ComponentMembraneActivity extends ComponentActivity implements RunA
                     /* While membrane is started
                      * serve all non functional calls
                      * */
-                    while (Fractive.getMembraneController(componentBody.getProActiveComponentImpl())
+                    while (Utils.getPAMembraneController(componentBody.getPAComponentImpl())
                             .getMembraneState().equals(PAMembraneController.MEMBRANE_STARTED)) {
                         componentService.blockingServeOldest(nfRequestFilter);
                         if (!body.isActive()) {//Don't know if this is OK

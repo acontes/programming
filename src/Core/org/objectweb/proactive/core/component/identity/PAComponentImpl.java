@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
@@ -59,7 +60,6 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -68,9 +68,9 @@ import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.PAInterfaceImpl;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.controller.ControllerState;
@@ -119,7 +119,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
     }
 
     /**
-     * Constructor for ProActiveComponent.
+     * Constructor for PAComponent.
      *
      * @param componentParameters
      * @param myBody
@@ -175,8 +175,8 @@ public class PAComponentImpl implements PAComponent, Serializable {
     }
 
     private void addMandatoryControllers(Vector<InterfaceType> nftype) throws Exception {
-        Component boot = GCM.getBootstrapComponent(); // Getting the Fractal-Proactive bootstrap component
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        Component boot = GCM.getBootstrapComponent(); // Getting the Fractal-GCM-ProActive bootstrap component
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
 
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory.createFcItfType(
                 Constants.LIFECYCLE_CONTROLLER,
@@ -230,7 +230,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
             try {//Setting the real NF type, as some controllers may not be generated
                 Component boot = GCM.getBootstrapComponent();
-                TypeFactory type_factory = Fractal.getTypeFactory(boot);
+                GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
                 InterfaceType[] nf = new InterfaceType[nftype.size()];
                 nftype.toArray(nf);
                 this.componentParameters.setComponentNFType(type_factory.createFcType(nf));
@@ -271,8 +271,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
         if (BindingController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) {
-            if (isPrimitive &&
-                (Fractive.getClientInterfaceTypes(componentParam.getComponentType()).length == 0)) {
+            if (isPrimitive && (Utils.getClientItfTypes(componentParam.getComponentType()).length == 0)) {
                 // The binding controller is not generated for a component without client interfaces
                 if (logger.isDebugEnabled()) {
                     logger.debug("user component class of '" + componentParam.getName() +
@@ -404,7 +403,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
                             controllerItfName + ".");
                 }
 
-                controllerClass = Class.forName((String) controllers.get(controllerItf.getName()));
+                controllerClass = Class.forName(controllers.get(controllerItf.getName()));
 
                 //create Binding and Content controllers only if necessary
                 if (BindingController.class.isAssignableFrom(controllerClass) &&
@@ -467,7 +466,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
         try {//Setting the real NF type, as some controllers may not be generated
             Component boot = GCM.getBootstrapComponent();
-            TypeFactory type_factory = Fractal.getTypeFactory(boot);
+            GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
             InterfaceType[] nf = new InterfaceType[nfType.size()];
             nfType.toArray(nf);
             this.componentParameters.setComponentNFType(type_factory.createFcType(nf));
@@ -756,7 +755,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
     public void migrateControllersDependentActiveObjectsTo(Node node) throws MigrationException {
         /*
-         * for (ProActiveController controller : controlItfs.values()) {
+         * for (PAController controller : controlItfs.values()) {
          * controller.migrateDependentActiveObjectsTo(node); }
          */
         for (Interface controller : controlItfs.values()) {
@@ -771,12 +770,12 @@ public class PAComponentImpl implements PAComponent, Serializable {
     }
 
     private void writeObject(java.io.ObjectOutputStream out) throws java.io.IOException {
-        //        System.out.println("writing ProActiveComponentImpl");
+        //        System.out.println("writing PAComponentImpl");
         out.defaultWriteObject();
     }
 
     private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        //        System.out.println("reading ProActiveComponentImpl");
+        //        System.out.println("reading PAComponentImpl");
         in.defaultReadObject();
     }
 

@@ -140,7 +140,7 @@ public class PABindingCompiler extends BindingCompiler {
 
                     tasks.getTask("bind" + clientItf, clientComp);
                 } catch (NoSuchElementException e) {
-                    ProActiveBindTask bindTask = new ProActiveBindTask(builder, type, clientItf, serverItf);
+                    PABindTask bindTask = new PABindTask(builder, type, clientItf, serverItf);
                     bindTask.setInstanceProviderTask(createClientTask);
                     bindTask.setServerInstanceProviderTask(createServerTask);
 
@@ -210,7 +210,7 @@ public class PABindingCompiler extends BindingCompiler {
         return clientItf;
     }
 
-    static class ProActiveBindTask extends AbstractRequireInstanceProviderTask {
+    static class PABindTask extends AbstractRequireInstanceProviderTask {
         private TaskMap.TaskHole serverInstanceProviderTask;
 
         private BindingBuilder builder;
@@ -221,7 +221,7 @@ public class PABindingCompiler extends BindingCompiler {
 
         private String serverItf;
 
-        public ProActiveBindTask(final BindingBuilder builder, final int type, final String clientItf,
+        public PABindTask(final BindingBuilder builder, final int type, final String clientItf,
                 final String serverItf) {
             this.builder = builder;
             this.type = type;

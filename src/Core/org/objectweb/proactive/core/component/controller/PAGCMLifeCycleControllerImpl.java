@@ -41,6 +41,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.etsi.uri.gcm.api.type.GCMInterfaceType;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -55,8 +56,8 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -121,18 +122,18 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                                     throw new IllegalLifeCycleException(
                                         "invalid collection interface name at runtime (suffix required)");
                                 }
-                                if (Fractal.getBindingController(owner).lookupFc(itf.getFcItfName()) == null) {
+                                if (GCM.getBindingController(owner).lookupFc(itf.getFcItfName()) == null) {
                                     if (itfTypes[i].isFcClientItf()) {
                                         throw new IllegalLifeCycleException(
                                             "compulsory collection client interface " +
                                                 itfTypes[i].getFcItfName() + " in component " +
-                                                Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                                GCM.getNameController(getFcItfOwner()).getFcName() +
                                                 " is not bound.");
                                     } else { // itfTypes[i] is a server interface of a composite
                                         throw new IllegalLifeCycleException(
                                             "compulsory collection server interface " +
                                                 itfTypes[i].getFcItfName() + " in composite component " +
-                                                Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                                GCM.getNameController(getFcItfOwner()).getFcName() +
                                                 " is not bound to any sub component.");
                                     }
                                 }
@@ -140,32 +141,32 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                         }
                     } else if (((GCMInterfaceType) itfTypes[i]).isGCMMulticastItf() &&
                         !itfTypes[i].isFcOptionalItf()) {
-                        Object[] bindedServerItf = Fractive.getMulticastController(getFcItfOwner())
+                        Object[] bindedServerItf = GCM.getMulticastController(getFcItfOwner())
                                 .lookupGCMMulticast(itfTypes[i].getFcItfName());
                         if ((bindedServerItf == null) || (bindedServerItf.length == 0)) {
                             if (itfTypes[i].isFcClientItf()) {
                                 throw new IllegalLifeCycleException("compulsory multicast client interface " +
                                     itfTypes[i].getFcItfName() + " in component " +
-                                    Fractal.getNameController(getFcItfOwner()).getFcName() + " is not bound.");
+                                    GCM.getNameController(getFcItfOwner()).getFcName() + " is not bound.");
                             } else { // itfTypes[i] is a server interface of a composite
                                 throw new IllegalLifeCycleException("compulsory multicast server interface " +
                                     itfTypes[i].getFcItfName() + " in composite component " +
-                                    Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                    GCM.getNameController(getFcItfOwner()).getFcName() +
                                     " is not bound to any sub component.");
                             }
                         }
                     } else if ((((GCMInterfaceType) itfTypes[i]).getGCMCardinality().equals(
                             GCMTypeFactory.SINGLETON_CARDINALITY) || ((GCMInterfaceType) itfTypes[i])
                             .getGCMCardinality().equals(GCMTypeFactory.GATHERCAST_CARDINALITY)) &&
-                        (Fractal.getBindingController(getFcItfOwner()).lookupFc(itfTypes[i].getFcItfName()) == null)) {
+                        (GCM.getBindingController(getFcItfOwner()).lookupFc(itfTypes[i].getFcItfName()) == null)) {
                         if (itfTypes[i].isFcClientItf()) {
                             throw new IllegalLifeCycleException("compulsory client interface " +
                                 itfTypes[i].getFcItfName() + " in component " +
-                                Fractal.getNameController(getFcItfOwner()).getFcName() + " is not bound.");
+                                GCM.getNameController(getFcItfOwner()).getFcName() + " is not bound.");
                         } else { // itfTypes[i] is a server interface of a composite
                             throw new IllegalLifeCycleException("compulsory server interface " +
                                 itfTypes[i].getFcItfName() + " in composite component " +
-                                Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                GCM.getNameController(getFcItfOwner()).getFcName() +
                                 " is not bound to any sub component.");
                         }
                     }
@@ -176,18 +177,18 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                             // TODO Check binding
                         } else if (((GCMInterfaceType) itfTypes[i]).getGCMCardinality().equals(
                                 GCMTypeFactory.GATHERCAST_CARDINALITY)) {
-                            List<Object> connectedClientItfs = Fractive.getGathercastController(
-                                    getFcItfOwner()).getGCMConnectedClients(itfTypes[i].getFcItfName());
+                            List<Object> connectedClientItfs = GCM.getGathercastController(getFcItfOwner())
+                                    .getGCMConnectedClients(itfTypes[i].getFcItfName());
                             if ((connectedClientItfs == null) || connectedClientItfs.isEmpty()) {
                                 throw new IllegalLifeCycleException(
                                     "compulsory gathercast client interface " + itfTypes[i].getFcItfName() +
                                         " in composite component " +
-                                        Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                        GCM.getNameController(getFcItfOwner()).getFcName() +
                                         " is not bound to any sub component.");
                             }
                         } else { // client interface is a single or multicast interface
                             boolean isBound = false;
-                            Component[] subComponents = Fractal.getContentController(getFcItfOwner())
+                            Component[] subComponents = GCM.getContentController(getFcItfOwner())
                                     .getFcSubComponents();
                             for (int j = 0; (j < subComponents.length) && !isBound; j++) {
                                 try {
@@ -204,10 +205,10 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                                             //                                                    .lookupFcMulticast(subComponentItfs[k])
                                             //                                                    .getDelegatee();
                                             //                                            if ((delegatee != null) && !delegatee.isEmpty()) {
-                                            //                                                ProActiveInterface[] delegatees = delegatee
-                                            //                                                        .toArray(new ProActiveInterface[] {});
+                                            //                                                PAInterface[] delegatees = delegatee
+                                            //                                                        .toArray(new PAInterface[] {});
                                             //                                                for (int l = 0; l < delegatees.length; l++) {
-                                            //                                                    if (((ProActiveComponent) delegatees[l].getFcItfOwner())
+                                            //                                                    if (((PAComponent) delegatees[l].getFcItfOwner())
                                             //                                                            .getID().equals(owner.getID())) {
                                             //                                                        isBound = true;
                                             //                                                        break;
@@ -217,7 +218,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                                         } else {
                                             Object subComponentItfImpl = null;
                                             try {
-                                                subComponentItfImpl = Fractal.getBindingController(
+                                                subComponentItfImpl = GCM.getBindingController(
                                                         subComponents[j]).lookupFc(subComponentItfs[k]);
                                             } catch (NoSuchInterfaceException nsie) {
                                                 // should never happen
@@ -241,7 +242,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
                             if (!isBound) {
                                 throw new IllegalLifeCycleException("compulsory client interface " +
                                     itfTypes[i].getFcItfName() + " in composite component " +
-                                    Fractal.getNameController(getFcItfOwner()).getFcName() +
+                                    GCM.getNameController(getFcItfOwner()).getFcName() +
                                     " is not bound to any sub component.");
                             }
                         }
@@ -250,9 +251,9 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
             }
 
             //try {
-            //   ProActiveInterface it = (ProActiveInterface) Fractive.getMembraneController(getFcItfOwner());
+            //   PAInterface it = (PAInterface) Fractive.getMembraneController(getFcItfOwner());
             //   Object obj = it.getFcItfImpl();
-            //   ((ProActiveMembraneControllerImpl) obj).checkInternalInterfaces();
+            //   ((PAMembraneControllerImpl) obj).checkInternalInterfaces();
             //} catch (NoSuchInterfaceException nsie) {
             //Nothing to do, if the component does not have any membrane controller
             //}
@@ -260,21 +261,19 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
             String hierarchical_type = owner.getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // start all inner components
-                Component[] inner_components = Fractal.getContentController(getFcItfOwner())
-                        .getFcSubComponents();
+                Component[] inner_components = GCM.getContentController(getFcItfOwner()).getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
                         try {
-                            if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
-                                    .equals(PAMembraneController.MEMBRANE_STOPPED)) {
+                            if (Utils.getPAMembraneController(inner_components[i]).getMembraneState().equals(
+                                    PAMembraneController.MEMBRANE_STOPPED)) {
                                 throw new IllegalLifeCycleException(
                                     "Before starting all subcomponents, make sure that the membrane of all of them is started");
                             }
                         } catch (NoSuchInterfaceException e) {
-                            //the subComponent doesn't have a ProActiveMembraneController, no need to check what's is in the previous try block
+                            //the subComponent doesn't have a PAMembraneController, no need to check what's is in the previous try block
                         }
-                        ((LifeCycleController) inner_components[i]
-                                .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).startFc();
+                        (GCM.getGCMLifeCycleController(inner_components[i])).startFc();
                     }
                 }
             }
@@ -282,7 +281,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
             //getRequestQueue().start();
             fcState = LifeCycleController.STARTED;
             if (logger.isDebugEnabled()) {
-                logger.debug("started " + Fractal.getNameController(owner).getFcName());
+                logger.debug("started " + GCM.getNameController(owner).getFcName());
             }
         } catch (ClassNotFoundException cnfe) {
             logger.error("class not found : " + cnfe.getMessage(), cnfe);
@@ -299,21 +298,19 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
             String hierarchical_type = owner.getComponentParameters().getHierarchicalType();
             if (hierarchical_type.equals(Constants.COMPOSITE)) {
                 // stop all inner components
-                Component[] inner_components = Fractal.getContentController(getFcItfOwner())
-                        .getFcSubComponents();
+                Component[] inner_components = GCM.getContentController(getFcItfOwner()).getFcSubComponents();
                 if (inner_components != null) {
                     for (int i = 0; i < inner_components.length; i++) {
                         try {
-                            if (Fractive.getMembraneController(inner_components[i]).getMembraneState()
-                                    .equals(PAMembraneController.MEMBRANE_STOPPED)) {
+                            if (Utils.getPAMembraneController(inner_components[i]).getMembraneState().equals(
+                                    PAMembraneController.MEMBRANE_STOPPED)) {
                                 throw new IllegalLifeCycleException(
                                     "Before stopping all subcomponents, make sure that the membrane of all them is started");
                             }
                         } catch (NoSuchInterfaceException e) {
-                            //the subComponent doesn't have a ProActiveMembraneController, no need to check what's is in the previous try block
+                            //the subComponent doesn't have a PAMembraneController, no need to check what's is in the previous try block
                         }
-                        ((LifeCycleController) inner_components[i]
-                                .getFcInterface(Constants.LIFECYCLE_CONTROLLER)).stopFc();
+                        (GCM.getGCMLifeCycleController(inner_components[i])).stopFc();
                     }
                 }
             }
@@ -321,7 +318,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
             //getRequestQueue().stop();
             fcState = LifeCycleController.STOPPED;
             if (logger.isDebugEnabled()) {
-                logger.debug("stopped" + Fractal.getNameController(owner).getFcName());
+                logger.debug("stopped" + GCM.getNameController(owner).getFcName());
             }
         } catch (NoSuchInterfaceException nsie) {
             logger.error("interface not found : " + nsie.getMessage());
@@ -341,7 +338,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
 
     /*
      * @see
-     * org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController#getFcState
+     * org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController#getFcState
      * (short)
      */
     public String getFcState(short priority) {
@@ -357,7 +354,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
 
     /*
      * @see
-     * org.objectweb.proactive.core.component.controller.ProActiveGCMLifeCycleController#stopFc(short)
+     * org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController#stopFc(short)
      */
     public void stopFc(short priority) {
         stopFc();
@@ -369,7 +366,7 @@ public class PAGCMLifeCycleControllerImpl extends AbstractPAController implement
 
         } else {
             throw new ProActiveRuntimeException(
-                "ProActiveGCMLifeCycleControllerImpl : Impossible to duplicate the controller " + this +
+                "PAGCMLifeCycleControllerImpl: Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
     }

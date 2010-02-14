@@ -42,10 +42,10 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.group.Group;
@@ -93,7 +93,7 @@ public class PANFImplementationBuilderImpl extends PAImplementationBuilderImpl {
             ControllerDescription controllerDesc, ContentDescription contentDesc,
             org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
 
-        PAGenericFactory genericFactory = (PAGenericFactory) Fractal.getGenericFactory(bootstrap);
+        PAGenericFactory genericFactory = Utils.getPAGenericFactory(bootstrap);
 
         if (virtualNode == null) {
             return genericFactory.newNFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
@@ -114,7 +114,7 @@ public class PANFImplementationBuilderImpl extends PAImplementationBuilderImpl {
             ContentDescription contentDesc,
             org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
 
-        PAGenericFactory genericFactory = (PAGenericFactory) Fractal.getGenericFactory(bootstrap);
+        PAGenericFactory genericFactory = Utils.getPAGenericFactory(bootstrap);
 
         if (virtualNode == null) {
             return genericFactory.newNFcInstance(type, controllerDesc, contentDesc, (Node) null);

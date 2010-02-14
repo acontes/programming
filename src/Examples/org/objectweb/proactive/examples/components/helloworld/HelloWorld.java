@@ -40,13 +40,12 @@ package org.objectweb.proactive.examples.components.helloworld;
  * Author: Eric Bruneton
  * Modified by: The ProActive Team
  */
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
@@ -119,7 +118,7 @@ public class HelloWorld {
             // OPTION 2 : DO NOT USE THE FRACTAL ADL
             // -------------------------------------------------------------------
             Component boot = GCM.getBootstrapComponent();
-            TypeFactory tf = GCM.getTypeFactory(boot);
+            GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             Component rComp = null;
 
             // type of root component
@@ -134,10 +133,10 @@ public class HelloWorld {
             // type of server component
             ComponentType sType = tf.createFcType(new InterfaceType[] {
                     tf.createFcItfType("s", Service.class.getName(), false, false, false),
-                    tf.createFcItfType("attribute-controller", ServiceAttributes.class.getName(), false,
-                            false, false) });
+                    tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER, ServiceAttributes.class.getName(),
+                            false, false, false) });
 
-            GenericFactory cf = Fractal.getGenericFactory(boot);
+            GenericFactory cf = GCM.getGenericFactory(boot);
 
             if (!useTemplates) {
                 // -------------------------------------------------------------------
@@ -153,8 +152,8 @@ public class HelloWorld {
                 Component sComp = cf.newFcInstance(sType, new ControllerDescription("server",
                     Constants.PRIMITIVE), new ContentDescription(ServerImpl.class.getName()));
 
-                ((ServiceAttributes) Fractal.getAttributeController(sComp)).setHeader("--------> ");
-                ((ServiceAttributes) Fractal.getAttributeController(sComp)).setCount(1);
+                ((ServiceAttributes) GCM.getAttributeController(sComp)).setHeader("--------> ");
+                ((ServiceAttributes) GCM.getAttributeController(sComp)).setCount(1);
 
                 if (useWrapper) {
                     sType = tf.createFcType(new InterfaceType[] { tf.createFcItfType("s", Service.class
@@ -168,13 +167,13 @@ public class HelloWorld {
                         Constants.COMPOSITE), null);
 
                     // component assembly
-                    Fractal.getContentController(CComp).addFcSubComponent(cComp);
-                    Fractal.getContentController(SComp).addFcSubComponent(sComp);
-                    Fractal.getBindingController(CComp).bindFc("r", cComp.getFcInterface("r"));
-                    Fractal.getBindingController(cComp).bindFc("s",
-                            Fractal.getContentController(CComp).getFcInternalInterface("s"));
-                    //Fractal.getBindingController(cComp).bindFc("s", CComp.getFcInterface("s"));
-                    Fractal.getBindingController(SComp).bindFc("s", sComp.getFcInterface("s"));
+                    GCM.getContentController(CComp).addFcSubComponent(cComp);
+                    GCM.getContentController(SComp).addFcSubComponent(sComp);
+                    GCM.getBindingController(CComp).bindFc("r", cComp.getFcInterface("r"));
+                    GCM.getBindingController(cComp).bindFc("s",
+                            GCM.getContentController(CComp).getFcInternalInterface("s"));
+                    //GCM.getBindingController(cComp).bindFc("s", CComp.getFcInterface("s"));
+                    GCM.getBindingController(SComp).bindFc("s", sComp.getFcInterface("s"));
                     // replaces client and server components by "wrapper" components
                     // THIS CHANGES REFERENCES (STUBS)
                     cComp = CComp;
@@ -182,14 +181,14 @@ public class HelloWorld {
                 }
 
                 // component assembly
-                Fractal.getContentController(rComp).addFcSubComponent(cComp);
-                Fractal.getContentController(rComp).addFcSubComponent(sComp);
-                Fractal.getBindingController(rComp).bindFc("r", cComp.getFcInterface("r"));
-                Fractal.getBindingController(cComp).bindFc("s", sComp.getFcInterface("s"));
+                GCM.getContentController(rComp).addFcSubComponent(cComp);
+                GCM.getContentController(rComp).addFcSubComponent(sComp);
+                GCM.getBindingController(rComp).bindFc("r", cComp.getFcInterface("r"));
+                GCM.getBindingController(cComp).bindFc("s", sComp.getFcInterface("s"));
             }
 
             // start root component
-            Fractal.getLifeCycleController(rComp).startFc();
+            GCM.getGCMLifeCycleController(rComp).startFc();
 
             // call main method
             ((Runnable) rComp.getFcInterface("r")).run();

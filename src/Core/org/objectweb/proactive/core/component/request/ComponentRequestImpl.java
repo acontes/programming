@@ -42,10 +42,10 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -53,7 +53,6 @@ import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestImpl;
 import org.objectweb.proactive.core.body.request.ServeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
@@ -110,12 +109,12 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
         Object result = null;
         Throwable exception = null;
 
-        PAComponentImpl actualComponent = ((ComponentBody) targetBody).getProActiveComponentImpl();
+        PAComponentImpl actualComponent = ((ComponentBody) targetBody).getPAComponentImpl();
         if (logger.isDebugEnabled()) {
             try {
                 logger.debug("invocation on method [" + methodCall.getName() + "] of interface [" +
                     methodCall.getComponentMetadata().getComponentInterfaceName() + "] on component : [" +
-                    Fractal.getNameController(actualComponent).getFcName() + "]");
+                    GCM.getNameController(actualComponent).getFcName() + "]");
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
             }
@@ -137,7 +136,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
-                    result = ((PAGathercastControllerImpl) ((PAInterface) Fractive
+                    result = ((PAGathercastControllerImpl) ((PAInterface) GCM
                             .getGathercastController(actualComponent)).getFcItfImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (methodCall.getComponentMetadata().getComponentInterfaceName().equals(
@@ -158,7 +157,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
                     (!getMethodCall().getComponentMetadata().getSenderItfID().equals(
                             new ItfID(itfType.getFcItfName(), targetBody.getID())))) {
                     // delegate to gather controller, except for self requests
-                    result = ((PAGathercastControllerImpl) ((PAInterface) Fractive
+                    result = ((PAGathercastControllerImpl) ((PAInterface) GCM
                             .getGathercastController(actualComponent)).getFcItfImpl())
                             .handleRequestOnGatherItf(this);
                 } else if (hierarchical_type.equals(Constants.COMPOSITE)) {
@@ -208,7 +207,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for preprocessing from the inputInterceptors 
     private void interceptBeforeInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            List<Interface> inputInterceptors = ((ComponentBody) targetBody).getProActiveComponentImpl()
+            List<Interface> inputInterceptors = ((ComponentBody) targetBody).getPAComponentImpl()
                     .getInputInterceptors();
             Iterator<Interface> it = inputInterceptors.iterator();
             while (it.hasNext()) {
@@ -225,8 +224,8 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
     // intercept and delegate for postprocessing from the inputInterceptors 
     private void interceptAfterInvocation(Body targetBody) {
         if (methodCall.getReifiedMethod() != null) {
-            if (((ComponentBody) targetBody).getProActiveComponentImpl() != null) {
-                List<Interface> interceptors = ((ComponentBody) targetBody).getProActiveComponentImpl()
+            if (((ComponentBody) targetBody).getPAComponentImpl() != null) {
+                List<Interface> interceptors = ((ComponentBody) targetBody).getPAComponentImpl()
                         .getInputInterceptors();
 
                 // use inputInterceptors in reverse order after invocation
@@ -248,7 +247,7 @@ public class ComponentRequestImpl extends RequestImpl implements ComponentReques
      */
     public boolean isControllerRequest() {
         // according to the Fractal spec v2.0 , section 4.1
-        return Utils.isControllerInterfaceName(methodCall.getComponentMetadata().getComponentInterfaceName());
+        return Utils.isControllerItfName(methodCall.getComponentMetadata().getComponentInterfaceName());
     }
 
     /*

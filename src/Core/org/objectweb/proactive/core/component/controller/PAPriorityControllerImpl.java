@@ -104,7 +104,7 @@ public class PAPriorityControllerImpl extends AbstractPAController implements Pr
             return RequestPriority.NF2;
         } else if (nf3s.get(methodName) != null) {
             return RequestPriority.NF3;
-        } else if (Utils.isControllerInterfaceName(itfName)) {
+        } else if (Utils.isControllerItfName(itfName)) {
             return RequestPriority.NF1;
         } else {
             return RequestPriority.F;

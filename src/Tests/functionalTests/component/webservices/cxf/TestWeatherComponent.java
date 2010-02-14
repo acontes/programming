@@ -37,13 +37,12 @@ package functionalTests.component.webservices.cxf;
 
 import static org.junit.Assert.assertTrue;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -75,7 +74,7 @@ public class TestWeatherComponent extends FunctionalTest {
 
             boot = GCM.getBootstrapComponent();
 
-            TypeFactory tf = GCM.getTypeFactory(boot);
+            GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             GenericFactory cf = GCM.getGenericFactory(boot);
 
             ComponentType typeComp = tf.createFcType(new InterfaceType[] { tf.createFcItfType(
@@ -84,7 +83,7 @@ public class TestWeatherComponent extends FunctionalTest {
             comp = cf.newFcInstance(typeComp, new ControllerDescription("server", Constants.PRIMITIVE),
                     new ContentDescription(WeatherServiceComponent.class.getName(), null));
 
-            Fractal.getLifeCycleController(comp).startFc();
+            GCM.getGCMLifeCycleController(comp).startFc();
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
             ws = wsf.getWebServices(url);

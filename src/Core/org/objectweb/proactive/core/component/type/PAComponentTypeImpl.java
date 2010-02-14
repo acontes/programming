@@ -44,6 +44,7 @@ import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -63,7 +64,7 @@ public class PAComponentTypeImpl implements ComponentType, PAGCMInterfaceType, S
     private final InterfaceType[] interfaceTypes;
 
     /**
-     * Constructor for ProActiveComponentTypeImpl.
+     * Constructor for PAComponentTypeImpl.
      */
     public PAComponentTypeImpl(final InterfaceType[] interfaceTypes) throws InstantiationException {
         this.interfaceTypes = clone(interfaceTypes);
@@ -92,12 +93,12 @@ public class PAComponentTypeImpl implements ComponentType, PAGCMInterfaceType, S
      * Seems doesn't be used
      * copy constructor
      */
-    //    public ProActiveComponentTypeImpl(final ComponentType componentType) {
+    //    public PAComponentTypeImpl(final ComponentType componentType) {
     //        InterfaceType[] tempItfTypes = componentType.getFcInterfaceTypes();
     //        this.interfaceTypes = new InterfaceType[tempItfTypes.length];
     //        for (int i = 0; i < interfaceTypes.length; i++) {
     //            // deep copy
-    //            interfaceTypes[i] = new ProActiveInterfaceTypeImpl(tempItfTypes[i]);
+    //            interfaceTypes[i] = new PAInterfaceTypeImpl(tempItfTypes[i]);
     //        }
     //    }
     /**
@@ -153,7 +154,7 @@ public class PAComponentTypeImpl implements ComponentType, PAGCMInterfaceType, S
     }
 
     public String getFcItfName() {
-        return "component";
+        return Constants.COMPONENT;
     }
 
     public String getFcItfSignature() {

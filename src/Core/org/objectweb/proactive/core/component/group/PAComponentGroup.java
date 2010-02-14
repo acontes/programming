@@ -73,10 +73,10 @@ public class PAComponentGroup {
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     /**
-     * creates an empty group able to contain ProActiveInterfaceImpl objects of the given type..
-     * The stub in front of the group proxy is of type ProActiveInterfaceImpl.
+     * creates an empty group able to contain PAInterfaceImpl objects of the given type..
+     * The stub in front of the group proxy is of type PAInterfaceImpl.
      * @param interfaceType the type of interface we need a group of Interface objects on
-     * @return a group of ProActiveInterfaceImpl elements
+     * @return a group of PAInterfaceImpl elements
      * @throws ClassNotFoundException
      * @throws ClassNotReifiableException
      */
@@ -129,7 +129,7 @@ public class PAComponentGroup {
             // create the stub with the appropriate parameters
             Constructor<PAComponentRepresentativeImpl> constructor = PAComponentRepresentativeImpl.class
                     .getConstructor(new Class[] { ComponentType.class, String.class, String.class });
-            result = (PAComponentRepresentative) constructor
+            result = constructor
                     .newInstance(new Object[] { componentType, controllerDesc.getHierarchicalType(),
                             controllerDesc.getControllersConfigFileLocation() });
 
@@ -177,7 +177,7 @@ public class PAComponentGroup {
             // create the stub with the appropriate parameters
             Constructor<PANFComponentRepresentativeImpl> constructor = PANFComponentRepresentativeImpl.class
                     .getConstructor(new Class[] { ComponentType.class, String.class, String.class });
-            result = (PAComponentRepresentative) constructor
+            result = constructor
                     .newInstance(new Object[] { componentType, controllerDesc.getHierarchicalType(),
                             controllerDesc.getControllersConfigFileLocation() });
 

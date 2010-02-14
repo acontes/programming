@@ -39,17 +39,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.adl.RegistryManager;
 import org.objectweb.proactive.core.component.adl.nodes.ADLNodeProvider;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
@@ -101,7 +100,7 @@ public class PAImplementationBuilderImpl implements PAImplementationBuilder, Bin
     }
 
     //  --------------------------------------------------------------------------
-    // Implementation of the Implementation Builder and ProActiveImplementationBuilder interfaces
+    // Implementation of the Implementation Builder and PAImplementationBuilder interfaces
     // --------------------------------------------------------------------------
     public Object createComponent(Object arg0, String arg1, String arg2, Object arg3, Object arg4, Object arg5)
             throws Exception {
@@ -126,7 +125,7 @@ public class PAImplementationBuilderImpl implements PAImplementationBuilder, Bin
             bootstrap = (Component) context.get("bootstrap");
         }
         if (bootstrap == null) {
-            bootstrap = GCM.getBootstrapComponent();
+            bootstrap = Utils.getBootstrapComponent();
         }
         if ((deploymentDescriptor != null) && (adlVN != null)) {
             // consider exported virtual nodes
@@ -234,7 +233,7 @@ public class PAImplementationBuilderImpl implements PAImplementationBuilder, Bin
         public Component createFComponent(ComponentType type, ControllerDescription controllerDesc,
                 ContentDescription contentDesc, VirtualNode adlVN) throws Exception {
             Component result = null;
-            PAGenericFactory genericFactory = (PAGenericFactory) Fractal.getGenericFactory(bootstrap);
+            PAGenericFactory genericFactory = Utils.getPAGenericFactory(bootstrap);
 
             if ((deploymentVN != null) && VirtualNode.MULTIPLE.equals(adlVN.getCardinality()) &&
                 controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
@@ -286,7 +285,7 @@ public class PAImplementationBuilderImpl implements PAImplementationBuilder, Bin
                 ContentDescription contentDesc, VirtualNode adlVN) throws Exception {
             Component result = null;
 
-            PAGenericFactory genericFactory = (PAGenericFactory) Fractal.getGenericFactory(bootstrap);
+            PAGenericFactory genericFactory = Utils.getPAGenericFactory(bootstrap);
             result = genericFactory.newFcInstance(type, controllerDesc, contentDesc, ADLNodeProvider
                     .getNode(gcmDeploymentVN));
 
@@ -297,7 +296,7 @@ public class PAImplementationBuilderImpl implements PAImplementationBuilder, Bin
     private List<Component> newFcInstanceAsList(Component bootstrap, Type type,
             ControllerDescription controllerDesc, ContentDescription contentDesc,
             org.objectweb.proactive.core.descriptor.data.VirtualNode virtualNode) throws Exception {
-        PAGenericFactory genericFactory = (PAGenericFactory) Fractal.getGenericFactory(bootstrap);
+        PAGenericFactory genericFactory = Utils.getPAGenericFactory(bootstrap);
         if (virtualNode == null) {
             return genericFactory.newFcInstanceAsList(type, controllerDesc, contentDesc, (Node[]) null);
         }

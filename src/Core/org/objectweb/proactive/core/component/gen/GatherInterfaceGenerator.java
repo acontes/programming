@@ -62,8 +62,7 @@ public class GatherInterfaceGenerator {
     protected static final transient ClassPool pool = ClassPool.getDefault();
     private static Logger gatherLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GATHERCAST);
 
-    public static Class<?> generateInterface(PAGCMInterfaceType itfType)
-            throws InterfaceGenerationFailedException {
+    public static Class<?> generateInterface(PAGCMInterfaceType itfType) {
         Class<?> generated = null;
         String gatherProxyItfName = Utils.getGatherProxyItfClassName(itfType);
         try {

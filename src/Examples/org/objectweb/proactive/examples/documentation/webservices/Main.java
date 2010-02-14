@@ -35,6 +35,7 @@
  */
 package org.objectweb.proactive.examples.documentation.webservices;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -43,8 +44,6 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveException;
@@ -78,7 +77,7 @@ public class Main {
             //@snippet-start webservices_Component_1
             Component boot = GCM.getBootstrapComponent();
 
-            TypeFactory tf = GCM.getTypeFactory(boot);
+            GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             GenericFactory cf = GCM.getGenericFactory(boot);
 
             // type of server component
@@ -88,7 +87,7 @@ public class Main {
             Component a = cf.newFcInstance(sType, new ControllerDescription("server", Constants.PRIMITIVE),
                     new ContentDescription(AImpl.class.getName()));
             //start the component
-            Fractal.getLifeCycleController(a).startFc();
+            GCM.getGCMLifeCycleController(a).startFc();
             //@snippet-end webservices_Component_1
 
             //@snippet-start webservices_Component_2

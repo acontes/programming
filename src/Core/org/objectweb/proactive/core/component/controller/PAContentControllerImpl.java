@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -52,10 +53,10 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.exceptions.ContentControllerExceptionListException;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
@@ -75,7 +76,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
     protected List<Component> fcSubComponents;
 
     /**
-     * Constructor for ProActiveContentController.
+     * Constructor for PAContentController.
      */
     public PAContentControllerImpl(Component owner) {
         super(owner);
@@ -104,8 +105,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
 
         for (int i = 0; i < itfs.length; i++) {
             InterfaceType itfType = (InterfaceType) ((Interface) itfs[i]).getFcItfType();
-            if (!itfType.isFcClientItf() && !itfType.getFcItfName().equals(Constants.COMPONENT) &&
-                !itfType.getFcItfName().endsWith("-controller")) {
+            if (!itfType.isFcClientItf() && !Utils.isControllerItfName(itfType.getFcItfName())) {
                 internalItfs.add(itfs[i]);
             }
         }
@@ -169,10 +169,10 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
                 }
                 return;
             }
-            if (Fractal.getSuperController(subComponent).getFcSuperComponents().length != 0) {
+            if (GCM.getSuperController(subComponent).getFcSuperComponents().length != 0) {
                 throw new IllegalContentException(
                     "This implementation of the Fractal model does not currently allow sharing : " +
-                        Fractal.getNameController(subComponent).getFcName() + " has no super controller");
+                        GCM.getNameController(subComponent).getFcName() + " has no super controller");
             }
         } catch (NoSuchInterfaceException e) {
             logger
@@ -187,7 +187,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
         if (ref_on_this_component.equals(subComponent)) {
             try {
                 throw new IllegalArgumentException("cannot add " +
-                    Fractal.getNameController(getFcItfOwner()).getFcName() + " component into itself ");
+                    GCM.getNameController(getFcItfOwner()).getFcName() + " component into itself ");
             } catch (NoSuchInterfaceException e) {
                 logger.error(e.getMessage());
             }
@@ -197,7 +197,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
         if (getAllSubComponents(this_component).contains(ref_on_this_component)) {
             String name;
             try {
-                name = Fractal.getNameController(subComponent).getFcName();
+                name = GCM.getNameController(subComponent).getFcName();
             } catch (NoSuchInterfaceException nsie) {
                 throw new ProActiveRuntimeException("cannot access the component parameters controller", nsie);
             }
@@ -207,9 +207,8 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
         fcSubComponents.add(subComponent);
         // add a ref on the current component
         try {
-            Object itf = subComponent.getFcInterface(Constants.SUPER_CONTROLLER);
-
-            ((PASuperController) itf).addParent(ref_on_this_component);
+            PASuperController itf = Utils.getPASuperController(subComponent);
+            itf.addParent(ref_on_this_component);
         } catch (NoSuchInterfaceException e) {
             IllegalContentException ice = new IllegalContentException(
                 "Cannot add component : cannot find super-controller interface.");
@@ -225,19 +224,18 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
             IllegalContentException {
         checkLifeCycleIsStopped();
         try {
-            if (((PABindingController) Fractal.getBindingController(getFcItfOwner())).isBoundTo(subComponent)) {
+            if (Utils.getPABindingController(getFcItfOwner()).isBoundTo(subComponent)) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external server interfaces");
             }
             Component[] subComponents = getFcSubComponents();
             for (int i = 0; i < subComponents.length; i++) {
-                if (((PABindingController) Fractal.getBindingController(subComponents[i]))
-                        .isBoundTo(subComponent)) {
+                if (Utils.getPABindingController(subComponents[i]).isBoundTo(subComponent)) {
                     throw new IllegalContentException(
                         "cannot remove a sub component that holds bindings on its external server interfaces");
                 }
             }
-            if (((PABindingController) Fractal.getBindingController(subComponent)).isBound()) {
+            if (Utils.getPABindingController(subComponent).isBound()) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external client interfaces");
             }
@@ -248,7 +246,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
             throw new IllegalContentException("not a sub component : " + subComponent);
         }
         try {
-            ((PASuperController) Fractal.getSuperController(subComponent)).removeParent(subComponent);
+            Utils.getPASuperController(subComponent).removeParent(subComponent);
         } catch (NoSuchInterfaceException e) {
             fcSubComponents.add(subComponent);
             IllegalContentException ice = new IllegalContentException(
@@ -281,7 +279,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
 
             if (!allSubComponents.contains(c)) {
                 try {
-                    ContentController cc = (ContentController) c.getFcInterface(Constants.CONTENT_CONTROLLER);
+                    ContentController cc = GCM.getContentController(c);
                     subComponents = cc.getFcSubComponents();
                     for (int i = subComponents.length - 1; i >= 0; --i) {
                         stack.add(subComponents[i]);
@@ -383,7 +381,7 @@ public class PAContentControllerImpl extends AbstractPAController implements PAC
 
         } else {
             throw new ProActiveRuntimeException(
-                "ProActiveContentControllerImpl : Impossible to duplicate the controller " + this +
+                "PAContentControllerImpl: Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
     }

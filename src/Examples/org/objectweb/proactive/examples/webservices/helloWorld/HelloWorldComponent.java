@@ -37,6 +37,7 @@ package org.objectweb.proactive.examples.webservices.helloWorld;
 
 import java.io.File;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -44,12 +45,11 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
@@ -124,8 +124,8 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
         try {
             boot = GCM.getBootstrapComponent();
 
-            TypeFactory tf = Fractal.getTypeFactory(boot);
-            PAGenericFactory cf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+            GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
+            PAGenericFactory cf = Utils.getPAGenericFactory(boot);
 
             // type of server component
             ComponentType sType = tf
@@ -162,7 +162,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf {
             }
 
             //start the component
-            Fractal.getLifeCycleController(comp).startFc();
+            GCM.getGCMLifeCycleController(comp).startFc();
         } catch (InstantiationException e1) {
             e1.printStackTrace();
         } catch (NoSuchInterfaceException e) {

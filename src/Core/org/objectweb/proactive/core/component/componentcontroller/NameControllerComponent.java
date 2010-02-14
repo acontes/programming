@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.component.controller.ControllerState;
  * @author The ProActive Team
  *
  */
-public class NameControllerComponent extends AbstractProActiveComponentController implements NameController,
+public class NameControllerComponent extends AbstractPAComponentController implements NameController,
         ControllerStateDuplication {
 
     private String name;
@@ -65,9 +65,8 @@ public class NameControllerComponent extends AbstractProActiveComponentControlle
             name = (String) c;
 
         } else {
-            throw new ProActiveRuntimeException(
-                "ProActiveNameController : Impossible to duplicate the controller " + this +
-                    " from the controller" + c);
+            throw new ProActiveRuntimeException("PANameController: Impossible to duplicate the controller " +
+                this + " from the controller" + c);
         }
 
     }

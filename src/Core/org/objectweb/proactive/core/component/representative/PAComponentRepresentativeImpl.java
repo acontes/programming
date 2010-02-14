@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
@@ -56,15 +57,14 @@ import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
 import org.objectweb.proactive.core.component.controller.AbstractPAController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
@@ -165,8 +165,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
 
         if (BindingController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
             !itfType.isInternal()) {
-            if (isPrimitive &&
-                (Fractive.getClientInterfaceTypes(componentParam.getComponentType()).length == 0)) {
+            if (isPrimitive && (Utils.getClientItfTypes(componentParam.getComponentType()).length == 0)) {
                 // The binding controller is not generated for a component without client interfaces
                 if (logger.isDebugEnabled()) {
                     logger.debug("user component class of '" + componentParam.getName() +
@@ -190,8 +189,8 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     private void addMandatoryControllers() throws Exception {
-        Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = Fractal.getTypeFactory(boot);
+        Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-GCM-Proactive bootstrap component*/
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
 
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory
                 .createFcItfType(
@@ -322,8 +321,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
             }
 
             if (BindingController.class.isAssignableFrom(controllerClass)) {
-                if ((hierarchicalType.equals(Constants.PRIMITIVE) && (Fractive
-                        .getClientInterfaceTypes(componentType).length == 0))) {
+                if ((hierarchicalType.equals(Constants.PRIMITIVE) && (Utils.getClientItfTypes(componentType).length == 0))) {
                     //bindingController = null;
                     if (logger.isDebugEnabled()) {
                         logger
@@ -346,7 +344,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
 
         try {//Setting the real NF type, as some controllers may not be generated
             Component boot = GCM.getBootstrapComponent();
-            TypeFactory type_factory = Fractal.getTypeFactory(boot);
+            GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
             InterfaceType[] nf = new InterfaceType[nfType.size()];
             nfType.toArray(nf);
             componentNfType = type_factory.createFcType(nf);
@@ -519,7 +517,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     /*
-     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getReferenceOnBaseObject()
+     * implements org.objectweb.proactive.core.component.identity.PAComponent#getReferenceOnBaseObject()
      */
     public Object getReferenceOnBaseObject() {
         logger.error("getReferenceOnBaseObject() method is not available in component representatives");
@@ -527,21 +525,21 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     /*
-     * implements org.objectweb.proactive.core.component.identity.ProActiveComponent#getRepresentativeOnThis()
+     * implements org.objectweb.proactive.core.component.identity.PAComponent#getRepresentativeOnThis()
      */
     public PAComponent getRepresentativeOnThis() {
         return this;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#getStubOnReifiedObject()
+     * @see org.objectweb.proactive.core.component.representative.PAComponentRepresentative#getStubOnReifiedObject()
      */
     public StubObject getStubOnBaseObject() {
         return stubOnBaseObject;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative#setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
+     * @see org.objectweb.proactive.core.component.representative.PAComponentRepresentative#setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
      */
     public void setStubOnBaseObject(StubObject stub) {
         stubOnBaseObject = stub;
@@ -561,7 +559,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
      * @see org.objectweb.fractal.api.Interface#getFcItfName()
      */
     public String getFcItfName() {
-        return "component";
+        return Constants.COMPONENT;
     }
 
     /**

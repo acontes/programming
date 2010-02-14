@@ -35,6 +35,7 @@
  */
 package functionalTests.component.lookup;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
@@ -66,7 +67,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Component boot = GCM.getBootstrapComponent();
-        TypeFactory typeFactory = GCM.getTypeFactory(boot);
+        GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(boot);
         GenericFactory componentFactory = GCM.getGenericFactory(boot);
         typeA = typeFactory.createFcType(new InterfaceType[] { typeFactory.createFcItfType("i1", I1.class
                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) });

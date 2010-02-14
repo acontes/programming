@@ -42,6 +42,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServices;
@@ -147,7 +148,7 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         for (Object o : interfaces) {
             Interface interface_ = (Interface) o;
             String interfaceName = interface_.getFcItfName();
-            if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
+            if (!Utils.isControllerItfName(interfaceName) &&
                 !((InterfaceType) interface_.getFcItfType()).isFcClientItf()) {
 
                 logger.debug("The component interface '" + interfaceName + "' has been deployed on " +
@@ -172,7 +173,7 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
         for (Object o : interfaces) {
             Interface interface_ = (Interface) o;
             String interfaceName = interface_.getFcItfName();
-            if (!interfaceName.contains("-controller") && !interfaceName.equals("component") &&
+            if (!Utils.isControllerItfName(interfaceName) &&
                 !((InterfaceType) interface_.getFcItfType()).isFcClientItf()) {
                 logger.debug("The component interface '" + interfaceName + "' previously deployed on " +
                     this.url + WSConstants.SERVICES_PATH + componentName + "_" + interfaceName +

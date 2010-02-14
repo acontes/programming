@@ -46,6 +46,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -54,7 +55,6 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.migration.MigrationException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.ServeException;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.identity.PAComponent;
@@ -153,8 +153,7 @@ public class GatherRequestsQueues implements Serializable {
 
         List<Object> connectedClientItfs;
         try {
-            connectedClientItfs = Fractive.getGathercastController(owner).getGCMConnectedClients(
-                    serverItfName);
+            connectedClientItfs = GCM.getGathercastController(owner).getGCMConnectedClients(serverItfName);
         } catch (NoSuchInterfaceException e) {
             throw new ServeException("this component has no gathercast controller");
         }
@@ -218,12 +217,11 @@ public class GatherRequestsQueues implements Serializable {
         return result;
     }
 
-    private void notifyUpdate(String serverItfName, List<GatherRequestsQueue> requestQueues)
-            throws ServeException {
+    private void notifyUpdate(String serverItfName, List<GatherRequestsQueue> requestQueues) {
         // default: if all connected itfs have sent a request, then process it
         try {
-            List<Object> connectedClientItfs = Fractive.getGathercastController(owner)
-                    .getGCMConnectedClients(serverItfName);
+            List<Object> connectedClientItfs = GCM.getGathercastController(owner).getGCMConnectedClients(
+                    serverItfName);
             GatherRequestsQueue firstRequestsInLine = requestQueues.get(0); // need to ensure this
             if (firstRequestsInLine.isFull()) {
                 // ok, condition met, proceed with request

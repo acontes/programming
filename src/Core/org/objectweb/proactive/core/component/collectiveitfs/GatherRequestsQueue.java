@@ -71,7 +71,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  *
  */
 public class GatherRequestsQueue implements Serializable {
-    //private ProActiveComponent owner;
     private GatherFuturesHandler futuresHandler; // primitive pooling
     private List<Object> connectedClientItfs; // consistency?
     private Map<ItfID, ComponentRequest> requests;

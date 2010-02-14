@@ -35,6 +35,7 @@
  */
 package functionalTests.component.nonfunctional.creation.nftype.externalserver;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
@@ -43,6 +44,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.node.Node;
@@ -69,8 +71,8 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = GCM.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot); /*Getting the GCM-ProActive type factory*/
+        PAGenericFactory cf = Utils.getPAGenericFactory(boot); /*Getting the GCM-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,

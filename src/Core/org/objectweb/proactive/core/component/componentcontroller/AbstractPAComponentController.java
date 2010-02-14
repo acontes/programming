@@ -50,15 +50,15 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author The ProActive Team
  *
  */
-public abstract class AbstractProActiveComponentController implements Serializable, HostComponentSetter {
+public abstract class AbstractPAComponentController implements Serializable, HostComponentSetter {
     protected static Logger controllerLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
     PAComponent hostComponent;
 
     /**
-     * Constructor for AbstractProActiveComponentController.
+     * Constructor for AbstractPAComponentController.
      *
      */
-    public AbstractProActiveComponentController() {
+    public AbstractPAComponentController() {
     }
 
     public void setHostComponent(Component hostComponent) {

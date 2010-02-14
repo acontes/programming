@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -57,10 +58,10 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.NFBinding;
 import org.objectweb.proactive.core.component.NFBindings;
 import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.HostComponentSetter;
 import org.objectweb.proactive.core.component.exceptions.NoSuchComponentException;
 import org.objectweb.proactive.core.component.identity.PAComponent;
@@ -122,7 +123,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             IllegalLifeCycleException {
         try {
             if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED) ||
-                Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
+                GCM.getGCMLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "To perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
             }
@@ -141,7 +142,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 "Only non-functional components should be added to the membrane");
         }
         try {
-            name = Fractal.getNameController(component).getFcName();
+            name = GCM.getNameController(component).getFcName();
         } catch (NoSuchInterfaceException e) {
             IllegalContentException ice = new IllegalContentException(
                 "The component has to implement the name-controller interface");
@@ -159,7 +160,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
          */
             Component[] fcomponents = null;
             try {
-                fcomponents = Fractal.getContentController(owner).getFcSubComponents();
+                fcomponents = GCM.getContentController(owner).getFcSubComponents();
             } catch (NoSuchInterfaceException e) {
                 IllegalContentException ice = new IllegalContentException(
                     "The host component seems to be a composite without content-controller interface!!!");
@@ -173,7 +174,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
              */
                 try {
                     try {
-                        if (Fractive.getMembraneController(c).getMembraneState().equals(
+                        if (Utils.getPAMembraneController(c).getMembraneState().equals(
                                 PAMembraneController.MEMBRANE_STOPPED)) {
                             throw new IllegalLifeCycleException(
                                 "While iterating on functional components, it apprears that one of them has its membranje in a stopped state. It should be started.");
@@ -182,7 +183,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                         //If the component does not have any membrane-controller, it won't have any impact
                     }
 
-                    if (Fractal.getNameController(c).getFcName().compareTo(name) == 0) {
+                    if (GCM.getNameController(c).getFcName().compareTo(name) == 0) {
                         throw new IllegalContentException(
                             "The name of the component is already assigned to an existing functional component");
                     }
@@ -196,7 +197,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             }
         } /* end of case with composite */
         try {
-            ((PASuperController) Fractal.getSuperController(component)).addParent(ownerRepresentative);
+            Utils.getPASuperController(component).addParent(ownerRepresentative);
         } catch (NoSuchInterfaceException e) {
 
             /*
@@ -239,10 +240,10 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         PAInterface cl = null;
         Component srOwner = srItf.getFcItfOwner();
         try {
-            if (nfBindings.hasBinding("membrane", clItf, Fractal.getNameController(srOwner).getFcName(),
-                    srItf.getFcItfName())) {
+            if (nfBindings.hasBinding("membrane", clItf, GCM.getNameController(srOwner).getFcName(), srItf
+                    .getFcItfName())) {
                 throw new IllegalBindingException("The binding : membrane." + clItf + "--->" +
-                    Fractal.getNameController(srOwner).getFcName() + "." + srItf.getFcItfName() +
+                    GCM.getNameController(srOwner).getFcName() + "." + srItf.getFcItfName() +
                     " already exists");
             }
         } catch (NoSuchInterfaceException e1) {
@@ -299,10 +300,10 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
         //Check whether the binding exists
         try {
-            if (nfBindings.hasBinding("membrane", clItf, Fractal.getNameController(srOwner).getFcName(),
-                    srItf.getFcItfName())) {
+            if (nfBindings.hasBinding("membrane", clItf, GCM.getNameController(srOwner).getFcName(), srItf
+                    .getFcItfName())) {
                 throw new IllegalBindingException("The binding : membrane." + clItf + "--->" +
-                    Fractal.getNameController(srOwner).getFcName() + "." + srItf.getFcItfName() +
+                    GCM.getNameController(srOwner).getFcName() + "." + srItf.getFcItfName() +
                     " already exists");
             }
         } catch (NoSuchInterfaceException e1) {
@@ -411,21 +412,18 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                     if (server.getComponent() == null) { //A client interface of a NF component to a NF external/internal client
                         if (srItfType.isFcClientItf() && srItfType.getFcItfName().endsWith("-controller")) { //Connection to any (internal/external) client NF interface
                             checkMembraneIsStopped();
-                            Fractal.getBindingController(client.getComponent()).bindFc(
-                                    clItfType.getFcItfName(),
+                            GCM.getBindingController(client.getComponent()).bindFc(clItfType.getFcItfName(),
                                     owner.getRepresentativeOnThis().getFcInterface(srItfType.getFcItfName()));// Alias client binding
                             //Check whether the binding already exist
-                            if (nfBindings.hasBinding(Fractal.getNameController(client.getComponent())
+                            if (nfBindings.hasBinding(GCM.getNameController(client.getComponent())
                                     .getFcName(), client.getInterface().getFcItfName(), "membrane", srItf
                                     .getFcItfName())) {
                                 throw new IllegalBindingException("The binding : " +
-                                    Fractal.getNameController(client.getComponent()).getFcName() + "." +
-                                    clItf + "--->" + "membrane" + "." + srItf.getFcItfName() +
-                                    " already exists");
+                                    GCM.getNameController(client.getComponent()).getFcName() + "." + clItf +
+                                    "--->" + "membrane" + "." + srItf.getFcItfName() + " already exists");
                             }
                             nfBindings.addClientAliasBinding(new NFBinding(null, clItfType.getFcItfName(),
-                                srItf, Fractal.getNameController(client.getComponent()).getFcName(),
-                                "membrane"));
+                                srItf, GCM.getNameController(client.getComponent()).getFcName(), "membrane"));
 
                         } else { //Exception!!
                             throw new IllegalBindingException(
@@ -441,7 +439,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                                     "When binding two NF components, a client interface must be bound to a server one");
                             } else { //Call to binding controller of the component that has the client interface
                                 checkMembraneIsStopped();
-                                Fractal.getBindingController(client.getComponent()).bindFc(
+                                GCM.getBindingController(client.getComponent()).bindFc(
                                         clItfType.getFcItfName(),
                                         server.getComponent().getFcInterface(srItfType.getFcItfName()));
                             }
@@ -451,20 +449,19 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                     if (server.getComponent() == null) {
                         if (!srItfType.isFcClientItf() && srItfType.isInternal()) { //External client NF interface only bound to inner server NF interface
                             //No beed to check the membrane state of Host component
-                            Fractive.getMembraneController(client.getComponent()).bindNFc(
+                            Utils.getPAMembraneController(client.getComponent()).bindNFc(
                                     clItfType.getFcItfName(),
                                     owner.getRepresentativeOnThis().getFcInterface(srItfType.getFcItfName()));
                             //Check Whether this binding already exist
-                            if (nfBindings.hasBinding(Fractal.getNameController(client.getComponent())
+                            if (nfBindings.hasBinding(GCM.getNameController(client.getComponent())
                                     .getFcName(), client.getInterface().getFcItfName(), "membrane", srItf
                                     .getFcItfName())) {
                                 throw new IllegalBindingException("The binding : " +
-                                    Fractal.getNameController(client.getComponent()).getFcName() + "." +
-                                    clItf + "--->" + "membrane" + "." + srItf.getFcItfName() +
-                                    " already exists");
+                                    GCM.getNameController(client.getComponent()).getFcName() + "." + clItf +
+                                    "--->" + "membrane" + "." + srItf.getFcItfName() + " already exists");
                             }
                             nfBindings.addNormalBinding(new NFBinding(clItf, clItfType.getFcItfName(), srItf,
-                                Fractal.getNameController(client.getComponent()).getFcName(), "membrane"));
+                                GCM.getNameController(client.getComponent()).getFcName(), "membrane"));
                         } else { //Exception
                             throw new IllegalBindingException(
                                 "The server interface has to be a NF inner server one");
@@ -515,7 +512,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             throw new NoSuchComponentException("There is no component named " + component);
         }
         checkMembraneIsStarted(nfcomponents.get(component));
-        return Fractal.getLifeCycleController(nfcomponents.get(component)).getFcState();
+        return GCM.getGCMLifeCycleController(nfcomponents.get(component)).getFcState();
     }
 
     public Component[] getNFcSubComponents() {
@@ -529,7 +526,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             throw new NoSuchComponentException("There is no " + component + " inside the membrane");
         }
         checkMembraneIsStarted(nfcomponents.get(component));
-        return Fractal.getBindingController(nfcomponents.get(component)).listFc();
+        return GCM.getBindingController(nfcomponents.get(component)).listFc();
     }
 
     public Object lookupNFc(String itfname) throws NoSuchInterfaceException, NoSuchComponentException {
@@ -550,14 +547,14 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
         } else {//The component is either functional or non-functional
             if (itf.getComponent() instanceof PANFComponentRepresentative) {
-                return Fractal.getBindingController(itf.getComponent()).lookupFc(theItf.getFcItfName());
+                return GCM.getBindingController(itf.getComponent()).lookupFc(theItf.getFcItfName());
             } else {//The component is functional, and we are attempting to lookup on a client non-functional external interface
                 if (theType.getFcItfName().endsWith("-controller")) {
-                    return Fractive.getMembraneController(itf.getComponent()).lookupNFc(
+                    return Utils.getPAMembraneController(itf.getComponent()).lookupNFc(
                             itf.getInterface().getFcItfName());
                 }
                 //throw new NoSuchComponentException("The specified component: " +
-                //  Fractal.getNameController(itf.getComponent()).getFcName() + " is not in the membrane");
+                //  GCM.getNameController(itf.getComponent()).getFcName() + " is not in the membrane");
             }
 
         }
@@ -568,7 +565,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             IllegalLifeCycleException, NoSuchComponentException {
         try { /* Check the lifecycle of the membrane and the component */
             if (membraneState.equals(MEMBRANE_STARTED) ||
-                Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
+                GCM.getGCMLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "To perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
             }
@@ -579,7 +576,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         checkMembraneIsStarted(component);
         String componentname = null;
         try {
-            componentname = Fractal.getNameController(component).getFcName();
+            componentname = GCM.getNameController(component).getFcName();
         } catch (NoSuchInterfaceException i) {
             IllegalContentException ice = new IllegalContentException(
                 "NF components are identified by their names. The component to remove does not have any.");
@@ -595,7 +592,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         Component toRemove = nfcomponents.get(componentname);
 
         try {
-            if (((PABindingController) Fractal.getBindingController(toRemove)).isBound().booleanValue()) {
+            if (Utils.getPABindingController(toRemove).isBound().booleanValue()) {
                 throw new IllegalContentException(
                     "cannot remove a sub component that holds bindings on its external interfaces");
             }
@@ -604,7 +601,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
 
         try {
-            ((PASuperController) Fractal.getSuperController(toRemove)).removeParent(ownerRepresentative);
+            Utils.getPASuperController(toRemove).removeParent(ownerRepresentative);
         } catch (NoSuchInterfaceException e) {
 
             /* No superController */
@@ -617,7 +614,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
     public void setControllerObject(String itf, Object controllerclass) throws NoSuchInterfaceException {
         try {
             if (membraneState.equals(PAMembraneController.MEMBRANE_STARTED) ||
-                Fractal.getLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
+                GCM.getGCMLifeCycleController(owner).getFcState().equals(LifeCycleController.STARTED)) {
                 throw new IllegalLifeCycleException(
                     "For the moment, to perform reconfiguration inside the membrane, the lifecycle and the membrane must be stopped");
             }
@@ -636,7 +633,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
 
         checkMembraneIsStarted(nfcomponents.get(component));
-        Fractal.getLifeCycleController(nfcomponents.get(component)).startFc();
+        GCM.getGCMLifeCycleController(nfcomponents.get(component)).startFc();
     }
 
     public void stopNFc(String component) throws IllegalLifeCycleException, NoSuchComponentException,
@@ -646,7 +643,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         }
         checkMembraneIsStarted(nfcomponents.get(component));
 
-        Fractal.getLifeCycleController(nfcomponents.get(component)).stopFc();
+        GCM.getGCMLifeCycleController(nfcomponents.get(component)).stopFc();
     }
 
     public void unbindNFc(String clientItf) throws NoSuchInterfaceException, IllegalLifeCycleException,
@@ -667,8 +664,8 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             checkMembraneIsStarted(theComp);
             if (theComp instanceof PANFComponentRepresentative) {
                 if (clItfType.isFcClientItf()) {
-                    Fractal.getBindingController(theComp).unbindFc(theItf.getInterface().getFcItfName());
-                    nfBindings.removeClientAliasBinding(Fractal.getNameController(theComp).getFcName(), it
+                    GCM.getBindingController(theComp).unbindFc(theItf.getInterface().getFcItfName());
+                    nfBindings.removeClientAliasBinding(GCM.getNameController(theComp).getFcName(), it
                             .getFcItfName());
                 } else {//The interface is not client. It should be.
                     throw new IllegalBindingException("You should specify a client singleton interface");
@@ -707,7 +704,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         for (Component c : nfcomponents.values()) {
             try {
                 checkMembraneIsStarted(c);
-                Fractal.getLifeCycleController(c).startFc();
+                GCM.getGCMLifeCycleController(c).startFc();
             } catch (NoSuchInterfaceException nosi) {
 
                 /*
@@ -724,12 +721,12 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         for (Component c : nfcomponents.values()) {
             try {
                 checkMembraneIsStarted(c);
-                Fractal.getLifeCycleController(c).stopFc();
+                GCM.getGCMLifeCycleController(c).stopFc();
 
             } catch (NoSuchInterfaceException nosi) {
 
                 try {
-                    logger.debug("The component" + Fractal.getNameController(c).getFcName() +
+                    logger.debug("The component" + GCM.getNameController(c).getFcName() +
                         " has no LifeCycle Controller");
                 } catch (NoSuchInterfaceException e) {// If the component has no lifecycle controller, then it can not be started or stopped
 
@@ -750,7 +747,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         for (Component c : nfcomponents.values()) {
             try {
                 result = result &&
-                    (Fractal.getLifeCycleController(c).getFcState().compareTo(LifeCycleController.STOPPED) == 0);
+                    (GCM.getGCMLifeCycleController(c).getFcState().compareTo(LifeCycleController.STOPPED) == 0);
             } catch (NoSuchInterfaceException e) {
 
                 /* Without a lifecycle controller, the componnet has no lifecycle state */
@@ -767,11 +764,11 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
      */
     private Component getFunctionalComponent(String name) {
         try {
-            Component[] fComponents = Fractal.getContentController(owner).getFcSubComponents();
+            Component[] fComponents = GCM.getContentController(owner).getFcSubComponents();
 
             for (Component c : fComponents) {
                 try {
-                    if (Fractal.getNameController(c).getFcName().compareTo(name) == 0) {
+                    if (GCM.getNameController(c).getFcName().compareTo(name) == 0) {
                         return c;
                     }
                 } catch (NoSuchInterfaceException e) {
@@ -802,13 +799,12 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             nfcomponents = (HashMap<String, Component>) c;
         } else {
             throw new ProActiveRuntimeException(
-                "ProActiveMembraneControllerImpl : Impossible to duplicate the controller " + this +
+                "PAMembraneControllerImpl: Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
     }
 
-    private ComponentAndInterface getComponentAndInterface(String itf) throws NoSuchInterfaceException,
-            NoSuchComponentException {
+    private ComponentAndInterface getComponentAndInterface(String itf) throws NoSuchInterfaceException {
         String[] itfTab = itf.split("\\.", 2);
         if (itfTab.length == 1) { /*
          * The interface tab has only one element : if it exists, it is
@@ -867,7 +863,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
     private void checkMembraneIsStarted(Component comp) throws IllegalLifeCycleException {
 
         try {
-            if (Fractive.getMembraneController(comp).getMembraneState().equals(
+            if (Utils.getPAMembraneController(comp).getMembraneState().equals(
                     PAMembraneController.MEMBRANE_STOPPED)) {
                 throw new IllegalLifeCycleException(
                     "The desired operation can not be performed. The membrane of a non-functional component is stopped. It should be started.");

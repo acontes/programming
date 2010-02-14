@@ -41,6 +41,7 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -52,8 +53,6 @@ import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.I;
@@ -61,7 +60,7 @@ import functionalTests.component.conform.components.I;
 
 public class TestCollection extends Conformtest {
     protected Component boot;
-    protected TypeFactory tf;
+    protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType t;
     protected final static String serverI = "server/" + PKG + ".I/false,false,false";
@@ -81,7 +80,7 @@ public class TestCollection extends Conformtest {
     @Before
     public void setUp() throws Exception {
         boot = GCM.getBootstrapComponent();
-        tf = GCM.getTypeFactory(boot);
+        tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("server", I.class.getName(), false, false, false),
@@ -115,7 +114,7 @@ public class TestCollection extends Conformtest {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, F, SC, NC, MC, MCC, GC,
                 serverI, clientI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC,
                 serverI, clientI })));
     }
@@ -126,7 +125,7 @@ public class TestCollection extends Conformtest {
         Component c = gf.newFcInstance(t, compositeTemplate, "composite");
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, F, SC, NC, serverI,
                 clientI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI,
                 clientI })));
     }
@@ -137,7 +136,7 @@ public class TestCollection extends Conformtest {
     @Test
     public void testPrimitiveGetFcInterface() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
-        Fractal.getLifeCycleController(c).startFc();
+        GCM.getGCMLifeCycleController(c).startFc();
         Interface i;
         i = (Interface) c.getFcInterface("servers0");
         assertEquals("Bad interface", servers0I, getItf(i, false));
@@ -165,7 +164,7 @@ public class TestCollection extends Conformtest {
         i = (Interface) c.getFcInterface("clients1");
         assertEquals("Bad interface", clients1I, getItf(i, false));
 
-        ContentController cc = Fractal.getContentController(c);
+        ContentController cc = GCM.getContentController(c);
         i = (Interface) cc.getFcInternalInterface("servers2");
         // ((InterfaceType) i.getFcItfType()).isFcClientItf()) should return false since it's an internal client, therefore a server!
         // TODO check this behavior with Julia or AOKell
@@ -193,7 +192,7 @@ public class TestCollection extends Conformtest {
         i = (Interface) c.getFcInterface("clients1");
         assertEquals("Bad interface", clients1I, getItf(i, false));
 
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MC, MCC, GC,
                 serverI, clientI })));
     }
@@ -212,7 +211,7 @@ public class TestCollection extends Conformtest {
         i = (Interface) c.getFcInterface("clients1");
         assertEquals("Bad interface", clients1I, getItf(i, false));
 
-        ContentController cc = Fractal.getContentController(c);
+        ContentController cc = GCM.getContentController(c);
         i = (Interface) cc.getFcInternalInterface("servers2");
         assertEquals("Bad interface", servers2I, getItf(i, false));
         i = (Interface) cc.getFcInternalInterface("servers3");
@@ -222,7 +221,7 @@ public class TestCollection extends Conformtest {
         i = (Interface) cc.getFcInternalInterface("clients3");
         assertEquals("Bad interface", clients3I, getItf(i, false));
 
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, serverI,
                 clientI })));
     }

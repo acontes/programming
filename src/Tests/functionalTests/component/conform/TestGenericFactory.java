@@ -40,6 +40,7 @@ import static org.junit.Assert.fail;
 import java.util.Arrays;
 import java.util.HashSet;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -49,8 +50,7 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.Constants;
 
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.CAttributes;
@@ -63,7 +63,7 @@ import functionalTests.component.conform.components.Z;
 
 public class TestGenericFactory extends Conformtest {
     protected Component boot;
-    protected TypeFactory tf;
+    protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType t;
     protected ComponentType u;
@@ -74,14 +74,14 @@ public class TestGenericFactory extends Conformtest {
     @Before
     public void setUp() throws Exception {
         boot = GCM.getBootstrapComponent();
-        tf = GCM.getTypeFactory(boot);
+        tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType("server", I.class.getName(), false, false, false),
                 tf.createFcItfType("client", I.class.getName(), true, false, false) });
         u = tf.createFcType(new InterfaceType[] {
-                tf.createFcItfType("attribute-controller", CAttributes.class.getName(), false, false, false),
-                tf.createFcItfType("server", I.class.getName(), false, false, false),
+                tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER, CAttributes.class.getName(), false, false,
+                        false), tf.createFcItfType("server", I.class.getName(), false, false, false),
                 tf.createFcItfType("client", I.class.getName(), true, false, false) });
     }
 
@@ -139,7 +139,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, flatPrimitiveTemplate, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, NC, MCC, GC, MC, F, sI,
                 cI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, NC, MCC, GC, MC, sI,
                 cI })));
     }
@@ -150,7 +150,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(u, flatParametricPrimitiveTemplate, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, AC, NC, MCC, GC, MC, F,
                 sI, cI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, AC, NC, MCC, GC, MC,
                 sI, cI })));
     }
@@ -161,7 +161,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, primitiveTemplate, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, SC, NC, MCC, GC, MC, F,
                 sI, cI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MCC, GC, MC,
                 sI, cI })));
     }
@@ -172,7 +172,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(u, parametricPrimitiveTemplate, C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, MC, MCC, GC, SC, NC, AC,
                 F, sI, cI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, MC, MCC, GC, SC, NC,
                 AC, sI, cI })));
     }
@@ -183,7 +183,7 @@ public class TestGenericFactory extends Conformtest {
         Component c = gf.newFcInstance(t, compositeTemplate, null);
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, SC, NC, MCC, GC, MC,
                 F, sI, cI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, CC, SC, NC, MCC, GC,
                 MC, sI, cI })));
     }
@@ -195,7 +195,7 @@ public class TestGenericFactory extends Conformtest {
 
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, SC, AC, NC, MCC, GC,
                 MC, F, sI, cI })));
-        c = Fractal.getFactory(c).newFcInstance();
+        c = GCM.getFactory(c).newFcInstance();
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, AC, NC, MCC,
                 GC, MC, sI, cI })));
     }

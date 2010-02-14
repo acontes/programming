@@ -51,5 +51,5 @@ public interface PAComponentFactory {
      * @param myBody a reference on the body of the active object
      * @return a proactive component metaobject
      */
-    public PAComponent newProActiveComponent(Body myBody);
+    public PAComponent newPAComponent(Body myBody);
 }

@@ -35,6 +35,7 @@
  */
 package functionalTests.component.nonfunctional.creation.remote.primitive;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.After;
 import org.junit.Assert;
@@ -42,10 +43,10 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 
@@ -77,16 +78,16 @@ public class Test extends ComponentTestDefaultNodes {
         Component boot = GCM.getBootstrapComponent();
 
         /*
-         * Getting the Fractal-ProActive type factory
+         * Getting the GCM-ProActive type factory
          */
-        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
 
         /*
          * Getting the
-         * Fractal-ProActive generic
+         * GCM-ProActive generic
          * factory
          */
-        PAGenericFactory cf = (PAGenericFactory) GCM.getGenericFactory(boot);
+        PAGenericFactory cf = Utils.getPAGenericFactory(boot);
 
         ComponentType fcType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "fitness-controller-membrane", DummyControllerItf.class.getName(), TypeFactory.SERVER,
@@ -100,7 +101,7 @@ public class Test extends ComponentTestDefaultNodes {
 
         dummyNFComponent = cf.newNFcInstance(fcType, controllerDescription, contentDescription, super
                 .getANode());
-        Fractal.getLifeCycleController(dummyNFComponent).startFc();
+        GCM.getGCMLifeCycleController(dummyNFComponent).startFc();
         DummyControllerItf ref = (DummyControllerItf) dummyNFComponent
                 .getFcInterface("fitness-controller-membrane");
         name = ref.dummyMethodWithResult();

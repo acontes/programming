@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.Component;
 public class PANFSuperControllerImpl extends PASuperControllerImpl {
 
     /**
-     * Constructor for ProActiveNFSuperController.
+     * Constructor for PANFSuperController.
      *
      * @param owner The owner component.
      */

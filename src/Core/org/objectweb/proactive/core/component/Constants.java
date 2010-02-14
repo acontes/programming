@@ -49,8 +49,6 @@ public interface Constants {
     public final static String COMPOSITE = "composite";
     public final static String PRIMITIVE = "primitive";
     public final static String PARALLEL = "parallel";
-    public final static boolean SYNCHRONOUS = true;
-    public final static boolean WITHOUT_CONFIG_FILE = false;
 
     // controller names
     public final static String ATTRIBUTE_CONTROLLER = "attribute-controller";
@@ -59,7 +57,6 @@ public interface Constants {
     public final static String COMPONENT = "component";
     public final static String CONTENT_CONTROLLER = "content-controller";
     public final static String CONTROLLER_STATE_DUPLICATION = "controller-state-duplication-controller";
-    public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
     public final static String GATHERCAST_CONTROLLER = "gathercast-controller";
     public final static String HOST_SETTER_CONTROLLER = "host-setter-controller";
     public final static String LIFECYCLE_CONTROLLER = "lifecycle-controller";
@@ -71,4 +68,11 @@ public interface Constants {
     public final static String PRIORITY_CONTROLLER = "priority-controller";
     public final static String REQUEST_QUEUE_CONTROLLER = "request-queue-controller";
     public final static String SUPER_CONTROLLER = "super-controller";
+
+    public final static String FACTORY = "factory";
+    public final static String TYPE_FACTORY = "type-factory";
+    public final static String GENERIC_FACTORY = "generic-factory";
+    public final static boolean SYNCHRONOUS = true;
+    public final static boolean WITHOUT_CONFIG_FILE = false;
+    public final static String CYCLIC_NODE_SUFFIX = "-cyclicInstanceNumber-";
 }

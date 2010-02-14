@@ -75,7 +75,6 @@ public abstract class Conformtest extends ComponentTest {
         PAContentController.class.getCanonicalName() + "/false,false,false";
     protected final static String NC = Constants.NAME_CONTROLLER + "/" +
         NameController.class.getCanonicalName() + "/false,false,false";
-    //protected final static String NC = "name-controller/org.objectweb.proactive.core.component.controller.ProActiveNameController/false,false,false";
     protected final static String LC = Constants.LIFECYCLE_CONTROLLER + "/" +
         PAGCMLifeCycleController.class.getCanonicalName() + "/false,false,false";
     protected final static String SC = Constants.SUPER_CONTROLLER + "/" +
@@ -203,7 +202,7 @@ public abstract class Conformtest extends ComponentTest {
 
         //        ContentController cc;
         //        try {
-        //            cc = Fractal.getContentController(c);
+        //            cc = GCM.getContentController(c);
         //        } catch (NoSuchInterfaceException e) {
         //            return;
         //        }

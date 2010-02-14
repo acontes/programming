@@ -92,9 +92,8 @@ public class PANameController extends AbstractPAController implements NameContro
             name = (String) c;
 
         } else {
-            throw new ProActiveRuntimeException(
-                "ProActiveNameController : Impossible to duplicate the controller " + this +
-                    " from the controller" + c);
+            throw new ProActiveRuntimeException("PANameController: Impossible to duplicate the controller " +
+                this + " from the controller" + c);
         }
 
     }

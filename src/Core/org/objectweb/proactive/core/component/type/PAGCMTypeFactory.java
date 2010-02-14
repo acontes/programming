@@ -64,7 +64,7 @@ public interface PAGCMTypeFactory extends GCMTypeFactory {
      *      client interfaces.
      * @param isOptional <tt>true</tt> if component interfaces of this type are
      *      optional interfaces.
-     * @param cardinality see { @link ProActiveInterfaceType#getFcCardinality() }
+     * @param cardinality see { @link PAInterfaceType#getFcCardinality() }
      * for a description of cardinalities
      * @param isInternal boolean value, indicating whether the interface is internal
      * @return an interface type initialized with the given values.

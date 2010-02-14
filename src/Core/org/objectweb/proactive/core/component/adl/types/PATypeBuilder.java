@@ -85,6 +85,6 @@ public class PATypeBuilder extends FractalTypeBuilder {
         for (int i = 0; i < types.length; ++i) {
             types[i] = (InterfaceType) interfaceTypes[i];
         }
-        return GCM.getTypeFactory(bootstrap).createFcType(types);
+        return GCM.getGCMTypeFactory(bootstrap).createFcType(types);
     }
 }

@@ -43,7 +43,6 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -61,7 +60,7 @@ public abstract class CommonSetup extends ComponentTest {
     public static String SERVER_SERVICEMULTICAST_NAME = "Service";
 
     protected Component boot;
-    protected TypeFactory tf;
+    protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected String url;
     protected Component[] servers;
@@ -71,7 +70,7 @@ public abstract class CommonSetup extends ComponentTest {
 
     public void setUpAndDeploy() throws Exception {
         boot = GCM.getBootstrapComponent();
-        tf = GCM.getTypeFactory(boot);
+        tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
 
         url = AbstractWebServicesFactory.getLocalUrl();
@@ -84,7 +83,7 @@ public abstract class CommonSetup extends ComponentTest {
         for (int i = 0; i < NUMBER_SERVERS; i++) {
             servers[i] = gf.newFcInstance(sType, new ControllerDescription(SERVER_DEFAULT_NAME + i,
                 Constants.PRIMITIVE), new ContentDescription(Server.class.getName()));
-            Fractal.getLifeCycleController(servers[i]).startFc();
+            GCM.getGCMLifeCycleController(servers[i]).startFc();
             ws = wsf.getWebServices(url);
             ws.exposeComponentAsWebService(servers[i], SERVER_DEFAULT_NAME + i);
         }
@@ -94,9 +93,8 @@ public abstract class CommonSetup extends ComponentTest {
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 tf.createFcItfType(Client.SERVICES_NAME, Services.class.getName(), TypeFactory.CLIENT,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                ((GCMTypeFactory) tf).createGCMItfType(Client.SERVICEMULTICASTREAL_NAME,
-                        ServiceMulticast.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL,
-                        GCMTypeFactory.MULTICAST_CARDINALITY),
+                tf.createGCMItfType(Client.SERVICEMULTICASTREAL_NAME, ServiceMulticast.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.OPTIONAL, GCMTypeFactory.MULTICAST_CARDINALITY),
                 tf.createFcItfType(Client.SERVICEMULTICASTFALSE_NAME, ServiceMulticast.class.getName(),
                         TypeFactory.CLIENT, TypeFactory.OPTIONAL, TypeFactory.SINGLE) });
     }

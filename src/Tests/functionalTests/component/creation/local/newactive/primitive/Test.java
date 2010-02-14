@@ -35,13 +35,13 @@
  */
 package functionalTests.component.creation.local.newactive.primitive;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -76,7 +76,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Component boot = GCM.getBootstrapComponent();
-        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
@@ -86,7 +86,7 @@ public class Test extends ComponentTest {
             new Object[] { "toto" }));
         //logger.debug("OK, instantiated the component");
         // start the component!
-        Fractal.getLifeCycleController(componentA).startFc();
+        GCM.getGCMLifeCycleController(componentA).startFc();
         ComponentInfo ref = (ComponentInfo) componentA.getFcInterface("componentInfo");
         name = ref.getName();
         nodeUrl = ((ComponentInfo) componentA.getFcInterface("componentInfo")).getNodeUrl();

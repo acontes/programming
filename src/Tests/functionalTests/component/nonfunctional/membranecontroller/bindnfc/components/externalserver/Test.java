@@ -38,17 +38,17 @@ package functionalTests.component.nonfunctional.membranecontroller.bindnfc.compo
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.controller.PAMembraneController;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
@@ -80,8 +80,8 @@ public class Test extends ComponentTest {
     public void action() throws Exception {
         //Thread.sleep(2000);
         Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
-        TypeFactory type_factory = GCM.getTypeFactory(boot); /*Getting the Fractal-ProActive type factory*/
-        PAGenericFactory cf = Fractive.getGenericFactory(boot); /*Getting the Fractal-ProActive generic factory*/
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot); /*Getting the GCM-ProActive type factory*/
+        PAGenericFactory cf = Utils.getPAGenericFactory(boot); /*Getting the GCM-ProActive generic factory*/
 
         Type fType = type_factory.createFcType(new InterfaceType[] { type_factory.createFcItfType(
                 "componentInfo", ComponentInfo.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
@@ -133,7 +133,7 @@ public class Test extends ComponentTest {
                     Constants.WITHOUT_CONFIG_FILE), (Node) null);
 
         //Filling the membrane with object  controllers
-        PAMembraneController memController = Fractive.getMembraneController(componentA);
+        PAMembraneController memController = Utils.getPAMembraneController(componentA);
 
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
                 org.objectweb.proactive.core.component.controller.PABindingControllerImpl.class.getName());
@@ -147,23 +147,23 @@ public class Test extends ComponentTest {
         //Creation of the non-functional name controller component
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
         Component nameController = null;
-        Map context = new HashMap();
+        Map<Object, Object> context = new HashMap<Object, Object>();
         nameController = (Component) f.newComponent(
                 "org.objectweb.proactive.core.component.componentcontroller.adl.nameControllerComponent",
                 context);
 
         System.out.println("The name of the nameController component is : " +
-            Fractal.getNameController(nameController).getFcName());
+            GCM.getNameController(nameController).getFcName());
 
-        Fractal.getNameController(nameController).setFcName("nameController");//Mandatory to manipulate NF components inside the membrane
-        //Fractal.getLifeCycleController(parametersController).startFc();
+        GCM.getNameController(nameController).setFcName("nameController");//Mandatory to manipulate NF components inside the membrane
+        //GCM.getGCMLifeCycleController(parametersController).startFc();
         memController.addNFSubComponent(nameController);
         memController.bindNFc(Constants.NAME_CONTROLLER, "nameController.name");
 
         //Adding a non-functional GCM component into the membrane.
         Component dummyMaster = (Component) f.newComponent(
                 "functionalTests.component.nonfunctional.adl.dummyMaster", context);
-        Fractal.getNameController(dummyMaster).setFcName("dummyMaster");
+        GCM.getNameController(dummyMaster).setFcName("dummyMaster");
 
         memController.addNFSubComponent(dummyMaster);
         memController.bindNFc("dummy-controller", "dummyMaster.dummy-master");
@@ -171,13 +171,13 @@ public class Test extends ComponentTest {
         Component dummyController = (Component) f.newComponent(
                 "functionalTests.component.nonfunctional.adl.dummyPrimitive", context);
 
-        Fractal.getNameController(dummyController).setFcName("dummyPrimitive");
+        GCM.getNameController(dummyController).setFcName("dummyPrimitive");
 
         memController.addNFSubComponent(dummyController);
         memController.bindNFc("dummyMaster.dummy-client", "dummyPrimitive.dummy-membrane");
 
         memController.startMembrane();// Before starting the mmebrane, make sure that all mandatory NF interfaces are bound
-        System.err.println("Name is : " + Fractal.getNameController(componentA).getFcName());
+        System.err.println("Name is : " + GCM.getNameController(componentA).getFcName());
         memController.stopMembrane();//The membrane must be in a stopped state for reconfiguration
 
         memController.removeNFSubComponent(nameController);
@@ -185,7 +185,7 @@ public class Test extends ComponentTest {
                 org.objectweb.proactive.core.component.controller.PANameController.class.getName());
         memController.startMembrane();//Restart the membrane, to be able to serve non-functional calls
         System.err.println("Object replaces component : Name is : " +
-            Fractal.getNameController(componentA).getFcName());
+            GCM.getNameController(componentA).getFcName());
         memController.stopMembrane();
 
         memController.addNFSubComponent(nameController);
@@ -193,7 +193,7 @@ public class Test extends ComponentTest {
 
         memController.startMembrane();
         System.err.println("Name is : component replaces object : " +
-            Fractal.getNameController(componentA).getFcName());
+            GCM.getNameController(componentA).getFcName());
         memController.stopMembrane();
 
         memController.startMembrane();
@@ -216,7 +216,7 @@ public class Test extends ComponentTest {
      * @see testsuite.test.AbstractTest#endTest()
      */
     public void endTest() throws Exception {
-        Fractal.getLifeCycleController(componentA).stopFc();
+        GCM.getGCMLifeCycleController(componentA).stopFc();
     }
 
     public boolean postConditions() throws Exception {

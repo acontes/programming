@@ -49,6 +49,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.config.PAProperties;
@@ -81,7 +82,7 @@ public class Setup {
             }
 
             if (gf == null) {
-                gf = (PAGenericFactory) GCM.getGenericFactory(boot);
+                gf = Utils.getPAGenericFactory(boot);
             }
         }
     }

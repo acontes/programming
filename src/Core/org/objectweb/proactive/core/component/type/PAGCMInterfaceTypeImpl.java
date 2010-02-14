@@ -74,7 +74,7 @@ public class PAGCMInterfaceTypeImpl implements PAGCMInterfaceType, Serializable 
     private String cardinality;
 
     /**
-     * Constructor for ProActiveInterfaceTypeImpl.
+     * Constructor for PAInterfaceTypeImpl.
      */
     public PAGCMInterfaceTypeImpl() {
         super();
@@ -85,20 +85,20 @@ public class PAGCMInterfaceTypeImpl implements PAGCMInterfaceType, Serializable 
      * Seems doesn't be used
      * @param itfType
      */
-    //    public ProActiveInterfaceTypeImpl(final InterfaceType itfType) {
+    //    public PAInterfaceTypeImpl(final InterfaceType itfType) {
     //        this.name = itfType.getFcItfName();
     //        this.signature = itfType.getFcItfSignature();
     //        this.isClient = itfType.isFcClientItf();
     //        this.isOptional = itfType.isFcOptionalItf();
     //        this.isStream = false;
     //        if (itfType.isFcCollectionItf()) {
-    //            cardinality = ProActiveTypeFactory.COLLECTION_CARDINALITY;
+    //            cardinality = PATypeFactory.COLLECTION_CARDINALITY;
     //        } else {
-    //            cardinality = ProActiveTypeFactory.SINGLETON_CARDINALITY;
+    //            cardinality = PATypeFactory.SINGLETON_CARDINALITY;
     //        }
     //    }
     /**
-     * Constructor for ProActiveInterfaceTypeImpl.
+     * Constructor for PAInterfaceTypeImpl.
      */
     public PAGCMInterfaceTypeImpl(String name, String signature, boolean isClient, boolean isOptional,
             String cardinality) throws InstantiationException {

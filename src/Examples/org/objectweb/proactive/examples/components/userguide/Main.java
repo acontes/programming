@@ -39,19 +39,19 @@ package org.objectweb.proactive.examples.components.userguide;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -87,8 +87,8 @@ public class Main {
     private static void launchFirstPrimitive() {
         try {
             Component boot = GCM.getBootstrapComponent();
-            TypeFactory typeFact = Fractal.getTypeFactory(boot);
-            GenericFactory genericFact = Fractal.getGenericFactory(boot);
+            GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
+            GenericFactory genericFact = GCM.getGenericFactory(boot);
             Component primitiveComputer = null;
 
             // type of PrimitiveComputer component
@@ -101,8 +101,8 @@ public class Main {
                 Constants.PRIMITIVE), new ContentDescription(PrimitiveComputer.class.getName()));
 
             // start PrimitiveComputer component
-            Fractal.getLifeCycleController(primitiveComputer).startFc();
-            ((LifeCycleController) primitiveComputer.getFcInterface("lifecycle-controller")).startFc();
+            GCM.getGCMLifeCycleController(primitiveComputer).startFc();
+            GCM.getGCMLifeCycleController(primitiveComputer).startFc();
 
             // get the compute-itf interface
             ComputeItf itf = ((ComputeItf) primitiveComputer.getFcInterface("compute-itf"));
@@ -122,8 +122,8 @@ public class Main {
     private static void launchWithoutADL() {
         try {
             Component boot = GCM.getBootstrapComponent();
-            TypeFactory typeFact = Fractal.getTypeFactory(boot);
-            GenericFactory genericFact = Fractal.getGenericFactory(boot);
+            GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
+            GenericFactory genericFact = GCM.getGenericFactory(boot);
 
             // component types: PrimitiveComputer, PrimitiveMaster, CompositeWrapper
             ComponentType computerType = typeFact.createFcType(new InterfaceType[] { typeFact
@@ -149,15 +149,14 @@ public class Main {
                 "CompositeWrapper", Constants.COMPOSITE), null);
 
             // component assembling
-            Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
-            Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
-            Fractal.getBindingController(compositeWrapper).bindFc("run",
-                    primitiveMaster.getFcInterface("run"));
-            Fractal.getBindingController(primitiveMaster).bindFc("compute-itf",
+            GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
+            GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
+            GCM.getBindingController(compositeWrapper).bindFc("run", primitiveMaster.getFcInterface("run"));
+            GCM.getBindingController(primitiveMaster).bindFc("compute-itf",
                     primitiveComputer.getFcInterface("compute-itf"));
 
             // start CompositeWrapper component
-            Fractal.getLifeCycleController(compositeWrapper).startFc();
+            GCM.getGCMLifeCycleController(compositeWrapper).startFc();
 
             // get the run interface
             Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
@@ -173,8 +172,8 @@ public class Main {
     private static void launchAndDeployWithoutADL() {
         try {
             Component boot = GCM.getBootstrapComponent();
-            TypeFactory typeFact = Fractal.getTypeFactory(boot);
-            PAGenericFactory genericFact = (PAGenericFactory) Fractal.getGenericFactory(boot);
+            GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
+            PAGenericFactory genericFact = Utils.getPAGenericFactory(boot);
 
             ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Main.class
                     .getResource("deploymentDescriptor.xml").getPath());
@@ -207,15 +206,14 @@ public class Main {
                 "CompositeWrapper", Constants.COMPOSITE), null);
 
             // component assembling
-            Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
-            Fractal.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
-            Fractal.getBindingController(compositeWrapper).bindFc("run",
-                    primitiveMaster.getFcInterface("run"));
-            Fractal.getBindingController(primitiveMaster).bindFc("compute-itf",
+            GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
+            GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
+            GCM.getBindingController(compositeWrapper).bindFc("run", primitiveMaster.getFcInterface("run"));
+            GCM.getBindingController(primitiveMaster).bindFc("compute-itf",
                     primitiveComputer.getFcInterface("compute-itf"));
 
             // start CompositeWrapper component
-            Fractal.getLifeCycleController(compositeWrapper).startFc();
+            GCM.getGCMLifeCycleController(compositeWrapper).startFc();
 
             // get the run interface
             Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
@@ -241,7 +239,7 @@ public class Main {
                     "org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper", context);
 
             // start PrimitiveComputer component
-            Fractal.getLifeCycleController(compositeWrapper).startFc();
+            GCM.getGCMLifeCycleController(compositeWrapper).startFc();
 
             // get the run interface
             Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));
@@ -264,7 +262,7 @@ public class Main {
                     "org.objectweb.proactive.examples.components.userguide.adl.PrimitiveComputer", context);
 
             // start PrimitiveComputer component
-            Fractal.getLifeCycleController(compositeWrapper).startFc();
+            GCM.getGCMLifeCycleController(compositeWrapper).startFc();
 
             // get the run interface
             ComputeItf itf = ((ComputeItf) compositeWrapper.getFcInterface("compute-itf"));
@@ -294,7 +292,7 @@ public class Main {
                     "org.objectweb.proactive.examples.components.userguide.adl.CompositeWrapper", context);
 
             // start PrimitiveComputer component
-            Fractal.getLifeCycleController(compositeWrapper).startFc();
+            GCM.getGCMLifeCycleController(compositeWrapper).startFc();
 
             // get the compute-itf interface
             Runnable itf = ((Runnable) compositeWrapper.getFcInterface("run"));

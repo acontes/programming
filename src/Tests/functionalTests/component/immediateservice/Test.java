@@ -35,13 +35,12 @@
  */
 package functionalTests.component.immediateservice;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -64,16 +63,16 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         Component boot = GCM.getBootstrapComponent();
-        TypeFactory type_factory = GCM.getTypeFactory(boot);
+        GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         Component comp = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
                 .createFcItfType("itf", Itf.class.getName(), false, false, false) }),
                 new ControllerDescription("component", Constants.PRIMITIVE), new ContentDescription(A.class
                         .getName(), new Object[] {}));
-        Fractal.getLifeCycleController(comp).startFc();
+        GCM.getGCMLifeCycleController(comp).startFc();
 
-        LifeCycleController lcc = Fractal.getLifeCycleController(comp);
+        LifeCycleController lcc = GCM.getGCMLifeCycleController(comp);
 
         Itf itf = (Itf) comp.getFcInterface("itf");
 

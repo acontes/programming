@@ -47,7 +47,7 @@ import org.objectweb.fractal.api.Component;
 public class PANFContentControllerImpl extends PAContentControllerImpl {
 
     /**
-     * Constructor for ProActiveNFContentController.
+     * Constructor for PANFContentController.
      *
      * @param owner The owner component.
     */

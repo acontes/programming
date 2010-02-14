@@ -37,6 +37,7 @@ package functionalTests.component.webservices.cxf;
 
 import static org.junit.Assert.assertTrue;
 
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
@@ -44,8 +45,6 @@ import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -85,7 +84,7 @@ public class TestCompositeComponent extends FunctionalTest {
 
             boot = GCM.getBootstrapComponent();
 
-            TypeFactory tf = GCM.getTypeFactory(boot);
+            GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             GenericFactory cf = GCM.getGenericFactory(boot);
 
             // type of server component
@@ -108,14 +107,14 @@ public class TestCompositeComponent extends FunctionalTest {
                 Constants.PRIMITIVE), new ContentDescription(ChooseNameComponent.class.getName(), null));
 
             // start the component
-            ContentController cc = Fractal.getContentController(comp);
+            ContentController cc = GCM.getContentController(comp);
             cc.addFcSubComponent(hello);
             cc.addFcSubComponent(chooseName);
-            BindingController bc = Fractal.getBindingController(comp);
+            BindingController bc = GCM.getBindingController(comp);
             bc.bindFc("hello-name", hello.getFcInterface("hello-name"));
-            bc = Fractal.getBindingController(hello);
+            bc = GCM.getBindingController(hello);
             bc.bindFc("choose-name", chooseName.getFcInterface("choose-name"));
-            Fractal.getLifeCycleController(comp).startFc();
+            GCM.getGCMLifeCycleController(comp).startFc();
 
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");
             ws = wsf.getWebServices(url);

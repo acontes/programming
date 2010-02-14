@@ -94,7 +94,7 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
             Interface itf = (Interface) it.next();
 
             // gather mechanism currently only offered for functional interfaces
-            if (!Utils.isControllerInterfaceName(itf.getFcItfName())) {
+            if (!Utils.isControllerItfName(itf.getFcItfName())) {
                 addManagedInterface((PAInterface) itf);
             }
         }
@@ -140,7 +140,7 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
     }
 
     /*
-     * @seeorg.objectweb.proactive.core.component.controller.AbstractProActiveController#
+     * @seeorg.objectweb.proactive.core.component.controller.AbstractPAController#
      * setControllerItfType()
      */
     @Override
@@ -168,9 +168,9 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
     /*
      * TODO : throw exception when binding already exists? (this would make the method synchronous)
      * 
-     * @seeorg.objectweb.proactive.core.component.controller.ProActiveBindingController#
-     * addedBindingOnServerItf(org.objectweb.proactive.core.component.ProActiveInterface,
-     * org.objectweb.proactive.core.component.ProActiveInterface)
+     * @seeorg.objectweb.proactive.core.component.controller.PABindingController#
+     * addedBindingOnServerItf(org.objectweb.proactive.core.component.PAInterface,
+     * org.objectweb.proactive.core.component.PAInterface)
      */
     public void notifyAddedGCMBinding(String gathercastItfName, Component owner, String clientItfName) {
         ItfID itfID = new ItfID(clientItfName, ((PAComponent) owner).getID());
@@ -188,10 +188,9 @@ public class PAGathercastControllerImpl extends AbstractCollectiveInterfaceContr
     }
 
     /*
-     * 
-     * @seeorg.objectweb.proactive.core.component.controller.ProActiveBindingController#
+     * @seeorg.objectweb.proactive.core.component.controller.PABindingController#
      * removedBindingOnServerItf(java.lang.String,
-     * org.objectweb.proactive.core.component.identity.ProActiveComponent, java.lang.String)
+     * org.objectweb.proactive.core.component.identity.PAComponent, java.lang.String)
      */
     public void notifyRemovedGCMBinding(String gathercastItfName, Component owner, String clientItfName) {
         ItfID itfID = new ItfID(clientItfName, ((PAComponent) owner).getID());

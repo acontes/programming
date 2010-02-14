@@ -38,12 +38,12 @@ package org.objectweb.proactive.core.component.adl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.adl.FactoryFactory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.LifeCycleController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Fractive;
@@ -73,7 +73,7 @@ public class Launcher {
         if (comp instanceof Component) {
             LifeCycleController lc = null;
             try {
-                lc = Fractal.getLifeCycleController((Component) comp);
+                lc = GCM.getGCMLifeCycleController((Component) comp);
             } catch (NoSuchInterfaceException ignored) {
             }
             if (lc != null) {

@@ -241,7 +241,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
             dispatcher.dispatchTasks(tasksToDispatch, doneSignal, mc.getReifiedMethod().getAnnotation(
                     Dispatch.class));
 
-            // LocalBodyStore.getInstance().setCurrentThreadBody(ProActive.getBodyOnThis());
+            // LocalBodyStore.getInstance().setCurrentThreadBody(PAActiveObject.getBodyOnThis());
         } else {
             super.oneWayCallOnGroup(mc, exceptionList);
         }

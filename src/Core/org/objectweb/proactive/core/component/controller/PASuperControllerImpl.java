@@ -110,7 +110,7 @@ public class PASuperControllerImpl extends AbstractPAController implements Seria
             fcParents = ((SuperControllerState) c).getParents();
         } else {
             throw new ProActiveRuntimeException(
-                "ProActiveSuperControllerImpl : Impossible to duplicate the controller " + this +
+                "PASuperControllerImpl: Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
     }

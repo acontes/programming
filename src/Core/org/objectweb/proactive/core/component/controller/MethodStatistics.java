@@ -37,6 +37,7 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.util.List;
 
+import org.etsi.uri.gcm.api.control.MonitorController;
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
@@ -46,7 +47,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * The MethodStatistics instances of each method are managed by the monitor controller.
  * 
  * @author The ProActive Team
- * @see org.objectweb.proactive.core.component.controller.MonitorController
+ * @see MonitorController
  *
  */
 @PublicAPI

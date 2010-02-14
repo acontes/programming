@@ -42,11 +42,9 @@ import java.util.Iterator;
 import java.util.Map;
 
 import org.etsi.uri.gcm.api.control.MonitorController;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.NameController;
-import org.objectweb.fractal.util.Fractal;
-import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.controller.MethodStatistics;
 
 import functionalTests.ComponentTest;
@@ -116,15 +114,14 @@ public class TestMonitoring extends ComponentTest {
     }
 
     public void start() throws Exception {
-        Component[] subComponents = Fractal.getContentController(root).getFcSubComponents();
+        Component[] subComponents = GCM.getContentController(root).getFcSubComponents();
         for (int i = 0; i < subComponents.length; i++) {
-            if (((NameController) subComponents[i].getFcInterface(Constants.NAME_CONTROLLER)).getFcName()
-                    .equals("server")) {
-                monitor = (MonitorController) subComponents[i].getFcInterface(Constants.MONITOR_CONTROLLER);
+            if (GCM.getNameController(subComponents[i]).getFcName().equals("server")) {
+                monitor = GCM.getMonitorController(subComponents[i]);
             }
         }
 
-        Fractal.getLifeCycleController(root).startFc();
+        GCM.getGCMLifeCycleController(root).startFc();
 
         Runner runner1 = ((Runner) root.getFcInterface("runner1"));
         Runner runner2 = ((Runner) root.getFcInterface("runner2"));

@@ -41,8 +41,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.etsi.uri.gcm.api.control.MulticastController;
 import org.etsi.uri.gcm.api.type.GCMInterfaceType;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -54,14 +56,12 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Binding;
 import org.objectweb.proactive.core.component.Bindings;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.ItfStubObject;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
@@ -89,7 +89,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         Serializable, ControllerStateDuplication {
     protected Bindings bindings; // key = clientInterfaceName ; value = Binding
 
-    //    private Map<String, Map<ProActiveComponent, List<String>>> bindingsOnServerItfs = new HashMap<String, Map<ProActiveComponent,List<String>>>(0);
+    //    private Map<String, Map<PAComponent, List<String>>> bindingsOnServerItfs = new HashMap<String, Map<ProActiveComponent,List<String>>>(0);
 
     // Map(serverItfName, Map(owner, clientItfName))
     public PABindingControllerImpl(Component owner) {
@@ -116,7 +116,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
     protected void checkBindability(String clientItfName, Interface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
         if (!(serverItf instanceof PAInterface)) {
-            throw new IllegalBindingException("Can only bind interfaces of type ProActiveInterface");
+            throw new IllegalBindingException("Can only bind interfaces of type PAInterface");
         }
 
         //        if (((InterfaceType) serverItf.getFcItfType()).isFcClientItf())
@@ -136,15 +136,15 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         // clientItfName + " to other client interface "
         // +server_itf_type.getFcItfName() );
         // }
-        if (!(Fractal.getLifeCycleController(getFcItfOwner())).getFcState().equals(
-                LifeCycleController.STOPPED)) {
+        if (!(GCM.getGCMLifeCycleController(getFcItfOwner())).getFcState()
+                .equals(LifeCycleController.STOPPED)) {
             throw new IllegalLifeCycleException("component has to be stopped to perform binding operations");
         }
 
         // multicast interfaces : interfaces must be compatible
         // (rem : itf is null when it is a single itf not yet bound
-        if (Utils.isMulticastItf(clientItfName, getFcItfOwner())) {
-            Fractive.getMulticastController(owner).ensureGCMCompatibility(clientItfType, serverItf);
+        if (Utils.isGCMMulticastItf(clientItfName, getFcItfOwner())) {
+            GCM.getMulticastController(owner).ensureGCMCompatibility(clientItfType, serverItf);
 
             // ensure multicast interface of primitive component is initialized
             if (isPrimitive()) {
@@ -158,14 +158,14 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             }
         }
 
-        if (Utils.isGathercastItf(serverItf)) {
-            Fractive.getGathercastController(owner).ensureGCMCompatibility(clientItfType, serverItf);
+        if (Utils.isGCMGathercastItf(serverItf)) {
+            GCM.getGathercastController(owner).ensureGCMCompatibility(clientItfType, serverItf);
         }
         //  TODO type checkings for other cardinalities
-        else if (Utils.isSingletonItf(clientItfName, getFcItfOwner())) {
+        else if (Utils.isGCMSingletonItf(clientItfName, getFcItfOwner())) {
             InterfaceType sType = (InterfaceType) serverItf.getFcItfType();
 
-            //InterfaceType cType = (InterfaceType)((ProActiveInterface)owner.getFcInterface(clientItfName)).getFcItfType();
+            //InterfaceType cType = (InterfaceType)((PAInterface)owner.getFcInterface(clientItfName)).getFcItfType();
             InterfaceType cType = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName);
 
             try {
@@ -193,7 +193,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                         .getFcItfType()).isFcCollectionItf()) {
                     // binding from a single client interface : only 1 binding
                     // is allowed
-                    controllerLogger.warn(Fractal.getNameController(getFcItfOwner()).getFcName() + "." +
+                    controllerLogger.warn(GCM.getNameController(getFcItfOwner()).getFcName() + "." +
                         clientItfName + " is already bound");
 
                     throw new IllegalBindingException(clientItfName + " is already bound");
@@ -286,10 +286,10 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             //            if (PAGroup.isGroup(serverItf)) {
             //                serverComponentName = "a group of components ";
             //            } else {
-            //                serverComponentName = Fractal.getNameController((sItf).getFcItfOwner()).getFcName();
+            //                serverComponentName = GCM.getNameController((sItf).getFcItfOwner()).getFcName();
             //            }
             //
-            //            controllerLogger.debug("binding " + Fractal.getNameController(getFcItfOwner()).getFcName() + "." +
+            //            controllerLogger.debug("binding " + GCM.getNameController(getFcItfOwner()).getFcName() + "." +
             //                clientItfName + " to " + serverComponentName + "." + (sItf).getFcItfName());
             //        }
 
@@ -358,28 +358,28 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         }
 
         // Multicast bindings are handled here
-        if (Utils.isMulticastItf(clientItfName, owner)) {
-            if (Utils.isGathercastItf(sItf)) {
+        if (Utils.isGCMMulticastItf(clientItfName, owner)) {
+            if (Utils.isGCMGathercastItf(sItf)) {
                 //                Fractive.getMulticastController(owner)
                 //                .bindFcMulticast(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // no adaptor here
-                ((PAMulticastControllerImpl) ((PAInterface) Fractive.getMulticastController(owner))
-                        .getFcItfImpl()).bindFc(clientItfName, sItf);
+                ((PAMulticastControllerImpl) ((PAInterface) GCM.getMulticastController(owner)).getFcItfImpl())
+                        .bindFc(clientItfName, sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
                 try {
-                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                    if (Utils.getPAMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
                             PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The membrane of the owner of the server interface should be started");
                     }
                 } catch (NoSuchInterfaceException e) {
-                    //If the component doesn't have a ProActiveMembraneController, it won't have any impact on the rest of the method.
+                    //If the component doesn't have a PAMembraneController, it won't have any impact on the rest of the method.
                 }
-                Fractive.getGathercastController((sItf).getFcItfOwner()).notifyAddedGCMBinding(
+                GCM.getGathercastController((sItf).getFcItfOwner()).notifyAddedGCMBinding(
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
             } else {
-                PAMulticastController mc = Fractive.getMulticastController(owner);
+                MulticastController mc = GCM.getMulticastController(owner);
                 PAInterface pitf = (PAInterface) mc;
                 PAMulticastControllerImpl impl = (PAMulticastControllerImpl) pitf.getFcItfImpl();
                 impl.bindFc(clientItfName, sItf);
@@ -392,20 +392,20 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         if (isPrimitive()) {
             checkClientInterfaceExist(clientItfName);
             // binding operation is delegated
-            if (Utils.isGathercastItf(sItf)) {
+            if (Utils.isGCMGathercastItf(sItf)) {
                 primitiveBindFc(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
                 try {
-                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                    if (Utils.getPAMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
                             PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The membrane of the owner of the server interface should be started");
                     }
                 } catch (NoSuchInterfaceException e) {
-                    //If the component doesn't have a ProActiveMembraneController, it won't have any impact on the rest of the method.
+                    //If the component doesn't have a PAMembraneController, it won't have any impact on the rest of the method.
                 }
-                Fractive.getGathercastController((sItf).getFcItfOwner()).notifyAddedGCMBinding(
+                GCM.getGathercastController((sItf).getFcItfOwner()).notifyAddedGCMBinding(
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
             } else {
                 primitiveBindFc(clientItfName, sItf);
@@ -419,30 +419,29 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         client_itf_type = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName);
 
         if (isComposite()) {
-            if (Utils.isGathercastItf(sItf)) {
+            if (Utils.isGCMGathercastItf(sItf)) {
                 compositeBindFc(clientItfName, client_itf_type, getGathercastAdaptor(clientItfName,
                         serverItf, sItf));
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
                 try {
-                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                    if (Utils.getPAMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
                             PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The membrane of the owner of the server interface should be started");
                     }
                 } catch (NoSuchInterfaceException e) {
-                    //If the component doesn't have a ProActiveMembraneController, it won't have any impact on the rest of the method.
+                    //If the component doesn't have a PAMembraneController, it won't have any impact on the rest of the method.
                 }
-                Fractive.getGathercastController(sItf.getFcItfOwner()).notifyAddedGCMBinding(
-                        sItf.getFcItfName(), owner.getRepresentativeOnThis(), clientItfName);
+                GCM.getGathercastController(sItf.getFcItfOwner()).notifyAddedGCMBinding(sItf.getFcItfName(),
+                        owner.getRepresentativeOnThis(), clientItfName);
             } else {
                 compositeBindFc(clientItfName, client_itf_type, sItf);
             }
         }
     }
 
-    private PAInterface getGathercastAdaptor(String clientItfName, Object serverItf, PAInterface sItf)
-            throws NoSuchInterfaceException {
+    private PAInterface getGathercastAdaptor(String clientItfName, Object serverItf, PAInterface sItf) {
         // add an adaptor proxy for matching interface types
         Class<?> clientItfClass = null;
         try {
@@ -492,7 +491,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
      * binding method enforcing Interface type for the server interface, for composite components
      */
     private void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
-            throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
+            throws NoSuchInterfaceException {
         PAInterface clientItf = null;
         clientItf = (PAInterface) getFcItfOwner().getFcInterface(clientItfName);
         // TODO remove this as we should now use multicast interfaces for this purpose
@@ -534,20 +533,19 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             // delegate to primitive component
             BindingController user_binding_controller = (BindingController) ((PAComponent) getFcItfOwner())
                     .getReferenceOnBaseObject();
-            if (Utils.isGathercastItf((Interface) user_binding_controller.lookupFc(clientItfName))) {
-                PAInterface sItf = (PAInterface) user_binding_controller.lookupFc(clientItfName);
-
+            PAInterface sItf = (PAInterface) user_binding_controller.lookupFc(clientItfName);
+            if ((sItf != null) && Utils.isGCMGathercastItf(sItf.getFcItfName(), sItf.getFcItfOwner())) {
                 try {
-                    if (Fractive.getMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
+                    if (Utils.getPAMembraneController((sItf).getFcItfOwner()).getMembraneState().equals(
                             PAMembraneController.MEMBRANE_STOPPED)) {
                         throw new IllegalLifeCycleException(
                             "The client interface is bound to a component that has its membrane in a stopped state. It should be strated, as this method could interact with its controllers.");
                     }
                 } catch (NoSuchInterfaceException e) {
-                    //If the component doesn't have a ProActiveMembraneController, it won't have any impact on the rest of the method.
+                    //If the component doesn't have a PAMembraneController, it won't have any impact on the rest of the method.
                 }
 
-                Fractive.getGathercastController(sItf.getFcItfOwner()).notifyRemovedGCMBinding(
+                GCM.getGathercastController(sItf.getFcItfOwner()).notifyRemovedGCMBinding(
                         sItf.getFcItfName(), sItf.getFcItfOwner(), clientItfName);
             }
             user_binding_controller.unbindFc(clientItfName);
@@ -606,15 +604,15 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
     }
 
     protected void checkClientInterfaceName(String clientItfName) throws NoSuchInterfaceException {
-        if (Utils.hasSingleCardinality(clientItfName, owner)) {
+        if (Utils.isGCMSingletonItf(clientItfName, owner)) {
             return;
         }
 
-        if (Utils.pertainsToACollectionInterface(clientItfName, owner) != null) {
+        if (Utils.isGCMCollectionItf(clientItfName, owner)) {
             return;
         }
 
-        if (Utils.isMulticastItf(clientItfName, owner)) {
+        if (Utils.isGCMMulticastItf(clientItfName, owner)) {
             return;
         }
 
@@ -665,7 +663,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             bindings = (Bindings) c;
         } else {
             throw new ProActiveRuntimeException(
-                "ProActiveBindingControllerImpl : Impossible to duplicate the controller " + this +
+                "PABindingControllerImpl: Impossible to duplicate the controller " + this +
                     " from the controller" + c);
         }
     }
@@ -701,8 +699,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 }
             } else {
                 try {
-                    PAMulticastController mc = (PAMulticastController) getFcItfOwner().getFcInterface(
-                            Constants.MULTICAST_CONTROLLER);
+                    PAMulticastController mc = Utils.getPAMulticastController(getFcItfOwner());
                     if (mc.isBoundTo(curItf.getFcItfName(), serverItfsComponent))
                         return Boolean.valueOf(true);
                 } catch (NoSuchInterfaceException e) {
