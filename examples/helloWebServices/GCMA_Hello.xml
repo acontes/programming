@@ -7,7 +7,7 @@
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.dir" />
 
-		<descriptorVariable name="hostCapacity" value="2"/>
+		<descriptorVariable name="hostCapacity" value="1"/>
 		<descriptorVariable name="vmCapacity" value="1"/>
 	</environment>
 
@@ -15,6 +15,7 @@
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
+				<jvmarg value="-Dproactive.http.port=8081" />
 				<applicationClasspath>
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
 					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
@@ -23,7 +24,7 @@
 				</applicationClasspath>
 			</configuration>
 
-			<virtualNode id="Hello" capacity="2"/>
+			<virtualNode id="Hello" capacity="1"/>
 		</proactive>
 	</application>
 

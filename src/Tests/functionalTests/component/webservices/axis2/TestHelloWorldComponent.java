@@ -52,6 +52,8 @@ import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
 import org.objectweb.proactive.extensions.webservices.client.Client;
 import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.component.controller.AbstractPAWebServicesControllerImpl;
+import org.objectweb.proactive.extensions.webservices.component.controller.PAWebServicesController;
 import org.objectweb.proactive.extensions.webservices.exceptions.UnknownFrameWorkException;
 
 import functionalTests.FunctionalTest;
@@ -65,6 +67,7 @@ public class TestHelloWorldComponent extends FunctionalTest {
     private String url;
     private Component comp;
     private WebServices ws;
+    private PAWebServicesController wsc;
 
     @org.junit.Before
     public void deployHelloWorldComponent() {
@@ -83,18 +86,28 @@ public class TestHelloWorldComponent extends FunctionalTest {
                             .createFcItfType("good-bye-world", GoodByeWorldItf.class.getName(), false, false,
                                     false) });
 
-            comp = cf.newFcInstance(typeComp, new ControllerDescription("server", Constants.PRIMITIVE),
-                    new ContentDescription(HelloWorldComponent.class.getName(), null));
+            String controllersConfigFileLocation = AbstractPAWebServicesControllerImpl.getControllerFileUrl(
+                    "axis2").getPath();
+            ControllerDescription cd = new ControllerDescription("composite", Constants.PRIMITIVE,
+                controllersConfigFileLocation);
+            comp = cf.newFcInstance(typeComp, cd, new ContentDescription(HelloWorldComponent.class.getName(),
+                null));
 
             GCM.getGCMLifeCycleController(comp).startFc();
 
+            // Deploying the service in the Active Object way
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");
             ws = wsf.getWebServices(url);
-
             ws.exposeComponentAsWebService(comp, "server", new String[] { "hello-world" });
-
             ws.exposeComponentAsWebService(comp, "server2");
 
+            // Deploying the service using the web service controller
+            wsc = org.objectweb.proactive.extensions.webservices.component.Utils
+                    .getPAWebServicesController(comp);
+            wsc.initServlet();
+            wsc.setUrl(url);
+            wsc.exposeComponentAsWebService("server3", new String[] { "hello-world" });
+            wsc.exposeComponentAsWebService("server4");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -167,11 +180,79 @@ public class TestHelloWorldComponent extends FunctionalTest {
         }
     }
 
+    @org.junit.Test
+    public void testHelloWorldComponent2() {
+
+        ClientFactory cf = null;
+        try {
+            cf = AbstractClientFactory.getClientFactory("axis2");
+        } catch (UnknownFrameWorkException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+
+            Client client = cf.getClient(url, "server3_hello-world", HelloWorldItf.class);
+
+            client.oneWayCall("putHelloWorld", null);
+
+            boolean containsHello = (Boolean) client.call("contains", new Object[] { "Hello world!" },
+                    boolean.class)[0];
+
+            assertTrue(containsHello);
+
+            client.oneWayCall("putTextToSay", new Object[] { "Good bye world!" });
+
+            String text = (String) client.call("sayText", null, String.class)[0];
+            assertTrue(text.equals("Hello world!"));
+
+            text = (String) client.call("sayText", null, String.class)[0];
+            assertTrue(text.equals("Good bye world!"));
+
+            text = (String) client.call("sayText", null, String.class)[0];
+            assertTrue(text.equals("The list is empty"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+
+            Client client = cf.getClient(url, "server4_hello-world", HelloWorldItf.class);
+
+            client.oneWayCall("putTextToSay", new Object[] { "Hi ProActive Team!" });
+
+            String text = (String) client.call("sayText", null, String.class)[0];
+            assertTrue(text.equals("Hi ProActive Team!"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+            Client client = cf.getClient(url, "server4_good-bye-world", GoodByeWorldItf.class);
+
+            client.oneWayCall("putGoodByeWorld", null);
+
+            String text = (String) client.call("sayText", null, String.class)[0];
+            assertTrue(text.equals("Good bye world!"));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
+
     @org.junit.After
     public void undeployHelloWorldComponent() {
         try {
             ws.unExposeComponentAsWebService("server", new String[] { "hello-world" });
             ws.unExposeComponentAsWebService(this.comp, "server2");
+            wsc.unExposeComponentAsWebService("server3", new String[] { "hello-world" });
+            wsc.unExposeComponentAsWebService("server4");
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

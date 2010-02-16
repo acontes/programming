@@ -54,6 +54,8 @@ import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
 import org.objectweb.proactive.extensions.webservices.client.Client;
 import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
+import org.objectweb.proactive.extensions.webservices.component.controller.AbstractPAWebServicesControllerImpl;
+import org.objectweb.proactive.extensions.webservices.component.controller.PAWebServicesController;
 
 import functionalTests.FunctionalTest;
 import functionalTests.component.webservices.common.ChooseNameComponent;
@@ -71,6 +73,7 @@ public class TestCompositeComponent extends FunctionalTest {
 
     private String url;
     private WebServices ws;
+    private PAWebServicesController wsc;
 
     @org.junit.Before
     public void deployComposite() {
@@ -99,8 +102,11 @@ public class TestCompositeComponent extends FunctionalTest {
                     "choose-name", ChooseNameItf.class.getName(), false, false, false) });
 
             // create server component
-            comp = cf.newFcInstance(typeComp, new ControllerDescription("composite", Constants.COMPOSITE),
-                    null);
+            String controllersConfigFileLocation = AbstractPAWebServicesControllerImpl.getControllerFileUrl(
+                    "axis2").getPath();
+            ControllerDescription cd = new ControllerDescription("composite", Constants.COMPOSITE,
+                controllersConfigFileLocation);
+            comp = cf.newFcInstance(typeComp, cd, null);
             hello = cf.newFcInstance(typeHello, new ControllerDescription("hello", Constants.PRIMITIVE),
                     new ContentDescription(HelloNameComponent.class.getName(), null));
             chooseName = cf.newFcInstance(typeChoose, new ControllerDescription("choosename",
@@ -116,10 +122,17 @@ public class TestCompositeComponent extends FunctionalTest {
             bc.bindFc("choose-name", chooseName.getFcInterface("choose-name"));
             GCM.getGCMLifeCycleController(comp).startFc();
 
+            // Deploying the service in the Active Object way
             WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");
             ws = wsf.getWebServices(url);
             ws.exposeComponentAsWebService(comp, "composite", new String[] { "hello-name" });
 
+            // Deploying the service using the web service controller
+            wsc = org.objectweb.proactive.extensions.webservices.component.Utils
+                    .getPAWebServicesController(comp);
+            wsc.initServlet();
+            wsc.setUrl(url);
+            wsc.exposeComponentAsWebService("composite2", new String[] { "hello-name" });
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);
@@ -146,10 +159,26 @@ public class TestCompositeComponent extends FunctionalTest {
         }
     }
 
+    @org.junit.Test
+    public void testComposite2() {
+
+        try {
+            ClientFactory cf = AbstractClientFactory.getClientFactory("axis2");
+            Client client = cf.getClient(url, "composite2_hello-name", HelloNameItf.class);
+            int index = 0;
+            String result = (String) client.call("helloName", new Object[] { index }, String.class)[0];
+            assertTrue(result.equals("Hello ProActive Team!"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
+
     @org.junit.After
     public void undeployComposite() {
         try {
             ws.unExposeComponentAsWebService("composite", new String[] { "hello-name" });
+            wsc.unExposeComponentAsWebService("composite2", new String[] { "hello-name" });
         } catch (Exception e) {
             e.printStackTrace();
             assertTrue(false);

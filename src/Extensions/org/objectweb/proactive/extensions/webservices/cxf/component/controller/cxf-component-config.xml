@@ -2,7 +2,6 @@
 <componentConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:noNamespaceSchemaLocation="component-config.xsd"
  name="defaultConfiguration">
- <!--  This is the default configuration file for the controllers and interceptors of a component in the proactive implementation.-->
     <controllers>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.PABindingController</interface>
@@ -14,7 +13,7 @@
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController</interface>
-            <implementation>org.objectweb.proactive.extensions.webservices.cxf.initialization.CXFPALifeCycleControllerImpl</implementation>
+            <implementation>org.objectweb.proactive.core.component.controller.PAGCMLifeCycleControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.controller.PASuperController</interface>
@@ -39,6 +38,10 @@
         <controller>
             <interface>org.etsi.uri.gcm.api.control.MonitorController</interface>
             <implementation>org.objectweb.proactive.core.component.controller.PAMonitorControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.extensions.webservices.component.controller.PAWebServicesController</interface>
+            <implementation>org.objectweb.proactive.extensions.webservices.cxf.component.controller.PAWebServicesControllerImpl</implementation>
         </controller>
     </controllers>
 
