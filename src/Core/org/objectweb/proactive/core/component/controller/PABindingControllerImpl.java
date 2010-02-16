@@ -347,12 +347,12 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 }
             }
             if (!isSubComponent) {
-                throw new IllegalBindingException("could not bind internal client interface " +
-                    clientItfName + " of component " + GCM.getNameController(getFcItfOwner()).getFcName() +
-                    " on interface " + sItf.getFcItfName() + " of component " +
-                    GCM.getNameController(sItf.getFcItfOwner()).getFcName() + " because " +
-                    GCM.getNameController(sItf.getFcItfOwner()).getFcName() + " is not a subcomponent of " +
-                    GCM.getNameController(getFcItfOwner()).getFcName());
+                throw new IllegalBindingException(
+                    "could not bind internal client interface " +
+                        clientItfName +
+                        " on server interface " +
+                        sItf.getFcItfName() +
+                        " : the component owner of the server interface is not a subcomponent of the component owner of the internal client interface.");
             }
         }
 
