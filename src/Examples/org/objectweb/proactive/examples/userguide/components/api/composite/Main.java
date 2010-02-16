@@ -45,6 +45,7 @@ import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.fractal.api.control.ContentController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -92,6 +93,15 @@ public class Main {
 
         Component composite = gf.newFcInstance(tComposite, new ControllerDescription("composite",
             Constants.COMPOSITE), null);
+
+        // TODO: Add slave and master components to the composite component
+        //@tutorial-break
+        //@snippet-break api_composite_Main_skeleton
+        ContentController cc = GCM.getContentController(composite);
+        cc.addFcSubComponent(slave);
+        cc.addFcSubComponent(master);
+        //@snippet-resume api_composite_Main_skeleton
+        //@tutorial-resume
 
         // TODO: Do the bindings
         //@tutorial-break
