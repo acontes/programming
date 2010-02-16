@@ -256,6 +256,16 @@ public class Utils {
     }
 
     /**
+     * Checks whether a component interface is a client interface.
+     *
+     * @param itfName Component interface.
+     * @return True if the given interface is a client interface.
+     */
+    public static boolean isGCMClientItf(Interface itf) {
+        return ((GCMInterfaceType) itf.getFcItfType()).isFcClientItf();
+    }
+
+    /**
      * Returns the cardinality of the given component interface name.
      *
      * @param itfName Component interface name.
@@ -323,6 +333,18 @@ public class Utils {
      */
     public static boolean isGCMCollectiveItf(Interface itf) {
         return ((PAGCMInterfaceType) itf.getFcItfType()).isGCMCollectiveItf();
+    }
+
+    /**
+     * Checks whether a component interface is a client interface.
+     *
+     * @param itfName Component interface name.
+     * @param owner Reference on the component owner of the given component interface name.
+     * @return True if the given interface is a client interface.
+     * @throws NoSuchInterfaceException If the component has no such component interface name.
+     */
+    public static boolean isGCMClientItf(String itfName, Component owner) throws NoSuchInterfaceException {
+        return isGCMClientItf((Interface) owner.getFcInterface(itfName));
     }
 
     /**

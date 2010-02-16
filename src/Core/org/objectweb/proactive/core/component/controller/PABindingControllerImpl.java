@@ -335,6 +335,27 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             return;
         }
 
+        // checks binding from internal client interface of composite component to server interface of subcomponent
+        if (isComposite() && !Utils.isGCMClientItf(clientItfName, getFcItfOwner())) {
+            Component sComponent = sItf.getFcItfOwner();
+            Component[] subComponents = GCM.getContentController(getFcItfOwner()).getFcSubComponents();
+            boolean isSubComponent = false;
+            for (Component subComponent : subComponents) {
+                if (subComponent.equals(sComponent)) {
+                    isSubComponent = true;
+                    break;
+                }
+            }
+            if (!isSubComponent) {
+                throw new IllegalBindingException("could not bind internal client interface " +
+                    clientItfName + " of component " + GCM.getNameController(getFcItfOwner()).getFcName() +
+                    " on interface " + sItf.getFcItfName() + " of component " +
+                    GCM.getNameController(sItf.getFcItfOwner()).getFcName() + " because " +
+                    GCM.getNameController(sItf.getFcItfOwner()).getFcName() + " is not a subcomponent of " +
+                    GCM.getNameController(getFcItfOwner()).getFcName());
+            }
+        }
+
         // if output interceptors are defined
         // TODO_M check with groups : interception is here done at the beginning
         // of the group invocation,
@@ -360,8 +381,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         // Multicast bindings are handled here
         if (Utils.isGCMMulticastItf(clientItfName, owner)) {
             if (Utils.isGCMGathercastItf(sItf)) {
-                //                Fractive.getMulticastController(owner)
-                //                .bindFcMulticast(clientItfName, getGathercastAdaptor(clientItfName, serverItf, sItf));
                 // no adaptor here
                 ((PAMulticastControllerImpl) ((PAInterface) GCM.getMulticastController(owner)).getFcItfImpl())
                         .bindFc(clientItfName, sItf);
@@ -383,8 +402,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 PAInterface pitf = (PAInterface) mc;
                 PAMulticastControllerImpl impl = (PAMulticastControllerImpl) pitf.getFcItfImpl();
                 impl.bindFc(clientItfName, sItf);
-                //((MulticastControllerImpl) Fractive.getMulticastController(owner))
-                // .bindFc(clientItfName, sItf);
             }
             return;
         }
