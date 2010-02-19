@@ -608,13 +608,12 @@
             </mediaobject>
          </figure>
 			<para>
-				Thus, for prioritize non functional requests, a new
-				controller,
+				Thus, for prioritize non functional requests, the
 				<literal>
-					org.objectweb.proactive.core.component.controller.PriorityController
-				</literal>,
-				has to be used:
-				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/prioritycontroller.snip"/></textobject></programlisting>
+					org.etsi.uri.gcm.api.control.PriorityController
+				</literal>
+				controller has to be used:
+				<programlisting language="java"><textobject><textdata fileref="code_snippets/PriorityController.java"/></textobject></programlisting>
 			</para>
 		</section>
 
