@@ -38,7 +38,6 @@ package org.objectweb.proactive.examples.documentation.webservices;
 
 import java.io.File;
 
-import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.InitActive;
 import org.objectweb.proactive.api.PAActiveObject;
