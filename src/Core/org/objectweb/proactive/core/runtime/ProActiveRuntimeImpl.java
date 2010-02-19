@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -480,7 +481,8 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         }
 
         try {
-            LocalNode localNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName);
+            LocalNode localNode = new LocalNode(nodeName, jobId, nodeSecurityManager, vnName,
+                replacePreviousBinding);
             if (replacePreviousBinding && (this.nodeMap.get(nodeName) != null)) {
                 localNode.setActiveObjects(this.nodeMap.get(nodeName).getActiveObjectsId());
                 this.nodeMap.remove(nodeName);

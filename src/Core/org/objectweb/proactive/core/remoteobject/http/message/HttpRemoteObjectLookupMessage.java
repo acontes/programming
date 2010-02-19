@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -45,6 +46,7 @@ import org.objectweb.proactive.core.remoteobject.http.HTTPRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.http.HttpRemoteObjectImpl;
 import org.objectweb.proactive.core.remoteobject.http.util.HTTPRegistry;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMessage;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -86,7 +88,8 @@ public class HttpRemoteObjectLookupMessage extends HttpMessage implements Serial
     @Override
     public Object processMessage() {
         if (this.urn != null) {
-            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance().lookup(url);
+            InternalRemoteRemoteObject irro = HTTPRegistry.getInstance().lookup(
+                    URIBuilder.getNameFromURI(url));
 
             //            System.out.println("HttpRemoteObjectLookupMessage.processMessage() ++ ro at " + url +" : " +ro) ;
             if (irro != null) {

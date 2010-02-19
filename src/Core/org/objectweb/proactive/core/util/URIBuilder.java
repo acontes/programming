@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -81,8 +82,15 @@ public class URIBuilder {
         }
     }
 
+    /**
+     * returns a new URI where the name part has been set to name
+     * @param baseURI the base URI
+     * @param name the new name
+     * @return the new URI which the new name part
+     */
     public static URI buildURI(URI baseURI, String name) {
-        return URI.create(baseURI.toString() + name);
+        return buildURI(getHostNameFromUrl(baseURI), name, getProtocol(baseURI), getPortNumber(baseURI),
+                false);
     }
 
     /**
