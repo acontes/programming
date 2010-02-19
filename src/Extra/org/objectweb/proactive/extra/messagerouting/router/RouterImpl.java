@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -296,7 +297,7 @@ public class RouterImpl extends RouterInternal implements Runnable {
             Collection<Client> clients = clientMap.values();
             tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
         }
-        logger.debug("Client " + sc.socket() + " disconnected");
+        logger.debug("Client " + attachment.getRemoteEndpoint() + " disconnected");
 
     }
 
@@ -356,6 +357,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
         public void run() {
             for (Client client : this.clients) {
+                if (this.disconnectedAgent.equals(client.getAgentId()))
+                    continue;
+
                 ErrorMessage error = new ErrorMessage(ErrorType.ERR_DISCONNECTION_BROADCAST, client
                         .getAgentId(), this.disconnectedAgent, 0);
                 try {

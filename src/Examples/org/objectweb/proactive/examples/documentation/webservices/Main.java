@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -50,11 +51,15 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.examples.documentation.classes.B;
 import org.objectweb.proactive.examples.documentation.components.A;
 import org.objectweb.proactive.examples.documentation.components.AImpl;
+import org.objectweb.proactive.examples.webservices.helloWorld.GoodByeWorldItf;
 import org.objectweb.proactive.examples.webservices.helloWorld.HelloWorld;
+import org.objectweb.proactive.examples.webservices.helloWorld.HelloWorldComponent;
+import org.objectweb.proactive.examples.webservices.helloWorld.HelloWorldItf;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
@@ -125,12 +130,47 @@ public class Main {
                     "putTextToSay", "sayText" });
             //@snippet-end webservices_AO_2
 
+            //@snippet-start webservices_Component_4
+            Component componentBoot = Utils.getBootstrapComponent();
+
+            GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(componentBoot);
+            GenericFactory genericFactory = GCM.getGenericFactory(componentBoot);
+
+            // type of server component
+            ComponentType componentType = typeFactory.createFcType(new InterfaceType[] {
+                    typeFactory.createFcItfType("hello-world", HelloWorldItf.class.getName(), false, false,
+                            false),
+                    typeFactory.createFcItfType("goodbye-world", GoodByeWorldItf.class.getName(), false,
+                            false, false) });
+
+            // create server component
+            Component helloWorld = genericFactory.newFcInstance(componentType, new ControllerDescription(
+                "server", Constants.PRIMITIVE), new ContentDescription(HelloWorldComponent.class.getName()));
+            //start the component
+            GCM.getGCMLifeCycleController(helloWorld).startFc();
+
+            // If you want the default WebServicesFactory, you can use
+            // WebServicesFactory.getDefaultWebServicesFactory()
+            WebServicesFactory webServicesFactory = AbstractWebServicesFactory.getWebServicesFactory("cxf");
+
+            // If you want to use the local Jetty server, you can use
+            // AbstractWebServicesFactory.getLocalUrl() to get its url with
+            // its port number (which is random except if you have set the
+            // proactive.http.port variable)
+            WebServices webservices = webServicesFactory.getWebServices("http://localhost:8080/");
+
+            // If you want to expose only the goodbye-world interface for example, 
+            // use the following line instead:
+            // webservices.exposeComponentAsWebService(helloWorld, "MyHelloWorldComponentService", new String[] { "goodbye-world" });
+            webservices.exposeComponentAsWebService(helloWorld, "MyHelloWorldComponentService");
+            //@snippet-end webservices_Component_4
+
             //@snippet-start webservices_AO_3
             // Instead of using "cxf", you can also use wsf.getFrameWorkId()
             // in order to be sure to get the same framework as the service
             // has used to be exposed. However, you can call a cxf service
             // using an axis2 client but there exists some incompatibility
-            // between these two framework.
+            // between these two frameworks.
             // If you want the default ClientFactory, you can use
             // ClientFactory.getDefaultClientFactory()
             ClientFactory clientFactory = AbstractClientFactory.getClientFactory("cxf");
@@ -150,7 +190,43 @@ public class Main {
 
             // Call with no argument
             res = client.call("sayText", null, String.class);
+
+            System.out.println((String) res[0]);
+
+            // Call with no argument
+            res = client.call("sayText", null, String.class);
+
+            System.out.println((String) res[0]);
             //@snippet-end webservices_AO_3
+
+            //@snippet-start webservices_Component_5
+            // Instead of using "cxf", you can also use webServicesFactory.getFrameWorkId()
+            // in order to be sure to get the same framework as the service
+            // has used to be exposed. However, you can call a cxf service
+            // using an axis2 client but there exists some incompatibility
+            // between these two frameworks.
+            // If you want the default ClientFactory, you can use
+            // ClientFactory.getDefaultClientFactory()
+            ClientFactory cFactory = AbstractClientFactory.getClientFactory("cxf");
+
+            // Instead of using "http://localhost:8080/", you can use ws.getUrl() to
+            // ensure to get to good service address.
+            Client serviceClient = cFactory.getClient("http://localhost:8080/",
+                    "MyHelloWorldComponentService_goodbye-world", GoodByeWorldItf.class);
+
+            // Call which returns a result
+            Object[] result = serviceClient.call("goodByeWorld", new Object[] { "ProActive Team" },
+                    String.class);
+            System.out.println((String) result[0]);
+
+            // Call which does not return a result
+            serviceClient.oneWayCall("setText", new Object[] { "Hi ProActive Team!" });
+
+            // Call with no argument
+            result = serviceClient.call("sayText", null, String.class);
+
+            System.out.println((String) result[0]);
+            //@snippet-end webservices_Component_5
         } catch (ActiveObjectCreationException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -241,17 +242,18 @@ public class FunctionalTest {
 
     static private void killProActiveWithJPS() throws IOException {
         String javaHome = System.getProperty("java.home");
-        File jpsBin = null;
-        switch (OperatingSystem.getOperatingSystem()) {
+        final OperatingSystem os = OperatingSystem.getOperatingSystem();
+        String jpsFilename = null;
+        switch (os) {
             case unix:
-                jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
-                    "jps");
+                jpsFilename = "jps";
                 break;
             case windows:
-                jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
-                    "jps.exe");
+                jpsFilename = "jps.exe";
                 break;
         }
+        File jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
+            jpsFilename);
         if (!jpsBin.exists()) {
             throw new FileNotFoundException("JPS not found: " + jpsBin.toString());
         }
@@ -268,12 +270,23 @@ public class FunctionalTest {
 
                 String pid = line.substring(0, line.indexOf(" "));
                 Process kill = null;
-                switch (OperatingSystem.getOperatingSystem()) {
+                switch (os) {
                     case unix:
                         kill = Runtime.getRuntime().exec(new String[] { "kill", "-9", pid });
                         break;
                     case windows:
                         kill = Runtime.getRuntime().exec(new String[] { "taskkill", "/PID", pid });
+                        // If the the exit value is incorrect try tskill command
+                        int exitValue = -1;
+                        try {
+                            exitValue = kill.waitFor();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Thread.currentThread().interrupt();
+                        }
+                        if (exitValue != 0) {
+                            kill = Runtime.getRuntime().exec(new String[] { "tskill", pid });
+                        }
                         break;
                     default:
                         logger.info("Unsupported operating system");
