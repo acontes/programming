@@ -36,6 +36,7 @@ public interface PAWebServicesController {
     public void initServlet(Node... nodes) throws ActiveObjectCreationException, NodeException,
             UnknownFrameWorkException;
 
+    //@snippet-start PAWebServicesController_expose_methods
     /**
      * Expose a component as a web service. Each server interface of the component
      * will be accessible by  the urn [componentName]_[interfaceName].
@@ -77,4 +78,5 @@ public interface PAWebServicesController {
      */
     public void unExposeComponentAsWebService(String componentName, String[] interfaceNames)
             throws WebServicesException;
+    //@snippet-end PAWebServicesController_expose_methods
 }

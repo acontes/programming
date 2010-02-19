@@ -568,6 +568,8 @@ arg: hello - world</screen>
                <listitem><para>Create the Master component type as you created the Slave component type in the previous tutorial.
                Hint: in that case, there are two interfaces (one client and one server interface)</para></listitem>
                <listitem><para>Instantiate the Master component</para></listitem>
+			   <listitem><para>Add the two sub-components (master and slave) to the composite. Hint: use the <literal>GCM.getContentController()</literal> 
+			   static method to get a <literal>ContentController</literal> and use it to add these sub-components.</para></listitem>
                <listitem><para>Do the bindings. Hint: For doing a binding, you should first get the <literal>BindingController</literal> of the component containing the client interface
                you want to bind and then, call the method <literal>bindFc()</literal> on it. To get the <literal>BindingController</literal>, use the
                <literal>Fractal.getBindingController()</literal> mehtod.</para></listitem>

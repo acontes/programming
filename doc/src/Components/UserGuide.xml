@@ -249,7 +249,7 @@
 				Components are deployed on the virtual node that is
 				specified in their definition. It has to appear in the
 				deployment descriptor
-				<emphasis role="underline">unless</emphasis>
+				<emphasis role="bold">unless</emphasis>
 				this virtual node is exported. In this case, the name of
 				the exported virtual node should appear in the
 				deployment descriptor, unless this exported virtual node
@@ -2032,7 +2032,16 @@ Node node = vns.get("VN1").getANode();</programlisting>
 
 
 
-			<section xml:id="Stepstoexposeanactiveobjectasa_29"><info><title>Steps to expose or unexpose a component as a web services</title></info>
+			<section xml:id="Stepstoexposeanactiveobjectasa_29"><info><title>Steps to expose/unexpose a component as a web services using the <literal>WebServices</literal> interface</title></info>
+
+				<para>
+					There are two ways of exposing and unexposing a component as a web service: 
+					the first one is the same as we can do with active objects and the second
+					one uses the <literal>PAWebServicesController</literal>, 
+					which is a component controller dedicated to the web services exposition.
+					This section deals with the first method.  
+				</para>
+
 
 				<para>The steps for exporting and using a component as a web service
 				are the following:</para>
@@ -2046,11 +2055,11 @@ Node node = vns.get("VN1").getANode();</programlisting>
 
 					<listitem>
 						<para>Once the element created and activated, a <emphasis role="bold">WebServicesFactory</emphasis> object has to be instantiated: </para>
-						<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("axis2");</programlisting>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_6.snip" /></textobject></programlisting>
 						<para>or</para>
-						<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory("cxf");</programlisting>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_8.snip" /></textobject></programlisting>
 						<para>or else</para>
-						<programlisting language="java">WebServicesFactory wsf = AbstractWebServicesFactory.getDefaultWebServicesFactory();</programlisting>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_7.snip" /></textobject></programlisting>
 					</listitem>
 					<listitem>
 						<para>Then, you have to instantiate a <emphasis role="bold">WebServices</emphasis> object as follows: </para>
@@ -2086,6 +2095,63 @@ Node node = vns.get("VN1").getANode();</programlisting>
 				</itemizedlist>
 			</section>
 
+			<section xml:id="Stepstoexposeanactiveobjectasa_30"><info><title>Steps to expose/unexpose a component as a web services using <literal>PAWebServicesController</literal></title></info>
+
+				<para>
+					As said in the previous section, it is possible to expose web services in two differents manners.
+					This section explains how to proceed with the dedicated web services controller.
+				</para>
+
+
+				<itemizedlist>
+					<listitem>
+						<para>First, write your component with the web service controller:</para>
+
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_11.snip" /></textobject></programlisting>
+						<para>
+
+							The first line is meant to retrieve the path of the controller file.
+							This file is located at 
+							<literal>"&lt;your ProActive Home&gt;/src/Extensions/org/objectweb/proactive/extensions/webservices/axis2/initialization/axis2-component-config.xml"</literal>
+							or at
+							<literal>"&lt;your ProActive Home&gt;/src/Extensions/org/objectweb/proactive/extensions/webservices/cxf/initialization/cxf-component-config.xml"</literal>
+							for the cxf controller.
+						</para>
+					</listitem>
+
+					<listitem>
+						<para>Then, get the controller to be able to use it:</para>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_12.snip" /></textobject></programlisting>
+					</listitem>
+					<listitem>
+						<para>Then, you have to set the url where you want the controller exposes the service:</para>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_13.snip" /></textobject></programlisting>
+						<para>If you want to use the local Jetty server to expose your component, you can use the following line
+						to retrieve the good URL:</para>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_14.snip" /></textobject></programlisting>
+						<para>This will get the Jetty port which is a random port and build the url.</para>
+					</listitem>
+					<listitem>
+						<para>And finally, you can used one of the <literal>PAWebServicesController</literal> methods: </para>
+						<programlisting language="java"><textobject><textdata fileref="automatic_snippets/PAWebServicesController_expose_methods.snip" /></textobject></programlisting>
+
+						<para>where:</para>
+
+						<itemizedlist>
+							<listitem>
+								<para><emphasis role="bold">componentName</emphasis> the first part of the service name
+								which will identify the component on the server. The service will be exposed at the address
+								http://[host]:[port]/proactive/services/componentName_interfaceName</para>
+							</listitem>
+							<listitem>
+								<para><emphasis role="bold">interfaceNames</emphasis> is a String array
+								containing the interfaces of the component you want to make accessible. If
+								this parameters is null (or is absent), all the functional server interfaces of the component will be exposed.</para>
+							</listitem>
+						</itemizedlist>
+					</listitem>
+				</itemizedlist>
+			</section>
 			<section xml:id="exposeonremotejettyservers_29"><info><title>Exposing as a web service on remote Jetty servers launched during the deployment</title></info>
 				<para>
 				When you call the exposition of your component,
@@ -2102,40 +2168,27 @@ Node node = vns.get("VN1").getANode();</programlisting>
 				where your object has been initialized. Thus, you just have to instantiate your component using this implementation of <literal>InitActive</literal>.
 				</para>
 
-				<programlisting language="java">// Get the Axis2 InitActive in charge of deploying the Axis2 Servlet
-				InitActive axis2InitActive = WebServicesInitActiveFactory.getInitActive("axis2");
-				Component myComponent = myGenericFactory.newFcInstance(myComponentType,
-				new ControllerDescription("myControllerName", Constants.PRIMITIVE),
-				new ContentDescription(MyComponent.class.getName(), null, axis2InitActive, null), myNode);</programlisting>
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_9.snip" /></textobject></programlisting>
 
 				<para>
-				There exists another way to do that using controllers. Indeed, the webservice extension also provides a customized controller
-				that will deploy the chosen servlet at component start.
+					If you have chosen to use the <literal>PAWebServicesController</literal> controller, you do not need to modified your component instantiation
+					but instead, before the first exposition, you just have to call the following method on the controller:
 				</para>
 
-				<para>So, you can proceed as follows:</para>
-
-				<programlisting language="java">ControllerDescription cd = new ControllerDescription("myControllerName", Constants.PRIMITIVE,
-				"&lt;your ProActive Home&gt;/src/Extensions/" +
-				"org/objectweb/proactive/extensions/webservices/cxf/initialization/cxf-component-config.xml");
-				Component myComp = myGenericFactory.newFcInstance(myComponentType, cd,
-				new ContentDescription(MyComponent.class.getName()));</programlisting>
-
-				<para>
-				The <literal>cxf-component-config.xml</literal> file just redefines the controller to be the
-				<literal>org.objectweb.proactive.extensions.webservices.cxf.initialization.CXFProActiveLifeCycleControllerImpl</literal>.
-				For using the <literal>org.objectweb.proactive.extensions.webservices.axis2.initialization.Axis2ProActiveLifeCycleControllerImpl</literal>,
-				use the file located at <literal>"&lt;your ProActive Home&gt;/src/Extensions/org/objectweb/proactive/extensions/webservices/axis2/initialization/axis2-component-config.xml"</literal>
-				</para>
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_16.snip" /></textobject></programlisting>
 
 				<para>
 				Now, let us assume that your component is deployed on a node or locally and that you want to expose it on a host where another node is deployed.
 				On this host, there is only a running Jetty server without any web services servlet.
-				In order to deploy the CXF or Axis2 servlet on it, you can use the following code:
+				If you are using the web services controller, it is really straight forward. You just have to put a node as an argument of the previous method:
 				</para>
 
-				<programlisting language="java">WebServicesInitActiveFactory.getInitActive("cxf").initServlet(myNode);</programlisting>
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_17.snip" /></textobject></programlisting>
 
+				<para>
+					If you are not using the controller, you can use the following line:
+				</para>
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_AO_8.snip" /></textobject></programlisting>
 				<para>
 				Then, you can expose your component as a web service as in <xref linkend="Stepstoexposeanactiveobjectasa_29"/>.
 				</para>
@@ -2209,6 +2262,11 @@ Node node = vns.get("VN1").getANode();</programlisting>
 					The following piece of code creates the component and exposes its interfaces as a web services.
 				</para>
 				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_4.snip" /></textobject></programlisting>
+
+				<para>
+					If you want to use the web service controller, you should write the following line:
+				</para>
+				<programlisting language="java"><textobject><textdata fileref="automatic_snippets/webservices_Component_18.snip" /></textobject></programlisting>
 
 				<para>All the interfaces (<literal>hello-world</literal> and <literal>goodbye-world</literal>) of the component <literal>helloWorld</literal> have been deployed as web
 				services on the web server located at
