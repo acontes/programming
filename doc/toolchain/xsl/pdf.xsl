@@ -192,7 +192,7 @@
 		<xsl:variable name="line">
 			<fo:inline keep-with-next.within-line="always">
 				<xsl:choose>
-					<xsl:when test="self::chapter or self::appendix or self::bibliography or self::index">
+					<xsl:when test="self::chapter or self::appendix or self::bibliography or self::index or self::preface">
 						<xsl:attribute name="font-weight">
 							bold
 						</xsl:attribute>
@@ -222,8 +222,7 @@
 					</xsl:variable>
 					<xsl:if test="$toc_line_name = 'chapter' or $toc_line_name = 'part'  or $toc_line_name = 'appendix'">
 						<xsl:call-template name="gentext">
-							<xsl:with-param name="key" select="$toc_line_name">
-							</xsl:with-param>
+							<xsl:with-param name="key" select="$toc_line_name"/>
 						</xsl:call-template>
 						<xsl:call-template name="gentext.space">
 						</xsl:call-template>
@@ -256,6 +255,12 @@
 			</xsl:when>
 			<xsl:when test="self::chapter or self::appendix or self::bibliography or self::index">
 				<fo:block end-indent="{$toc.indent.width}pt" last-line-end-indent="-{$toc.indent.width}pt" space-after="1mm" space-before="3mm" text-align-last="justify">
+					<xsl:copy-of select="$line">
+					</xsl:copy-of>
+				</fo:block>
+			</xsl:when>
+			<xsl:when test="self::preface">
+				<fo:block end-indent="{$toc.indent.width}pt" last-line-end-indent="-{$toc.indent.width}pt" space-after="0mm" space-before="8mm" text-align-last="justify">
 					<xsl:copy-of select="$line">
 					</xsl:copy-of>
 				</fo:block>
@@ -752,13 +757,13 @@
 	<xsl:template name="book.version">
 		<fo:block space-after="50mm" text-align="center" font-size="12pt" font-weight="bold">
 			<xsl:text>Version</xsl:text>
-			<xsl:call-template name="gentext.space" />
-			<xsl:copy-of select="$VERSION" />
+			<xsl:call-template name="gentext.space"/>
+			<xsl:copy-of select="$VERSION"/>
 			<xsl:if test="not($RELEASEDATE = 'RELEASE DATE NOT SET')">
-				<xsl:call-template name="gentext.space" />
+				<xsl:call-template name="gentext.space"/>
 				<xsl:text>-</xsl:text>
-				<xsl:call-template name="gentext.space" />
-				<xsl:copy-of select="$RELEASEDATE" />
+				<xsl:call-template name="gentext.space"/>
+				<xsl:copy-of select="$RELEASEDATE"/>
 			</xsl:if>
 			<!--This variable is passed as a parameter in the ant task-->
 		</fo:block>
@@ -781,7 +786,7 @@
 			</fo:block>
 			<!-- The Version -->
 			<fo:block text-align="center">
-				<xsl:call-template name="book.version" />
+				<xsl:call-template name="book.version"/>
 			</fo:block>
 			<!-- The author's name -->
 			<fo:block space-before="10mm" text-align="center">
@@ -802,7 +807,7 @@
 							<fo:block text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-INRIA.png
+										images/png/logo-INRIA.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										40px
@@ -817,7 +822,7 @@
 							<fo:block text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-UNSA.png
+										images/png/logo-UNSA.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										40px
@@ -832,7 +837,7 @@
 							<fo:block text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-CNRS.png
+										images/png/logo-CNRS.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										45px
@@ -848,8 +853,8 @@
 			</fo:table>
 			<!-- The Revision and copyright -->
 			<fo:table space-before="5mm" table-layout="fixed" width="100%">
-				<fo:table-column column-width="proportional-column-width(1)" />
-				<fo:table-column column-width="proportional-column-width(1)" />
+				<fo:table-column column-width="proportional-column-width(1)"/>
+				<fo:table-column column-width="proportional-column-width(1)"/>
 				<fo:table-body>
 					<fo:table-row>
 						<!-- The ObjectWeb Logo -->
@@ -857,7 +862,7 @@
 							<fo:block space-after="15mm" text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-OW2.png
+										images/png/logo-OW2.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										25pt
@@ -872,7 +877,7 @@
 							<fo:block space-after="15mm" text-align="center">
 								<fo:external-graphic>
 									<xsl:attribute name="src">
-										images/logo-ActiveEon.png
+										images/png/logo-ActiveEon.png
 									</xsl:attribute>
 									<xsl:attribute name="height">
 										35pt
@@ -887,25 +892,23 @@
 				</fo:table-body>
 			</fo:table>
 			<fo:table space-before="5mm" table-layout="fixed" width="100%">
-				<fo:table-column column-width="30%" />
-				<fo:table-column column-width="70%" />
+				<fo:table-column column-width="30%"/>
+				<fo:table-column column-width="70%"/>
 				<fo:table-body>
 					<fo:table-row>
 						<fo:table-cell>
 							<fo:block text-align="left" font-size="10pt" font-style="italic">
 								<xsl:text>Generated</xsl:text>
-								<xsl:call-template name="gentext.space" />
+								<xsl:call-template name="gentext.space"/>
 								<xsl:text>on</xsl:text>
-								<xsl:call-template name="gentext.space" />
-								<xsl:copy-of select="$TODAY" />
+								<xsl:call-template name="gentext.space"/>
+								<xsl:copy-of select="$TODAY"/>
 								<!--This variable is passed as a parameter in the ant task-->
 							</fo:block>
 						</fo:table-cell>
 						<fo:table-cell>
-							<fo:block text-align="right"
-								font-size="10pt" font-weight="italic">
-								<xsl:apply-templates
-									mode="book.titlepage.recto.mode" select="bookinfo/copyright" />
+							<fo:block text-align="right" font-size="10pt" font-weight="italic">
+								<xsl:apply-templates mode="book.titlepage.recto.mode" select="bookinfo/copyright"/>
 							</fo:block>
 						</fo:table-cell>
 					</fo:table-row>
@@ -963,11 +966,7 @@
 		</xsl:apply-templates>
 		<xsl:apply-templates mode="book.titlepage.verso.auto.mode" select="info/legalnotice">
 		</xsl:apply-templates>
-		<!--   <xsl:apply-templates mode="titlepage.mode" select="preface"/> -->
-		<xsl:if test="preface">
-			<xsl:call-template name="toto.tutu">
-			</xsl:call-template>
-		</xsl:if>
+<!--		<xsl:apply-templates mode="titlepage.mode" select="preface"/>-->
 	</xsl:template>
 	<xsl:template name="book.verso.title">
 		<fo:block>
@@ -1232,12 +1231,7 @@
 			</xsl:if>
 		</fo:block>
 	</xsl:template>
-	<!-- DEBUG METHOD. -->
-	<xsl:template name="toto.tutu">
-		<fo:block background-color="#FF0000">
-			Toto Tutu
-		</fo:block>
-	</xsl:template>
+
 	<!-- emphasis in programlistings contains color, specified by the @role -->
 	<xsl:template match="emphasis">
 		<xsl:variable name="depth">
@@ -1648,13 +1642,13 @@
 		</xsl:call-template>
 	</xsl:template>
 	<xsl:template match="email">
-		<xsl:call-template name="emailF" />
+		<xsl:call-template name="emailF"/>
 	</xsl:template>
 	<xsl:template match="email" mode="in.address">
 		<fo:block>
 			<xsl:text>e-mail:</xsl:text>
-			<xsl:call-template name="gentext.space" />
-			<xsl:call-template name="emailF" />
+			<xsl:call-template name="gentext.space"/>
+			<xsl:call-template name="emailF"/>
 		</fo:block>
 	</xsl:template>
 	<xsl:template match="phone|fax" mode="in.address">
@@ -1662,7 +1656,7 @@
 			<xsl:value-of select="name(.)">
 			</xsl:value-of>
 			<xsl:text>:</xsl:text>
-			<xsl:call-template name="gentext.space" />
+			<xsl:call-template name="gentext.space"/>
 			<xsl:call-template name="inline.charseq">
 			</xsl:call-template>
 		</fo:block>
@@ -1679,7 +1673,7 @@
 			<xsl:apply-templates select="."/>
 			<xsl:if test="not(count(parent::node()/pob) = 0)">
 				<xsl:text>,</xsl:text>
-				<xsl:call-template name="gentext.space" />
+				<xsl:call-template name="gentext.space"/>
 				<xsl:apply-templates select="parent::node()/pob"/>
 			</xsl:if>
 		</fo:block>
@@ -1697,7 +1691,7 @@
 		<fo:block>
 			<xsl:apply-templates select="."/>
 			<xsl:if test="not(count(parent::node()/city) = 0)">
-				<xsl:call-template name="gentext.space" />
+				<xsl:call-template name="gentext.space"/>
 				<xsl:apply-templates select="parent::node()/city"/>
 			</xsl:if>
 		</fo:block>
@@ -1715,7 +1709,7 @@
 	<!-- Modification of fo/verbatim.xsl Line #158 -->
 	<xsl:template match="address">
 		<xsl:variable name="id">
-			<xsl:call-template name="object.id" />
+			<xsl:call-template name="object.id"/>
 		</xsl:variable>
 		<fo:block id="{$id}" space-before="0.5em">
 <!--			<fo:block>-->
@@ -1738,7 +1732,7 @@
 <!--				<xsl:apply-templates select="country"/>-->
 <!--				<xsl:apply-templates select="phone|fax|email" mode="in.address" />-->
 <!--			</fo:block>-->
-			<xsl:apply-templates select="*" mode="in.address" />
+			<xsl:apply-templates select="*" mode="in.address"/>
 <!--			<xsl:for-each select="*">-->
 <!--				<xsl:message>-->
 <!--					<xsl:text> In ADDRESS, </xsl:text><xsl:value-of select="name(.)" /> <xsl:value-of select="." /> -->
@@ -2113,7 +2107,79 @@
 		<xsl:value-of select="$expandedText">
 		</xsl:value-of>
 	</xsl:template>
-</xsl:stylesheet><!--
+
+	<xsl:template match="text()" mode="mode1">
+		<xsl:param name="myName"/>
+		<xsl:choose>
+			<!-- This condition is true when the string is a zero-length string -->
+			<xsl:when test="not(boolean(normalize-space(string(.))))">
+				<xsl:apply-templates mode="mode1" select="following-sibling::node()[1]">
+					<xsl:with-param name="myName" select="$myName"/>
+				</xsl:apply-templates>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'false'"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+	<xsl:template match="*" mode="mode1">
+		<xsl:param name="myName"/>
+		<xsl:choose>
+			<xsl:when test="name() = $myName">
+				<xsl:value-of select="'true'"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="'false'"/>
+			</xsl:otherwise>
+		</xsl:choose>
+
+		
+	</xsl:template>
+
+	<xsl:template name="isFollowedBySameElement"> 
+		<xsl:variable name="myName" select="name()"/>
+		<xsl:variable name="result">
+			<xsl:apply-templates mode="mode1" select="following-sibling::node()[1]">
+				<xsl:with-param name="myName" select="$myName"/>
+			</xsl:apply-templates>
+		</xsl:variable>
+		<xsl:choose>
+			<!-- This condition is true when $result is a zero-length string -->
+			<!-- 
+				 It is in particular the case when there does not exist
+				 following siblings: templates are not called and so result
+				 is not set.
+			-->
+			<xsl:when test="not(boolean(normalize-space($result)))">
+				<xsl:value-of select="'false'"/>
+			</xsl:when>
+			<!-- In this case, result has been set, so we return it as it is -->
+			<xsl:otherwise>
+				<xsl:value-of select="$result"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+
+
+	<xsl:template match="newline">
+		<xsl:variable name="followedByNewLine">
+			<xsl:call-template name="isFollowedBySameElement"/>
+		</xsl:variable>
+		<xsl:choose>
+			<xsl:when test="$followedByNewLine = 'true'">
+				<fo:block> </fo:block>
+			</xsl:when>
+			<xsl:otherwise>
+				<fo:block linefeed-treatment="preserve" white-space-treatment="preserve" white-space-collapse="false">
+					<fo:inline>
+</fo:inline>
+				</fo:block>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+</xsl:stylesheet>
+<!-- 
 	<xsl:message>
 	<xsl:text> OK, question.toc </xsl:text> <xsl:copy-of select="$id" /> 
 	</xsl:message>
