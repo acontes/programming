@@ -44,7 +44,7 @@ import org.objectweb.proactive.Active;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.Service;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.controller.PAMembraneController;
+import org.objectweb.proactive.core.component.control.PAMembraneController;
 
 
 /**

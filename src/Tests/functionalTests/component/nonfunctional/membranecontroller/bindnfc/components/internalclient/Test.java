@@ -50,7 +50,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.controller.PAMembraneController;
+import org.objectweb.proactive.core.component.control.PAMembraneController;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
@@ -95,25 +95,25 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.BINDING_CONTROLLER,
-                                        /*BINDING CONTROLLER*/org.objectweb.proactive.core.component.controller.PABindingController.class
+                                        /*BINDING CONTROLLER*/org.objectweb.proactive.core.component.control.PABindingController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.CONTENT_CONTROLLER,
-                                        /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.controller.PAContentController.class
+                                        /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.control.PAContentController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.LIFECYCLE_CONTROLLER,
-                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController.class
+                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.controller.PASuperController.class
+                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.control.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
@@ -142,7 +142,7 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.controller.PASuperController.class
+                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.control.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
@@ -168,13 +168,13 @@ public class Test extends ComponentTest {
         PAMembraneController memController = Utils.getPAMembraneController(componentA);
 
         memController.setControllerObject(Constants.BINDING_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.PABindingControllerImpl.class.getName());
+                org.objectweb.proactive.core.component.control.PABindingControllerImpl.class.getName());
         memController.setControllerObject(Constants.CONTENT_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.PAContentControllerImpl.class.getName());
+                org.objectweb.proactive.core.component.control.PAContentControllerImpl.class.getName());
         memController.setControllerObject(Constants.SUPER_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.PASuperControllerImpl.class.getName());
+                org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameController.class.getName());
 
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
         Map<Object, Object> context = new HashMap<Object, Object>();
@@ -193,7 +193,7 @@ public class Test extends ComponentTest {
 
         PAMembraneController memControllerB = Utils.getPAMembraneController(componentB);
         memControllerB.setControllerObject(Constants.SUPER_CONTROLLER,
-                org.objectweb.proactive.core.component.controller.PASuperControllerImpl.class.getName());
+                org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
 
         Component dummyController = (Component) f.newComponent(
                 "functionalTests.component.nonfunctional.adl.dummyPrimitive", context);

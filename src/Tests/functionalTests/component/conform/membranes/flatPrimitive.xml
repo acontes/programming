@@ -7,18 +7,18 @@
 	<controllers>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.PABindingController
+				org.objectweb.proactive.core.component.control.PABindingController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.PABindingControllerImpl
+				org.objectweb.proactive.core.component.control.PABindingControllerImpl
 			</implementation>
 		</controller>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController
+				org.objectweb.proactive.core.component.control.PAGCMLifeCycleController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.PAGCMLifeCycleControllerImpl
+				org.objectweb.proactive.core.component.control.PAGCMLifeCycleControllerImpl
 			</implementation>
 		</controller>
 		<controller>
@@ -26,15 +26,15 @@
 				org.objectweb.fractal.api.control.NameController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.PANameController
+				org.objectweb.proactive.core.component.control.PANameController
 			</implementation>
 		</controller>
 		<controller>
 			<interface>
-				org.objectweb.proactive.core.component.controller.PAMulticastController
+				org.objectweb.proactive.core.component.control.PAMulticastController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.PAMulticastControllerImpl
+				org.objectweb.proactive.core.component.control.PAMulticastControllerImpl
 			</implementation>
 		</controller>
 		<controller>
@@ -42,15 +42,15 @@
 				org.etsi.uri.gcm.api.control.GathercastController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.controller.PAGathercastControllerImpl
+				org.objectweb.proactive.core.component.control.PAGathercastControllerImpl
 			</implementation>
 		</controller>
         <controller>
             <interface>
-            	org.objectweb.proactive.core.component.controller.PAMigrationController
+            	org.objectweb.proactive.core.component.control.PAMigrationController
             </interface>
             <implementation>
-            	org.objectweb.proactive.core.component.controller.PAMigrationControllerImpl
+            	org.objectweb.proactive.core.component.control.PAMigrationControllerImpl
             </implementation>
         </controller>
 	</controllers>

@@ -46,7 +46,7 @@ import org.etsi.uri.gcm.api.control.MonitorController;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.proactive.core.component.controller.MethodStatistics;
+import org.objectweb.proactive.core.component.control.MethodStatistics;
 
 import functionalTests.ComponentTest;
 

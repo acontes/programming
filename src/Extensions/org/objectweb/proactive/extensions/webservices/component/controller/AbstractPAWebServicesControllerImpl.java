@@ -11,7 +11,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.controller.AbstractPAController;
+import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;

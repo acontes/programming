@@ -58,7 +58,7 @@ import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBody;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
-import org.objectweb.proactive.core.component.controller.PAGathercastControllerImpl;
+import org.objectweb.proactive.core.component.control.PAGathercastControllerImpl;
 import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.representative.ItfID;

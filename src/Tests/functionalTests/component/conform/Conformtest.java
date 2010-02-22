@@ -55,12 +55,12 @@ import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.core.component.controller.PABindingController;
-import org.objectweb.proactive.core.component.controller.PAContentController;
-import org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController;
-import org.objectweb.proactive.core.component.controller.PAMigrationController;
-import org.objectweb.proactive.core.component.controller.PAMulticastController;
-import org.objectweb.proactive.core.component.controller.PASuperController;
+import org.objectweb.proactive.core.component.control.PABindingController;
+import org.objectweb.proactive.core.component.control.PAContentController;
+import org.objectweb.proactive.core.component.control.PAGCMLifeCycleController;
+import org.objectweb.proactive.core.component.control.PAMigrationController;
+import org.objectweb.proactive.core.component.control.PAMulticastController;
+import org.objectweb.proactive.core.component.control.PASuperController;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 
 import functionalTests.ComponentTest;
@@ -87,7 +87,7 @@ public abstract class Conformtest extends ComponentTest {
         PAMulticastController.class.getCanonicalName() + "/false,false,false";
     protected final static String GC = Constants.GATHERCAST_CONTROLLER + "/" +
         GathercastController.class.getCanonicalName() + "/false,false,false";
-    //protected final static String CP = "component-parameters-controller/org.objectweb.proactive.core.component.controller.ComponentParametersController/false,false,false";
+    //protected final static String CP = "component-parameters-controller/org.objectweb.proactive.core.component.control.ComponentParametersController/false,false,false";
     protected final static String PC = Constants.PRIORITY_CONTROLLER + "/" +
         PriorityController.class.getCanonicalName() + "/false,false,false";
     protected final static String MoC = Constants.MONITOR_CONTROLLER + "/" +

@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.config.ComponentConfigurationHandler;
-import org.objectweb.proactive.core.component.controller.AbstractPAController;
+import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.gen.RepresentativeInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.identity.PAComponentImpl;
@@ -196,7 +196,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory
                 .createFcItfType(
                         Constants.LIFECYCLE_CONTROLLER,
-                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.controller.PAGCMLifeCycleController.class
+                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
         Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
                 itfType.getFcItfName(), this, itfType, itfType.isInternal(), false);

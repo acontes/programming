@@ -621,7 +621,7 @@
 			</info>
 
 			<para>
-				By using the monitor controller, <literal>org.objectweb.proactive.core.component.controller.MonitorController</literal>,
+				By using the monitor controller, <literal>org.objectweb.proactive.core.component.control.MonitorController</literal>,
 				users can retrieve various statistics on components such as the average length of the queue of a given method or the last
 				execution time of another method. Thus, with these metrics, users can be informed on the QoS (Quality of Service) and then decide to do
 				some changes in their application to improve its performance.
@@ -629,7 +629,7 @@
 			<para>
 				After having started the monitoring (Method <literal>startMonitoring</literal>), for each methods exposed by the server
 				interfaces of a component, this controller will be able to provide an instance of
-				<literal>org.objectweb.proactive.core.component.controller.MethodStatistics</literal>, which itself provides some
+				<literal>org.objectweb.proactive.core.component.control.MethodStatistics</literal>, which itself provides some
 				statistics related to a given method.
 			</para>
 			<para>
@@ -644,7 +644,7 @@
 							<programlisting language="java">public Map&lt;String, MethodStatistics&gt; getAllStatistics();</programlisting>
 							Which returns every MethodStatistics (i.e. statistics of each methods of each server interfaces of the monitored component)
 							contained into a Map. The key to obtain the MethodStatistics corresponding to a method can be generated thanks to the method
-							<literal>org.objectweb.proactive.core.component.controller.MonitorControllerHelper.generateKey</literal> which takes as
+							<literal>org.objectweb.proactive.core.component.control.MonitorControllerHelper.generateKey</literal> which takes as
 							parameters the name of the interface, the name of the method and an array of parameter types of the method.
 						</para>
 					</listitem>

@@ -37,7 +37,7 @@
 package functionalTests.component.collectiveitf.unicast;
 
 import org.objectweb.fractal.api.Component;
-import org.objectweb.proactive.core.component.controller.PAMulticastControllerImpl;
+import org.objectweb.proactive.core.component.control.PAMulticastControllerImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
 
 

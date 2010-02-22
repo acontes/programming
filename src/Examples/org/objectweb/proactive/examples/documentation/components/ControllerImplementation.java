@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.controller.AbstractPAController;
+import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 

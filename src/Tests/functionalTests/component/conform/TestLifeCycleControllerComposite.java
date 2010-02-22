@@ -155,7 +155,7 @@ public class TestLifeCycleControllerComposite extends TestLifeCycleController {
         // TODO test issue: adding a sub-component in a started composite automatically starts the added one?
         cc.addFcSubComponent(d);
         //crash here
-        //due to org.objectweb.proactive.core.component.controller.AbstractProActiveController.checkLifeCycleIsStopped() 
+        //due to org.objectweb.proactive.core.component.control.AbstractPAController.checkLifeCycleIsStopped() 
         //first line which impose the composite to be in stopped state
         try {
             cc.removeFcSubComponent(d);
