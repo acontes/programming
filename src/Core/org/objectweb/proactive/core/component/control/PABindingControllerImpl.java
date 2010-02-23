@@ -381,10 +381,11 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
 
         // Multicast bindings are handled here
         if (Utils.isGCMMulticastItf(clientItfName, owner)) {
+            MulticastController mc = GCM.getMulticastController(owner);
+            PAInterface pitf = (PAInterface) mc;
+            PAMulticastControllerImpl impl = (PAMulticastControllerImpl) pitf.getFcItfImpl();
+            impl.bindFc(clientItfName, sItf);
             if (Utils.isGCMGathercastItf(sItf)) {
-                // no adaptor here
-                ((PAMulticastControllerImpl) ((PAInterface) GCM.getMulticastController(owner)).getFcItfImpl())
-                        .bindFc(clientItfName, sItf);
                 // add a callback ref in the server gather interface
                 // TODO should throw a binding event
                 try {
@@ -398,11 +399,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 }
                 GCM.getGathercastController((sItf).getFcItfOwner()).notifyAddedGCMBinding(
                         sItf.getFcItfName(), (owner).getRepresentativeOnThis(), clientItfName);
-            } else {
-                MulticastController mc = GCM.getMulticastController(owner);
-                PAInterface pitf = (PAInterface) mc;
-                PAMulticastControllerImpl impl = (PAMulticastControllerImpl) pitf.getFcItfImpl();
-                impl.bindFc(clientItfName, sItf);
             }
             return;
         }
