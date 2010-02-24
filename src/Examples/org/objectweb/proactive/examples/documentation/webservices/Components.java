@@ -247,7 +247,7 @@ public class Components {
         //@snippet-end webservices_Component_13
 
         //@snippet-start webservices_Component_14
-        String url = AbstractPAWebServicesControllerImpl.getLocalUrl();
+        String url = wsc.getLocalUrl();
         //@snippet-end webservices_Component_14
 
         //@snippet-start webservices_Component_15

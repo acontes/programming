@@ -88,7 +88,7 @@ public abstract class AbstractPAWebServicesControllerImpl extends AbstractPACont
         return AbstractWebServicesFactory.getLocalPort();
     }
 
-    public static String getLocalUrl() {
+    public String getLocalUrl() {
         return AbstractWebServicesFactory.getLocalUrl();
     }
 

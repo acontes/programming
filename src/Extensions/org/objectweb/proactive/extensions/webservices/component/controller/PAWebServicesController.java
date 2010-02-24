@@ -14,14 +14,14 @@ public interface PAWebServicesController {
     /**
      * Sets the url where the component will be deployed.
      *
-     * @param url
+     * @param The url where the component will be deployed.
      */
     public void setUrl(String url);
 
     /**
      * Gets the url where the component will be deployed.
      *
-     * @return url
+     * @return The url where the component will be deployed.
      */
     public String getUrl();
 
@@ -35,6 +35,13 @@ public interface PAWebServicesController {
      */
     public void initServlet(Node... nodes) throws ActiveObjectCreationException, NodeException,
             UnknownFrameWorkException;
+
+    /**
+     * Gets the default local url where the component will be deployed.
+     *
+     * @return The default local url where the component will be deployed
+     */
+    public String getLocalUrl();
 
     //@snippet-start PAWebServicesController_expose_methods
     /**
