@@ -48,6 +48,7 @@ public abstract class AbstractPAWebServicesControllerImpl extends AbstractPACont
     public AbstractPAWebServicesControllerImpl(Component owner) {
         super(owner);
         this.framework = getFramework();
+        this.url = getLocalUrl();
     }
 
     /**
