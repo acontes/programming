@@ -132,7 +132,7 @@ public class Test extends ComponentTest {
         memController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.control.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameControllerImpl.class.getName());
 
         memController.startMembrane();//Starting the membrane, non-functional calls can be emitted on controllers
         //Emmiting calls on non-functional interfaces
@@ -148,7 +148,7 @@ public class Test extends ComponentTest {
         componentBMembraneController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
         componentBMembraneController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.control.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameControllerImpl.class.getName());
         componentBMembraneController.startMembrane();//Need to do this, otherwise, when adding this component to the composite one, there will be a suspension, because the addFcSubComponent method is calling the SuperController of the primitive component
 
         GCM.getContentController(componentA).addFcSubComponent(componentB);
@@ -174,7 +174,7 @@ public class Test extends ComponentTest {
         memController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.control.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameControllerImpl.class.getName());
 
         memController.startMembrane();
         GCM.getBindingController(componentA).unbindFc("componentInfo");

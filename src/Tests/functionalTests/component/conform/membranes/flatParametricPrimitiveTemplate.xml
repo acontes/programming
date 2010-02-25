@@ -27,7 +27,7 @@
 				org.objectweb.fractal.api.control.NameController
 			</interface>
 			<implementation>
-				org.objectweb.proactive.core.component.control.PANameController
+				org.objectweb.proactive.core.component.control.PANameControllerImpl
 			</implementation>
 		</controller>
 		<controller>

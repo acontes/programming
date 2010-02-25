@@ -143,7 +143,7 @@ public class Test extends ComponentTest {
         memController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.control.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameControllerImpl.class.getName());
 
         //Creation of the non-functional name controller component
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
@@ -183,7 +183,7 @@ public class Test extends ComponentTest {
 
         memController.removeNFSubComponent(nameController);
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.control.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameControllerImpl.class.getName());
         memController.startMembrane();//Restart the membrane, to be able to serve non-functional calls
         System.err.println("Object replaces component : Name is : " +
             GCM.getNameController(componentA).getFcName());

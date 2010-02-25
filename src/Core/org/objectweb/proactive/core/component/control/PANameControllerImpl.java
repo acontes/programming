@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
  * @author The ProActive Team
  *
  */
-public class PANameController extends AbstractPAController implements NameController,
+public class PANameControllerImpl extends AbstractPAController implements NameController,
         ControllerStateDuplication {
     // FIXME coherency between this value and the one in component parameters controller
     String name;
@@ -59,7 +59,7 @@ public class PANameController extends AbstractPAController implements NameContro
     /**
      * @param owner
      */
-    public PANameController(Component owner) {
+    public PANameControllerImpl(Component owner) {
         super(owner);
     }
 

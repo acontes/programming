@@ -172,7 +172,7 @@ public class Test extends ComponentTest {
         memController.setControllerObject(Constants.SUPER_CONTROLLER,
                 org.objectweb.proactive.core.component.control.PASuperControllerImpl.class.getName());
         memController.setControllerObject(Constants.NAME_CONTROLLER,
-                org.objectweb.proactive.core.component.control.PANameController.class.getName());
+                org.objectweb.proactive.core.component.control.PANameControllerImpl.class.getName());
 
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getNFFactory();
         Map<Object, Object> context = new HashMap<Object, Object>();

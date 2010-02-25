@@ -81,7 +81,7 @@ import org.objectweb.proactive.core.component.control.PAGCMLifeCycleController;
 import org.objectweb.proactive.core.component.control.PAGCMLifeCycleControllerImpl;
 import org.objectweb.proactive.core.component.control.PAMembraneController;
 import org.objectweb.proactive.core.component.control.PAMembraneControllerImpl;
-import org.objectweb.proactive.core.component.control.PANameController;
+import org.objectweb.proactive.core.component.control.PANameControllerImpl;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.gen.MetaObjectInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.group.PAComponentGroup;
@@ -190,7 +190,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
         itfType = (PAGCMInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
         /* NAME CONTROLLER */NameController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                 TypeFactory.SINGLE);
-        controller = createController(itfType, PANameController.class);
+        controller = createController(itfType, PANameControllerImpl.class);
         ((NameController) controller).setFcName(componentParameters.getName());
         controlItfs.put(controller.getFcItfName(), controller);
         nftype.add((InterfaceType) controller.getFcItfType());
