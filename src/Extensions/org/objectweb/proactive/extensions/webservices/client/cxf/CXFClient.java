@@ -37,6 +37,7 @@
 package org.objectweb.proactive.extensions.webservices.client.cxf;
 
 import org.apache.cxf.frontend.ClientFactoryBean;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.extensions.webservices.WSConstants;
 import org.objectweb.proactive.extensions.webservices.client.AbstractClient;
 import org.objectweb.proactive.extensions.webservices.client.Client;
@@ -65,7 +66,8 @@ public class CXFClient extends AbstractClient implements Client {
         ClientFactoryBean factory = new ClientFactoryBean();
         factory.setServiceClass(serviceClass);
         factory.setAddress(url + WSConstants.SERVICES_PATH + serviceName);
-        factory.getServiceFactory().setQualifyWrapperSchema(false);
+        factory.getServiceFactory().setQualifyWrapperSchema(
+                PAProperties.PA_WEBSERVICES_ELEMENTFORMDEFAULT.isTrue());
         return factory.create();
 
     }

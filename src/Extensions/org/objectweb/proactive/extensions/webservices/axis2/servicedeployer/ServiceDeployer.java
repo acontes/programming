@@ -53,6 +53,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
 import org.objectweb.proactive.extensions.webservices.common.MethodUtils;
@@ -189,6 +190,8 @@ public class ServiceDeployer {
 
         // Add the variable isComponent to the service
         axisService.addParameter("isComponent", Boolean.toString(isComponent));
+
+        axisService.setElementFormDefault(PAProperties.PA_WEBSERVICES_ELEMENTFORMDEFAULT.isTrue());
 
         // Add the service to the axis configuration
         axisConfiguration.addService(axisService);

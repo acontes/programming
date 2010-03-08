@@ -661,6 +661,16 @@ public enum PAProperties {
     PA_WEBSERVICES_FRAMEWORK("proactive.webservices.framework", PAPropertiesType.STRING),
 
     /**
+     * Web services: WSDL elementFormDefault attribute
+     *
+     * When creating a web service, the generated WSDL contains an XSD schema which represents
+     * the SOAP message format. This property allows to set the elementFormDefault of this schema
+     * to "qualified" or "unqualified". It is set to false ("unqualified") by default.
+     *
+     */
+    PA_WEBSERVICES_ELEMENTFORMDEFAULT("proactive.webservices.elementformdefault", PAPropertiesType.BOOLEAN),
+
+    /**
      * if true, write the bytecode of the generated stub on the disk
      * 
      */
