@@ -129,7 +129,9 @@ public class ServiceDeployer {
         schemaGenerator = new CustomDefaultSchemaGenerator(loader, implClass, null,
             Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
         //            }
-        schemaGenerator.setElementFormDefault(Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED);
+        schemaGenerator.setElementFormDefault(
+                (PAProperties.PA_WEBSERVICES_ELEMENTFORMDEFAULT.isTrue()) ? Java2WSDLConstants.FORM_DEFAULT_QUALIFIED : Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED
+        );
         Utils.addExcludeMethods(excludedOperations);
         schemaGenerator.setExcludeMethods(excludedOperations);
 
@@ -190,8 +192,6 @@ public class ServiceDeployer {
 
         // Add the variable isComponent to the service
         axisService.addParameter("isComponent", Boolean.toString(isComponent));
-
-        axisService.setElementFormDefault(PAProperties.PA_WEBSERVICES_ELEMENTFORMDEFAULT.isTrue());
 
         // Add the service to the axis configuration
         axisConfiguration.addService(axisService);
