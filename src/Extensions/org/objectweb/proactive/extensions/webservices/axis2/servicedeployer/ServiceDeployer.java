@@ -129,9 +129,9 @@ public class ServiceDeployer {
         schemaGenerator = new CustomDefaultSchemaGenerator(loader, implClass, null,
             Java2WSDLConstants.SCHEMA_NAMESPACE_PRFIX, service);
         //            }
-        schemaGenerator.setElementFormDefault(
-                (PAProperties.PA_WEBSERVICES_ELEMENTFORMDEFAULT.isTrue()) ? Java2WSDLConstants.FORM_DEFAULT_QUALIFIED : Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED
-        );
+        schemaGenerator
+                .setElementFormDefault((PAProperties.PA_WEBSERVICES_ELEMENTFORMDEFAULT.isTrue()) ? Java2WSDLConstants.FORM_DEFAULT_QUALIFIED
+                        : Java2WSDLConstants.FORM_DEFAULT_UNQUALIFIED);
         Utils.addExcludeMethods(excludedOperations);
         schemaGenerator.setExcludeMethods(excludedOperations);
 
