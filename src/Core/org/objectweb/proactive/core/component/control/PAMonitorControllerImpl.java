@@ -103,10 +103,9 @@ public class PAMonitorControllerImpl extends AbstractPAController implements Mon
     }
 
     private void registerMethods() {
-        PAActiveObject.setImmediateService("getStatistics", new Class[] { String.class, String.class });
-        PAActiveObject.setImmediateService("getStatistics", new Class[] { String.class, String.class,
+        PAActiveObject.setImmediateService("getGCMStatistics", new Class[] { String.class, String.class,
                 (new Class<?>[] {}).getClass() });
-        PAActiveObject.setImmediateService("getAllStatistics");
+        PAActiveObject.setImmediateService("getAllGCMStatistics");
 
         statistics = Collections.synchronizedMap(new HashMap<String, Object>());
         keysList = new HashMap<String, String>();
