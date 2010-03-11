@@ -44,7 +44,6 @@ import org.apache.log4j.Logger;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
-import org.objectweb.proactive.core.component.StreamInterface;
 import org.objectweb.proactive.core.component.type.annotations.gathercast.MethodSynchro;
 import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -81,23 +80,6 @@ public class PAGCMInterfaceTypeImpl implements PAGCMInterfaceType, Serializable 
         super();
     }
 
-    /**
-     * copy constructor
-     * Seems doesn't be used
-     * @param itfType
-     */
-    //    public PAInterfaceTypeImpl(final InterfaceType itfType) {
-    //        this.name = itfType.getFcItfName();
-    //        this.signature = itfType.getFcItfSignature();
-    //        this.isClient = itfType.isFcClientItf();
-    //        this.isOptional = itfType.isFcOptionalItf();
-    //        this.isStream = false;
-    //        if (itfType.isFcCollectionItf()) {
-    //            cardinality = PATypeFactory.COLLECTION_CARDINALITY;
-    //        } else {
-    //            cardinality = PATypeFactory.SINGLETON_CARDINALITY;
-    //        }
-    //    }
     /**
      * Constructor for PAInterfaceTypeImpl.
      */
@@ -269,7 +251,7 @@ public class PAGCMInterfaceTypeImpl implements PAGCMInterfaceType, Serializable 
                 .equals(cardinality)));
     }
 
-    public boolean isGCMStreamItf() {
+    public boolean isStreamItf() {
         return isStream;
     }
 
@@ -280,7 +262,7 @@ public class PAGCMInterfaceTypeImpl implements PAGCMInterfaceType, Serializable 
     @Override
     public int hashCode() {
         return (this.getFcItfName() + this.getFcItfSignature() + this.isFcClientItf() +
-            this.isFcOptionalItf() + this.isGCMStreamItf() + this.isFcCollectionItf() +
+            this.isFcOptionalItf() + this.isStreamItf() + this.isFcCollectionItf() +
             this.isGCMGathercastItf() + this.isGCMMulticastItf() + this.isGCMSingletonItf()).hashCode();
     }
 
@@ -292,7 +274,7 @@ public class PAGCMInterfaceTypeImpl implements PAGCMInterfaceType, Serializable 
                 this.getFcItfSignature().equals(itf.getFcItfSignature()) &&
                 (this.isFcClientItf() == itf.isFcClientItf()) &&
                 (this.isFcOptionalItf() == itf.isFcOptionalItf()) &&
-                (this.isGCMStreamItf() == itf.isGCMStreamItf()) &&
+                (this.isStreamItf() == itf.isStreamItf()) &&
                 (this.isFcCollectionItf() == itf.isFcCollectionItf()) &&
                 (this.isGCMGathercastItf() == itf.isGCMGathercastItf()) &&
                 (this.isGCMMulticastItf() == itf.isGCMMulticastItf()) &&

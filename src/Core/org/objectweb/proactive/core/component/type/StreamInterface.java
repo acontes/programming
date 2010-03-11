@@ -34,19 +34,17 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component;
+package org.objectweb.proactive.core.component.type;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Tag interface for allow to check when the component interface type is created if it
- * implements this tag and if all the contained methods have a void return type.
- * 
- * @author The ProActive Team
+ * Tag interface allowing to ensure that a component interface implementing this interface only provides methods
+ * with a void return type.
  *
+ * @author The ProActive Team
  */
 @PublicAPI
 public interface StreamInterface {
-
 }

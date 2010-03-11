@@ -38,7 +38,6 @@ package org.objectweb.proactive.core.component.type;
 
 import org.etsi.uri.gcm.api.type.GCMInterfaceType;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.StreamInterface;
 
 
 /**
@@ -56,7 +55,7 @@ public interface PAGCMInterfaceType extends GCMInterfaceType {
      * 
      * @return true if this interface extends the {@link StreamInterface} interface, false otherwise
      */
-    public boolean isGCMStreamItf();
+    public boolean isStreamItf();
 
     public boolean isInternal();
 }

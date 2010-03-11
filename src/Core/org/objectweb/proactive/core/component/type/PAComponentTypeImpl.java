@@ -198,7 +198,7 @@ public class PAComponentTypeImpl implements ComponentType, PAGCMInterfaceType, S
         return false;
     }
 
-    public boolean isGCMStreamItf() {
+    public boolean isStreamItf() {
         return false;
     }
 
