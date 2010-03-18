@@ -43,8 +43,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * Interface that the class used to call web services through web service binding must implements.
  *
  * @author The ProActive Team
- * @see Axis2WSCaller
- * @see CXFWSCaller
  */
 @PublicAPI
 //@snippet-start proactivewscaller

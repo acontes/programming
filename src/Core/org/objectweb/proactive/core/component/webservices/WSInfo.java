@@ -46,7 +46,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 /**
  * Web service informations used to bind a client interface of a component to a web service: contains the URL
- * of the web service and the name of the class which has to be called to use this web service.
+ * of the web service and the name of the class which has to be used to call this web service.
  * <br>
  * The class in charge to call the web service must implement the {@link PAWSCaller} interface.
  * <br>
@@ -54,9 +54,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * is used.
  *
  * @author The ProActive Team
- * @see PAWSCaller
- * @see Axis2WSCaller
- * @see CXFWSCaller
  */
 @PublicAPI
 public class WSInfo implements Serializable {
