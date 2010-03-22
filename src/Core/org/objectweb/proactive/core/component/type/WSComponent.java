@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -144,7 +145,7 @@ public class WSComponent implements Serializable, Component, NameController, Lif
 
     public Type getFcType() {
         try {
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             return tf.createFcType(new InterfaceType[] { (InterfaceType) ((Interface) fcInterfaceImpl)
                     .getFcItfType() });

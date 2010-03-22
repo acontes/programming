@@ -87,7 +87,7 @@ public class Main {
     //@snippet-start launch_first_primitive
     private static void launchFirstPrimitive() {
         try {
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
             GenericFactory genericFact = GCM.getGenericFactory(boot);
             Component primitiveComputer = null;
@@ -122,7 +122,7 @@ public class Main {
     //@snippet-start launch_without_ADL
     private static void launchWithoutADL() {
         try {
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
             GenericFactory genericFact = GCM.getGenericFactory(boot);
 
@@ -172,7 +172,7 @@ public class Main {
     //@snippet-end launch_without_ADL
     private static void launchAndDeployWithoutADL() {
         try {
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
             PAGenericFactory genericFact = Utils.getPAGenericFactory(boot);
 

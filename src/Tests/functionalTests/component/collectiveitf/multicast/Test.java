@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.core.component.Utils;
 
 import functionalTests.ComponentTest;
 
@@ -91,7 +92,7 @@ public class Test extends ComponentTest {
 
     @org.junit.Test
     public void testMulticastServerItfNotBound() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
         GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType ct = tf.createFcType(new InterfaceType[] { tf.createGCMItfType("serverMult",
@@ -108,7 +109,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     @Ignore
     public void testStartCompositeWithInternalClientItfBoundOnMulticast() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory ptf = GCM.getGCMTypeFactory(boot);
         GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType rType = ptf.createFcType(new InterfaceType[] {

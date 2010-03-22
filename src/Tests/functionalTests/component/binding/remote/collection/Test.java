@@ -85,7 +85,7 @@ public class Test extends ComponentTestDefaultNodes {
      */
     @org.junit.Test
     public void action() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         PAGenericFactory cf = Utils.getPAGenericFactory(boot);
 

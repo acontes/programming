@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 
 
 /**
@@ -60,7 +61,7 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
         GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType tComposite = tf.createFcType(new InterfaceType[] { tf.createFcItfType("runner",

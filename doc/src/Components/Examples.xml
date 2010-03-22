@@ -270,8 +270,8 @@
       <para>You can either compile and run the code yourself, or follow the
       instructions for preparing the examples and use the script
       helloworld_fractal.sh (or .bat). If you choose the first solution, do
-      not forget to set the gcm.provider system property (or the
-      fractal.provider system property).</para>
+      not forget to set the <literal>gcm.provider</literal> system property
+      (or the <literal>fractal.provider</literal> system property).</para>
 
       <para>If you run the program with no arguments (i.e. not using the
       parser, no wrapper composite components, and local deployment) , you

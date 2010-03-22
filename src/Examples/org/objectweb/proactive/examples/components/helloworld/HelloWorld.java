@@ -51,6 +51,7 @@ import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.adl.Launcher;
 
 
@@ -118,7 +119,7 @@ public class HelloWorld {
             // -------------------------------------------------------------------
             // OPTION 2 : DO NOT USE THE FRACTAL ADL
             // -------------------------------------------------------------------
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             Component rComp = null;
 

@@ -50,6 +50,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 
 import functionalTests.ComponentTest;
 
@@ -68,7 +69,7 @@ public class TestOptional extends ComponentTest {
      */
     @Test
     public void testPriorityController() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
@@ -88,7 +89,7 @@ public class TestOptional extends ComponentTest {
 
     @Test(expected = NoSuchInterfaceException.class)
     public void testNoPriorityController() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 

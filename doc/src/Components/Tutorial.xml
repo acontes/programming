@@ -493,7 +493,7 @@ public void compute(String arg) {
                Thus, we propose you to:
             </para>
             <orderedlist>
-               <listitem><para>Get the Bootstrap component using the <literal>GCM.getBootstrapComponent()</literal> method</para></listitem>
+               <listitem><para>Get the Bootstrap component using the <literal>org.objectweb.proactive.core.component.Utils.getBootstrapComponent()</literal> method</para></listitem>
                <listitem><para>Get the GCMTypeFactory using the <literal>GCM.getGCMTypeFactory()</literal> method</para></listitem>
                <listitem><para>Get the GenericFactory using the <literal>GCM.getGenericFactory()</literal> method</para></listitem>
                <listitem><para>Create the i1 Interface Type (org.objectweb.proactive.examples.userguide.components.api.starter.Itf1) using the <literal>createFcItfType()</literal> method

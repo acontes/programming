@@ -47,6 +47,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
@@ -76,7 +77,7 @@ public class TestHelloWorldComponent extends FunctionalTest {
         try {
             url = AbstractWebServicesFactory.getLocalUrl();
 
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
 
             GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             GenericFactory cf = GCM.getGenericFactory(boot);

@@ -77,7 +77,7 @@ public class Setup {
     private static void init() throws InstantiationException, NoSuchInterfaceException {
         if ((tf == null) || (gf == null)) {
             PAProperties.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             if (tf == null) {
                 tf = GCM.getGCMTypeFactory(boot);
             }

@@ -47,6 +47,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.extensions.webservices.AbstractWebServicesFactory;
 import org.objectweb.proactive.extensions.webservices.WebServices;
 import org.objectweb.proactive.extensions.webservices.WebServicesFactory;
@@ -70,7 +71,7 @@ public abstract class CommonSetup extends ComponentTest {
     protected WebServices ws;
 
     public void setUpAndDeploy() throws Exception {
-        boot = GCM.getBootstrapComponent();
+        boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
 

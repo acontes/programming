@@ -76,7 +76,7 @@ public class Test extends ComponentTestDefaultNodes {
         /*
          * Getting the Fractal-Proactive bootstrap component
          */
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
 
         /*
          * Getting the GCM-ProActive type factory

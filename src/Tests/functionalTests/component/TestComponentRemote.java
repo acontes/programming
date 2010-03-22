@@ -102,7 +102,7 @@ public class TestComponentRemote extends ComponentTestDefaultNodes {
      */
     @org.junit.Test
     public void testCreationNewactiveComposite() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         PAGenericFactory cf = Utils.getPAGenericFactory(boot);
         ComponentType i1_i2_type = type_factory.createFcType(new InterfaceType[] {

@@ -53,6 +53,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
 
 import functionalTests.component.conform.components.BadSlaveMulticast;
@@ -80,7 +81,7 @@ public class TestMulticast extends Conformtest {
     // -------------------------------------------------------------------------
     @Before
     public void setUp() throws Exception {
-        boot = GCM.getBootstrapComponent();
+        boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
         tMaster = tf.createFcType(new InterfaceType[] {

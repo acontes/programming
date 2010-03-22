@@ -126,7 +126,7 @@ public class HelloWorldComponent implements HelloWorldItf, GoodByeWorldItf, Seri
         GCMApplication gcmad = null;
 
         try {
-            boot = GCM.getBootstrapComponent();
+            boot = Utils.getBootstrapComponent();
 
             GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             PAGenericFactory cf = Utils.getPAGenericFactory(boot);

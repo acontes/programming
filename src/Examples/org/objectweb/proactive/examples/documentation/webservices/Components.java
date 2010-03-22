@@ -79,7 +79,7 @@ public class Components {
     public static void main(String[] args) throws InstantiationException, NoSuchInterfaceException,
             IllegalLifeCycleException, ProActiveException {
         //@snippet-start webservices_Component_1
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
 
         GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);

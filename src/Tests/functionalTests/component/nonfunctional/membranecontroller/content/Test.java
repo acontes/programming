@@ -76,7 +76,7 @@ public class Test extends ComponentTest {
     @org.junit.Test
     public void action() throws Exception {
         // Thread.sleep(2000);
-        Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
+        Component boot = Utils.getBootstrapComponent(); /*Getting the Fractal-Proactive bootstrap component*/
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot); /*Getting the GCM-ProActive type factory*/
         PAGenericFactory cf = Utils.getPAGenericFactory(boot); /*Getting the GCM-ProActive generic factory*/
 

@@ -51,6 +51,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 
 
 /**
@@ -63,7 +64,7 @@ public class Main {
         // TODO: Get the Bootstrap Component
         //@tutorial-break
         //@snippet-break api_starter_Main_skeleton
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         //@snippet-resume api_starter_Main_skeleton
         //@tutorial-resume
         // TODO: Get the TypeFactory

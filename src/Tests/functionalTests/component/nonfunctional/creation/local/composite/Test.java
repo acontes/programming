@@ -75,7 +75,7 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        Component boot = GCM.getBootstrapComponent(); /*
+        Component boot = Utils.getBootstrapComponent(); /*
          * Getting the Fractal-Proactive
          * bootstrap component
          */

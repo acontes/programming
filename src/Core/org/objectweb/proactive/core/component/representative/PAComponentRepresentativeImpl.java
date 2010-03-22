@@ -190,7 +190,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     private void addMandatoryControllers() throws Exception {
-        Component boot = GCM.getBootstrapComponent(); /*Getting the Fractal-GCM-Proactive bootstrap component*/
+        Component boot = Utils.getBootstrapComponent(); /*Getting the Fractal-GCM-Proactive bootstrap component*/
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
 
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory
@@ -344,7 +344,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
         }
 
         try {//Setting the real NF type, as some controllers may not be generated
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
             InterfaceType[] nf = new InterfaceType[nfType.size()];
             nfType.toArray(nf);

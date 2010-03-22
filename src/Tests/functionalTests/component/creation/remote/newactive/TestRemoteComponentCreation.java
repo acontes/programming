@@ -74,7 +74,7 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
      */
     @org.junit.Test
     public void primitiveCreation() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         PAGenericFactory cf = Utils.getPAGenericFactory(boot);
 
@@ -101,7 +101,7 @@ public class TestRemoteComponentCreation extends ComponentTestDefaultNodes {
     @org.junit.Test
     @Ignore
     public void compositeCreation() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         PAGenericFactory cf = Utils.getPAGenericFactory(boot);
 

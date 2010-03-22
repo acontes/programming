@@ -353,7 +353,7 @@
 
 	<section xml:id="ImplementationspecificAPI_53"><info><title>Implementation specific API</title></info>
 
-		<section xml:id="bootstrapcomponent_53"><info><title>Bootstrap component</title></info>
+		<section xml:id="apibootstrapcomponent_53"><info><title>API and bootstrap component</title></info>
 
 			<para>
 				The API is the same as for any Fractal implementation,
@@ -362,23 +362,56 @@
 			</para>
 
 			<para>
-				To get the bootstrap component, one should use the
-				<literal>org.objectweb.proactive.core.component.Utils#getBootstrapComponent()</literal>
-				method. This method creates an instance of the class
-				specified in the <literal>gcm.provider</literal>
-				system property (or in the
-				<literal>fractal.provider</literal> system property
-				if the first one has not been set), and uses this
-				instance to get the	bootstrap component. For this
-				implementation, the <literal>gcm.provider</literal>
-				system property has to be set to
+				Thus to get the bootstrap component, there are three
+				possibilities:
+				<itemizedlist>
+					<listitem>
+						<para>
+							Use the standard Fractal API with one of
+							the methods
+							<literal>org.objectweb.fractal.util.Fractal#getBootstrapComponent(...)</literal>.
+							In that case, the
+							<literal>fractal.provider</literal> system
+							property has to be set.
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Use the standard GCM API with one of the
+							methods
+							<literal>org.etsi.uri.gcm.util.GCM#getBootstrapComponent(...)</literal>.
+							In that case, the
+							<literal>gcm.provider</literal> system
+							property has to be set. 
+						</para>
+					</listitem>
+					<listitem>
+						<para>
+							Use the ProActive/GCM API with one of the
+							methods
+							<literal>org.objectweb.proactive.core.component.Utils#getBootstrapComponent(...)</literal>.
+							In that case, the system property to be
+							set can be either
+							<literal>gcm.provider</literal> or
+							<literal>fractal.provider</literal>.
+							This last solution is the one used in all
+							examples and tests provided through
+							ProActive.
+					</para>
+					</listitem>
+				</itemizedlist>
+				In all cases, for this implementation the used system
+				property has to be set to
 				<literal>org.objectweb.proactive.core.component.Fractive</literal>.
+			</para>
+
+			<para>
 				The
 				<literal>org.objectweb.proactive.core.component.Utils</literal>
 				class also contains several useful methods to
 				handle components. Moreover, as for any Fractal
 				or GCM implementation, ProActive/GCM also
-				supports the use of methods	of the
+				supports the use of other methods of the
 				<literal>org.objectweb.fractal.util.Fractal</literal>
 				and
 				<literal>org.etsi.uri.gcm.util.GCM</literal>

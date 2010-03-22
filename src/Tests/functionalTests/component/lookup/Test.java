@@ -48,6 +48,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
+import org.objectweb.proactive.core.component.Utils;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
@@ -67,7 +68,7 @@ public class Test extends ComponentTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(boot);
         GenericFactory componentFactory = GCM.getGenericFactory(boot);
         typeA = typeFactory.createFcType(new InterfaceType[] { typeFactory.createFcItfType("i1", I1.class

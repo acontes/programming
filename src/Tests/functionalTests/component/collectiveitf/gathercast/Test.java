@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.ComponentTest;
@@ -102,7 +103,7 @@ public class Test extends ComponentTest {
 
     @org.junit.Test
     public void testStartCompositeWithGathercastInternalClientItf() throws Exception {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory ptf = GCM.getGCMTypeFactory(boot);
         GenericFactory gf = GCM.getGenericFactory(boot);
         ComponentType rType = ptf.createFcType(new InterfaceType[] {

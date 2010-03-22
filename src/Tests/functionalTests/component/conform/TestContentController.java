@@ -52,6 +52,7 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.proactive.core.component.Utils;
 
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.I;
@@ -75,7 +76,7 @@ public class TestContentController extends Conformtest {
     //  }
     @Before
     public void setUp() throws Exception {
-        boot = GCM.getBootstrapComponent();
+        boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] {

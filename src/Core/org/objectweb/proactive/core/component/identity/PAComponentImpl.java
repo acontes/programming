@@ -176,7 +176,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
     }
 
     private void addMandatoryControllers(Vector<InterfaceType> nftype) throws Exception {
-        Component boot = GCM.getBootstrapComponent(); // Getting the Fractal-GCM-ProActive bootstrap component
+        Component boot = Utils.getBootstrapComponent(); // Getting the Fractal-GCM-ProActive bootstrap component
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
 
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory.createFcItfType(
@@ -230,7 +230,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
             }
 
             try {//Setting the real NF type, as some controllers may not be generated
-                Component boot = GCM.getBootstrapComponent();
+                Component boot = Utils.getBootstrapComponent();
                 GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
                 InterfaceType[] nf = new InterfaceType[nftype.size()];
                 nftype.toArray(nf);
@@ -466,7 +466,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
         }
 
         try {//Setting the real NF type, as some controllers may not be generated
-            Component boot = GCM.getBootstrapComponent();
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
             InterfaceType[] nf = new InterfaceType[nfType.size()];
             nfType.toArray(nf);

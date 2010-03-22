@@ -104,7 +104,7 @@ public class ExampleMain {
         Node aNode = vn.getANode();
 
         //@snippet-start component_examples_5
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
         //@snippet-end component_examples_5
 
         //@snippet-start component_examples_6
@@ -126,7 +126,7 @@ public class ExampleMain {
         //@snippet-start component_examples_9
         ControllerDescription controllerDesc = new ControllerDescription("myName", // name of the component
             Constants.PRIMITIVE // the hierarchical type of the component
-        // it could be PRIMITIVE, COMPOSITE, or PARALLEL
+        // it could be PRIMITIVE or COMPOSITE
         );
         //@snippet-end component_examples_9
 
@@ -142,7 +142,7 @@ public class ExampleMain {
     }
 
     public void interfacesExamples() throws InstantiationException, NoSuchInterfaceException {
-        Component boot = GCM.getBootstrapComponent();
+        Component boot = Utils.getBootstrapComponent();
 
         GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
 
