@@ -36,5 +36,13 @@
             <interface>org.objectweb.proactive.core.component.control.PAMigrationController</interface>
             <implementation>org.objectweb.proactive.core.component.control.PAMigrationControllerImpl</implementation>
         </controller>
+        <controller>
+            <interface>org.etsi.uri.gcm.api.control.MonitorController</interface>
+            <implementation>org.objectweb.proactive.core.component.control.PAMonitorControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.etsi.uri.gcm.api.control.PriorityController</interface>
+            <implementation>org.objectweb.proactive.core.component.control.PAPriorityControllerImpl</implementation>
+        </controller>
     </controllers>
 </componentConfiguration>

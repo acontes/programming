@@ -88,10 +88,10 @@ public abstract class Conformtest extends ComponentTest {
     protected final static String GC = Constants.GATHERCAST_CONTROLLER + "/" +
         GathercastController.class.getCanonicalName() + "/false,false,false";
     //protected final static String CP = "component-parameters-controller/org.objectweb.proactive.core.component.control.ComponentParametersController/false,false,false";
-    protected final static String PC = Constants.PRIORITY_CONTROLLER + "/" +
-        PriorityController.class.getCanonicalName() + "/false,false,false";
     protected final static String MoC = Constants.MONITOR_CONTROLLER + "/" +
         MonitorController.class.getCanonicalName() + "/false,false,false";
+    protected final static String PC = Constants.PRIORITY_CONTROLLER + "/" +
+        PriorityController.class.getCanonicalName() + "/false,false,false";
 
     //  protected final static String COMP = "component/"+ComponentItf.TYPE.getFcItfSignature()+"/false,false,false";
     //  protected final static String BC = "binding-controller/"+BindingControllerDef.TYPE.getFcItfSignature()+"/false,false,false";

@@ -98,7 +98,7 @@ public class TestCollection extends Conformtest {
     public void testPrimitiveWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", C.class.getName());
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, LC, SC, NC, MCC, GC, MC,
-                MoC, serverI, clientI })));
+                MoC, PC, serverI, clientI })));
         //       new Object[] { COMP, BC, LC, SC, NC, serverI, clientI })));
     }
 
@@ -106,7 +106,7 @@ public class TestCollection extends Conformtest {
     public void testCompositeWithCollection() throws Exception {
         Component c = gf.newFcInstance(t, "composite", null);
         checkComponent(c, new HashSet<Object>(Arrays.asList(new Object[] { COMP, BC, CC, LC, SC, NC, MCC, GC,
-                MC, MoC, serverI, clientI })));
+                MC, MoC, PC, serverI, clientI })));
     }
 
     @Test
