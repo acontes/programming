@@ -49,7 +49,6 @@ public interface Constants {
     // hierarchical types of component
     public final static String COMPOSITE = "composite";
     public final static String PRIMITIVE = "primitive";
-    public final static String PARALLEL = "parallel";
 
     // controller names
     public final static String ATTRIBUTE_CONTROLLER = "attribute-controller";

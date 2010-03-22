@@ -547,8 +547,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         }
 
         if (contentDesc == null) {
-            // either a parallel or a composite component, no
-            // activity/factory/node specified
+            // a composite component, no activity/factory/node specified
             if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {
@@ -639,8 +638,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
             ControllerDescription controllerDesc, ContentDescription contentDesc, Node node)
             throws InstantiationException, ActiveObjectCreationException, NodeException {
         if (contentDesc == null) {
-            // either a parallel or a composite component, no
-            // activitiy/factory/node specified
+            // a composite component, no activitiy/factory/node specified
             if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {

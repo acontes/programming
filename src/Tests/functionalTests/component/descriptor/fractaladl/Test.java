@@ -145,7 +145,7 @@ public class Test extends ComponentTest {
         //        System.out.println("*** received " + nb_messages + "  : " +
         //            resulting_msg.toString());
         //        System.out.println("***" + resulting_msg.toString());
-        // this --> primitiveC --> primitiveA --> primitiveB--> primitiveA --> primitiveC --> this  (message goes through parallel and composite components)
+        // this --> primitiveC --> primitiveA --> primitiveB--> primitiveA --> primitiveC --> this  (message goes through composite components)
         String single_message = Test.MESSAGE + PrimitiveComponentA.MESSAGE + PrimitiveComponentB.MESSAGE +
             PrimitiveComponentA.MESSAGE + Test.MESSAGE;
 

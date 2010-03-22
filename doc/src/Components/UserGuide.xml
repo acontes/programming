@@ -147,7 +147,7 @@
 							21: The
 							<emphasis role="bold">controller</emphasis>
 							elements can have the following 'desc'
-							values: 'composite' or 'primitive'.
+							values: 'primitive' or 'composite'.
 						</para>
 					</listitem>
 					<listitem>

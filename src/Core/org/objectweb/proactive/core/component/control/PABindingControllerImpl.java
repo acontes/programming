@@ -425,7 +425,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             return;
         }
 
-        // composite or parallel
         InterfaceType client_itf_type;
 
         client_itf_type = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName);
@@ -510,7 +509,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         // if we have a collection interface, the impl object is actually a
         // group of references to interfaces
         // Thus we have to add the link to the new interface in this group
-        // same for client interfaces of parallel components
         if (clientItfType.getFcItfName().equals(clientItfName)) {
             // single binding
             clientItf.setFcItfImpl(serverItf);
@@ -529,8 +527,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
      * @see org.objectweb.fractal.api.control.BindingController#unbindFc(String)
      * 
      * CAREFUL : unbinding action on collective interfaces will remove all the bindings to this
-     * interface. This is also the case when removing bindings from the server interface of a
-     * parallel component (yes you can do unbindFc(parallelServerItfName) !)
+     * interface.
      */
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {

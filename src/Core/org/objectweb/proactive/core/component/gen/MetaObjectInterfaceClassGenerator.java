@@ -76,7 +76,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * which the body is attached.<br>
  * - In case of a composite component, the impl field will be a component
  * representative.<br>
- * - For a parallel component, the impl field will be a group of component representatives.<br>
  *
  *  @author The ProActive Team
  */
