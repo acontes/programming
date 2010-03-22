@@ -33,45 +33,34 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worke
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerWatcher;
 
 
-public class AOSubWorker extends AOWorker implements WorkerPeer {
+public class AOSubWorker extends AOWorker implements WorkerPeer, WorkerDeadListener {
 
     /**
      * 
      */
-    private static final long serialVersionUID = 4461125099993797764L;
 
     static final Logger logger = ProActiveLogger.getLogger(Loggers.MASTERWORKER_SUBWORKERS);
     static final boolean debug = logger.isDebugEnabled();
-
-    private long peerid = 0;
-    /** Pinger (checks that workers are alive) */
-    private WorkerWatcher pinger;
 
     /** used for create new submaster */
     private WorkerMaster superProvider;
     private MemoryFactory memoryFactory;
     private String subMasterName;
     private long workerNameCounter;
-
-    private HashMap<Long, Node> deployedNodes;
-
-    private BooleanWrapper subMasterFailed = new BooleanWrapper(false);
-    private boolean electedSubMaster = false;
-    private boolean isElecting = false;
-
     private Node currentNode = null;
 
-    /**
-     * a thread pool used for submaster election
-     */
+    /** election related */
+    private HashMap<Long, Node> deployedNodes;
+    private long peerid = 0;
+    private WorkerWatcher pinger;
     private ExecutorService threadPool;
-
-    /**
-     * workerpeers deployed so far
-     */
     private HashMap<Long, WorkerPeer> workerPeerList;
     private HashMap<Long, String> workerNameList;
-    private HashMap<String, Worker> workers;
+
+    /** whether the worker is in election mode */
+    private Boolean isInElection = false;
+    /** iAmSubMaster musted by called after isDead */
+    private Boolean isDeadCalled = false;
 
     public AOSubWorker() {
 
@@ -98,29 +87,148 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     }
 
     /**
-     * Getter of the property <tt>peerId</tt>
-     * 
-     * @return Returns the peerid.
-     * @uml.property name="peerid"
+     * The additional operation of initActivity of AOSubWorker
+     * 1) two additional immediate service isDead and areYouAlive
+     * 2) add a pinger to monitor the SubMaster
      */
-    public long getPeerId() {
-        // TODO Auto-generated method stub
-        return peerid;
+    public void initActivity(Body body) {
+
+        terminated = false;
+        stubOnThis = (AOWorker) PAActiveObject.getStubOnThis();
+        PAActiveObject.setImmediateService("heartBeat");
+        //PAActiveObject.setImmediateService("terminate");
+
+        //for AOSubWorker begin
+        PAActiveObject.setImmediateService("isDead", new Class<?>[] { String.class });
+        PAActiveObject.setImmediateService("areYouAlive", new Class<?>[] { Long.class, String.class });
+        //The worker pinger
+        try {
+            currentNode = PAActiveObject.getNode();
+            pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
+                    new Object[] { stubOnThis }, currentNode);
+            pinger.addWorkerToWatch((Worker) provider, subMasterName);
+            if (debug) {
+                logger.debug("Workerpeer " + name + " add a pinger to wathch its submaster " + subMasterName);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        threadPool = Executors.newCachedThreadPool();
+        //for AOSubWorker end
+
+        // Initial Task
+        stubOnThis.getTaskAndSchedule();
+
     }
 
     /**
-     * Setter of the property <tt>peerId</tt>
-     * 
-     * @uml.property name="peerid"
+     * The additional operation of terminate of AOSubWorker
+     * 1) stop the pinger before stop itself
      */
-    public void setPeerId(long peerid) {
-        // TODO Auto-generated method stub
-        this.peerid = peerid;
+    public BooleanWrapper terminate() {
+        PAFuture.waitFor(pinger.terminate());
+        return super.terminate();
     }
 
+    /**
+     * The additional operation of scheduleTask of AOSubWorker
+     * 1) when find itself enter the election mode, stop the
+     * worker's behaviour i.e. clear and stop handling tasks
+     */
+    public void scheduleTask() {
+        if (!terminated) {
+
+            //for AOSubWorker begin
+            synchronized (isInElection) {
+                //stop the worker's behaviour
+                if (isInElection) {
+                    pendingTasks.clear();
+                    pendingTasksFutures.clear();
+                    return;
+                }
+            }
+            //for AOSubWorker end
+
+            while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0)) {
+                pendingTasks.addAll(pendingTasksFutures.remove());
+            }
+
+            if (!suspended && (pendingTasks.size() > 0)) {
+
+                TaskIntern<Serializable> newTask = pendingTasks.remove();
+                // We handle the current Task
+                stubOnThis.handleTask(newTask);
+
+            }
+            // if there is nothing to do or if we are suspended we sleep
+        }
+
+    }
+
+    private void sleepForAWhile(long t) {
+        try {
+            Thread.sleep(t);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Internal class responsible for election algorithm thread
+     * for one time election, each worker should run this thread
+     * only one time
+     */
+    private class ElectionHandler implements Runnable {
+
+        public ElectionHandler() {
+        }
+
+        public void run() {
+            electNewSubMaster();
+        }
+    }
+
+    /**
+     * belowing part is election logic
+     */
+
+    /**
+     * inherited from WorkerDeadListener, never used
+     */
+    public boolean isDead(Worker worker) {
+        return false;
+    }
+
+    /**
+     * called by the pinger when the pinger find SubMaster dead
+     * it is the only way to enter the election mode
+     */
+    public boolean isDead(final String workerName) {
+
+        if (debug) {
+            logger.debug(this.name + " find submaster is dead");
+        }
+
+        isDeadCalled = true;
+        //set this flag to stop the worker's behaviour
+        synchronized (isInElection) {
+            isInElection = true;
+        }
+
+        threadPool.execute(new ElectionHandler());
+        return false;
+    }
+
+    /**
+     * called by the SubMaster to broadcast the peer list knowledge
+     * this is called during the deployment time
+     */
     public BooleanWrapper updateWorkerPeerList(long workerNameCounter, Map<Long, WorkerPeer> workerPeerList,
             Map<Long, String> workerNameList) {
-        // TODO Auto-generated method stub
+
+        if (debug) {
+            logger.debug("updateWorkerPeerList called");
+        }
 
         synchronized (workerPeerList) {
             synchronized (workerNameList) {
@@ -132,7 +240,7 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
                     this.workerNameList.putAll(workerNameList);
                 } else {
                     if (debug) {
-                        logger.debug("The peerlist that the peer already have is new than the given one..");
+                        logger.debug("old message");
                     }
                     return new BooleanWrapper(false);
                 }
@@ -141,9 +249,10 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
         if (workerNameCounter > this.workerNameCounter)
             this.workerNameCounter = workerNameCounter;
         if (debug) {
-            String output = "Peer list size is :" + workerPeerList.size() + " details is: ";
+            String output = "updateWorkerPeerList: Peer list size is :" + workerPeerList.size() +
+                " details is: ";
             for (long keyid : this.workerPeerList.keySet()) {
-                output = output + keyid;
+                output = output + "-" + keyid;
             }
 
             logger.debug(output);
@@ -153,420 +262,202 @@ public class AOSubWorker extends AOWorker implements WorkerPeer {
     }
 
     /**
-     * Send a message to all the workers whose peerid is smaller than this
-     * If one of them give back a message, then, go out
-     * We create a new thread to ask other workers and the main thread return a true
+     * called by the worker peer with bigger id
+     * if returned the bigger peer give up to be the new SubMaster
+     * and wait for the new SubMaster's arrival
+     * must be synchronous
      */
-    public WorkerMaster canBeSubMaster(final Long peerId, final String peerName, final WorkerPeer workerPeer) {
-        synchronized (workerPeerList) {
-            synchronized (workerNameList) {
-                if (!workerPeerList.containsKey(peerId)) {
-                    workerPeerList.put(peerId, workerPeer);
-                    if (!workerNameList.containsKey(peerId)) {
-                        workerNameList.put(peerId, peerName);
-                    }
-                }
-            }
-        }
-
-        if (!subMasterFailed.booleanValue()) {
-            if (isDead().booleanValue()) {
-                threadPool.execute(new HeartBeatHandler());
-                return null;
-            }
-            return this.provider;
-        }
-        return null;
-
-    }
-
-    public BooleanWrapper iAmSubmaster(WorkerMaster submaster, final String subMasterName,
-            final Map<Long, String> workerNameList, final Map<Long, WorkerPeer> workerPeerList) {
-        // TODO Auto-generated method stub
-        this.workerPeerList.clear();
-        this.workerNameList.clear();
+    public boolean areYouAlive(final Long peerId, final String peerName) {
 
         if (debug) {
-            logger.debug("" + subMasterName + " informs " + name + " that he is the new submaster");
+            logger.debug("areYouAlive called caller: " + peerName + " caller's id: " + peerId + " self: " +
+                this.name);
         }
-
-        this.provider = submaster;
-        this.subMasterName = subMasterName;
-
-        // Add all the workerpeers of the given list to the list of the workerpeer
-        this.workerPeerList.putAll(workerPeerList);
-        this.workerNameList.putAll(workerNameList);
-        this.pinger.addWorkerToWatch((Worker) submaster, subMasterName);
-        if (debug) {
-            logger.debug(name + " asks its pinger to watch " + subMasterName);
-        }
-        this.subMasterFailed = new BooleanWrapper(false);
-        return new BooleanWrapper(true);
-    }
-
-    public boolean isDead(Worker worker) {
-        // TODO Auto-generated method stub
-        if (isDead().booleanValue()) {
-            threadPool.execute(new HeartBeatHandler());
-        }
-        return false;
+        return true;
     }
 
     /**
-     * if isDead is called, that's to say a peer whose peerId is smaller than him 
-     * has detected the missing of the subMaster, so he just clear himself and waiting.
+     * the new SubMaster's arrival
+     * asyn but the result should be waited by the new SubMaster
+     * the only way out of election mode
      */
-    public BooleanWrapper isDead() {
-        // TODO Auto-generated method stub
-        synchronized (subMasterFailed) {
-            if (!subMasterFailed.booleanValue()) {
-                if (debug) {
-                    logger.debug("SubMaster " + subMasterName + " is reported missing!");
-                }
-                try {
-                    ((Worker) provider).heartBeat();
-                    // The subMaster is alive, you made a mistake
-                    return new BooleanWrapper(false);
-                } catch (Exception e) {
-                    if (!subMasterFailed.booleanValue()) {
-                        if (debug) {
-                            logger.debug("SubMaster " + subMasterName + " really missed!");
-                        }
-                        subMasterFailed = new BooleanWrapper(true);
-                        try {
-                            pinger.removeWorkerToWatch(subMasterName);
-                            if (debug) {
-                                logger.debug("Remove the SubMaster " + subMasterName + " from pinger!");
-                            }
-                        } catch (Exception e1) {
-                            if (debug) {
-                                logger.debug("Error happens when do the clear for submaster missing!");
-                            }
-                            e1.printStackTrace();
-                        }
-                    }
-                }
-            }
+    public BooleanWrapper iAmSubMaster(WorkerMaster submaster, final String subMasterName,
+            final Map<Long, String> workerNameList, final Map<Long, WorkerPeer> workerPeerList) {
+
+        //must be called after isDead, wait for the pinger
+        while (isDeadCalled == false) {
+            sleepForAWhile(200);
         }
+
+        //reset this flag for next election
+        isDeadCalled = false;
+
         if (debug) {
-            logger.debug("SubMaster " + subMasterName + " has missed!");
+            logger.debug("iAmSubMaster called caller: " + subMasterName + " self: " + name);
         }
+
+        //update the peer list knowledge
+        this.workerPeerList.clear();
+        this.workerNameList.clear();
+        this.workerPeerList.putAll(workerPeerList);
+        this.workerNameList.putAll(workerNameList);
+        this.provider = submaster;
+        this.subMasterName = subMasterName;
+        this.pinger.removeWorkerToWatch(subMasterName);
+        this.pinger.addWorkerToWatch((Worker) submaster, subMasterName);
+
+        //get out of election mode
+        //and reschedule task
+        //the only way out
+        synchronized (isInElection) {
+            isInElection = false;
+        }
+        stubOnThis.getTaskAndSchedule();
+
+        //ack to the new SubMaster
         return new BooleanWrapper(true);
+
     }
 
-    public boolean isDead(final String workerName) {
-        if (isDead().booleanValue()) {
-            threadPool.execute(new HeartBeatHandler());
-        }
-        return false;
-    }
-
+    /**
+     * election logic
+     * in one election each worker should run this in a new thread
+     * only once
+     */
     private void electNewSubMaster() {
-        // If the workerPeerList is null, try to descover all the workerPeer
-        if (workerPeerList.size() == 0) {
-            if (deployedNodes.size() > 1) {
-                for (Long keyId : deployedNodes.keySet()) {
-                    try {
-                        Object[] aos = deployedNodes.get(keyId).getActiveObjects(AOSubWorker.class.getName());
-                        if (aos.length > 0) {
-                            workerPeerList.put(keyId, ((WorkerPeer) aos[0]));
-                            if (debug) {
-                                logger.debug("Found workerPeer " + keyId);
-                            }
-                        }
-
-                    } catch (NodeException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    } catch (ActiveObjectCreationException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
-                }
-            } else {
-                // has no connection to other nodes, do nothing
-
-            }
-
-        }
 
         Set<Long> peerids = new HashSet<Long>(workerPeerList.keySet());
         String workername = null;
         WorkerPeer workerpeer = null;
 
         if (debug) {
-            logger.debug("Start the election of a new submaster");
-        }
-        isElecting = true;
+            logger.debug("election started on " + name);
 
-        if (debug) {
-            String output = "Peer list size is : " + peerids.size() + " details is: ";
+            String output = "election1 Peer list size is : " + peerids.size() + " details is: ";
             for (long keyid : peerids) {
-                output = output + keyid;
+                output = output + "-" + keyid;
             }
 
             logger.debug(output);
         }
 
-        // do a loop, if get no response, elect himself as a submaster
-        // otherwise the one who give him a response will take charge in the election
+        //check the peers whose id is smaller then mine
+        //if any of them is alive, I will give up and wait
+        //for the arrival of the new SubMaster
         for (Long peerId : peerids) {
-            if (workerPeerList.containsKey(peerId) && workerNameList.containsKey(peerId)) {
+
+            if (this.peerid > peerId && workerNameList.containsKey(peerId)) {
                 workerpeer = (WorkerPeer) workerPeerList.get(peerId);
                 workername = workerNameList.get(peerId);
-                if (this.peerid > peerId) {
-                    try {
-                        if (debug) {
-                            logger.debug("Ask if " + workername + " can be a submaster");
-                        }
-                        // Send a message to ask those peers whose peerids are smaller than this 
-                        // If any of the workers has heartbeat, then go out and waiting
-                        WorkerMaster subMaster = workerpeer.canBeSubMaster(this.peerid, this.name,
-                                (AOSubWorker) this.stubOnThis);
-                        PAFuture.waitFor(subMaster);
-                        // If get the subMaster
-                        if (null != subMaster) {
-                            this.provider = subMaster;
-                            this.subMasterFailed = new BooleanWrapper(false);
-                            this.isElecting = false;
-                            this.electedSubMaster = false;
-                            this.pinger.removeWorkerToWatch(subMasterName);
-                            this.pinger.addWorkerToWatch((Worker) subMaster, subMasterName);
-                        }
-                        if (debug) {
-                            logger.debug("Receive a reply from Worker " + workername + ", waiting");
-                        }
-                        //	                    if(!warp.booleanValue()) {
-                        //                    	// If it return that the subMaster is alive
-                        //                    	subMasterFailed = true;
-                        //							                    
-                        //                    	return;
-                        //                    }
-                        return;
-                    } catch (Exception e) {
-                        if (debug) {
-                            logger.debug("Worker " + workername + " is missing");
-                        }
+                try {
+                    if (debug) {
+                        logger.debug(this.name + " ask if " + workername + " is alive");
                     }
+
+                    workerpeer.areYouAlive(this.peerid, this.name);
+
+                    if (debug) {
+                        logger.debug(this.name + "receive a reply from Worker " + workername + ", waiting");
+                    }
+                    //give up and wait
+                    return;
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug(this.name + "in election Worker " + workername + " is missing");
+                    }
+                    e.printStackTrace();
                 }
-                //	            else{
-                //	            	
-                //	            	try {
-                //	                    if (debug) {
-                //	                        logger.debug("Tell the worker " + workername + " that the submaster is reported missing");
-                //	                    }
-                //	                    // Send a message to inform the subMaster has dead
-                //	                    // If any of the workers has heartbeat, then go out and waiting
-                //	                    BooleanWrapper warp = workerPeerList.get(peerid).isDead();
-                ////	                    PAFuture.waitFor(warp, 100);
-                ////	                    if(!warp.booleanValue()) {
-                ////	                    	// If it return that the subMaster is alive
-                ////	                    	subMasterFailed = true;
-                ////	                    	return;
-                ////	                    }
-                //	                } catch (Exception e) {
-                //	                    if (debug) {
-                //	                        logger.debug("Worker" + workername + " is missing");
-                //	                    }
-                //	                } 
-                //	            	
-                //	            }
             }
+
         }
 
-        // The workerpeer remove himself from the peerlist
+        //new SubMaster logic
+
+        //step0 preparation remove himself from the peerlist
         workerPeerList.remove(this.peerid);
         workerNameList.remove(this.peerid);
         Collection<WorkerPeer> workerpeers = new ArrayList<WorkerPeer>(workerPeerList.values());
 
         if (debug) {
-            String output = "Peer list size is :" + workerPeerList.size() + " Peerid is :" + this.peerid +
-                " details is: ";
-            for (long keyid : workerPeerList.keySet()) {
-                output = output + keyid;
-            }
 
+            logger.debug("new submaster entering");
+
+            String output = "election2 Peer list size is :" + workerPeerList.size() + " Peerid is :" +
+                this.peerid + " details is: ";
+            for (long keyid : workerPeerList.keySet()) {
+                output = output + "-" + keyid;
+            }
             logger.debug(output);
         }
 
-        // If no worker is alive, we then determined himself to be the submaster
-        // Create a new active object submaster on this node 
-        // by calling the special construction funciton of the AOSubMaster
-
         try {
+            //step1: AO creation
             AOSubMaster subMaster = (AOSubMaster) PAActiveObject.newActive(AOSubMaster.class.getName(),
                     new Object[] { subMasterName, (WorkerMaster) superProvider, memoryFactory }, currentNode);
-
-            // Inform all the workerpeers in the list that he is the new submaster
-            // Here we pass the argument like submaster stub or just submaster
-            for (WorkerPeer peer : workerpeers) {
-                peer.iAmSubmaster(subMaster, subMasterName, workerNameList, workerPeerList);
+            if (debug) {
+                logger.debug("new submaster created1 AO creation done");
             }
 
-            // Get workers
-            workers = new HashMap<String, Worker>();
+            //step2: init the new SubMaster
+            HashMap<String, Worker> workers = new HashMap<String, Worker>();
             for (Long peerid : workerPeerList.keySet()) {
                 if (peerid > workerNameCounter)
                     workerNameCounter = peerid;
                 workers.put(workerNameList.get(peerid), (AOSubWorker) workerPeerList.get(peerid));
             }
-            // Call the initSubMaster to init the subMaster
             BooleanWrapper wrap = subMaster.InitSubMaster(workerNameCounter, workerPeerList, workers);
             PAFuture.waitFor(wrap);
 
-            // The worker then terminate himself
-            this.subMasterFailed = new BooleanWrapper(false);
-            this.electedSubMaster = true;
-
-        } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NodeException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        } catch (Exception e2) {
-            // TODO Auto-generated catch block
-            e2.printStackTrace();
-        }
-
-    }
-
-    public void initActivity(Body body) {
-        // TODO Auto-generated method stub
-        terminated = false;
-
-        stubOnThis = (AOSubWorker) PAActiveObject.getStubOnThis();
-
-        PAActiveObject.setImmediateService("canBeSubMaster", new Class<?>[] { long.class, String.class,
-                WorkerPeer.class });
-        PAActiveObject.setImmediateService("addWorkerPeer", new Class<?>[] { long.class, String.class,
-                WorkerPeer.class });
-        // PAActiveObject.setImmediateService("iAmSubmaster", new Class<?> [] {WorkerMaster.class, String.class, HashMap.class});
-        PAActiveObject.setImmediateService("isDead");
-        PAActiveObject.setImmediateService("isDead", new Class<?>[] { String.class });
-        PAActiveObject.setImmediateService("heartBeat");
-
-        //PAActiveObject.setImmediateService("terminate");
-
-        // The worker pinger
-        try {
-            currentNode = PAActiveObject.getNode();
-            pinger = (WorkerWatcher) PAActiveObject.newActive(AOPinger.class.getName(),
-                    new Object[] { stubOnThis }, currentNode);
-            pinger.addWorkerToWatch((Worker) provider, subMasterName);
             if (debug) {
-                logger.debug("Workerpeer " + name + " add a pinger to wathch its submaster " + subMasterName);
-            }
-        } catch (ActiveObjectCreationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (NodeException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        // get a thread for the peer
-        threadPool = Executors.newCachedThreadPool();
-        // Initial Task
-        stubOnThis.getTaskAndSchedule();
-    }
-
-    public BooleanWrapper terminate() {
-        if (debug) {
-            logger.debug("Terminating " + name + "...");
-        }
-        PAFuture.waitFor(pinger.terminate());
-
-        ((WorkerMemoryImpl) memory).clear();
-        initialMemory.clear();
-
-        // We terminate the pinger
-
-        if (debug) {
-            logger.debug(name + " terminated...");
-        }
-
-        provider = null;
-        stubOnThis = null;
-        PAActiveObject.terminateActiveObject(false);
-        return new BooleanWrapper(true);
-    }
-
-    /** gets the initial task to solve */
-    @SuppressWarnings("unchecked")
-    public void getTaskAndSchedule() {
-        // We get some tasks
-        getTasks();
-
-        if (!terminated) {
-            // We schedule the execution
-            stubOnThis.scheduleTask();
-        }
-    }
-
-    /** ScheduleTask : find a new task to run */
-    public void scheduleTask() {
-        if (!terminated) {
-
-            while ((pendingTasks.size() == 0) && (pendingTasksFutures.size() > 0) &&
-                !subMasterFailed.booleanValue()) {
-                pendingTasks.addAll(pendingTasksFutures.remove());
+                logger.debug("new submaster created2 initialization done");
             }
 
-            if (subMasterFailed.booleanValue()) {
-                clear();
-            }
-
-            while (subMasterFailed.booleanValue()) {
+            //step3 broadcasting
+            ArrayList<BooleanWrapper> confirm = new ArrayList<BooleanWrapper>();
+            for (WorkerPeer peer : workerpeers) {
                 try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    // TODO Auto-generated catch block
+                    BooleanWrapper rlt = peer.iAmSubMaster(subMaster, subMasterName, workerNameList,
+                            workerPeerList);
+                    confirm.add(rlt);
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug("broadcasting exception");
+                    }
                     e.printStackTrace();
                 }
             }
 
-            if (electedSubMaster) {
-                electedSubMaster = false;
-                isElecting = false;
-                terminate();
-            } else if (isElecting) {
-                isElecting = false;
-                stubOnThis.getTaskAndSchedule();
+            if (debug) {
+                logger.debug("new submaster created3 start waiting for result");
             }
 
-            if (!suspended && (pendingTasks.size() > 0)) {
-
-                TaskIntern<Serializable> newTask = pendingTasks.remove();
-                // We handle the current Task
-                stubOnThis.handleTask(newTask);
-
+            //must wait for the result
+            for (int i = 0; i < confirm.size(); i++) {
+                try {
+                    PAFuture.waitFor(confirm.get(i));
+                } catch (Exception e) {
+                    if (debug) {
+                        logger.debug("wait confirm exception");
+                    }
+                    e.printStackTrace();
+                }
             }
 
-            // if there is nothing to do or if we are suspended we sleep
+            if (debug) {
+                logger.debug("new submaster created4 broadcasting done");
+            }
+
+            //step4 terminate myself as a worker
+            stubOnThis.terminate();
+
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            if (debug) {
+                logger.debug(this.name + " new submaster error");
+            }
+            e.printStackTrace();
         }
 
     }
 
-    /**
-     * Internal class which deal with test if the workers whose peerid is smaller than this are live or not
-     *
-     * @author The ProActive Team
-     */
-    private class HeartBeatHandler implements Runnable {
-
-        /**
-         * HeartBeatHandler
-         *
-         */
-        public HeartBeatHandler() {
-        }
-
-        /**
-         * {@inheritDoc}
-         */
-        public void run() {
-            electNewSubMaster();
-        }
-    }
 }

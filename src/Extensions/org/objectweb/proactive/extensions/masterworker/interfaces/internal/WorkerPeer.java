@@ -13,14 +13,14 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public interface WorkerPeer extends WorkerDeadListener {
 
     /**
-     * Return whether it can be SubMaster or not
+     * Return whether the WorkerPeer called is alive
+     * must be synchronous
      */
-    public abstract WorkerMaster canBeSubMaster(final Long peerId, final String peerName,
-            final WorkerPeer workerPeer);
+    public abstract boolean areYouAlive(final Long peerId, final String peerName);
 
     /**
      * The SubMaster informs a new peer join the group.
-     * The worker peer adds a new peer to the worker peer list
+     * each time the whole peer list is updated
      */
     public abstract BooleanWrapper updateWorkerPeerList(long workerNameCounter,
             Map<Long, WorkerPeer> workerPeerList, Map<Long, String> workerNameSet);
@@ -30,11 +30,7 @@ public interface WorkerPeer extends WorkerDeadListener {
      * When a new submaster is generated, he send the peerlist to all the workers
      * The workers update the peerlist of the peer
      */
-    public abstract BooleanWrapper iAmSubmaster(WorkerMaster submaster, final String subMasterName,
+    public abstract BooleanWrapper iAmSubMaster(WorkerMaster submaster, final String subMasterName,
             final Map<Long, String> workernamelist, final Map<Long, WorkerPeer> workerpeerlist);
 
-    /**
-     * Used for the peer who detect the failure of the subMaster to broadcast the message to the other peers
-     */
-    public abstract BooleanWrapper isDead();
 }
