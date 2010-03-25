@@ -7,14 +7,15 @@
 		<javaPropertyVariable name="proactive.home" />
 		<javaPropertyVariable name="user.home" />
 
-		<descriptorVariable name="hostCapacity" value="2"/>
-		<descriptorVariable name="vmCapacity" value="2"/>
+		<descriptorVariable name="hostCapacity" value="1"/>
+		<descriptorVariable name="vmCapacity" value="4"/>
 	</environment>
 
 
 	<application>
 		<proactive base="root" relpath="${proactive.home}">
 			<configuration>
+				<jvmarg value="-Xmx2000m -Xms2000m"/>
 				<applicationClasspath>
 					<pathElement base="proactive" relpath="dist/lib/ProActive_examples.jar"/>
 					<pathElement base="proactive" relpath="dist/lib/ibis-1.4.jar"/>
@@ -23,14 +24,13 @@
 				</applicationClasspath>
 			</configuration>
 
-			<virtualNode id="Workers" capacity="4"/>
+			<virtualNode id="Workers" capacity="32"/>
 		</proactive>
-
 	</application>
 
 	<resources>
 		<nodeProvider id="workers">
-			<file path="../GCMD_Local.xml" />
+			<file path="SSHLan.xml" />
 		</nodeProvider>
 	</resources>
 </GCMApplication>

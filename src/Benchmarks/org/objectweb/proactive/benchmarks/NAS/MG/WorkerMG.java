@@ -779,9 +779,9 @@ public class WorkerMG extends Timed implements Serializable {
             for (int axis = 1; axis <= 3; axis++) {
                 if (clss.np != 1) {
                     matrixExchanger.prepare(axis, +1, u, uoff, u, uoff, n1, n2, n3);
-                    PASPMD.exchange("pos" + axis, nbr[axis][2][kk], matrixExchanger, matrixExchanger);
+                    PASPMD.exchange("pos" + axis + kk, nbr[axis][2][kk], matrixExchanger, matrixExchanger);
                     matrixExchanger.prepare(axis, -1, u, uoff, u, uoff, n1, n2, n3);
-                    PASPMD.exchange("neg" + axis, nbr[axis][0][kk], matrixExchanger, matrixExchanger);
+                    PASPMD.exchange("neg" + axis + kk, nbr[axis][0][kk], matrixExchanger, matrixExchanger);
                 } else {
                     comm1p(axis, u, uoff, n1, n2, n3, kk);
                 }
@@ -795,9 +795,9 @@ public class WorkerMG extends Timed implements Serializable {
         for (int axis = 1; axis <= 3; axis++) {
             if (clss.np != 1) {
                 matrixExchanger.prepare(axis, +1, u, uoff, u, uoff, n1, n2, n3);
-                PASPMD.exchange("pos" + axis, nbr[axis][2][kk], matrixExchanger, matrixExchanger);
+                PASPMD.exchange("poss" + axis + kk, nbr[axis][2][kk], matrixExchanger, matrixExchanger);
                 matrixExchanger.prepare(axis, -1, u, uoff, u, uoff, n1, n2, n3);
-                PASPMD.exchange("neg" + axis, nbr[axis][0][kk], matrixExchanger, matrixExchanger);
+                PASPMD.exchange("negg" + axis + kk, nbr[axis][0][kk], matrixExchanger, matrixExchanger);
             } else {
                 comm1p_ex(axis, u, uoff, n1, n2, n3, kk);
             }

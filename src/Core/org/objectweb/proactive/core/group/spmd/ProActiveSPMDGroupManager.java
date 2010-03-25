@@ -40,6 +40,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.objectweb.proactive.api.PAGroup;
+import org.objectweb.proactive.core.group.spmd.topology.ProActiveSPMDTopologyManager;
+
 
 /**
  * @author The ProActive Team
@@ -66,11 +69,17 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
     private LinkedList<String> barrierTags = new LinkedList<String>();
 
     /**
+	 * Manager of the topology of the spmd group
+	 */
+	private ProActiveSPMDTopologyManager topologyManager;
+    
+    /**
      * Set the SPMD group for the active object.
      * @param o - the new SPMD group
      */
     public void setSPMDGroup(Object o) {
         this.spmdGroup = o;
+        this.topologyManager = new ProActiveSPMDTopologyManager(PAGroup.getGroup(o));
     }
 
     /**
@@ -81,6 +90,14 @@ public class ProActiveSPMDGroupManager implements java.io.Serializable {
         return this.spmdGroup;
     }
 
+    /**
+	 * Return the manager of the topology of the spmd group.
+	 * @return the manager of the topology of the spmd group.
+	 */
+	public ProActiveSPMDTopologyManager getTopologyManager(){
+		return topologyManager;
+	}
+    
     /**
      * Adds the barrier ID into the list of barrier ID used to tag messages.
      * @param barrierID the barrier name

@@ -66,6 +66,8 @@ import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
 import org.objectweb.proactive.core.gc.GarbageCollector;
+import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
+import org.objectweb.proactive.core.group.spmd.topology.ProActiveSPMDTopologyManager;
 import org.objectweb.proactive.core.mop.ConstructorCall;
 import org.objectweb.proactive.core.mop.ConstructorCallExecutionFailedException;
 import org.objectweb.proactive.core.mop.ConstructorCallImpl;
@@ -497,6 +499,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
         }
 
+        long initSend = System.currentTimeMillis();
+        
         if (this.isLocal) {
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.startTimer(sourceBody.getID(), TimerWarehouse.LOCAL_COPY);
@@ -522,6 +526,16 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
         }
 
+        if(methodCall.getName().equals("_ImmediateMethodCallDummy")){
+			int timeToSend = (int)(System.currentTimeMillis()-initSend);
+			ProActiveSPMDGroupManager spmdManager = ((AbstractBody)sourceBody).getProActiveSPMDGroupManager();
+			if(spmdManager != null){
+				ProActiveSPMDTopologyManager topologyManager = spmdManager.getTopologyManager();
+				if(topologyManager != null)
+					topologyManager.addLatency(timeToSend, this.getBody());
+			}
+		}
+        
         FuturePool fp = sourceBody.getFuturePool();
 
         // A synchronous termination request may have destroyed the future pool

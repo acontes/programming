@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export PROACTIVE_HOME=/auto/sop-nas2a/u/sop-nas2a/vol/home_oasis/mvaldene/workspace/SHORT_Topology_Discovering
+
 if [ -z "$PROACTIVE" ]
 then
 	workingDir=`dirname $0`
