@@ -12,7 +12,7 @@ import java.util.Map;
 
 /**
  * Class trying to inferate the topology of a group a nodes,
- * by analyzing their latencies
+ * by analyzing their latencies.
  */
 public class TopologyInference implements Serializable{
 
