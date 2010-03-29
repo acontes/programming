@@ -1046,7 +1046,7 @@ public class AOMaster implements Serializable, WorkerMaster, InitActive, RunActi
             } else if (methodName.equals("waitAllResults") && resultQueue.areAllResultsAvailable()) {
                 servePending(null, service);
             } else if (methodName.equals("waitKResults")) {
-                int k = (Integer) pendingRequest.getParameter(1);
+                int k = (Integer) pendingRequest.getParameter(2);
                 if (resultQueue.countAvailableResults() >= k) {
                     servePending(null, service);
                 }
