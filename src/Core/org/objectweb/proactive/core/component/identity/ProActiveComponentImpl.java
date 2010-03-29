@@ -139,14 +139,18 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
 
         // 2. control interfaces
         if (nfType != null) { /*The nf type is specified*/
+        	logger.debug("ProActiveComponentImpl: This component has a NFType");
             if (!ctrlDesc.configFileIsSpecified()) { /*There is no file containing the nf configuration*/
+            	logger.debug("ProActiveComponentImpl: No config file specified.");
                 generateNfType(nfType, component_is_primitive);
             } else { /*The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file*/
-                checkCompatibility();
+            	logger.debug("ProActiveComponentImpl: Config file: ["+ ctrlDesc.getControllersConfigFileLocation()+"]");
+            	checkCompatibility();
                 addControllers(component_is_primitive);
             }
         } else { /*No NFTYpe, means that it has to be generated from the config file*/
-            addControllers(component_is_primitive);
+        	logger.debug("ProActiveComponentImpl: This component DOESN'T have a NFType. Configuration from ["+ ctrlDesc.getControllersConfigFileLocation() +"]");
+        	addControllers(component_is_primitive);
         }
 
         // 3. external functional interfaces
@@ -196,6 +200,7 @@ public class ProActiveComponentImpl implements ProActiveComponent, Serializable 
     }
 
     private void generateNfType(ComponentType nfType, boolean isPrimitive) {
+    	logger.debug("ProActiveComponentImpl: Generating NFType for "+ (isPrimitive?"primitive":"composite"));
         InterfaceType[] tmp = nfType.getFcInterfaceTypes();
         ProActiveInterfaceType[] interface_types = new ProActiveInterfaceType[tmp.length];
         System.arraycopy(tmp, 0, interface_types, 0, tmp.length);

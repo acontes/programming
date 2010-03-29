@@ -936,12 +936,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             			// and should have BindingController, so it shouldn't throw a NoSuchInterfaceException here
             			BindingController bc = null;
             			try {
-							bc = Fractal.getBindingController(pac);
-							if(!Utils.isControllerInterfaceName(interfaceName)) {
+            				// more ugliness ... name must not end with -NF 
+            				// this is to avoid that the tags be propagated in calls inside the membrane ... I don't want to monitor that, and it generates errors
+							if(!Utils.isControllerInterfaceName(interfaceName) && !componentSourceName.endsWith("-NF")) {
+								bc = Fractal.getBindingController(pac);
 								componentDestName = ((ProActiveComponentRepresentative)((ProActiveInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
 							}
 						} catch (NoSuchInterfaceException e) {
-							e.printStackTrace();
+							// FIXME I shouldn't add tags if the component is NF, I don't want to monitor them
+							// For now I will ignore them, but it should be solved in clean way (detecting before the fact that the component is NF)
+							//System.out.println("Couldn't find interface [" + interfaceName + "] on component ["+ componentSourceName + "]");
+							//e.printStackTrace();
 						}
 						
             			
