@@ -21,7 +21,7 @@
 				</proactiveClasspath>
 			</configuration>
 			
-			<virtualNode id="VN1" capacity="4">
+			<virtualNode id="VN2" capacity="4">
 				<nodeProvider refid="localhosts" />
             </virtualNode>
         </proactive>

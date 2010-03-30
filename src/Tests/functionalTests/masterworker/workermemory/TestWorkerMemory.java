@@ -51,7 +51,7 @@ import java.util.List;
  */
 public class TestWorkerMemory extends FunctionalTest {
     private URL descriptor = TestWorkerMemory.class
-            .getResource("/functionalTests/masterworker/workermemory/TestWorkerMemory.xml");
+            .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<MemoryTask, String> master;
     private List<MemoryTask> tasks;
     public static final int NB_TASKS = 3;
@@ -77,6 +77,7 @@ public class TestWorkerMemory extends FunctionalTest {
         master = new ProActiveMaster<MemoryTask, String>(new ConstantMemoryFactory(memory));
         master.addResources(descriptor);
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
     }
 
     @After

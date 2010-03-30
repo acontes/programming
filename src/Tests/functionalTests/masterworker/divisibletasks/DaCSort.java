@@ -66,7 +66,7 @@ public class DaCSort implements DivisibleTask<ArrayList<Integer>> {
 
     public ArrayList<Integer> run(WorkerMemory memory, SubMaster master) throws Exception {
         ArrayList l1 = new ArrayList(input.subList(0, input.size() / 2));
-        ArrayList l2 = new ArrayList(input.subList(input.size() / 2 + 1, input.size()));
+        ArrayList l2 = new ArrayList(input.subList(input.size() / 2, input.size()));
 
         if (l1.size() < MIN_LIST_TO_SPLIT) {
             ArrayList<FinalSort> tasks = new ArrayList<FinalSort>();
@@ -93,29 +93,30 @@ public class DaCSort implements DivisibleTask<ArrayList<Integer>> {
 
     private static ArrayList<Integer> merge(ArrayList<Integer> l1, ArrayList<Integer> l2) {
         // merging
-        Iterator<Integer> it1 = l1.iterator();
-        Iterator<Integer> it2 = l2.iterator();
-
+        int size1 = l1.size();
+        int size2 = l2.size();
+        int i = 0;
+        int j = 0;
         ArrayList<Integer> answer = new ArrayList<Integer>();
 
-        int a = it1.next();
-        int b = it2.next();
+        while (i < size1 && j < size2) {
 
-        do {
-            while ((a <= b) && answer.add(a) && it1.hasNext()) {
-                a = it1.next();
+            if (l1.get(i) <= l2.get(j)) {
+                answer.add(l1.get(i++));
+            } else {
+                answer.add(l2.get(j++));
             }
-            while ((a > b) && answer.add(b) && it2.hasNext()) {
-                b = it2.next();
-            }
-        } while (it1.hasNext() && it2.hasNext());
 
-        while (it1.hasNext()) {
-            answer.add(it1.next());
         }
-        while (it2.hasNext()) {
-            answer.add(it2.next());
+
+        while (i < size1) {
+            answer.add(l1.get(i++));
         }
+
+        while (j < size2) {
+            answer.add(l2.get(j++));
+        }
+
         return answer;
     }
 

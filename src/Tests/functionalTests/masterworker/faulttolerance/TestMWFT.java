@@ -52,8 +52,11 @@ import java.util.List;
  * Test load balancing
  */
 public class TestMWFT extends FunctionalTest {
-    private URL descriptor = TestMWFT.class.getResource("MasterWorkerFT.xml");
-    private URL descriptor2 = TestMWFT.class.getResource("MasterWorkerFT2.xml");
+    private URL descriptor = TestMWFT.class.getResource("/functionalTests/masterworker/TestMasterWorker.xml");
+    //	.getResource("MasterWorkerFT.xml");
+    private URL descriptor2 = TestMWFT.class
+            .getResource("/functionalTests/masterworker/TestMasterWorker1.xml");
+    //	.getResource("MasterWorkerFT2.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
     private GCMApplication pad;
@@ -64,6 +67,7 @@ public class TestMWFT extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
+        Thread.sleep(10000);
         master.solve(tasks);
         System.out.println("Waiting for one result");
         List<Integer> ids = master.waitKResults(1);

@@ -14,23 +14,31 @@
 		<proactive relpath="${proactive.home}" base="root">
 			<configuration>
 				<java base="root" relpath="${java.home}/bin/java"/>
-				<jvmarg value="-Dproactive.test=true -Dlog4j.configuration=file:${proactive.home}/compile/proactive-log4j"/>
-				<proactiveClasspath type="append">
+				<jvmarg value="-Dproactive.test=true" />
+                <proactiveClasspath type="append">
                     <pathElement base="proactive" relpath="classes/Tests"/>
                     <pathElement base="proactive" relpath="dist/lib/clover.jar"/>
 				</proactiveClasspath>
 			</configuration>
 			
-			<virtualNode id="VN1" capacity="4">
-				<nodeProvider refid="localhosts" />
+			<virtualNode id="Master" capacity="1">
+				<nodeProvider refid="localhost1" />
+            </virtualNode>
+
+
+            <virtualNode id="Workers" capacity="4">
+                <nodeProvider refid="localhost2" />
             </virtualNode>
         </proactive>
 		
 	</application>
 
 	<resources>
-		<nodeProvider id="localhosts">
-			<file path="localhost4x1.xml"/>
+		<nodeProvider id="localhost1">
+			<file path="../localhost.xml"/>
+		</nodeProvider>
+        <nodeProvider id="localhost2">
+			<file path="../localhost4x1.xml"/>
 		</nodeProvider>
     </resources>
 

@@ -70,6 +70,7 @@ public class TestBasicOrdered extends FunctionalTest {
         List<Integer> ids = new ArrayList<Integer>();
         ids.add(master.waitOneResult());
         int nbResults = master.countAvailableResults();
+
         ids.addAll(master.waitKResults(5));
         ids.add(master.waitOneResult());
         ids.addAll(master.waitAllResults());
@@ -92,6 +93,7 @@ public class TestBasicOrdered extends FunctionalTest {
         master = new ProActiveMaster<A, Integer>();
         master.addResources(descriptor);
         master.setResultReceptionOrder(Master.SUBMISSION_ORDER);
+
     }
 
     @After

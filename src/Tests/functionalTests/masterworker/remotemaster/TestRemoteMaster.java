@@ -51,17 +51,19 @@ import java.util.List;
  */
 public class TestRemoteMaster extends FunctionalTest {
     private URL descriptor = TestBasicOrdered.class
-            .getResource("/functionalTests/masterworker/remotemaster/RemoteMaster.xml");
+            .getResource("/functionalTests/masterworker/RemoteMaster.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
-    public static final int NB_TASKS = 30;
+    //public static final int NB_TASKS = 30;
+    public static final int NB_TASKS = 100;
 
     @org.junit.Test
     public void action() throws Exception {
         System.out.println(descriptor);
         tasks = new ArrayList<A>();
         for (int i = 0; i < NB_TASKS; i++) {
-            A t = new A(i, (NB_TASKS - i) * 100, false);
+            //A t = new A(i, (NB_TASKS - i) * 100, false);
+            A t = new A(i, (NB_TASKS - i), false);
             tasks.add(t);
         }
 
@@ -88,8 +90,9 @@ public class TestRemoteMaster extends FunctionalTest {
             last = next;
         }
         System.out.println("Testing number of workers");
-        // Only two workers should be present
-        assertTrue(master.workerpoolSize() == 2);
+        //in this version, submaster is the worker of main master,
+        //so there should be only one worker here
+        assertTrue(master.workerpoolSize() == 1);
     }
 
     @Before

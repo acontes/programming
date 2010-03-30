@@ -48,11 +48,14 @@ import java.util.List;
  * Test Master/Worker divisible task a merge/sort algorithm test
  */
 public class TestDivisibleTasks extends FunctionalTest {
-    private URL descriptor = TestBasicOrdered.class
+
+    private URL descriptor = TestDivisibleTasks.class
             .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
+
     private Master<DaCSort, ArrayList<Integer>> master;
     private List<DaCSort> tasks;
-    public static final int NB_ELEM = 10000;
+    //public static final int NB_ELEM = 10000;
+    public static final int NB_ELEM = 100000;
 
     @org.junit.Test
     public void action() throws Exception {

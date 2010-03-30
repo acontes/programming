@@ -29,7 +29,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.masterworker.divisibletasks;
+package functionalTests.masterworker.election;
 
 import functionalTests.FunctionalTest;
 import java.net.URL;
@@ -37,6 +37,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import functionalTests.masterworker.A;
 
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -53,41 +55,35 @@ import static junit.framework.Assert.assertTrue;
 
 
 /**
- * TestDivisibleTasksWithFT
+ * TestElection
  *
  * @author The ProActive Team
  */
-public class TestDivisibleTasksWithFT extends FunctionalTest {
+public class TestElection extends FunctionalTest {
 
-    private URL descriptor = TestDivisibleTasksWithFT.class
+    private URL descriptor = TestElection.class
             .getResource("/functionalTests/masterworker/TestMasterWorkerForElection.xml");
 
-    private Master<DaCSort, ArrayList<Integer>> master;
-    private List<DaCSort> tasks;
-    public static final int NB_ELEM = 100000;
-    public static final int ELECTION_TIME = 3;
+    private Master<A, Integer> master;
+    private List<A> tasks;
+    public static final int NB_TASKS = 1000;
     private GCMApplication pad;
-    private GCMApplication pad2;
     private GCMVirtualNode vn1;
-    private GCMVirtualNode vn2;
-
     Collection<Node> nodes;
 
     @Before
     public void initTest() throws Exception {
-        master = new ProActiveMaster<DaCSort, ArrayList<Integer>>();
+
+        master = new ProActiveMaster<A, Integer>();
 
         pad = PAGCMDeployment.loadApplicationDescriptor(descriptor);
         pad.startDeployment();
         vn1 = pad.getVirtualNode("VN1");
-
         vn1.waitReady();
         System.out.println("VN1 is ready");
-
         nodes = vn1.getCurrentNodes();
         long numberOfNodes = vn1.getNbCurrentNodes();
         System.out.println("number of nodes: " + numberOfNodes);
-
         master.addResources(nodes);
 
         //ensure the deployment
@@ -97,19 +93,41 @@ public class TestDivisibleTasksWithFT extends FunctionalTest {
         master.setInitialTaskFlooding(1);
         master.setPingPeriod(500);
 
-        tasks = new ArrayList<DaCSort>();
-        ArrayList<Integer> bigList = new ArrayList<Integer>();
-        for (int i = 0; i < NB_ELEM; i++) {
-            bigList.add((int) Math.round(Math.random() * NB_ELEM));
+        tasks = new ArrayList<A>();
+        for (int i = 0; i < NB_TASKS; i++) {
+            A t = new A(i, 200, false);
+            tasks.add(t);
         }
-        tasks.add(new DaCSort(bigList));
     }
 
     @org.junit.Test
     public void action() throws Exception {
 
-        for (int i = 0; i < ELECTION_TIME; i++)
-            oneTimeTest(i);
+        master.solve(tasks);
+        System.out.println("Waiting for one result");
+        List<Integer> ids = master.waitKResults(1);
+
+        System.out.println("Killing submaster");
+        killOneSubMaster(0);
+
+        int numberofResults = master.countAvailableResults();
+
+        System.out.println("cur number: " + numberofResults);
+
+        System.out.println("Waiting for the remaining results");
+        List<Integer> ids2 = master.waitAllResults();
+        ids.addAll(ids2);
+
+        assertTrue("Only one worker left", master.workerpoolSize() == 1);
+        assertTrue("all results back", ids.size() == NB_TASKS);
+
+        Iterator<Integer> it = ids.iterator();
+        int last = it.next();
+        while (it.hasNext()) {
+            int next = it.next();
+            assertTrue("Results recieved in submission order", last < next);
+            last = next;
+        }
 
     }
 
@@ -166,22 +184,6 @@ public class TestDivisibleTasksWithFT extends FunctionalTest {
 
         if (!foundFlag)
             System.out.println("SubMaster not found");
-    }
-
-    private void oneTimeTest(int k) throws Exception {
-        //solve
-        master.solve(tasks);
-        //kill submaster
-        killOneSubMaster(k);
-        //wait for result
-        ArrayList<Integer> answer = master.waitOneResult();
-        System.out.println("phase" + k + " answer size: " + answer.size());
-
-        for (int i = 0; i < answer.size() - 1; i++) {
-            assertTrue("List sorted", answer.get(i) <= answer.get(i + 1));
-        }
-        System.out.println("phase" + k + " finished");
-
     }
 
 }

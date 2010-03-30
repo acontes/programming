@@ -53,7 +53,7 @@ public class TestUserEx extends FunctionalTest {
             .getResource("/functionalTests/masterworker/TestMasterWorker.xml");
     private Master<A, Integer> master;
     private List<A> tasks;
-    public static final int NB_TASKS = 4;
+    public static final int NB_TASKS = 40;
 
     @org.junit.Test
     public void action() throws Exception {
@@ -85,6 +85,7 @@ public class TestUserEx extends FunctionalTest {
         master = new ProActiveMaster<A, Integer>();
         //@snippet-end master_creation   
         master.addResources(descriptor);
+
     }
 
     @After
