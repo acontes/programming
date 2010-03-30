@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.io.Serializable;
+
 import org.objectweb.proactive.core.UniqueID;
 
 /** 
@@ -10,7 +12,7 @@ import org.objectweb.proactive.core.UniqueID;
  * @author cruz
  *
  */
-public class ComponentRequestID {
+public class ComponentRequestID implements Serializable {
 
 	private Long reqID;
 	

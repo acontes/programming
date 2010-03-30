@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.io.Serializable;
+
 /** 
  * Abstract class for Monitoring Records.
  * The Log Store should handle this records.
@@ -7,7 +9,7 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
  * @author cruz
  *
  */
-public abstract class AbstractRecord {
+public abstract class AbstractRecord implements Serializable {
 
 	/** Type of the record, to know in which log to store it */
 	protected RecordType recordType;

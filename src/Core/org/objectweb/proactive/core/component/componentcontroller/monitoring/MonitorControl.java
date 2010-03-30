@@ -33,7 +33,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	
 	private EventControl eventControl;
 	private LogHandler logHandler;
-	private String itfs[] = {"events-control", "log-handler"};
+	private String itfs[] = {"events-control-nf", "log-handler-nf"};
 	
 	/** Monitoring status */
     private boolean started = false;
@@ -93,8 +93,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		String runtimeURL = ProActiveRuntimeImpl.getProActiveRuntime().getURL();
 		this.eventControl.setBodyToMonitor(aoID, runtimeURL, hostComponentName);
 		
+		// start the other components of the framework
 		this.eventControl.start();
-		//TODO: start monitoring
+		this.logHandler.init();
 	}
 
 	@Override
@@ -108,11 +109,11 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	public void bindFc(String cItf, Object sItf)
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
-		if(cItf.equals("events-control")) {
+		if(cItf.equals("events-control-nf")) {
 			eventControl = (EventControl) sItf;
 			return;
 		}
-		if(cItf.equals("log-handler")) {
+		if(cItf.equals("log-handler-nf")) {
 			logHandler = (LogHandler) sItf;
 			return;
 		}
@@ -126,10 +127,10 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
 	@Override
 	public Object lookupFc(String cItf) throws NoSuchInterfaceException {
-		if(cItf.equals("events-control")) {
+		if(cItf.equals("events-control-nf")) {
 			return eventControl;
 		}
-		if(cItf.equals("log-handler")) {;
+		if(cItf.equals("log-handler-nf")) {;
 			return logHandler;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
@@ -138,10 +139,10 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	@Override
 	public void unbindFc(String cItf) throws NoSuchInterfaceException,
 			IllegalBindingException, IllegalLifeCycleException {
-		if(cItf.equals("events-control")) {
+		if(cItf.equals("events-control-nf")) {
 			eventControl = null;
 		}
-		if(cItf.equals("log-handler")) {;
+		if(cItf.equals("log-handler-nf")) {;
 			logHandler = null;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		

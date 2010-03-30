@@ -9,12 +9,11 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 public class RequestRecord extends AbstractRecord {
 
-	
 	private String callerComponent;
 	private String calledComponent;
 	private String interfaceName;
 	private String methodName;
-		
+
 	private long arrivalTime;
 	private long servingStartTime;
 	private long replyTime;

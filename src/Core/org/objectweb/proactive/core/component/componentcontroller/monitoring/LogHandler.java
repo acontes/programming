@@ -12,11 +12,16 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  */
 public interface LogHandler {
 
+	// init the logs store
+	void init();
+	
 	// inserts new record in the store
 	void insert(AbstractRecord record);
 
 	// fetches an existing record in the store
 	AbstractRecord fetch(Object key, RecordType rt);
+	RequestRecord fetchRequestRecord(Object key);
+	CallRecord fetchCallRecord(Object key);
 	
 	// queries the existence of a record in the store
 	BooleanWrapper exists(Object key, RecordType rt);

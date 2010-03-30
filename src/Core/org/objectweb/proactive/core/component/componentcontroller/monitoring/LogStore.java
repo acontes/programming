@@ -38,7 +38,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 	}
 	
 	public void init() {
-		logger.debug("[Log Store] Init ...");
+		logger.debug("[Log Store] Initializing logs ...");
 		// should some of these two HashMap's be synchronized?		
 		requestLog = new HashMap<ComponentRequestID, RequestRecord>();
     	callLog = new HashMap<ComponentRequestID, CallRecord>();
@@ -69,6 +69,14 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			return callLog.get(key);
 		}
 		return null;
+	}
+	
+	// FIXME Should use the abstract class, but that gives a ClassCastException when passing it as a parameter
+	public RequestRecord fetchRequestRecord(Object key) {
+		return requestLog.get(key);
+	}
+	public CallRecord fetchCallRecord(Object key) {
+		return callLog.get(key);
 	}
 
 	@Override
