@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -53,9 +57,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.ProActiveRandom;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
@@ -67,6 +73,9 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
  */
 public class RouterImpl extends RouterInternal implements Runnable {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
+
+    static final public int DEFAULT_PORT = 33647;
 
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
@@ -93,6 +102,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
     private ServerSocketChannel ssc = null;
     private ServerSocket serverSocket = null;
 
+    /** An unique identifier for this router */
+    private final long routerId;
+
     /** Create a new router
      * 
      * When a new router is created it binds onto the given port.
@@ -113,6 +125,12 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
         init(config);
         tpe = Executors.newFixedThreadPool(config.getNbWorkerThreads());
+
+        long rand = 0;
+        while (rand == 0) {
+            rand = ProActiveRandom.nextPosLong(); // can be 0
+        }
+        this.routerId = rand;
     }
 
     private void init(RouterConfig config) throws IOException {
@@ -240,10 +258,10 @@ public class RouterImpl extends RouterInternal implements Runnable {
             if (byteRead == -1) {
                 clientDisconnected(key);
             }
-        } catch (IOException e) {
-            clientDisconnected(key);
-        } catch (IllegalStateException e) {
+        } catch (MalformedMessageException e) {
             // Disconnect the client to avoid a disaster
+            clientDisconnected(key);
+        } catch (IOException e) {
             clientDisconnected(key);
         }
     }
@@ -279,7 +297,7 @@ public class RouterImpl extends RouterInternal implements Runnable {
             Collection<Client> clients = clientMap.values();
             tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
         }
-        logger.debug("Client " + sc.socket() + " disconnected");
+        logger.debug("Client " + attachment.getRemoteEndpoint() + " disconnected");
 
     }
 
@@ -339,6 +357,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
         public void run() {
             for (Client client : this.clients) {
+                if (this.disconnectedAgent.equals(client.getAgentId()))
+                    continue;
+
                 ErrorMessage error = new ErrorMessage(ErrorType.ERR_DISCONNECTION_BROADCAST, client
                         .getAgentId(), this.disconnectedAgent, 0);
                 try {
@@ -348,5 +369,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
                 }
             }
         }
+    }
+
+    public long getId() {
+        return this.routerId;
     }
 }

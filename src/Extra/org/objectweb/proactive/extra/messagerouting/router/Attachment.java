@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -33,9 +37,11 @@
 package org.objectweb.proactive.extra.messagerouting.router;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
@@ -60,6 +66,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 4.1.0
  */
 public class Attachment {
+
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
 
     /** The id of this attachment
@@ -80,11 +87,49 @@ public class Attachment {
     /** The socket channel where to write for this given client */
     final private SocketChannel socketChannel;
 
+    final private AtomicBoolean dtored;
+
     public Attachment(RouterImpl router, SocketChannel socketChannel) {
         this.attachmentId = AttachmentIdGenerator.getId();
         this.assembler = new MessageAssembler(router, this);
         this.socketChannel = socketChannel;
         this.client = null;
+        this.dtored = new AtomicBoolean(false);
+    }
+
+    /** Free the resources (sockets and file descriptor) associated to this attachment. 
+     * 
+     * Must be called before dereferencing an attachment.
+     */
+    public void dtor() {
+        this.dtored.set(true);
+
+        try {
+            this.socketChannel.socket().close();
+        } catch (IOException e) {
+            ProActiveLogger.logEatedException(logger, e);
+        } finally {
+            try {
+                this.socketChannel.close();
+            } catch (IOException e) {
+                ProActiveLogger.logEatedException(logger, e);
+            }
+        }
+    }
+
+    /* To avoid file descriptor leak, we use finalize() to close the fds 
+     * even if dtor() has not been called. 
+     * 
+     * fd are eventually closed when the GC is run
+     */
+    @Override
+    protected void finalize() throws Throwable {
+        if (this.dtored.get() == false) {
+            logger
+                    .info("File descriptor leak detected. Attachment.dtor() must be called. Please fill a bug report");
+            this.dtor();
+            super.finalize();
+        }
     }
 
     public MessageAssembler getAssembler() {
@@ -117,8 +162,16 @@ public class Attachment {
         }
     }
 
-    public String getRemoteEndpoint() {
-        String unknown = "unknown";
+    public String getRemoteEndpointName() {
+        SocketAddress sa = getRemoteEndpoint();
+        if (sa == null)
+            return "unknown";
+        else
+            return sa.toString();
+    }
+
+    public InetSocketAddress getRemoteEndpoint() {
+        InetSocketAddress unknown = null;
 
         if (socketChannel == null)
             return unknown;
@@ -126,8 +179,13 @@ public class Attachment {
         SocketAddress sa = socketChannel.socket().getRemoteSocketAddress();
         if (sa == null)
             return unknown;
+        if (!(sa instanceof InetSocketAddress)) {
+            // InetSocketAddress is THE implementation for SocketAddress
+            return (InetSocketAddress) sa;
+        }
 
-        return sa.toString();
+        return unknown;
+
     }
 
     public void send(ByteBuffer byteBuffer) throws IOException {

@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -94,8 +99,16 @@ public class LocalNode implements SecurityEntity {
     // JMX MBean
     private NodeWrapperMBean mbean;
 
+    /**
+     * @param nodeName the node's name
+     * @param jobId the jobid of the node
+     * @param securityManager the security manager 
+     * @param virtualNodeName the name of the virtual node this node belongs to
+     * @param replacePreviousBinding if a node existing with the same name in the registry, replace it
+     * @throws ProActiveException
+     */
     public LocalNode(String nodeName, String jobId, ProActiveSecurityManager securityManager,
-            String virtualNodeName) throws ProActiveException {
+            String virtualNodeName, boolean replacePreviousBinding) throws ProActiveException {
         this.name = nodeName;
         this.jobId = ((jobId != null) ? jobId : Job.DEFAULT_JOBID);
         this.securityManager = securityManager;
@@ -114,10 +127,9 @@ public class LocalNode implements SecurityEntity {
                     "registering node certificate for VN " + this.virtualNodeName);
         }
 
-        this.runtimeRoe = new RemoteObjectExposer<ProActiveRuntime>(
-            "org.objectweb.proactive.core.runtime.ProActiveRuntime", ProActiveRuntimeImpl
-                    .getProActiveRuntime(), ProActiveRuntimeRemoteObjectAdapter.class);
-        this.runtimeRoe.createRemoteObject(name);
+        this.runtimeRoe = new RemoteObjectExposer<ProActiveRuntime>(ProActiveRuntime.class.getName(),
+            ProActiveRuntimeImpl.getProActiveRuntime(), ProActiveRuntimeRemoteObjectAdapter.class);
+        this.runtimeRoe.createRemoteObject(name, replacePreviousBinding);
 
         // JMX registration
         //        if (PAProperties.PA_JMX_MBEAN.isTrue()) {

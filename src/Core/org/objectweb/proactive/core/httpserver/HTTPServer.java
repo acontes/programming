@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -33,6 +38,7 @@ package org.objectweb.proactive.core.httpserver;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
 import org.mortbay.jetty.Connector;
@@ -40,6 +46,7 @@ import org.mortbay.jetty.Server;
 import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
+import org.mortbay.jetty.servlet.ServletMapping;
 import org.mortbay.xml.XmlConfiguration;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -53,6 +60,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class HTTPServer {
     final private static Logger logger = ProActiveLogger.getLogger(Loggers.HTTP_SERVER);
+
+    final public static String SERVER_CONTEXT = "/proactive";
 
     private static HTTPServer httpServer;
 
@@ -127,7 +136,7 @@ public class HTTPServer {
             logger.error("Failed to load jetty configuration file: " + configUrl, e);
         }
 
-        this.context = new Context(server, "/", Context.SESSIONS);
+        this.context = new Context(server, HTTPServer.SERVER_CONTEXT, Context.SESSIONS);
 
         this.server.start();
         // If a random port is used we have to set it
@@ -142,6 +151,17 @@ public class HTTPServer {
      */
     public void stop() throws Exception {
         this.server.stop();
+    }
+
+    public boolean isMapped(String mapping) {
+        ServletMapping[] servletMapping = this.context.getServletHandler().getServletMappings();
+        if (servletMapping == null)
+            return false;
+        for (ServletMapping sm : servletMapping) {
+            if (Arrays.asList(sm.getPathSpecs()).contains(mapping))
+                return true;
+        }
+        return false;
     }
 
     /**

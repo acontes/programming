@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,16 +24,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.messagerouting.protocol.message;
 
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
 
@@ -48,13 +53,15 @@ import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
  */
 public abstract class RegistrationMessage extends Message {
 
+    private static final long UNKNOWN_AGENT_ID = -1;
+
     /**
      * Fields of the {@link RegistrationMessage} header.
-     * 
+     *
      * These fields are put after the {@link Message} header.
      */
     public enum Field {
-        AGENT_ID(8, Long.class);
+        AGENT_ID(8, Long.class), ROUTER_ID(8, Long.class);
 
         private int length;
         private Class<?> type;
@@ -92,10 +99,28 @@ public abstract class RegistrationMessage extends Message {
             }
             return totalOffset;
         }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case AGENT_ID:
+                    return "AGENT_ID";
+                case ROUTER_ID:
+                    return "ROUTER_ID";
+                default:
+                    return super.toString();
+            }
+        }
     }
 
     /** The {@link AgentID} */
     final private AgentID agentID;
+
+    /** The router id 
+     *
+     * 0 if unknown (first connection)
+     */
+    final private long routerID;
 
     /** Create a registration message.
      * 
@@ -106,11 +131,14 @@ public abstract class RegistrationMessage extends Message {
      * 		must be the same than the correlated {@link MessageType#REGISTRATION_REQUEST}
      * @param agentID
      * 		The agentID or null
+     * @param routerID
+     * 		The router id
      */
-    public RegistrationMessage(MessageType type, long messageId, AgentID agentID) {
+    public RegistrationMessage(MessageType type, long messageId, AgentID agentID, long routerID) {
         super(type, messageId);
 
         this.agentID = agentID;
+        this.routerID = routerID;
         super.setLength(Message.Field.getTotalOffset() + Field.getTotalOffset());
 
     }
@@ -119,15 +147,25 @@ public abstract class RegistrationMessage extends Message {
      * Construct a message from the data contained in a formatted byte array.
      * @param byteArray the byte array from which to read
      * @param offset the offset at which to find the message in the byte array
+     * @throws MalformedMessageException if the byte buffer does not contain a valid message
      */
-    public RegistrationMessage(byte[] byteArray, int offset) {
-        super(byteArray, offset);
+    public RegistrationMessage(byte[] byteArray, int offset) throws MalformedMessageException {
+        super(byteArray, offset, Field.getTotalOffset());
 
-        this.agentID = readAgentID(byteArray, offset);
+        try {
+            this.agentID = readAgentID(byteArray, offset);
+            this.routerID = readRouterID(byteArray, offset);
+        } catch (MalformedMessageException e) {
+            throw new MalformedMessageException("Malformed " + this.getType() + " message:" + e.getMessage());
+        }
     }
 
     public AgentID getAgentID() {
         return this.agentID;
+    }
+
+    public long getRouterID() {
+        return this.routerID;
     }
 
     @Override
@@ -137,11 +175,14 @@ public abstract class RegistrationMessage extends Message {
 
         super.writeHeader(buff, 0);
 
-        long id = -1;
+        long id = UNKNOWN_AGENT_ID;
         if (this.agentID != null) {
             id = this.agentID.getId();
         }
+
         TypeHelper.longToByteArray(id, buff, Message.Field.getTotalOffset() + Field.AGENT_ID.getOffset());
+        TypeHelper.longToByteArray(routerID, buff, Message.Field.getTotalOffset() +
+            Field.ROUTER_ID.getOffset());
         return buff;
     }
 
@@ -150,11 +191,35 @@ public abstract class RegistrationMessage extends Message {
      * @param byteArray the buffer in which to read 
      * @param offset the offset at which to find the beginning of the message in the buffer
      * @return the AgentID of the formatted message
+     * @throws MalformedMessageException if the message contains an invalid agentID value
      */
-    static public AgentID readAgentID(byte[] byteArray, int offset) {
+    static public AgentID readAgentID(byte[] byteArray, int offset) throws MalformedMessageException {
         long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
             Field.AGENT_ID.getOffset());
-        return (id >= 0) ? new AgentID(id) : null;
+        if (id >= 0)
+            return new AgentID(id);
+        else if (id == UNKNOWN_AGENT_ID) {
+            // in the case of REG_REQ message, the Agent ID is unknown
+            MessageType type = Message.readType(byteArray, 0);
+            if (type.equals(MessageType.REGISTRATION_REQUEST))
+                return null;
+            else
+                throw new MalformedMessageException("Invalid value for the " + Field.AGENT_ID + " field:" +
+                    id);
+        } else
+            throw new MalformedMessageException("Invalid value for the " + Field.AGENT_ID + " field:" + id);
+    }
+
+    /**
+     * Reads the router ID  of a formatted message beginning at a certain offset inside a buffer. Encapsulates it in an AgentID object.
+     * @param byteArray the buffer in which to read 
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the Router ID of the formatted message
+     */
+    static public long readRouterID(byte[] byteArray, int offset) {
+        long id = TypeHelper.byteArrayToLong(byteArray, offset + Message.Field.getTotalOffset() +
+            Field.ROUTER_ID.getOffset());
+        return id;
     }
 
     @Override
@@ -179,7 +244,19 @@ public abstract class RegistrationMessage extends Message {
                 return false;
         } else if (!agentID.equals(other.agentID))
             return false;
+        if (routerID == 0) {
+            if (other.routerID != 0)
+                return false;
+        } else if (routerID != other.routerID)
+            // different router
+            return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + Field.AGENT_ID.toString() + ":" + this.agentID + ";" +
+            Field.ROUTER_ID.toString() + ":" + this.routerID + ";";
     }
 
 }

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="VFS provider through ProActive protocol" basedir="../../../../../../../compile/">
+
+	<import file="${basedir}/build.xml" />
+	<target name="compile" depends="core, stubGenerator, -compile"/>
+
+	<target name="-compile">
+		<compile_extension module="vfsprovider" />
+		<generate_stub_for_class srcDir="${cl.extensions.dir}" class="org/objectweb/proactive/extensions/vfsprovider/protocol/FileSystemServer" />
+		<generate_stub_for_class srcDir="${cl.extensions.dir}" class="org/objectweb/proactive/extensions/vfsprovider/server/FileSystemServerImpl" />
+	</target>
+</project>

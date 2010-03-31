@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -43,12 +48,12 @@ import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.masterworker.interfaces.DivisibleTask;
 import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.TaskIntern;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.Worker;
 import org.objectweb.proactive.extensions.masterworker.interfaces.internal.WorkerMaster;
-import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 import java.io.Serializable;
 import java.util.LinkedList;
@@ -71,6 +76,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
     protected static final boolean debug = logger.isDebugEnabled();
 
     protected boolean suspended = false;
+    protected boolean wakingup = false;
 
     /** stub on this active object */
     protected AOWorker stubOnThis;
@@ -216,6 +222,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
      * @param task task to run
      */
     public void handleTask(final TaskIntern<Serializable> task) {
+        wakingup = false;
 
         // if the task is a divisible one, we spawn a new specialized worker for it
         if (task.getTask() instanceof DivisibleTask) {
@@ -278,8 +285,10 @@ public class AOWorker implements InitActive, Serializable, Worker {
             // We handle the current Task
             stubOnThis.handleTask(newTask);
 
+        } else {
+            // if there is nothing to do or if we are suspended we sleep
+            wakingup = false;
         }
-        // if there is nothing to do or if we are suspended we sleep
     }
 
     /** {@inheritDoc} */
@@ -306,7 +315,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
             logger.debug(name + " receives a wake up message...");
         }
 
-        if (pendingTasks.size() > 0 || suspended) {
+        if (pendingTasks.size() > 0 || suspended || wakingup) {
             if (debug) {
                 logger.debug(name + " ignored wake up message ...");
             }
@@ -314,6 +323,7 @@ public class AOWorker implements InitActive, Serializable, Worker {
             if (debug) {
                 logger.debug(name + " wakes up...");
             }
+            wakingup = true;
             // Initial Task
             stubOnThis.getTaskAndSchedule();
         }
@@ -327,4 +337,5 @@ public class AOWorker implements InitActive, Serializable, Worker {
         service.flushAll();
         provider.isCleared(stubOnThis);
     }
+
 }

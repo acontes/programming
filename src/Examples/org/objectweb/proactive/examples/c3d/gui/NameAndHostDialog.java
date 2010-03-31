@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -48,6 +53,8 @@ import javax.swing.JTextField;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.ProActiveInet;
@@ -167,7 +174,7 @@ public class NameAndHostDialog extends JDialog implements ActionListener, Proper
         this.c3dDispatcher = null;
         // First try with the provided url, if the user entered the exact url for the dispatcher
         try {
-            this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class.getName(), url);
+            this.c3dDispatcher = PAActiveObject.lookupActive(C3DDispatcher.class, url);
             setVisible(false);
             return;
         } catch (Exception e) {
@@ -191,8 +198,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener, Proper
 
             if (name.equals("Dispatcher") && (name.indexOf("_VN") == -1)) { // replace by (java 1.5 String.contains)
                 try {
-                    this.c3dDispatcher = (Dispatcher) PAActiveObject.lookupActive(C3DDispatcher.class
-                            .getName(), registeredObjects[i]);
+                    this.c3dDispatcher = PAActiveObject.lookupActive(C3DDispatcher.class,
+                            registeredObjects[i]);
                     setVisible(false);
                     return;
                 } catch (ActiveObjectCreationException e) {
@@ -236,7 +243,8 @@ public class NameAndHostDialog extends JDialog implements ActionListener, Proper
         String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
 
         try {
-            port = RemoteObjectHelper.getDefaultPortForProtocol(protocol);
+            RemoteObjectFactory rof = AbstractRemoteObjectFactory.getRemoteObjectFactory(protocol);
+            port = rof.getPort();
         } catch (UnknownProtocolException e) {
             // Well should not happen ...
             e.printStackTrace();

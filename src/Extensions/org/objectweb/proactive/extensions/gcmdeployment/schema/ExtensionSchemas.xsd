@@ -12,7 +12,6 @@
     </xsd:annotation>
 
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupCCSSchema.xsd" />
-	<xsd:include schemaLocation="../GCMDeployment/group/GroupGLiteSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupGridEngineSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupLSFSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupLoadLevelerSchema.xsd" />
@@ -21,10 +20,17 @@
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupPrunSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupRSHSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/group/GroupSSHSchema.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/group/GroupMPISchema.xsd" />
 
 	<xsd:include schemaLocation="../GCMDeployment/bridge/BridgeRSHSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/bridge/BridgeSSHSchema.xsd" />
 	<xsd:include schemaLocation="../GCMDeployment/bridge/BridgeOARSHSchema.xsd" />
+
+	<xsd:include schemaLocation="../GCMDeployment/vm/vmware-vi.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/vm/vmware-vix.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/vm/virtualbox-ws.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/vm/libxen.xsd" />
+	<xsd:include schemaLocation="../GCMDeployment/vm/libvirt.xsd" />
 
 <!--
 	<xsd:include schemaLocation="../GCMDeployment/group/unsupported/GroupARCSchema.xsd" />

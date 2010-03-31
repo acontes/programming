@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -153,8 +158,8 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
                 RenderingEngine tmpEngine;
 
                 try {
-                    tmpEngine = (RenderingEngine) PAActiveObject.newActive(
-                            C3DRenderingEngine.class.getName(), param, node.getNodeInformation().getURL());
+                    tmpEngine = PAActiveObject.newActive(C3DRenderingEngine.class, param, node
+                            .getNodeInformation().getURL());
                 } catch (Exception e) {
                     e.printStackTrace();
                     throw new RuntimeException(e.toString());
@@ -518,8 +523,7 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
 
         if ((nbUsers >= 2) && (this.election == null)) {
             try {
-                this.election = (Election) PAActiveObject.newActive(Election.class.getName(),
-                        new Object[] { (C3DDispatcher) me });
+                this.election = PAActiveObject.newActive(Election.class, new Object[] { (C3DDispatcher) me });
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -861,15 +865,15 @@ public class C3DDispatcher implements InitActive, RunActive, Serializable, Dispa
             if (dispatcher == null)
                 throw new ProActiveException("Dispatcher virtual node is not defined");
 
-            Deployer deployer = (Deployer) PAActiveObject.newActive(Deployer.class.getName(), new Object[] {
-                    gcmad, renderer, dispatcher });
+            Deployer deployer = PAActiveObject.newActive(Deployer.class, new Object[] { gcmad, renderer,
+                    dispatcher });
 
             Node[] rendererNodes = deployer.getRendererNodes();
             Object[] param = new Object[] { rendererNodes, deployer };
 
             Node dispatcherNode = deployer.getDispatcherNode();
 
-            PAActiveObject.newActive(C3DDispatcher.class.getName(), param, dispatcherNode);
+            PAActiveObject.newActive(C3DDispatcher.class, param, dispatcherNode);
 
         } catch (ProActiveException e) {
             logger.error(e);

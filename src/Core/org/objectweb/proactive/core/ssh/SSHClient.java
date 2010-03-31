@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -156,6 +161,7 @@ public class SSHClient {
         }
 
         hostname = remArgs.remove(0);
+        int exitCode = 0;
 
         try {
             Connection conn = new Connection(hostname);
@@ -184,7 +190,9 @@ public class SSHClient {
                     }
                 } else {
                     // 2.2 Try to find identity files automagically
-                    for (String id : SSHKeys.getKeys()) {
+                    SshConfig config = new SshConfig();
+                    SSHKeys keys = new SSHKeys(config.getKeyDir());
+                    for (String id : keys.getKeys()) {
                         File f = new File(id);
                         if (!(f.exists() && f.isFile() && f.canRead())) {
                             continue;
@@ -237,7 +245,7 @@ public class SSHClient {
 
                         /* The remote side won't send us further data... */
                         if ((conditions & (ChannelCondition.STDOUT_DATA | ChannelCondition.STDERR_DATA)) == 0) {
-
+                            exitCode = sess.getExitStatus();
                             /* ... and we have consumed all data in the local arrival window. */
                             break;
                         }
@@ -276,6 +284,6 @@ public class SSHClient {
             e.printStackTrace(System.err);
             System.exit(2);
         }
-        System.exit(0);
+        System.exit(exitCode);
     }
 }

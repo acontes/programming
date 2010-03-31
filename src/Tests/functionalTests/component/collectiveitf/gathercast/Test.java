@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +24,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -31,13 +36,22 @@
  */
 package functionalTests.component.collectiveitf.gathercast;
 
+import static org.junit.Assert.fail;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.control.ContentController;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.factory.GenericFactory;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.component.type.ProActiveTypeFactory;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.ComponentTest;
@@ -84,5 +98,39 @@ public class Test extends ComponentTest {
         String result1 = ((TotoItf) testcase.getFcInterface("testA")).testWaitForAll().stringValue();
         String result2 = ((TotoItf) testcase.getFcInterface("testB")).testWaitForAll().stringValue();
         Assert.assertNotSame(result1, result2);
+    }
+
+    @org.junit.Test
+    public void testStartCompositeWithGathercastInternalClientItf() throws Exception {
+        Component boot = Fractal.getBootstrapComponent();
+        ProActiveTypeFactory ptf = (ProActiveTypeFactory) Fractal.getTypeFactory(boot);
+        GenericFactory gf = Fractal.getGenericFactory(boot);
+        ComponentType rType = ptf.createFcType(new InterfaceType[] {
+                ptf.createFcItfType("server", GatherDummyItf.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                ptf.createFcItfType("client", GatherDummyItf.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.MANDATORY, ProActiveTypeFactory.GATHER_CARDINALITY) });
+        ComponentType cType = ptf.createFcType(new InterfaceType[] {
+                ptf.createFcItfType("server", GatherDummyItf.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                ptf.createFcItfType("client", DummyItf.class.getName(), TypeFactory.CLIENT,
+                        TypeFactory.OPTIONAL, TypeFactory.SINGLE) });
+        Component r = gf.newFcInstance(rType, "composite", null);
+        Component c = gf.newFcInstance(cType, "primitive", GatherClientServer.class.getName());
+        ContentController cc = Fractal.getContentController(r);
+        cc.addFcSubComponent(c);
+        Fractal.getBindingController(r).bindFc("server", c.getFcInterface("server"));
+        Fractal.getBindingController(r).bindFc("client", r.getFcInterface("server"));
+        try {
+            Fractal.getLifeCycleController(r).startFc();
+            fail();
+        } catch (IllegalLifeCycleException ilce) {
+        }
+        Fractal.getBindingController(c).bindFc("client", r.getFcInterface("client"));
+        try {
+            Fractal.getLifeCycleController(r).startFc();
+        } catch (IllegalLifeCycleException ilce) {
+            fail();
+        }
     }
 }

@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -69,10 +74,17 @@ public class Blast {
     }
 
     public static void main(String[] args) throws Exception {
-        String descriptor = Blast.class.getResource("LocalDescriptor.xml").getPath();
-        BlastParams param = new BlastParams(new File("/home/mleyton/NOSAVE/blast/query.nt"), new File(
-            "/home/mleyton/NOSAVE/blast/db.nt"), new File("/home/mleyton/NOSAVE/blast/bin-linux/formatdb"),
-            new File("/home/mleyton/NOSAVE/blast/bin-linux/blastall"), true, 2000 * 1024);
+
+        if (args.length < 5) {
+            System.out.println("Wrong number of arguments");
+            System.out.println("[Usage] org.objectweb.proactive.extensions.calcium.examples.blast.Blast "
+                + "DeploymentDescriptor Query Batabase path/to/formatdb path/to/blastall");
+            System.exit(-1);
+        }
+
+        String descriptor = args[0];
+        BlastParams param = new BlastParams(new File(args[1]), new File(args[2]), new File(args[3]),
+            new File(args[4]), true, 2000 * 1024);
 
         Blast blast = new Blast();
         blast.solve(param, descriptor);

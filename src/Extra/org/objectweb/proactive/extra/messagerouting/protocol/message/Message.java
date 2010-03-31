@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -37,6 +41,7 @@ import java.util.Map;
 
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.remoteobject.SynchronousReplyImpl;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
 
 
@@ -87,6 +92,26 @@ public abstract class Message {
 
         public static MessageType getMessageType(int value) {
             return idToMessageType.get(value);
+        }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case REGISTRATION_REQUEST:
+                    return "REG_REQ";
+                case REGISTRATION_REPLY:
+                    return "REG_REP";
+                case DATA_REQUEST:
+                    return "DATA_REQ";
+                case DATA_REPLY:
+                    return "DATA_REP";
+                case ERR_:
+                    return "ERR";
+                case DEBUG_:
+                    return "DBG";
+                default:
+                    return super.toString();
+            }
         }
     }
 
@@ -187,6 +212,22 @@ public abstract class Message {
 
             return totalOffset;
         }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case LENGTH:
+                    return "LEN";
+                case PROTO_ID:
+                    return "PROTO_ID";
+                case MSG_TYPE:
+                    return "MSG_TYPE";
+                case MSG_ID:
+                    return "MSG_ID";
+                default:
+                    return super.toString();
+            }
+        }
     }
 
     /* @@@@@@@@@@@@@@@@@@@@ Static methods @@@@@@@@@@@@@@@@@@@@@@ */
@@ -197,10 +238,10 @@ public abstract class Message {
      * 		a buffer which contains a message
      * @param offset
      * 		the offset at which the message begins  
-     * @throws IllegalArgumentException
-     * 		If a message cannot be constructed from the buffer
+     * @throws MalformedMessageException
+     * 		If the buffer does not contain a valid message
      */
-    public static Message constructMessage(byte[] buf, int offset) throws IllegalArgumentException {
+    public static Message constructMessage(byte[] buf, int offset) throws MalformedMessageException {
         // depending on the type of message, call a different constructor
         MessageType type = MessageType.getMessageType(TypeHelper.byteArrayToInt(buf, offset +
             Field.MSG_TYPE.getOffset()));
@@ -219,7 +260,7 @@ public abstract class Message {
             case DEBUG_:
                 return new DebugMessage(buf, offset);
             default:
-                throw new IllegalArgumentException("Unknown message type: " + type);
+                throw new MalformedMessageException("Unknown message type: " + type);
         }
     }
 
@@ -266,10 +307,16 @@ public abstract class Message {
      * @param offset 
      * 		the offset at which the message begins  
      * @return The value of the message type field of the message contained in buf at the given offset
+     * @throws MalformedMessageException if the message type field contains an invalid value
      */
-    public static MessageType readType(byte[] byteArray, int offset) {
-        return MessageType.getMessageType(TypeHelper.byteArrayToInt(byteArray, offset +
-            Field.MSG_TYPE.getOffset()));
+    public static MessageType readType(byte[] byteArray, int offset) throws MalformedMessageException {
+        int typeInt = TypeHelper.byteArrayToInt(byteArray, offset + Field.MSG_TYPE.getOffset());
+        MessageType type = MessageType.getMessageType(typeInt);
+        if (type != null)
+            return type;
+        else
+            throw new MalformedMessageException("Invalid value for the " + Field.MSG_TYPE + " field:" +
+                typeInt);
     }
 
     /** Length of this message */
@@ -300,22 +347,27 @@ public abstract class Message {
      * @param buf 
      *		a buffer which contains a message
      * @param offset 
-     * 		the offset at which the message begins  
-     * @throws IllegalArgumentException
-     * 		If the buffer does not match message requirements (proto ID, length etc.)
+     * 		the offset at which the message begins
+     * @param fieldsSize
+     * 		the size of the additional fields added by the messages. Can only be known within the particular implementations
+     * @throws MalformedMessageException
+     * 		If the buffer does not contain a valid message (proto ID, length etc.)
      */
-    protected Message(byte[] buf, int offset) throws IllegalArgumentException {
+    protected Message(byte[] buf, int offset, int fieldsSize) throws MalformedMessageException {
+
         this.length = readLength(buf, offset);
         this.protoId = readProtoID(buf, offset);
         this.type = readType(buf, offset);
         this.messageId = readMessageID(buf, offset);
 
-        if (this.length < Field.getTotalOffset()) {
-            throw new IllegalArgumentException("Invalid message length: " + this.length);
+        if (this.length < Field.getTotalOffset() + fieldsSize) {
+            throw new MalformedMessageException("Malformed " + type.toString() + " message: " +
+                "Invalid value for " + Field.LENGTH + " field:" + this.length);
         }
 
         if (this.protoId != PROTOV1) {
-            throw new IllegalArgumentException("Invalid message protocol ID: " + this.protoId);
+            throw new MalformedMessageException("Malformed " + type.toString() + " message: " +
+                "Invalid value for " + Field.PROTO_ID + " field:" + this.protoId);
         }
     }
 
@@ -369,8 +421,9 @@ public abstract class Message {
 
     @Override
     public String toString() {
-        return "length=" + this.length + " protoId=" + this.protoId + " type=" + this.type + " msgId=" +
-            messageId + " ";
+        return Field.MSG_TYPE.toString() + ":" + this.type + ";" + Field.PROTO_ID.toString() + ":" +
+            this.protoId + ";" + Field.MSG_ID.toString() + ":" + this.messageId + ";" +
+            Field.LENGTH.toString() + ":" + this.length + ";";
     }
 
     @Override

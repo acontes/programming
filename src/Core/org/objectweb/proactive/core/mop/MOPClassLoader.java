@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +24,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -31,8 +36,12 @@
  */
 package org.objectweb.proactive.core.mop;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Hashtable;
@@ -47,7 +56,7 @@ public class MOPClassLoader extends URLClassLoader {
 
     // retreives the optionnal byteCodeManipulator JVM arg
     // javassist is used by default
-    protected static Hashtable<String, byte[]> classDataCache = new Hashtable<String, byte[]>();
+    public static Hashtable<String, byte[]> classDataCache = new Hashtable<String, byte[]>();
     protected static MOPClassLoader mopCl = null;
 
     /**
@@ -188,12 +197,47 @@ public class MOPClassLoader extends URLClassLoader {
                 return Class.forName(name);
             }
         } catch (ClassNotFoundException e) {
-            // Test if the name of the class is actually a request for
-            // a stub class to be created
+            if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(name) && !(Utils.isStubClassName(name))) {
+                try {
+                    byte[] data = PAProxyBuilder.generatePAProxy(PAProxyBuilder
+                            .getBaseClassNameFromPAProxyName(name));
+                    MOPClassLoader.classDataCache.put(name, data);
+
+                    Class<?> baseCl = Class.forName(PAProxyBuilder.getBaseClassNameFromPAProxyName(name));
+
+                    if (cl == null) {
+                        cl = baseCl.getClassLoader();
+                    }
+
+                    Class<?> clazz = callDefineClassUsingReflection(name, data, cl);
+                    logger.debug("Generated paproxy class : " + name + "loaded into " +
+                        clazz.getClassLoader().toString());
+                    return clazz;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    logger.debug(ex);
+                    throw new ClassNotFoundException(ex.getMessage());
+                }
+
+            }
+
             if (Utils.isStubClassName(name)) {
-                logger.info("Generating class : " + name);
+                // Test if the name of the class is actually a request for
+                // a stub class to be created
+
                 //    e.printStackTrace();
                 String classname = Utils.convertStubClassNameToClassName(name);
+
+                if (PAProxyBuilder.doesClassNameEndWithPAProxySuffix(classname)) {
+                    try {
+                        loadClass(classname);
+                        //                    callDefineClassUsingReflection(classname, data);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                        logger.debug(ex);
+                        throw new ClassNotFoundException(ex.getMessage());
+                    }
+                }
 
                 byte[] data = null;
 
@@ -204,32 +248,11 @@ public class MOPClassLoader extends URLClassLoader {
                 // class Access checking. This method is supposed to be protected which means 
                 // we should not be accessing it but the access policy file allows us to access it freely.
                 try {
-                    Class<?> clc = Class.forName("java.lang.ClassLoader");
-                    Class<?>[] argumentTypes = new Class<?>[5];
-                    argumentTypes[0] = name.getClass();
-                    argumentTypes[1] = data.getClass();
-                    argumentTypes[2] = Integer.TYPE;
-                    argumentTypes[3] = Integer.TYPE;
-                    argumentTypes[4] = Class.forName("java.security.ProtectionDomain");
+                    Class<?> clazz = callDefineClassUsingReflection(name, data, null);
 
-                    Method m = clc.getDeclaredMethod("defineClass", argumentTypes);
-                    m.setAccessible(true);
-
-                    Object[] effectiveArguments = new Object[5];
-                    effectiveArguments[0] = name;
-                    effectiveArguments[1] = data;
-                    effectiveArguments[2] = Integer.valueOf(0);
-                    effectiveArguments[3] = Integer.valueOf(data.length);
-                    effectiveArguments[4] = this.getClass().getProtectionDomain();
-
-                    //  we have been loaded through the bootclasspath
-                    // so we use the context classloader
-                    if (this.getParent() == null) {
-                        return (Class<?>) m.invoke(Thread.currentThread().getContextClassLoader(),
-                                effectiveArguments);
-                    } else {
-                        return (Class<?>) m.invoke(this.getParent(), effectiveArguments);
-                    }
+                    logger.debug("Generated class : " + name + "loaded into " +
+                        clazz.getClassLoader().toString());
+                    return clazz;
                 } catch (Exception ex) {
                     logger.debug(ex);
                     throw new ClassNotFoundException(ex.getMessage());
@@ -239,5 +262,76 @@ public class MOPClassLoader extends URLClassLoader {
                 throw e;
             }
         }
+    }
+
+    protected Class<?> callDefineClassUsingReflection(String name, byte[] data, ClassLoader delegateCl)
+            throws ClassNotFoundException, SecurityException, NoSuchMethodException,
+            IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+        Class<?> clc = Class.forName("java.lang.ClassLoader");
+        Class<?>[] argumentTypes = new Class<?>[5];
+        argumentTypes[0] = name.getClass();
+        argumentTypes[1] = data.getClass();
+        argumentTypes[2] = Integer.TYPE;
+        argumentTypes[3] = Integer.TYPE;
+        argumentTypes[4] = Class.forName("java.security.ProtectionDomain");
+
+        Method m = clc.getDeclaredMethod("defineClass", argumentTypes);
+        m.setAccessible(true);
+
+        Object[] effectiveArguments = new Object[5];
+        effectiveArguments[0] = name;
+        effectiveArguments[1] = data;
+        effectiveArguments[2] = Integer.valueOf(0);
+        effectiveArguments[3] = Integer.valueOf(data.length);
+        effectiveArguments[4] = this.getClass().getProtectionDomain();
+
+        if (delegateCl != null) {
+            return (Class<?>) m.invoke(delegateCl, effectiveArguments);
+        }
+
+        //  we have been loaded through the bootclasspath
+        // so we use the context classloader
+        if (this.getParent() == null) {
+            return (Class<?>) m.invoke(Thread.currentThread().getContextClassLoader(), effectiveArguments);
+        } else {
+            return (Class<?>) m.invoke(this.getParent(), effectiveArguments);
+        }
+    }
+
+    @Override
+    public InputStream getResourceAsStream(String name) {
+        InputStream is = null;
+
+        name = convertResourceToClass(name);
+
+        byte[] data = getClassData(name);
+        if (data != null) {
+            is = new ByteArrayInputStream(data);
+        }
+
+        return is;
+    }
+
+    @Override
+    public URL getResource(String name) {
+        URL url = super.getResource(name);
+        name = convertResourceToClass(name);
+        if (url == null) {
+            byte[] data = getClassData(name);
+            if (data != null) {
+                try {
+                    url = new URL("pamop:///" + name);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return url;
+    }
+
+    private String convertResourceToClass(String ressource) {
+        String s = ressource.replace(".class", "");
+        s = s.replace("/", ".");
+        return s;
     }
 }

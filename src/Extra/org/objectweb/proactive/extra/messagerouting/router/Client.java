@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -33,6 +37,7 @@
 package org.objectweb.proactive.extra.messagerouting.router;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -62,6 +67,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
  */
 public class Client {
     static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
 
     /** This client represents one remote Agent. */
     final private AgentID agentId;
@@ -92,6 +98,12 @@ public class Client {
         this.attachment.setClient(this);
         this.agentId = agentID;
         this.pendingMessage = new ConcurrentLinkedQueue<ByteBuffer>();
+
+        if (admin_logger.isDebugEnabled()) {
+            admin_logger.debug("AgentID " + this.getAgentId() + " connected from " +
+                this.attachment.getRemoteEndpointName());
+        }
+
     }
 
     public AgentID getAgentId() {
@@ -183,6 +195,10 @@ public class Client {
      */
     public void discardAttachment() {
         synchronized (this.attachment_lock) {
+            if (admin_logger.isDebugEnabled()) {
+                admin_logger.debug("AgentID " + this.getAgentId() + " disconnected");
+            }
+
             logger.debug("Discarded attachment for " + this.agentId);
             this.attachment = null;
         }
@@ -204,6 +220,12 @@ public class Client {
             logger.debug("New attachment for " + this.agentId);
             this.attachment = attachment;
             this.attachment.setClient(this);
+
+            if (admin_logger.isDebugEnabled()) {
+                admin_logger.debug("AgentID " + this.getAgentId() + " reconnected from " +
+                    this.attachment.getRemoteEndpointName());
+            }
+
         }
     }
 

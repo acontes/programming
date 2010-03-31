@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -39,11 +44,13 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.MethodCallExecutionFailedException;
@@ -98,19 +105,29 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
 
     // Constructor of simple requests
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID) {
-        this(methodCall, sender, isOneWay, nextSequenceID, false);
+        this(methodCall, sender, isOneWay, nextSequenceID, false, null);
+    }
+
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
+            MessageTags tags) {
+        this(methodCall, sender, isOneWay, nextSequenceID, false, tags);
     }
 
     // Constructor of non functional requests without priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
             boolean isNFRequest) {
-        this(methodCall, sender, isOneWay, nextSequenceID, false, Request.NFREQUEST_NO_PRIORITY);
+        this(methodCall, sender, isOneWay, nextSequenceID, false, Request.NFREQUEST_NO_PRIORITY, null);
+    }
+
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
+            boolean isNFRequest, MessageTags tags) {
+        this(methodCall, sender, isOneWay, nextSequenceID, false, Request.NFREQUEST_NO_PRIORITY, tags);
     }
 
     // Constructor of non functional requests with priority
     public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
-            boolean isNFRequest, int nfRequestPriority) {
-        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName());
+            boolean isNFRequest, int nfRequestPriority, MessageTags tags) {
+        super(sender.getID(), nextSequenceID, isOneWay, methodCall.getName(), tags);
         this.methodCall = methodCall;
         this.sender = sender;
         this.isNFRequest = isNFRequest;
@@ -128,11 +145,17 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
         }
+
+    }
+
+    public RequestImpl(MethodCall methodCall, UniversalBody sender, boolean isOneWay, long nextSequenceID,
+            boolean isNFRequest, int nfRequestPriority) {
+        this(methodCall, sender, isOneWay, nextSequenceID, isNFRequest, nfRequestPriority, null);
     }
 
     // Constructor of synchronous requests
-    public RequestImpl(MethodCall methodCall, boolean isOneWay) {
-        super(null, 0, isOneWay, methodCall.getName());
+    public RequestImpl(MethodCall methodCall, boolean isOneWay, MessageTags tags) {
+        super(null, 0, isOneWay, methodCall.getName(), tags);
         this.methodCall = methodCall;
         this.senderNodeURI = "";
         if (enableStackTrace == null) {
@@ -142,6 +165,10 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
         if (enableStackTrace.booleanValue()) {
             this.stackTrace = new Exception().getStackTrace();
         }
+    }
+
+    public RequestImpl(MethodCall methodCall, boolean isOneWay) {
+        this(methodCall, isOneWay, null);
     }
 
     //
@@ -236,8 +263,14 @@ public class RequestImpl extends MessageImpl implements Request, java.io.Seriali
     protected Reply createReply(Body targetBody, MethodCallResult result) {
         ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis())
                 .getProActiveSecurityManager();
+        // Get request TAGs from current context
+        Request currentreq = LocalBodyStore.getInstance().getContext().getCurrentRequest();
+        MessageTags tags = null;
 
-        return new ReplyImpl(targetBody.getID(), this.sequenceNumber, this.methodName, result, psm);
+        if (currentreq != null)
+            tags = currentreq.getTags();
+
+        return new ReplyImpl(targetBody.getID(), this.sequenceNumber, this.methodName, result, psm, tags);
     }
 
     public boolean crypt(ProActiveSecurityManager psm, SecurityEntity destinationBody)

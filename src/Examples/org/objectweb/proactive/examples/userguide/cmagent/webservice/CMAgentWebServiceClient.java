@@ -1,17 +1,18 @@
-//@tutorial-start
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -23,6 +24,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -30,17 +34,13 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
+//@tutorial-start
 package org.objectweb.proactive.examples.userguide.cmagent.webservice;
 
-import java.rmi.RemoteException;
-
-import javax.xml.namespace.QName;
-import javax.xml.rpc.Call;
-import javax.xml.rpc.Service;
-import javax.xml.rpc.ServiceException;
-import javax.xml.rpc.ServiceFactory;
-
-import org.objectweb.proactive.extensions.webservices.WSConstants;
+import org.objectweb.proactive.examples.userguide.cmagent.simple.State;
+import org.objectweb.proactive.extensions.webservices.client.AbstractClientFactory;
+import org.objectweb.proactive.extensions.webservices.client.Client;
+import org.objectweb.proactive.extensions.webservices.client.ClientFactory;
 
 
 /**
@@ -49,40 +49,37 @@ import org.objectweb.proactive.extensions.webservices.WSConstants;
  */
 //@snippet-start webservice_cma_client_full
 public class CMAgentWebServiceClient {
+
     public static void main(String[] args) {
-        String address;
-        if (args.length == 0) {
-            address = "http://localhost:8080";
-        } else {
-            address = args[0];
-        }
-        if (!address.startsWith("http://")) {
-            address = "http://" + address;
-        }
 
-        address += WSConstants.SERV_RPC_ROUTER;
-        String namespaceURI = "cmAgentService";
-        String serviceName = "cmAgentService";
-        String portName = "getLastRequestServeTime";
-
-        ServiceFactory factory;
         try {
-            factory = ServiceFactory.newInstance();
+            String url = "";
+            String wsFrameWork = "";
+            if (args.length == 1) {
+                url = "http://localhost:8080/";
+                wsFrameWork = args[0];
+            } else if (args.length == 2) {
+                url = args[0];
+                wsFrameWork = args[1];
+            } else {
+                System.out.println("Wrong number of arguments:");
+                System.out.println("Usage: java CMAgentWebServiceClient [url] wsFrameWork");
+                System.out.println("where wsFrameWork is either 'axis2' or 'cxf'");
+                return;
+            }
 
-            Service service = factory.createService(new QName(serviceName));
+            ClientFactory cf = AbstractClientFactory.getClientFactory(wsFrameWork);
+            Client client = cf.getClient(url, "cmAgentService", CMAgentService.class);
 
-            Call call = service.createCall(new QName(portName));
+            Object[] response = client.call("getCurrentState", null, State.class);
 
-            call.setTargetEndpointAddress(address);
+            System.out.println("Current state is:\n" + ((State) response[0]).toString());
 
-            call.setOperationName(new QName(namespaceURI, portName));
+            response = client.call("waitLastRequestServeTime", null, long.class);
 
-            Object[] inParams = new Object[0];
-            String name = ((String) call.invoke(inParams));
-            System.out.println(name);
-        } catch (ServiceException e) {
-            e.printStackTrace();
-        } catch (RemoteException e) {
+            System.out.println("Last request serve time = " + response[0]);
+
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

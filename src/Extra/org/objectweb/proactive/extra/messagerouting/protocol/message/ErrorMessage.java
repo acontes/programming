@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,19 +24,26 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
 package org.objectweb.proactive.extra.messagerouting.protocol.message;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
+import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
 
 /** A {@link MessageType#ERR_} message
@@ -42,6 +51,9 @@ import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
  * Error message are used to notify error to the agent. Several {@link ErrorType} exist.
  * Each one indicate a special type of error.
  * 
+ * Within the current implementation, {@link MessageType#ERR_} is a {@link DataMessage} with the payload
+ * 	being an integer which identifies the error code.
+ *
  * @since ProActive 4.1.0
  */
 public class ErrorMessage extends DataMessage {
@@ -100,17 +112,79 @@ public class ErrorMessage extends DataMessage {
          *  <li>message ID is the message ID of the {@link MessageType#REGISTRATION_REQUEST}</li>
          * </ul>
          */
-        ERR_INVALID_AGENT_ID;
+        ERR_INVALID_AGENT_ID,
 
-        public byte[] toByteArray() {
-            byte[] buf = new byte[4];
-            TypeHelper.intToByteArray(this.ordinal(), buf, 0);
-            return buf;
+        /** Client advertised an unknown router ID on reconnection
+         * 
+         * This message is send when a client send a {@link MessageType#REGISTRATION_REQUEST}
+         * with an unknown router ID. A such error happens when a router is restarted.
+         * Existing clients try to reconnect the endpoint.
+         */
+        ERR_INVALID_ROUTER_ID,
+
+        /** A corrupted message was received, and cannot be
+         * properly treated by the receiver.
+         *
+         */
+        ERR_MALFORMED_MESSAGE;
+
+        /** Reverse map associating an error type to an ID  */
+        final static Map<Integer, ErrorType> idToErrorType;
+        static {
+            // Can't populate idToErrorType from constructor since enums are initialized before
+            // any static initializers are run. It is safe to do it from this static block
+            idToErrorType = new HashMap<Integer, ErrorType>();
+            for (ErrorType errorType : values()) {
+                idToErrorType.put(errorType.ordinal(), errorType);
+            }
+        }
+
+        public static ErrorType getErrorType(int value) {
+            return idToErrorType.get(value);
+        }
+
+        @Override
+        public String toString() {
+            switch (this) {
+                case ERR_DISCONNECTION_BROADCAST:
+                    return "ERR_DISCONNECTION_BROADCAST";
+                case ERR_INVALID_AGENT_ID:
+                    return "ERR_INVALID_AGENT_ID";
+                case ERR_INVALID_ROUTER_ID:
+                    return "ERR_INVALID_ROUTER_ID";
+                case ERR_NOT_CONNECTED_RCPT:
+                    return "ERR_NOT_CONNECTED_RCPT";
+                case ERR_UNKNOW_RCPT:
+                    return "ERR_UNKNOW_RCPT";
+                case ERR_MALFORMED_MESSAGE:
+                    return "ERR_MALFORMED_MESSAGE";
+                default:
+                    return super.toString();
+            }
         }
     }
 
     /** The type of this error message */
     final private ErrorType error;
+
+    /** Read the error type from the payload field of a raw message
+     * It is assumed that the payload of an error message
+     * 	is four bytes long, containing an encoded int
+     *
+     * @throws IllegalArgumentException - if the payload contains an unrecognized error code
+     * @throws IllegalArgumentException - if the payload is not a four-bytes buffer
+     * */
+    static public ErrorType readErrorType(byte[] payload) throws MalformedMessageException {
+        if (payload.length != 4)
+            throw new MalformedMessageException("The payload is not four-bytes long");
+
+        int errorCode = TypeHelper.byteArrayToInt(payload, 0);
+        ErrorType type = ErrorType.getErrorType(errorCode);
+        if (type != null)
+            return type;
+        else
+            throw new MalformedMessageException("Invalid value for the error code: " + errorCode);
+    }
 
     /** Create an error message
      *
@@ -124,7 +198,9 @@ public class ErrorMessage extends DataMessage {
      * 		The error type
      */
     public ErrorMessage(ErrorType error, AgentID recipient, AgentID faulty, long msgID) {
-        super(MessageType.ERR_, faulty, recipient, msgID, HttpMarshaller.marshallObject(error));
+        super(MessageType.ERR_, faulty, recipient, msgID, new byte[Integer.SIZE / 8]);
+        // fill in the payload
+        TypeHelper.intToByteArray(error.ordinal(), this.data, 0);
         this.error = error;
     }
 
@@ -135,20 +211,18 @@ public class ErrorMessage extends DataMessage {
      *            the byte array from which to read
      * @param offset
      *            the offset at which to find the message in the byte array
-     * @throws InstantiationException
+     * @throws MalformedMessageException
+     * 			If the buffer does not contain a valid error message
      */
-    public ErrorMessage(byte[] byteArray, int offset) throws IllegalArgumentException {
+    public ErrorMessage(byte[] byteArray, int offset) throws MalformedMessageException {
         super(byteArray, offset);
 
         if (this.getType() != MessageType.ERR_) {
-            throw new IllegalArgumentException("Invalid message type " + this.getType());
+            throw new MalformedMessageException("Malformed" + MessageType.ERR_ + " message:" +
+                "Invalid value for the " + Message.Field.MSG_TYPE + " field:" + this.getType());
         }
 
-        try {
-            this.error = (ErrorType) HttpMarshaller.unmarshallObject(this.getData());
-        } catch (ClassCastException e) {
-            throw new IllegalArgumentException("Invalid error type:" + e);
-        }
+        this.error = readErrorType(this.getData());
     }
 
     /** Return the type of the error*/
@@ -183,6 +257,11 @@ public class ErrorMessage extends DataMessage {
         } else if (!error.equals(other.error))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " Error code:" + this.error;
     }
 
 }

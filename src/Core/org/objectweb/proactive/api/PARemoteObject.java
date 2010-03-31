@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -38,12 +42,13 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectAdapter;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.adapter.Adapter;
-import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -58,7 +63,11 @@ public class PARemoteObject {
     public final static Logger logger = ProActiveLogger.getLogger(Loggers.REMOTEOBJECT);
 
     /* Used to attribute an unique name to RO created by turnRemote */
-    private final static String TURN_REMOTE_PREFIX = "__@@__TURN_REMOTE_";
+    private final static String TURN_REMOTE_PREFIX;
+    static {
+        String vmName = ProActiveRuntimeImpl.getProActiveRuntime().getVMInformation().getName();
+        TURN_REMOTE_PREFIX = "/" + vmName + "/TURN_REMOTE/";
+    }
 
     /* Used to attribute an unique name to RO created by turnRemote */
     private final static AtomicLong counter = new AtomicLong();
@@ -118,7 +127,8 @@ public class PARemoteObject {
     @SuppressWarnings("unchecked")
     public static <T> T turnRemote(T object) throws ProActiveException {
         RemoteObjectExposer<T> roe = newRemoteObject(object.getClass().getName(), object);
-        RemoteRemoteObject rro = roe.createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet());
+        RemoteRemoteObject rro = roe
+                .createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet(), false);
         return (T) new RemoteObjectAdapter(rro).getObjectProxy();
     }
 }

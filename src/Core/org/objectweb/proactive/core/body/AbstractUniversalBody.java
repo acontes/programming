@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -117,12 +122,16 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
             UniversalBodyRemoteObjectAdapter.class);
 
         try {
-            RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString());
+            RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString(), false);
             this.remoteBody = (UniversalBody) new RemoteObjectAdapter(rro).getObjectProxy();
         } catch (Exception e) {
             e.printStackTrace();
             throw new ActiveObjectCreationException(e);
         }
+    }
+
+    public String getUrl() {
+        return this.roe.getURL();
     }
 
     //
@@ -174,7 +183,8 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
             UniversalBodyRemoteObjectAdapter.class);
 
         try {
-            RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString());
+            // rebind must be true: if an object migrates between two JVM on the same machine (same rmi registry)
+            RemoteRemoteObject rro = this.roe.createRemoteObject(this.bodyID.toString(), true);
             this.remoteBody = (UniversalBody) new RemoteObjectAdapter(rro).getObjectProxy();
         } catch (ProActiveException e) {
             // TODO Auto-generated catch block
@@ -200,9 +210,11 @@ public abstract class AbstractUniversalBody implements UniversalBody, Serializab
         this.roe.createRemoteObject(RemoteObjectHelper.expandURI(URI.create(url)));
     }
 
-    public String registerByName(String name) throws ProActiveException {
-        this.roe.createRemoteObject(name);
-        return this.roe.getURL();
+    public String registerByName(String name, boolean rebind) throws ProActiveException {
+        RemoteRemoteObject rro = this.roe.createRemoteObject(name, rebind);
+        RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
+
+        return roa.getURI().toString();
     }
 
     public RemoteObjectExposer<UniversalBody> getRemoteObjectExposer() {

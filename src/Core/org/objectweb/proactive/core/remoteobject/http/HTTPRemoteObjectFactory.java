@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds 
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,12 +24,15 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
- *  Contributor(s):
+ *  Contributor(s): ActiveEon Team - http://www.activeeon.com
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject.http;
 
@@ -107,13 +112,12 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
 
         try {
             u = new URL(url.toString());
-            int port = u.getPort();
             url = URI.create(u.toString());
         } catch (MalformedURLException e) {
             url = URI.create(HTTPTransportServlet.get().getURL() + url.toString());
         }
 
-        HTTPRegistry.getInstance().bind(url.toString(), ro);
+        HTTPRegistry.getInstance().bind(URIBuilder.getNameFromURI(url), ro, replacePrevious); // Can throw a ProActiveException
 
         HttpRemoteObjectImpl rro = new HttpRemoteObjectImpl(ro, url);
 
@@ -129,25 +133,15 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
      *            the urn under which the active object has been registered
      */
     public void unregister(URI urn) throws ProActiveException {
-        HTTPRegistry.getInstance().unbind(urn.toString());
+        HTTPRegistry.getInstance().unbind(URIBuilder.getNameFromURI(urn));
     }
 
-    /**
-     * Looks-up a remote object previously registered in the bodies table .
-     * 
-     * @param urn
-     *            the urn (in fact its url + name) the remote Body is registered to
-     * @return a UniversalBody
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#lookup(java.net.URI)
      */
     public RemoteObject lookup(URI url) throws ProActiveException {
-        int port = url.getPort();
-
-        if (port == -1) {
-            port = PAProperties.PA_XMLHTTP_PORT.getValueAsInt();
-        }
-
         String urn = url.getPath();
-        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(urn, url, port);
+        HttpRemoteObjectLookupMessage message = new HttpRemoteObjectLookupMessage(urn, url);
         try {
             message.send();
         } catch (HTTPRemoteException e) {
@@ -162,20 +156,8 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
         }
     }
 
-    /**
-     * List all active object previously registered in the registry
-     * 
-     * @param url
-     *            the url of the host to scan, typically //machine_name
-     * @return a list of Strings, representing the registered names, and {} if no registry
-     * @exception java.io.IOException
-     *                if scanning reported some problem (registry not found, or malformed Url)
-     */
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.objectweb.proactive.core.body.BodyAdapterImpl#list(java.lang.String)
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.core.remoteobject.RemoteObjectFactory#list(java.net.URI)
      */
     public URI[] list(URI url) throws ProActiveException {
 
@@ -184,12 +166,12 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
         try {
             req.send();
 
-            String[] tmpUrl = req.getReturnedObject();
+            String[] names = req.getReturnedObject();
 
-            URI[] uris = new URI[tmpUrl.length];
+            URI[] uris = new URI[names.length];
 
-            for (int i = 0; i < tmpUrl.length; i++) {
-                uris[i] = URI.create(tmpUrl[i]);
+            for (int i = 0; i < names.length; i++) {
+                uris[i] = URIBuilder.buildURI(url, names[i]);
             }
 
             return uris;
@@ -218,13 +200,13 @@ public class HTTPRemoteObjectFactory extends AbstractRemoteObjectFactory impleme
         // see PROACTIVE-419
     }
 
-    public InternalRemoteRemoteObject createRemoteObject(RemoteObject remoteObject, String name)
-            throws ProActiveException {
+    public InternalRemoteRemoteObject createRemoteObject(RemoteObject remoteObject, String name,
+            boolean rebind) throws ProActiveException {
         URI uri = URIBuilder.buildURI(ProActiveInet.getInstance().getHostname(), name, this.getProtocolId());
 
         // register the object on the register
         InternalRemoteRemoteObject irro = new InternalRemoteRemoteObjectImpl(remoteObject, uri);
-        RemoteRemoteObject rmo = register(irro, uri, true);
+        RemoteRemoteObject rmo = register(irro, uri, rebind);
         irro.setRemoteRemoteObject(rmo);
 
         return irro;

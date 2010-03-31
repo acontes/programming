@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -37,6 +42,7 @@ import java.util.Map;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.bridge.Bridge;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.group.Group;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.hostinfo.HostInfo;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.vm.GCMVirtualMachineManager;
 
 
 /**
@@ -52,11 +58,13 @@ public class GCMDeploymentInfrastructure {
     private Map<String, Group> groups;
     private Map<String, Bridge> bridges;
     private Map<String, HostInfo> hosts;
+    private Map<String, GCMVirtualMachineManager> vmms;
 
     public GCMDeploymentInfrastructure() {
         groups = new HashMap<String, Group>();
         bridges = new HashMap<String, Bridge>();
         hosts = new HashMap<String, HostInfo>();
+        vmms = new HashMap<String, GCMVirtualMachineManager>();
     }
 
     public Map<String, Group> getGroups() {
@@ -71,6 +79,10 @@ public class GCMDeploymentInfrastructure {
         return hosts;
     }
 
+    public Map<String, GCMVirtualMachineManager> getVMM() {
+        return vmms;
+    }
+
     public void addGroup(Group group) {
         groups.put(group.getId(), group);
     }
@@ -81,5 +93,9 @@ public class GCMDeploymentInfrastructure {
 
     public void addHost(HostInfo host) {
         hosts.put(host.getId(), host);
+    }
+
+    public void addVMM(GCMVirtualMachineManager vmm) {
+        vmms.put(vmm.getId(), vmm);
     }
 }

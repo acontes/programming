@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -56,14 +61,17 @@ import org.objectweb.proactive.core.body.request.RequestFactory;
 import org.objectweb.proactive.core.body.request.RequestQueueFactory;
 import org.objectweb.proactive.core.body.request.RequestReceiver;
 import org.objectweb.proactive.core.body.request.RequestReceiverFactory;
+import org.objectweb.proactive.core.body.tags.LocalMemoryLeaseThread;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.MessageTagsFactory;
 import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.identity.ProActiveComponent;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentFactory;
 import org.objectweb.proactive.core.component.identity.ProActiveComponentImpl;
 import org.objectweb.proactive.core.component.request.SynchronousComponentRequestReceiver;
-import org.objectweb.proactive.core.debug.stepbystep.Debugger;
-import org.objectweb.proactive.core.debug.stepbystep.DebuggerFactory;
-import org.objectweb.proactive.core.debug.stepbystep.DebuggerImpl;
+import org.objectweb.proactive.core.debug.debugger.Debugger;
+import org.objectweb.proactive.core.debug.debugger.DebuggerFactory;
+import org.objectweb.proactive.core.debug.debugger.DebuggerImpl;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManager;
 import org.objectweb.proactive.core.group.spmd.ProActiveSPMDGroupManagerFactory;
 import org.objectweb.proactive.core.mop.MethodCall;
@@ -143,6 +151,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     protected ProActiveSecurityManager proActiveSecurityManager;
     protected FTManagerFactory ftmanagerFactoryInstance;
     protected DebuggerFactory debuggerFactoryInstance;
+    protected MessageTagsFactory requestTagsFactoryInstance;
     protected Object timItReductor;
 
     //
@@ -159,6 +168,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
         this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
         this.debuggerFactoryInstance = newDebuggerFactorySingleton();
+        this.requestTagsFactoryInstance = newRequestTagsFactorySingleton();
     }
 
     /**
@@ -182,6 +192,7 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
             this.proActiveSPMDGroupManagerFactoryInstance = newProActiveSPMDGroupManagerFactorySingleton();
             this.ftmanagerFactoryInstance = newFTManagerFactorySingleton();
             this.debuggerFactoryInstance = newDebuggerFactorySingleton();
+            this.requestTagsFactoryInstance = newRequestTagsFactorySingleton();
         }
     }
 
@@ -250,6 +261,10 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         return this.debuggerFactoryInstance;
     }
 
+    public MessageTagsFactory newRequestTagsFactory() {
+        return this.requestTagsFactoryInstance;
+    }
+
     //
     // -- PROTECTED METHODS -----------------------------------------------
     //
@@ -297,19 +312,23 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         return new DebuggerFactoryImpl();
     }
 
+    protected MessageTagsFactory newRequestTagsFactorySingleton() {
+        return new MessageTagsFactoryImpl();
+    }
+
     //  //
     //  // -- INNER CLASSES -----------------------------------------------
     //  //
     protected static class RequestFactoryImpl implements RequestFactory, java.io.Serializable {
         public Request newRequest(MethodCall methodCall, UniversalBody sourceBody, boolean isOneWay,
-                long sequenceID) {
+                long sequenceID, MessageTags tags) {
             //########### exemple de code pour les nouvelles factories
             //			if(System.getProperty("migration.stategy").equals("locationserver")){
             //				  return new RequestWithLocationServer(methodCall, sourceBody,
             //                isOneWay, sequenceID, LocationServerFactory.getLocationServer());
             //			}else{
             return new org.objectweb.proactive.core.body.request.RequestImpl(methodCall, sourceBody,
-                isOneWay, sequenceID);
+                isOneWay, sequenceID, tags);
             //}
         }
     }
@@ -474,6 +493,17 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
         }
     }
 
+    // REQUEST-TAGS
+    protected static class MessageTagsFactoryImpl implements MessageTagsFactory, Serializable {
+
+        /**
+         * @see MessageTagsFactory#newMessageTags()
+         */
+        public MessageTags newMessageTags() {
+            return new MessageTags();
+        }
+    }
+
     // SECURITY
     public void setProActiveSecurityManager(ProActiveSecurityManager psm) {
         this.proActiveSecurityManager = psm;
@@ -503,5 +533,6 @@ public class ProActiveMetaObjectFactory implements MetaObjectFactory, java.io.Se
     public Object getTimItReductor() {
         return this.timItReductor;
     }
+
 }
 //@snippet-end proactivemetaobjectfactory

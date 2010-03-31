@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,6 +24,9 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
@@ -31,6 +36,7 @@
  */
 package org.objectweb.proactive.core.body;
 
+import java.util.EmptyStackException;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
@@ -167,6 +173,21 @@ public class LocalBodyStore {
     public Context popContext() {
         Stack<Context> stack = this.contexts.get();
         return stack != null ? stack.pop() : null;
+    }
+
+    public boolean isInAo() {
+        Stack<Context> sc = contexts.get();
+        if (sc != null) {
+            try {
+                UniqueID id = sc.peek().getBody().getID();
+                return LocalBodyStore.getInstance().getLocalBody(id) != null;
+            } catch (EmptyStackException e) {
+                logger.warn("Contexts stack was empty", e);
+                return false;
+            }
+        } else {
+            return false;
+        }
     }
 
     /**

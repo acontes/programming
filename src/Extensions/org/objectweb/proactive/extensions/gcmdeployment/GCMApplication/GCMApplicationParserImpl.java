@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -21,6 +23,9 @@
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -40,6 +45,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -62,6 +68,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMParserHelper;
 import org.objectweb.proactive.extensions.gcmdeployment.Helpers;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParser;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutable;
+import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserExecutableMPI;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.ApplicationParserProactive;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.commandbuilder.CommandBuilder;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploymentDescriptor;
@@ -70,6 +77,7 @@ import org.objectweb.proactive.extensions.gcmdeployment.GCMDeployment.GCMDeploym
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeImpl;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeInternal;
 import org.objectweb.proactive.extensions.gcmdeployment.environment.Environment;
+import org.objectweb.proactive.extensions.dataspaces.core.InputOutputSpaceConfiguration;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -111,6 +119,9 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     protected Map<String, ApplicationParser> applicationParsersMap;
     protected TechnicalServicesProperties appTechnicalServices;
     protected ProActiveSecurityManager proactiveApplicationSecurityManager;
+    protected boolean dataSpacesEnabled;
+    protected Set<InputOutputSpaceConfiguration> inputOutputSpacesConfigurations;
+    protected String dataSpacesNamingServiceURL;
 
     public GCMApplicationParserImpl(URL descriptor, VariableContractImpl vContract) throws Exception {
         this(descriptor, vContract, null);
@@ -170,6 +181,7 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     private void registerDefaultApplicationParsers() {
         registerApplicationParser(new ApplicationParserProactive());
         registerApplicationParser(new ApplicationParserExecutable());
+        registerApplicationParser(new ApplicationParserExecutableMPI());
     }
 
     public void setupJAXP() throws IOException, ParserConfigurationException, SAXException {
@@ -454,5 +466,30 @@ public class GCMApplicationParserImpl implements GCMApplicationParser {
     public void setProactiveApplicationSecurityManager(
             ProActiveSecurityManager proactiveApplicationSecurityManager) {
         this.proactiveApplicationSecurityManager = proactiveApplicationSecurityManager;
+    }
+
+    public boolean isDataSpacesEnabled() {
+        return dataSpacesEnabled;
+    }
+
+    public void setDataSpacesEnabled(boolean dataSpacesEnabled) {
+        this.dataSpacesEnabled = dataSpacesEnabled;
+    }
+
+    public String getDataSpacesNamingServiceURL() {
+        return dataSpacesNamingServiceURL;
+    }
+
+    public void setDataSpacesNamingServiceURL(String dataSpacesNamingServiceURL) {
+        this.dataSpacesNamingServiceURL = dataSpacesNamingServiceURL;
+    }
+
+    public Set<InputOutputSpaceConfiguration> getInputOutputSpacesConfigurations() {
+        return inputOutputSpacesConfigurations;
+    }
+
+    public void setInputOutputSpacesConfigurations(
+            Set<InputOutputSpaceConfiguration> inputOutputSpacesConfigurations) {
+        this.inputOutputSpacesConfigurations = inputOutputSpacesConfigurations;
     }
 }

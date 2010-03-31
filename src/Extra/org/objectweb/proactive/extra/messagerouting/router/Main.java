@@ -1,16 +1,18 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2009 INRIA/University of Nice-Sophia Antipolis
- * Contact: proactive@ow2.org
+ * Copyright (C) 1997-2010 INRIA/University of 
+ * 				Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or any later version.
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
@@ -22,10 +24,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
  *  Contributor(s):
- *
  *
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
@@ -44,6 +48,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.UnrecognizedOptionException;
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -55,8 +60,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 class Main {
     static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
-
-    static final private int DEFAULT_PORT = 33647;
 
     private RouterConfig config;
     private Options options;
@@ -89,6 +92,7 @@ class Main {
         this.options.addOption("6", "ipv6", false, "Force the router to use IPv6 addresses only");
         this.options.addOption("w", "nbWorkers", true, "Size of the worker thread pool");
         this.options.addOption("h", "help", false, "Print help message");
+        this.options.addOption("v", "verbose", false, "Verbose mode. Print clients (dis)connections");
 
         CommandLine line = null;
 
@@ -106,7 +110,7 @@ class Main {
 
             arg = line.getOptionValue("p");
             if (arg == null) {
-                config.setPort(DEFAULT_PORT);
+                config.setPort(RouterImpl.DEFAULT_PORT);
             } else {
                 try {
                     short i = new Short(arg);
@@ -154,6 +158,11 @@ class Main {
                 } catch (NumberFormatException e) {
                     printHelpAndExit("Invalid worker number: " + arg);
                 }
+            }
+
+            if (line.hasOption("v")) {
+                Logger l = Logger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
+                l.setLevel(Level.DEBUG);
             }
         } catch (UnrecognizedOptionException e) {
             printHelpAndExit(e.getMessage());
