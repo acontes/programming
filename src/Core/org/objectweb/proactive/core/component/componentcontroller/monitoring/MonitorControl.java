@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -7,6 +8,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
@@ -50,7 +52,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     
 	@Override
 	public Map<String, MethodStatistics> getAllStatistics() {
-		// TODO Auto-generated method stub
+		logHandler.displayLogs();
 		return null;
 	}
 
@@ -82,7 +84,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	@Override
 	public void startMonitoring() {
 		started = true;
-		logger.debug("[Monitor Controll] Start ... !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+		logger.debug("[Monitor Controll] Start ... ");
 		String hostComponentName = null;
 		if(hostComponent != null) {
 			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
@@ -104,6 +106,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		//TODO: stop
 
 	}
+	
+	
+	
 
 	@Override
 	public void bindFc(String cItf, Object sItf)

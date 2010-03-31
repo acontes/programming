@@ -215,7 +215,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
         			" SeqNumber: " + data.getSequenceNumber() +
         			" NotifSeqNbr: " + notification.getSequenceNumber() +
         			" Tags: " + data.getTags());
-        	processWaitByNecessity(notification);
+        	//processWaitByNecessity(notification);
         	
         }
         else if (type.equals(NotificationType.setOfNotifications)) {
@@ -227,7 +227,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             }
         }
 		else {
-			logger.debug("Other");
+			logger.debug("Other: ["+ type +"]");
 		}
 		
 	}
@@ -265,10 +265,10 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	else {
     		// if there was no key, then it has to insert a new one
-    		logger.debug("Creating new RequestRecord on LogStore, component "+ this.monitoredComponentName);
+    		//logger.debug("Creating new RequestRecord on LogStore, component "+ this.monitoredComponentName);
     		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
     	}
-    	logger.debug("Inserting RequestRecord on LogStore, component "+ this.monitoredComponentName);
+    	//logger.debug("Inserting RequestRecord on LogStore, component "+ this.monitoredComponentName);
     	logStore.insert(rs);
     }
     
@@ -299,7 +299,8 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map (should exist already)
     	if(logStore.exists(current, RecordType.RequestRecord).booleanValue()) {
-    		rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
+    		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
+    		rs = logStore.fetchRequestRecord(current);	
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and be updated later,
@@ -336,7 +337,8 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map
     	if(logStore.exists(current, RecordType.RequestRecord).booleanValue()) {
-    		rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
+    		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
+    		rs = logStore.fetchRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
@@ -371,8 +373,26 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	if(interfaceName.equals("-")) {
     		return;
     	}
-    	CallRecord cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
-    	logStore.insert(cs);
+    	CallRecord cs;
+    	// checks if the call data has already been entered in the map
+    	if(logStore.exists(current, RecordType.CallRecord).booleanValue()) {
+    		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
+    		cs = logStore.fetchCallRecord(current);
+    		cs.setSentTime(notification.getTimeStamp());
+    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
+    	}
+    	else {
+    		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
+    		//logger.debug("Creating new CallRecord on LogStore, component "+ this.monitoredComponentName + ", ID: "+ current);
+    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
+    		//cs.setReplyReceptionTime(notification.getTimeStamp());
+    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
+    	}
+    	logStore.insertCallRecord(cs);
+    	//logStore.insert(cs);
+    	
+    	//cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
+    	//logStore.insert(cs);
     }
     
     /**
@@ -404,13 +424,18 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = logStore.fetchCallRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
+    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
+    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
     	}
-    	logStore.insert(cs);
+    	//logStore.insert(cs);
+    	logStore.insertCallRecord(cs);
+    	//logger.debug("INSERTED "+ cs.getReplyReceptionTime() + ", ID: "+ current);
+    	//logger.debug("READ     "+ logStore.fetchCallRecord(current).getReplyReceptionTime() + ", ID: "+ current);
     }
     
     /**
@@ -444,7 +469,8 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
     		cs.setWbnStartTime(notification.getTimeStamp());
     	}
-    	logStore.insert(cs);
+    	//logStore.insert(cs);
+    	logStore.insertCallRecord(cs);
     }
     
     /**

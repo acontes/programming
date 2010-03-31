@@ -790,9 +790,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         public void sendRequest(MethodCall methodCall, Future future, UniversalBody destinationBody)
                 throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
-
+            
             MessageTags tags = applyTags(sequenceID, destinationBody, methodCall);
-
+            
             Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
                     future == null, sequenceID, tags);
 
@@ -832,7 +832,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 //
 //                    if (!connectorID.equals(destinationBody.getID())) {
                         String tagNotification = createTagNotification(tags);
-
                         mbean.sendNotification(NotificationType.requestSent, new RequestNotificationData(
                             BodyImpl.this.bodyID, BodyImpl.this.getNodeURL(), destinationBody.getID(),
                             destinationBody.getNodeURL(), methodCall.getName(), -1, request
@@ -905,6 +904,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // Check the presence of the DSI Tag if enabled
             // Ohterwise add it
             if (PAProperties.PA_TAG_DSF.isTrue()) {
+            	System.out.println("And THIS TAGS ????-------------------");
                 if (!nextTags.check(DsiTag.IDENTIFIER)) {
                     nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }

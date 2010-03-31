@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -66,12 +67,12 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			
 		}
 		if(rt == RecordType.CallRecord) {
-			return callLog.get(key);
+			return null; //callLog.get(key);
 		}
 		return null;
 	}
 	
-	// FIXME Should use the abstract class, but that gives a ClassCastException when passing it as a parameter
+	// FIXME Should use the abstract class, but that gives a ClassCastException when passing it as a parameter, won't fix it now...
 	public RequestRecord fetchRequestRecord(Object key) {
 		return requestLog.get(key);
 	}
@@ -85,8 +86,16 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			requestLog.put(record.requestID, (RequestRecord) record);
 		}
 		else if(record.recordType == RecordType.CallRecord) {
-			callLog.put(record.requestID, (CallRecord) record);
+			//callLog.put(record.requestID, (CallRecord) record);
+			//logger.debug("INSERTED IN LOG: "+ ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() + " ID: "+ record.requestID );
 		}
+	}
+	
+	public void insertRequestRecord(RequestRecord record) {
+		requestLog.put(record.requestID, record);
+	}
+	public void insertCallRecord(CallRecord record) {
+		callLog.put(record.getRequestID(), record);
 	}
 
 	// the same from above... because HashMap.put() replaces old value!!
@@ -96,8 +105,62 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			requestLog.put(record.requestID, (RequestRecord) record);
 		}
 		else if(record.recordType == RecordType.CallRecord) {
-			callLog.put(record.requestID, (CallRecord) record);
+			//callLog.put(record.requestID, (CallRecord) record);
 		}
-	}    
+	} 
+	
+	// only for testing
+	public void displayLogs() {
+		String hostComponentName = null;
+		if(hostComponent != null) {
+			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
+		}
+		System.out.println("============ Component ["+ hostComponentName +"] ===============");
+		System.out.println("=====================Call Log===================================");
+		displayCallLog();
+		System.out.println("=====================Request Log================================");
+		displayRequestLog();
+		System.out.println("================================================================");
+		System.out.println();
+	}
+	
+	public void displayCallLog() {
+		String hostComponentName = null;
+		if(hostComponent != null) {
+			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
+		}
+    	Iterator<ComponentRequestID> i = callLog.keySet().iterator();
+    	ComponentRequestID crID;
+    	CallRecord cs;
+    	while(i.hasNext()) {
+    		crID = i.next();
+    		cs = callLog.get(crID);
+    		System.out.println("[callLog:"+hostComponentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + 
+    				" Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ 
+    				" SentTime: " + cs.getSentTime() + " RealReplyReceivedTime: " + cs.getReplyReceptionTime() +
+    				" WbN: " + (cs.getWbnStartTime()==0 ? 0 : (cs.getReplyReceptionTime() - cs.getWbnStartTime())) + 
+    				" SRV: " + (cs.getReplyReceptionTime() - cs.getSentTime()));
+    	}
+    }
+
+    public void displayRequestLog() {
+    	String hostComponentName = null;
+		if(hostComponent != null) {
+			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
+		}
+    	Iterator<ComponentRequestID> i = requestLog.keySet().iterator();
+    	ComponentRequestID crID;
+    	RequestRecord rs;
+    	while(i.hasNext()) {
+    		crID = i.next();
+    		rs = requestLog.get(crID);
+    		System.out.println("[reqsLog:"+hostComponentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() +
+    				" Call: "+ rs.getCalledComponent() + "." + rs.getInterfaceName()+"."+rs.getMethodName() +
+    				" Arr: " + rs.getArrivalTime() + " Serv: " + rs.getServingStartTime() + " Repl: " + rs.getReplyTime() +
+    				" WQ: " + (rs.getServingStartTime()-rs.getArrivalTime()) + 
+    				" SRV: " + (rs.getReplyTime()-rs.getServingStartTime()) +
+    				" TOT: "+ (rs.getReplyTime() - rs.getArrivalTime()));	
+    	}
+    }
     
 }

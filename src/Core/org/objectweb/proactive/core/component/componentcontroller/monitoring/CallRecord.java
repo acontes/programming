@@ -8,7 +8,9 @@ import java.io.Serializable;
  * @author cruz
  *
  */
-public class CallRecord extends AbstractRecord implements Serializable {
+public class CallRecord implements Serializable {
+	
+	private ComponentRequestID requestID;
 	
 	/** ID of the parent request */
 	private ComponentRequestID parentID;
@@ -30,7 +32,7 @@ public class CallRecord extends AbstractRecord implements Serializable {
 	
 	public CallRecord(ComponentRequestID requestID, ComponentRequestID parentID, String calledComponent, String interfaceName, String methodName,
 			long sentTime, boolean voidRequest) {
-		super(RecordType.CallRecord, requestID);
+		this.requestID = requestID;
 		this.parentID = parentID;
 		this.calledComponent = calledComponent;
 		this.interfaceName = interfaceName;

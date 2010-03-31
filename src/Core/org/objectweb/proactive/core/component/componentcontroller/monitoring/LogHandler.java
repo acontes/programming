@@ -17,7 +17,9 @@ public interface LogHandler {
 	
 	// inserts new record in the store
 	void insert(AbstractRecord record);
-
+	void insertRequestRecord(RequestRecord record);
+	void insertCallRecord(CallRecord record);
+	
 	// fetches an existing record in the store
 	AbstractRecord fetch(Object key, RecordType rt);
 	RequestRecord fetchRequestRecord(Object key);
@@ -28,5 +30,8 @@ public interface LogHandler {
 
 	// updates an existing record
 	void update(Object key, AbstractRecord record);
+	
+	// display Logs (only for testing)
+	void displayLogs();
 	
 }
