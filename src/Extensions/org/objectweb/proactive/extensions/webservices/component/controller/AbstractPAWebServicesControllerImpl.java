@@ -117,7 +117,8 @@ public abstract class AbstractPAWebServicesControllerImpl extends AbstractPACont
             throws WebServicesException {
         WebServicesFactory wsf = AbstractWebServicesFactory.getWebServicesFactory(this.framework);
         WebServices ws = wsf.getWebServices(url);
-        ws.unExposeComponentAsWebService(componentName, interfaceNames);
+        ws.unExposeComponentAsWebService(Fractive.getComponentRepresentativeOnThis(), componentName,
+                interfaceNames);
     }
 
     static public URL getControllerFileUrl(String wsFramework) throws UnknownFrameWorkException {

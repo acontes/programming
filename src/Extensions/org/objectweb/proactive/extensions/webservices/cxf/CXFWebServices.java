@@ -74,12 +74,12 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
      * @see org.objectweb.proactive.extensions.webservices.WebServices#exposeAsWebService(java.lang.Object, java.lang.String, java.lang.reflect.Method[])
      */
     public void exposeAsWebService(Object o, String urn, Method[] methods) throws WebServicesException {
-        
+
         if (methods == null || methods.length == 0) {
             exposeAsWebService(o, urn);
             return;
         }
-            
+
         MethodUtils.checkMethodsClass(methods);
         PADeployer.deploy(o, this.url, urn, methods, false);
 
@@ -100,7 +100,7 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
             exposeAsWebService(o, urn);
             return;
         }
-        
+
         // Transforms the array methods' name into an array of
         // methods (of type Method)
         MethodUtils mc = new MethodUtils(o.getClass().getSuperclass());
@@ -142,17 +142,29 @@ public class CXFWebServices extends AbstractWebServices implements WebServices {
      */
     public void exposeComponentAsWebService(Component component, String componentName, String[] interfaceNames)
             throws WebServicesException {
-        
+
         if (interfaceNames == null || interfaceNames.length == 0) {
             exposeComponentAsWebService(component, componentName);
             return;
         }
-        
+
         PADeployer.deployComponent(component, this.url, componentName, interfaceNames);
 
         for (String name : interfaceNames) {
             logger.debug("The component interface '" + name + "' has been deployed on " + this.url +
                 WSConstants.SERVICES_PATH + componentName + "_" + name + "?wsdl");
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.objectweb.proactive.extensions.webservices.WebServices#unExposeComponentAsWebService(org.objectweb.fractal.api.Component, java.lang.String, java.lang.String[])
+     */
+    public void unExposeComponentAsWebService(Component component, String componentName,
+            String[] interfaceNames) throws WebServicesException {
+        if (interfaceNames == null || interfaceNames.length == 0) {
+            unExposeComponentAsWebService(component, componentName);
+        } else {
+            unExposeComponentAsWebService(componentName, interfaceNames);
         }
     }
 
