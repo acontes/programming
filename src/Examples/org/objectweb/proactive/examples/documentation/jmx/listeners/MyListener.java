@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,34 +34,28 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.jmx.remote.management.mbean;
+package org.objectweb.proactive.examples.documentation.jmx.listeners;
 
-import java.util.ArrayList;
+//@snippet-start JMX_MyListener
+import javax.management.Notification;
+import javax.management.NotificationListener;
 
-import org.objectweb.proactive.examples.jmx.remote.management.status.Status;
+import org.objectweb.proactive.examples.documentation.jmx.mbeans.Hello;
 
 
-public interface OSGiFrameworkMBean {
+public class MyListener implements NotificationListener {
 
-    /* Getters and Setters */
-    public ArrayList<BundleInfo> getBundles();
+    public void handleNotification(Notification notification, Object handback) {
 
-    public String getUrl();
+        String type = notification.getType();
 
-    public String getProcessor();
-
-    public String getOsName();
-
-    public String getExeEnv();
-
-    public String getLanguage();
-
-    public String getVendor();
-
-    public String getVersion();
-
-    /* operations */
-    public Status installBundle(long transactionId, String location);
-
-    //    public void executeCommand(long transactionId, String command);
+        System.out.println("\nReceiving Notification: ");
+        System.out.println("My type is " + type);
+        if (type.equals(Hello.NOTIFICATION_NAME)) {
+            Hello h = (Hello) notification.getUserData();
+            System.out.println("my current message is: " + h.getMessage());
+            h.saySomething();
+        }
+    }
 }
+//@snippet-end JMX_MyListener

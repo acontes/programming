@@ -72,6 +72,7 @@ import org.objectweb.proactive.annotation.TurnRemote;
 import org.objectweb.proactive.annotation.TurnRemoteParam;
 import org.objectweb.proactive.annotation.UnwrapFuture;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -87,10 +88,11 @@ public class JavassistByteCodeStubBuilder {
     private static CtMethod proxyGetter;
     private static CtMethod proxySetter;
     private static volatile boolean classPoolInitialized = false;
+    private static ClassPool pool = ClassPool.getDefault();
 
     public synchronized static ClassPool getClassPool() {
-        ClassPool pool = ClassPool.getDefault();
         if (!classPoolInitialized) {
+            pool.appendClassPath(new LoaderClassPath(ProActiveRuntime.class.getClassLoader()));
             pool.appendClassPath(new LoaderClassPath(MOPClassLoader.getMOPClassLoader()));
             classPoolInitialized = true;
         }

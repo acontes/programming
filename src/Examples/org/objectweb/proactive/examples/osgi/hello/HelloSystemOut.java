@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,29 +34,33 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.documentation.jmx;
+package org.objectweb.proactive.examples.osgi.hello;
 
-//@snippet-start jmx_MyListener
-import javax.management.Notification;
-import javax.management.NotificationListener;
-import org.objectweb.proactive.core.UniqueID;
-import org.objectweb.proactive.core.jmx.notification.BodyNotificationData;
-import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
-public class MyListener implements NotificationListener {
+@ActiveObject
+public class HelloSystemOut implements HelloService {
+    private final String message = "Hello World!";
+    private java.text.DateFormat dateFormat = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-    public void handleNotification(Notification notification, Object handback) {
-        // Get the type of the notification
-        String type = notification.getType();
-        // Get the data of the notification
-        Object data = notification.getUserData();
+    /** ProActive compulsory no-args constructor */
+    public HelloSystemOut() {
+    }
 
-        if (type.equals(NotificationType.bodyCreated)) {
-            BodyNotificationData notificationData = (BodyNotificationData) data;
-            UniqueID id = notificationData.getId();
-            System.out.println("Active Object created with id:" + id);
-        }
+    public void sayHello() {
+        System.out.println(this.message + "\n from " + getHostName() + "\n at " +
+            dateFormat.format(new java.util.Date()));
+    }
+
+    /** finds the name of the local machine */
+    static String getHostName() {
+        return ProActiveInet.getInstance().getInetAddress().getHostName();
+    }
+
+    public void saySomething(String something) {
+        System.out.println(something + "\n from " + getHostName() + "\n at " +
+            dateFormat.format(new java.util.Date()));
     }
 }
-//@snippet-end jmx_MyListener
