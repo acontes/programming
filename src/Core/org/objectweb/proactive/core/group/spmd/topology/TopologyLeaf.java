@@ -9,7 +9,6 @@ public class TopologyLeaf extends TopologyNode {
 		super(hostRank);
 	}
 
-	@Override
 	public String toString() {
 		if(getParent() == null) return "(" + getId().toString() + ")";
 		String value = new Double(getParent().getChildLength(getId())).toString();
@@ -18,6 +17,14 @@ public class TopologyLeaf extends TopologyNode {
 		return getId().toString() + "_" + value;
 	}
 
+//	public String toString2() {
+//		if(getParent() == null) return "(" + getId().toString() + ")";
+//		String value = new Double(getParent().getChildLength(getId())).toString();
+//		if (value.length() > 5)
+//			value = value.substring(0, 5);
+//		return getId().toString() + "_" + value;
+//	}
+	
 	@Override
 	public void addChild(TopologyNode n, double length) {
 	}

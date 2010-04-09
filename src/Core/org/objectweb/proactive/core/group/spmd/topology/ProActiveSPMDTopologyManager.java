@@ -1,6 +1,12 @@
 package org.objectweb.proactive.core.group.spmd.topology;
 
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +38,7 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 	 */
 	public static final int LEADER_RANK = 0; 
 
-	public static final int NB_NEEDED_LATENCIES = 20;
+	public int NB_NEEDED_LATENCIES = 12;
 
 	/**
 	 * Timer of the thread managing the sending of the latencies
@@ -42,7 +48,7 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 	/**
 	 * Timer of the thread managing the sending of the latencies while the topology is not yet available
 	 */
-	private int deamonManagerStartTimer = 1000;
+	private int deamonManagerStartTimer = 250;
 
 	/**
 	 * Timer of the thread managing the construction of the topology tree
@@ -124,6 +130,7 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 	 */
 	private Object waitTree = new Object();
 
+	private long timeInit;
 
 	/**
 	 * Constructor, used for serialization
@@ -132,12 +139,12 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 	}
 
 	public ProActiveSPMDTopologyManager(Group<Object> spmdGroup) {
+		this.timeInit = System.currentTimeMillis();
 		this.body = PAActiveObject.getBodyOnThis();
 		this.groupSize = spmdGroup.size();
 		this.spmdGroup = spmdGroup;
 		this.myRank = PASPMD.getMyRank();
-		this.neededLatencies = (groupSize-1) * NB_NEEDED_LATENCIES;
-		this.threshold_nb_latencies = (neededLatencies * 40) / 100;
+		this.threshold_nb_latencies = (neededLatencies * 1) / 100;
 		this.communicationLatencies = new Latency[groupSize];
 		for (int i = 0; i < groupSize; i++) {
 			communicationLatencies[i] = new Latency(PASPMD.getMyRank(), i);
@@ -152,8 +159,29 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 
 		if(myRank == LEADER_RANK)
 			constructionTopologyManagement = new ConstructionTopologyManagemement();
-		
-		System.out.println("[rank = " + myRank + "]" + " [host = " + body.getNodeURL() + "]");
+
+//		System.out.println("rank = " + myRank  + " host = " + body.getNodeURL());
+		File conf = new File("conf.txt");
+		try{
+			if(conf.exists()){
+				FileInputStream fis = new FileInputStream(conf);
+				DataInputStream in = new DataInputStream(fis);
+				BufferedReader br = new BufferedReader(new InputStreamReader(in));
+				String line;
+				while((line = br.readLine()) != null){
+					String[] tab = line.split("=");
+					if(tab[0].equals("latping")){
+						this.deamonManagerStartTimer = Integer.parseInt(tab[1]);
+					}
+					else if(tab[0].equals("nbping")){
+						NB_NEEDED_LATENCIES = Integer.parseInt(tab[1]);
+					}
+				}
+			}
+		}
+		catch(Exception e){
+		}
+		this.neededLatencies = (groupSize-1) * NB_NEEDED_LATENCIES;
 	}
 
 	/**
@@ -442,9 +470,15 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 	 */
 	private class DeamonTopologyManager implements Runnable {
 		private Random rand = new Random();
-
+		int nbPing = 0;
+		
 		public void run() {
 			try{
+				//				try {
+				//					Thread.sleep(1000);
+				//				} catch (InterruptedException e1) {
+				//					e1.printStackTrace();
+				//				}
 				while(true) {
 					if(deamonManagerStartTimer > 1){
 						Thread.sleep(rand.nextInt(deamonManagerStartTimer) + deamonManagerStartTimer/2);						
@@ -457,12 +491,16 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 					ProxyForGroup<Object> leaderGroup = (ProxyForGroup<Object>)spmdGroup;
 					LocalBodyStore.getInstance().pushContext(new Context(body, null));
 					try{
+						nbPing++;
 						leaderGroup.reify(new MethodCallPing());
 					}
 					catch(ExceptionListException e){
 					}
 					//					System.out.println("needed lat = " + neededLatencies);
 				}
+//				if(myRank == 0){
+//					System.out.println("nbPing = " + nbPing);
+//				}
 				while (true) {
 					if (hasToSendLatencies()) {
 						sendLatencies();
@@ -605,10 +643,16 @@ public class ProActiveSPMDTopologyManager implements Serializable{
 				groupCommunicationLatencies[rank] = latencies;
 				if (!build && nbDifferentLatencies == groupCommunicationLatencies.length) {
 					build = true;
+//					System.out
+//					.println("ProActiveSPMDTopologyManager.ConstructionTopologyManagemement.setCommunicationLatencies() latences collectees tmp = " + (System.currentTimeMillis() - timeInit));
 					// first construction of the topology
 					topologyInference.makeTopologyInference();
+//					System.out
+//					.println("ProActiveSPMDTopologyManager.ConstructionTopologyManagemement.setCommunicationLatencies() Topologie construite tmp = " + (System.currentTimeMillis() - timeInit));
 					// diffusion of the topology
 					diffuseTopologyTree(topologyInference.getClusterTree(), treeId++);
+//					System.out
+//					.println("ProActiveSPMDTopologyManager.ConstructionTopologyManagemement.setCommunicationLatencies() Topologie diffuse tmp = " + (System.currentTimeMillis() - timeInit));
 					// creation and launch of the thread managing the update of the topology
 					deamonTopologyBuilder = new Thread(new DeamonTopologyBuilder());
 					deamonTopologyBuilder.start();

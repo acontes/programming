@@ -1,5 +1,8 @@
 package org.objectweb.proactive.core.group.spmd.topology;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,13 +45,13 @@ public class TopologyInference implements Serializable{
 	private TopologyNode clusterTree;
 	private int groupSize;
 	private int nextNodeId = -100000;
- 
+
 	/**
 	 * Constructor, used for serialization
 	 */
 	public TopologyInference(){
 	}
-	
+
 	public TopologyInference(Latency[][] groupCommunicationLatencies){
 		this.groupCommunicationLatencies = groupCommunicationLatencies;
 		this.groupSize = groupCommunicationLatencies.length;
@@ -60,11 +63,24 @@ public class TopologyInference implements Serializable{
 	 */
 	public void makeTopologyInference(){
 		inferateTopologie();
-//		System.out.println("Tree : " + topologyTree);
+		//				System.out.println("Tree : " + topologyTree.toString2());
 		simplifyTopologyTree(1.0/6);
-//		System.out.println("Apres clean : Tree : " + topologyTree);
+//		System.out.println("Apres clean : Tree : " + topologyTree.toString2());
 		makeClusterTree(true);
 		System.out.println("Topology tree : " + clusterTree);
+
+		try{
+			File f = new File("tree" + hosts.size() + ".tmp");
+			FileOutputStream fos = new FileOutputStream(f);
+			ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+			oos.writeObject(clusterTree);
+
+			oos.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 	/* 
@@ -100,7 +116,7 @@ public class TopologyInference implements Serializable{
 			makeTopologyInference();
 		return clusters;
 	}
-	
+
 	public int getNbClusters(){
 		return clusters.size();
 	}
@@ -145,6 +161,7 @@ public class TopologyInference implements Serializable{
 		double averageLeafLength = res[2] / res[5];
 		if(averageLeafLength > 1)
 			averageLeafLength = 1;
+//		System.out.println("TopologyInference.simplifyTopologyTree() avgNode = " + res[0]/res[3] + " seuil = " + (res[0]/res[3])*coeff + " avgLeaf = " + averageLeafLength);
 		cleanNegligibleNodes(topologyTree, averageNodeLength*coeff);
 		cleanNegativeValues(topologyTree, averageLeafLength);
 	}
@@ -279,8 +296,8 @@ public class TopologyInference implements Serializable{
 		} else if (y <= 0) {
 			branchingPoint = addNegativeValue(y, getNode(hosts, BH.getDestRank()));
 		} else {
-			double xMin = x - x / 10 - 0.01;
-			double xMax = x + x / 10 + 0.01;
+			double xMin = x - x / 10 - 0.1;
+			double xMax = x + x / 10 + 0.1;
 			branchingPoint = findBranchingPoint(x, xMin, xMax, getNode(hosts, AH.getDestRank()), getNode(hosts, BH.getDestRank()));
 		}
 
@@ -302,7 +319,6 @@ public class TopologyInference implements Serializable{
 
 		if (TopologyLeaf.class.isAssignableFrom(branchingPoint.getClass())) {
 			double length = branchingPoint.getParentLength();
-			System.out.println("node insert = " + host.getId() + " z = " + z);
 			branchingPoint = insertNodeDown(length, length, branchingPoint, branchingPoint.getParent());
 		}
 
@@ -475,6 +491,7 @@ public class TopologyInference implements Serializable{
 			ArrayList<TopologyNode> children = new ArrayList<TopologyNode>(tree.getChildren());
 			TopologyNode parent = tree.getParent();
 			if (parent != null && Math.abs(parent.getChildLength(tree.getId())) < negligibleValue) {
+//				System.out.println("TopologyInference.cleanNegligibleNodes() supression de length = " + parent.getChildLength(tree.getId()));
 				parent.removeChild(tree.getId());
 				for (TopologyNode n2 : children) {
 					parent.addChild(n2, tree.getChildLength(n2.getId()));
@@ -495,14 +512,16 @@ public class TopologyInference implements Serializable{
 	private void averageWeight(TopologyNode tree, double[] res) {
 		for (TopologyNode n : tree.getChildren()) {
 			double length = tree.getChildLength(n.getId());
-			res[0] += Math.abs(length);
-			res[3]++;
-			if (n.getClass().equals(TopologyNode.class)) {
-				res[1] += Math.abs(length);
-				res[4]++;
-			} else {
-				res[2] += Math.abs(length);
-				res[5]++;
+			if(length != 0){
+				res[0] += Math.abs(length);
+				res[3]++;
+				if (n.getClass().equals(TopologyNode.class)) {
+					res[1] += Math.abs(length);
+					res[4]++;
+				} else {
+					res[2] += Math.abs(length);
+					res[5]++;
+				}
 			}
 			averageWeight(n, res);
 		}
@@ -571,6 +590,7 @@ public class TopologyInference implements Serializable{
 		double[] tab = new double[6];
 		averageWeight(topologyTree, tab);
 		double avgLeaf = tab[2]/tab[5];
+//		System.out.println("avgleaf = " + avgLeaf + " seuil = " + (avgLeaf * 2 * 1.3 + 0.1));
 		List<List<TopologyNode>> clusters = new ArrayList<List<TopologyNode>>();
 		Map<Integer, TopologyLeaf> leafs = new HashMap<Integer, TopologyLeaf>(hosts);
 		while(leafs.size() > 0){ // while all nodes have not yet been added to a cluster
@@ -579,6 +599,7 @@ public class TopologyInference implements Serializable{
 			// select a node
 			for(TopologyLeaf l : leafs.values()){
 				double lLength = Math.abs(l.getParentLength());
+				//				double lLength = l.getParentLength();
 				if(leaf == null || lLength < minLength){
 					leaf = l;
 					minLength = lLength;
@@ -587,8 +608,9 @@ public class TopologyInference implements Serializable{
 			List<TopologyNode> cluster = new ArrayList<TopologyNode>();
 			removeLeafs(leafs, leaf);
 			cluster.add(leaf);
+//			System.out.println("    Cluster " + clusters.size() + " de " + leaf.getId());
 			// construct the cluster of the selected node
-			cluster(cluster, leafs, leaf.getParentLength(), avgLeaf*2.25, leaf.getParent(), null);
+			cluster(cluster, leafs, leaf.getParentLength(), avgLeaf*1.6, leaf.getParent(), null);
 			clusters.add(cluster);
 		}
 		return clusters;
@@ -618,12 +640,22 @@ public class TopologyInference implements Serializable{
 			for(TopologyLeaf leaf : childrenLeafs){  
 				if(contains(leafs, leaf.getId())){
 					double length = leaf.getParentLength() + actualDist;
-					if(length < 1.3*avgDist+0.1){
-						double avgDist2 = (avgDist * (cluster.size()-1) + length) / cluster.size();
-						avgDist = avgDist2;
-						if(avgDist < 0.2) avgDist = 0.2;
-						removeNode(leafs, leaf.getId());
-						cluster.add(leaf);
+					if(length < 1.25*avgDist+0.1){
+						if(length > -1.25*avgDist-0.1){
+							double avgDist2 = (avgDist * (cluster.size()-1) + length) / cluster.size();
+							avgDist = avgDist2;
+//							System.out.println(" add de " + leaf.getId() + " length = " + length);
+							if(avgDist < 0.20) {
+								avgDist = 0.20;
+//								System.out.println("set avgDist a 0.2");
+							}
+//							else System.out.println("avgdist = " + avgDist);
+							removeNode(leafs, leaf.getId());
+							cluster.add(leaf);
+						}
+						else {
+//							System.out.println("Valeur negative, insertion de " + leaf.getId() + " annule (length = " + length + ")");
+						}
 					}
 					else break;
 				}
@@ -639,8 +671,8 @@ public class TopologyInference implements Serializable{
 				}
 				else nodeLength = ref.getChildLength(node.getId());
 				if(previous == null || previous.getId() != node.getId()){
-					if(actualDist < avgDist){
-						double newAvg = cluster(cluster, leafs, actualDist+nodeLength, avgDist, node, ref);
+					if(actualDist < 1.5*avgDist){
+						double newAvg = cluster(cluster, leafs, (actualDist+nodeLength)<-0.1?-0.1:(actualDist+nodeLength), avgDist, node, ref);
 						avgDist = newAvg;
 					}
 					else break;
@@ -694,6 +726,7 @@ public class TopologyInference implements Serializable{
 					}
 				}
 				clusterNodes.get(newCluster).add(clust.get(0));
+//				System.out.println("TopologyInference.makeClusterTree() add de " +  rankRef + " au cluster " + newCluster + " lat = " + minlatency);
 				hostsToCluster[clust.get(0).getId()] = newCluster;
 				clust.remove(0);
 			}
@@ -717,19 +750,19 @@ public class TopologyInference implements Serializable{
 			}
 		}
 
-//		if(recursive){
-//			System.out.println("===============================");
-//			// affichage
-//			System.out.println("Clusters : ");
-//			for(int i = 0; i < nbClusters; i++){
-//				List<TopologyNode> ltn = clusterNodes.get(i);
-//				for(int j = 0; j < ltn.size(); j++){
-//					TopologyNode node = ltn.get(j);
-//					System.out.print(node.getId() + " ");
-//				}
-//				System.out.println();
-//			}
-//		}
+		//		if(recursive){
+		//			System.out.println("===============================");
+		//			// affichage
+		//			System.out.println("Clusters : ");
+		//			for(int i = 0; i < nbClusters; i++){
+		//				List<TopologyNode> ltn = clusterNodes.get(i);
+		//				for(int j = 0; j < ltn.size(); j++){
+		//					TopologyNode node = ltn.get(j);
+		//					System.out.print(node.getId() + " ");
+		//				}
+		//				System.out.println();
+		//			}
+		//		}
 
 		// construction of the table of latencies between clusters
 		Latency[][] latencies = new Latency[nbClusters][nbClusters];
@@ -751,18 +784,18 @@ public class TopologyInference implements Serializable{
 				}
 			}
 		}
-//		for(Latency[] tabLat : latencies){
-//			for(Latency lat : tabLat){
-//				System.out.print(lat.getAverage() + "   ");
-//			}
-//			System.out.println();
-//		}
+		//		for(Latency[] tabLat : latencies){
+		//			for(Latency lat : tabLat){
+		//				System.out.print(lat.getAverage() + "   ");
+		//			}
+		//			System.out.println();
+		//		}
 
 		// construction of the clusters's topology
 		if(nbClusters >= 3){
 			TopologyInference ti = new TopologyInference(latencies);
 			ti.inferateTopologie();
-			ti.simplifyTopologyTree(1.0/4);
+			ti.simplifyTopologyTree(1/5);
 			clusterTree = ti.topologyTree;
 
 			//			if(recursive && nbClusters > groupSize/8 && groupSize >= 24 && nbClusters > 8){
@@ -822,8 +855,8 @@ public class TopologyInference implements Serializable{
 					return 0;
 				}
 			});
-			
-			
+
+
 			//			}
 		}
 		else{
@@ -840,25 +873,27 @@ public class TopologyInference implements Serializable{
 				clusters.add(clusterTree.getChild(1));
 			}
 		}
-		
+
 		for(int i = 0; i < nbClusters; i++){
 			TopologyNode cluster = clusters.remove(0);
 			TopologyNode parent = cluster.getParent();
 			double length = cluster.getParentLength();
-			parent.removeChild(cluster.getId());
-			TopologyNode newCluster = new TopologyNode(((cluster.getId()+1)*-1), length, parent);
-			clusters.add(newCluster);
+			if(parent != null){
+				parent.removeChild(cluster.getId());
+				cluster = new TopologyNode(((cluster.getId()+1)*-1), length, parent);
+			}
+			clusters.add(cluster);
 			List<TopologyNode> clusterMembers = clusterNodes.get(i);
 			for(TopologyNode host : clusterMembers){
-				newCluster.addChild(host, 0);
+				cluster.addChild(host, 0);
 			}
 		}
-		
-//		System.out.println("ClusterTree : " + clusterTree) ;
+
+		//		System.out.println("ClusterTree : " + clusterTree) ;
 		//	System.out.println("Profondeur de l'arbre : " + clusterTree.getMaxDepth());
 		if(recursive){
 			clusterTree = balanceTopologyTree(clusterTree);
-//			System.out.println("Apres balance de l'arbre : " + clusterTree);
+			//			System.out.println("Apres balance de l'arbre : " + clusterTree);
 			electClusterLeaders(clusterNodes);
 		}
 
@@ -986,20 +1021,20 @@ public class TopologyInference implements Serializable{
 					if(avg < bestAvg || bestAvg < 0){
 						bestAvg = avg;
 						clusters.get(i).setId(rankRef);
-//						clustersLeaders[i] = rankRef;
+						//						clustersLeaders[i] = rankRef;
 					}
 				}
 			}
 		}
 
-//		System.out.println("TopologyInference.electClusterLeaders() " + clusterTree);
-//
-//		System.out.println("TopologyInference.electClusterLeaders() AFFICHAGE de -CLUSTERS-");
-//		for(int i = 0; i< clusters.size(); i++){
-//			System.out.println(" cluster " + i + " : " + clusters.get(i) + " leader = " + clusters.get(i).getId());
-//		}
-//		System.out.println("--------------------------------------------------");
-		
+		//		System.out.println("TopologyInference.electClusterLeaders() " + clusterTree);
+		//
+		//		System.out.println("TopologyInference.electClusterLeaders() AFFICHAGE de -CLUSTERS-");
+		//		for(int i = 0; i< clusters.size(); i++){
+		//			System.out.println(" cluster " + i + " : " + clusters.get(i) + " leader = " + clusters.get(i).getId());
+		//		}
+		//		System.out.println("--------------------------------------------------");
+
 		// select leaders of the clusters'leaders
 		Map<TopologyNode, Double> mapLength = new HashMap<TopologyNode, Double>();
 		for(int i = 0; i < nbClusters; i++){
@@ -1017,10 +1052,10 @@ public class TopologyInference implements Serializable{
 				else break;
 			}
 		}
-//		System.out.println("Leaders :");
-//		for(int i = 0; i < clustersLeaders.length; i++)
-//			System.out.print(clustersLeaders[i] + " ");
-//		System.out.println();
+		//		System.out.println("Leaders :");
+		//		for(int i = 0; i < clustersLeaders.length; i++)
+		//			System.out.print(clustersLeaders[i] + " ");
+		//		System.out.println();
 		//		System.out.println("normal : " + clusterTree.toString());
 	}
 

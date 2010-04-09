@@ -54,7 +54,9 @@ public class TopologyNode implements Serializable, Comparable<TopologyNode>{
 
 	public TopologyNode(int id, double length, TopologyNode parent) {
 		this(id);
-		parent.addChild(this, length);
+		if(parent != null){			
+			parent.addChild(this, length);
+		}
 	}
 
 	public TopologyNode(int id, TopologyNode parent, Map<Integer, TopologyNode> children, Map<Integer, Double> childLength) {
@@ -258,6 +260,14 @@ public class TopologyNode implements Serializable, Comparable<TopologyNode>{
 	 * Used to debug
 	 */
 	public String toString2() {
+		if(this.getClass().equals(TopologyLeaf.class)){
+			if(getParent() == null) return "(" + getId().toString() + ")";
+			String value = new Double(getParent().getChildLength(getId())).toString();
+			if (value.length() > 5)
+				value = value.substring(0, 5);
+			return getId().toString() + "_" + value;
+		}
+		else{
 		String s = "(X";
 		if (getParent() != null) {
 			String value = new Double(getParent().getChildLength(getId())).toString();
@@ -271,6 +281,7 @@ public class TopologyNode implements Serializable, Comparable<TopologyNode>{
 		}
 		s += ")";
 		return s;
+		}
 	}
 
 	/**
@@ -303,8 +314,8 @@ public class TopologyNode implements Serializable, Comparable<TopologyNode>{
 		}
 		if(o.getParent() == null)
 			return 1;
-		double myLength = parent.getChildLength(id);
-		double oLength = o.getParent().getChildLength(o.getId());
+		double myLength = Math.abs(parent.getChildLength(id));
+		double oLength = Math.abs(o.getParent().getChildLength(o.getId()));
 		if(myLength > oLength) 
 			return 1;
 		if(myLength < oLength)
