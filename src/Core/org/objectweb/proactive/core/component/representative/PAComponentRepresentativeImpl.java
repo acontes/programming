@@ -73,7 +73,7 @@ import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.group.ProxyForGroup;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
@@ -117,7 +117,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     public PAComponentRepresentativeImpl(ComponentType componentType, String hierarchicalType,
             String controllersConfigFileLocation) {
         this.componentType = componentType;
-        useShortcuts = PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue();
+        useShortcuts = CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.isTrue();
         this.hierarchicalType = hierarchicalType;
         addControllers(componentType, controllersConfigFileLocation);
 
@@ -137,7 +137,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
         this.componentParameters = componentParam;
         this.componentType = componentParam.getComponentType();
         this.componentNfType = componentParam.getComponentNFType();
-        useShortcuts = PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue();
+        useShortcuts = CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.isTrue();
 
         this.hierarchicalType = componentParam.getHierarchicalType();
         ControllerDescription controllerDesc = componentParam.getControllerDescription();
@@ -178,12 +178,12 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
         }
 
         if (NameController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
-            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            !itfType.isInternal()) { /* Mandatory controller, we don't have to recreate it */
             return true;
         }
 
         if (LifeCycleController.class.isAssignableFrom(controllerItf) && !itfType.isFcClientItf() &&
-            !itfType.isInternal()) { /*Mandatory controller, we don't have to recreate it*/
+            !itfType.isInternal()) { /* Mandatory controller, we don't have to recreate it */
             return true;
         }
         return false;
@@ -196,7 +196,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) type_factory
                 .createFcItfType(
                         Constants.LIFECYCLE_CONTROLLER,
-                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
+                        /* LIFECYCLE CONTROLLER */org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
         Interface interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
                 itfType.getFcItfName(), this, itfType, itfType.isInternal(), false);
@@ -204,7 +204,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
         nfInterfaceReferences.put(interface_reference.getFcItfName(), interface_reference);
 
         itfType = (PAGCMInterfaceType) type_factory.createFcItfType(Constants.NAME_CONTROLLER,
-        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
+        /* NAME CONTROLLER */org.objectweb.fractal.api.control.NameController.class.getName(),
                 TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE);
 
         interface_reference = RepresentativeInterfaceClassGenerator.instance().generateInterface(
@@ -417,7 +417,7 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     /*
-     *implements  org.objectweb.fractal.api.Component#getFcInterfaces()
+     * implements org.objectweb.fractal.api.Component#getFcInterfaces()
      */
     public Object[] getFcInterfaces() {
         Interface[] nfInterfaces = nfInterfaceReferences.values().toArray(
@@ -432,21 +432,21 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     /*
-     *implements  org.objectweb.fractal.api.Component#getFcType()
+     * implements org.objectweb.fractal.api.Component#getFcType()
      */
     public Type getFcType() {
         return componentType;
     }
 
     /*
-     *implements  org.objectweb.proactive.core.mop.StubObject#getProxy()
+     * implements org.objectweb.proactive.core.mop.StubObject#getProxy()
      */
     public Proxy getProxy() {
         return proxy;
     }
 
     /*
-     *implements  org.objectweb.proactive.core.mop.StubObject#setProxy(Proxy)}
+     * implements org.objectweb.proactive.core.mop.StubObject#setProxy(Proxy)}
      */
     public void setProxy(Proxy proxy) {
         // sets proxy for non functional interfaces
@@ -518,7 +518,8 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     /*
-     * implements org.objectweb.proactive.core.component.identity.PAComponent#getReferenceOnBaseObject()
+     * implements
+     * org.objectweb.proactive.core.component.identity.PAComponent#getReferenceOnBaseObject()
      */
     public Object getReferenceOnBaseObject() {
         logger.error("getReferenceOnBaseObject() method is not available in component representatives");
@@ -526,21 +527,24 @@ public class PAComponentRepresentativeImpl implements PAComponentRepresentative,
     }
 
     /*
-     * implements org.objectweb.proactive.core.component.identity.PAComponent#getRepresentativeOnThis()
+     * implements
+     * org.objectweb.proactive.core.component.identity.PAComponent#getRepresentativeOnThis()
      */
     public PAComponent getRepresentativeOnThis() {
         return this;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.representative.PAComponentRepresentative#getStubOnReifiedObject()
+     * @seeorg.objectweb.proactive.core.component.representative.PAComponentRepresentative#
+     * getStubOnReifiedObject()
      */
     public StubObject getStubOnBaseObject() {
         return stubOnBaseObject;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.representative.PAComponentRepresentative#setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
+     * @seeorg.objectweb.proactive.core.component.representative.PAComponentRepresentative#
+     * setStubOnReifiedObject(org.objectweb.proactive.core.mop.StubObject)
      */
     public void setStubOnBaseObject(StubObject stub) {
         stubOnBaseObject = stub;

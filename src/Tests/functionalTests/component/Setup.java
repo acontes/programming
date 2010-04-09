@@ -53,7 +53,7 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.type.Composite;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 
 
@@ -76,7 +76,8 @@ public class Setup {
 
     private static void init() throws InstantiationException, NoSuchInterfaceException {
         if ((tf == null) || (gf == null)) {
-            PAProperties.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
+            CentralPAPropertyRepository.GCM_PROVIDER
+                    .setValue("org.objectweb.proactive.core.component.Fractive");
             Component boot = Utils.getBootstrapComponent();
             if (tf == null) {
                 tf = GCM.getGCMTypeFactory(boot);

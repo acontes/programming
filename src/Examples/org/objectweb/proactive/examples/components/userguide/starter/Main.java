@@ -44,14 +44,14 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.proactive.core.component.adl.FactoryFactory;
 import org.objectweb.proactive.core.component.adl.Registry;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        PAProperties.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
+        CentralPAPropertyRepository.GCM_PROVIDER.setValue("org.objectweb.proactive.core.component.Fractive");
         GCMApplication gcma = PAGCMDeployment
                 .loadApplicationDescriptor(Main.class
                         .getResource("/org/objectweb/proactive/examples/components/userguide/starter/applicationDescriptor.xml"));

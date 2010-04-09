@@ -85,50 +85,50 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.BINDING_CONTROLLER,
-                                        /*BINDING CONTROLLER*/org.objectweb.proactive.core.component.control.PABindingController.class
+                                        /* BINDING CONTROLLER */org.objectweb.proactive.core.component.control.PABindingController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.CONTENT_CONTROLLER,
-                                        /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.control.PAContentController.class
+                                        /* CONTENT CONTROLLER */org.objectweb.proactive.core.component.control.PAContentController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.LIFECYCLE_CONTROLLER,
-                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
+                                        /* LIFECYCLE CONTROLLER */org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.control.PASuperController.class
+                                        /* SUPER CONTROLLER */org.objectweb.proactive.core.component.control.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
-                        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
-                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        /* NAME CONTROLLER */org.objectweb.fractal.api.control.NameController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.MULTICAST_CONTROLLER,
-                                        /*MULTICAST CONTROLLER*/org.objectweb.proactive.core.component.control.PAMulticastController.class
+                                        /* MULTICAST CONTROLLER */org.objectweb.proactive.core.component.control.PAMulticastController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.GATHERCAST_CONTROLLER,
-                        /*GATHERCAST CONTROLLER*/org.etsi.uri.gcm.api.control.GathercastController.class
+                        /* GATHERCAST CONTROLLER */org.etsi.uri.gcm.api.control.GathercastController.class
                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.MIGRATION_CONTROLLER,
-                                        /*MIGRATION CONTROLLER*/org.objectweb.proactive.core.component.control.PAMigrationController.class
+                                        /* MIGRATION CONTROLLER */org.objectweb.proactive.core.component.control.PAMigrationController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
 
                         ((PAGCMTypeFactory) type_factory)
                                 .createGCMItfType(
                                         "dummy-internal-client-controller",
-                                        /*DUMMY CONTROLLER*/functionalTests.component.nonfunctional.creation.DummyControllerItf.class
+                                        /* DUMMY CONTROLLER */functionalTests.component.nonfunctional.creation.DummyControllerItf.class
                                                 .getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
                                         GCMTypeFactory.SINGLETON_CARDINALITY, PAGCMTypeFactory.INTERNAL) });
 

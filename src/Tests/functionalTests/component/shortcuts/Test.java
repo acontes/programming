@@ -42,7 +42,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
@@ -212,11 +212,11 @@ public class Test extends ComponentTest {
 
     @Before
     public void initTest() throws Exception {
-        PAProperties.PA_COMPONENT_USE_SHORTCUTS.setValue("true");
+        CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.setValue("true");
     }
 
     @After
     public void endTest() throws Exception {
-        PAProperties.PA_COMPONENT_USE_SHORTCUTS.setValue("false");
+        CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.setValue("false");
     }
 }

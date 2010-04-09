@@ -79,7 +79,7 @@ import org.objectweb.proactive.core.component.representative.PAComponentRepresen
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeFactory;
 import org.objectweb.proactive.core.component.type.Composite;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
@@ -774,8 +774,9 @@ public class Fractive implements PAGenericFactory, Component, Factory {
                     }
                     threadPool.shutdown();
                     try {
-                        threadPool.awaitTermination(new Integer(PAProperties.PA_COMPONENT_CREATION_TIMEOUT
-                                .getValue()), TimeUnit.SECONDS);
+                        threadPool.awaitTermination(new Integer(
+                            CentralPAPropertyRepository.PA_COMPONENT_CREATION_TIMEOUT.getValue()),
+                                TimeUnit.SECONDS);
                     } catch (InterruptedException e) {
                         logger.info("Interruption when waiting for thread pool termination.", e);
                     }

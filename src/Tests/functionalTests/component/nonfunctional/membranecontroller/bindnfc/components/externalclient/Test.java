@@ -93,44 +93,44 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.BINDING_CONTROLLER,
-                                        /*BINDING CONTROLLER*/org.objectweb.proactive.core.component.control.PABindingController.class
+                                        /* BINDING CONTROLLER */org.objectweb.proactive.core.component.control.PABindingController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.CONTENT_CONTROLLER,
-                                        /*CONTENT CONTROLLER*/org.objectweb.proactive.core.component.control.PAContentController.class
+                                        /* CONTENT CONTROLLER */org.objectweb.proactive.core.component.control.PAContentController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.LIFECYCLE_CONTROLLER,
-                                        /*LIFECYCLE CONTROLLER*/org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
+                                        /* LIFECYCLE CONTROLLER */org.objectweb.proactive.core.component.control.PAGCMLifeCycleController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.control.PASuperController.class
+                                        /* SUPER CONTROLLER */org.objectweb.proactive.core.component.control.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
-                        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
-                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        /* NAME CONTROLLER */org.objectweb.fractal.api.control.NameController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
 
                         type_factory.createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                        /*MEMBRANE CONTROLLER*/PAMembraneController.class.getName(), TypeFactory.SERVER,
+                        /* MEMBRANE CONTROLLER */PAMembraneController.class.getName(), TypeFactory.SERVER,
                                 TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         "dummy-controller",
-                                        /*DUMMY CONTROLLER*/functionalTests.component.nonfunctional.creation.DummyControllerItf.class
+                                        /* DUMMY CONTROLLER */functionalTests.component.nonfunctional.creation.DummyControllerItf.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         "dummy-client-controller",
-                                        /*DUMMY CONTROLLER*/functionalTests.component.nonfunctional.creation.DummyControllerItf.class
+                                        /* DUMMY CONTROLLER */functionalTests.component.nonfunctional.creation.DummyControllerItf.class
                                                 .getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE), });
 
@@ -140,20 +140,20 @@ public class Test extends ComponentTest {
                         type_factory
                                 .createFcItfType(
                                         Constants.SUPER_CONTROLLER,
-                                        /*SUPER CONTROLLER*/org.objectweb.proactive.core.component.control.PASuperController.class
+                                        /* SUPER CONTROLLER */org.objectweb.proactive.core.component.control.PASuperController.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE),
                         type_factory.createFcItfType(Constants.NAME_CONTROLLER,
-                        /*NAME CONTROLLER*/org.objectweb.fractal.api.control.NameController.class.getName(),
-                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                        /* NAME CONTROLLER */org.objectweb.fractal.api.control.NameController.class
+                                .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
 
                         type_factory.createFcItfType(Constants.MEMBRANE_CONTROLLER,
-                        /*MEMBRANE CONTROLLER*/PAMembraneController.class.getName(), TypeFactory.SERVER,
+                        /* MEMBRANE CONTROLLER */PAMembraneController.class.getName(), TypeFactory.SERVER,
                                 TypeFactory.MANDATORY, TypeFactory.SINGLE),
                         type_factory
                                 .createFcItfType(
                                         "dummy-controller",
-                                        /*DUMMY CONTROLLER*/functionalTests.component.nonfunctional.creation.DummyControllerItf.class
+                                        /* DUMMY CONTROLLER */functionalTests.component.nonfunctional.creation.DummyControllerItf.class
                                                 .getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                                         TypeFactory.SINGLE), });
         /************************************NF type for componentB****************/
