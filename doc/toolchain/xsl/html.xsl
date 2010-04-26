@@ -46,7 +46,7 @@
 					<td>
 						<a href="http://www.inria.fr">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-INRIA.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-INRIA.png</xsl:attribute>
 								<xsl:attribute name="alt">INRIA</xsl:attribute>
 								<xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
 							</img>
@@ -58,7 +58,7 @@
 					<td>
 						<a href="http://www.unice.fr">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-UNSA.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-UNSA.png</xsl:attribute>
 								<xsl:attribute name="alt">UNSA</xsl:attribute>
 								<xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
 							</img>
@@ -70,7 +70,7 @@
 					<td>
 						<a href="http://www.cnrs.fr">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-CNRS.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-CNRS.png</xsl:attribute>
 								<xsl:attribute name="alt">CNRS-I3S</xsl:attribute>
 								<xsl:attribute name="title">A CNRS-INRIA-UNSA Research team</xsl:attribute>
 							</img>
@@ -81,7 +81,7 @@
 					<td colspan="2">
 						<a href="http://www.ow2.org/">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-OW2.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-OW2.png</xsl:attribute>
 								<xsl:attribute name="alt">OW2</xsl:attribute>
 								<xsl:attribute name="title">OW2 Consortium</xsl:attribute>
 								<xsl:attribute name="height">50%</xsl:attribute>
@@ -94,7 +94,7 @@
 					<td colspan="2">
 						<a href="http://www.activeeon.com/">
 							<img border="0">
-								<xsl:attribute name="src">images/logo-ActiveEon.png</xsl:attribute>
+								<xsl:attribute name="src">images/png/logo-ActiveEon.png</xsl:attribute>
 								<xsl:attribute name="alt">ActiveEon</xsl:attribute>
 								<xsl:attribute name="title">ActiveEon: a Professional Open Source company, co-developing and providing support for ProActive Parallel Suite®</xsl:attribute>
 							</img>
@@ -565,5 +565,105 @@
 			</xsl:call-template>
 		</xsl:variable>
 		<xsl:value-of select="$expandedText" />
+	</xsl:template>
+
+	<xsl:template match="newline">
+		<br />
+	</xsl:template>
+	
+
+	<xsl:template match="emphasis">
+		<xsl:choose>
+			<xsl:when test="@role='bold' or @role='' or @role='strong'">
+				<xsl:call-template name="inline.boldseq" />
+			</xsl:when>
+			<!--  ITALICS -->
+			<xsl:when test="@role='italics'">
+				<xsl:call-template name="inline.italicseq" />
+			</xsl:when>
+			<!--  UNDERLINE  -->
+<!--			<xsl:when test="@role='underline'">-->
+<!--				<xsl:call-template name="inline.charseq" />-->
+<!--			</xsl:when>-->
+			<!--  STRIKETHROUGH  -->
+<!--			<xsl:when test="@role='strikethrough'">-->
+<!--				<xsl:call-template name="inline.charseq" />-->
+<!--			</xsl:when>-->
+			<!--  WITHIN PROGRAMLISTINGS (not bold, but colorized)  -->
+			<!--  Added this test, which can be triggered after code beautifier parsing -->
+			<xsl:when test="@role='keyword' or @role='codeword' or @role='typeword' or @role='comment' or @role='string'">
+				<xsl:call-template name="myinline.emphasis">
+					<xsl:with-param name="role" select="@role" />
+				</xsl:call-template>
+			</xsl:when>
+			<!--  SHOULD NEVER HAPPEN, role not recognized -->
+			<xsl:otherwise>
+				<xsl:call-template name="inline.boldseq" />
+				<xsl:choose>
+					<xsl:when test="@role">
+						<xsl:message>
+							<!-- This should never happen. -->
+							Emphasis with role=
+							<xsl:value-of select="@role" />
+							is not allowed ==&gt;
+							<xsl:value-of select=".." />
+						</xsl:message>
+					</xsl:when>
+				</xsl:choose>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	<!-- A way to color in the emphasis, key being the 'role' attribute in {keyword,codeword,typeword,comment,string} -->
+	<xsl:template name="myinline.emphasis">
+		<xsl:param name="role" select="''" />
+		<xsl:param name="content">
+			<xsl:apply-templates />
+		</xsl:param>
+		<xsl:if test="@id">
+			<xsl:attribute name="id">
+				<xsl:value-of select="@id" />
+			</xsl:attribute>
+		</xsl:if>
+		<xsl:if test="@role = 'comment'">
+			<xsl:attribute name="font-style">
+				italic
+			</xsl:attribute>
+		</xsl:if>
+		<xsl:attribute name="color">
+			<xsl:choose>
+				<xsl:when test="@role = 'comment'">
+					#018101
+				</xsl:when>
+				<xsl:when test="@role = 'keyword'">
+					#0101ff
+				</xsl:when>
+				<xsl:when test="@role = 'codeword'">
+					#0101ff
+				</xsl:when>
+				<xsl:when test="@role = 'typeword'">
+					#931793
+				</xsl:when>
+				<xsl:when test="@role = 'string'">
+					#ff2aff
+				</xsl:when>
+				<xsl:otherwise>
+					#F00000
+				</xsl:otherwise>
+				<!-- This should never happen. -->
+			</xsl:choose>
+		</xsl:attribute>
+		<xsl:if test="@dir">
+			<xsl:attribute name="direction">
+				<xsl:choose>
+					<xsl:when test="@dir = 'ltr' or @dir = 'lro'">
+						ltr
+					</xsl:when>
+					<xsl:otherwise>
+						rtl
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:attribute>
+		</xsl:if>
+		<xsl:copy-of select="$content" />
 	</xsl:template>
 </xsl:stylesheet>

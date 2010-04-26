@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,6 +36,8 @@
  */
 package functionalTests.security;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.security.InvalidKeyException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -53,7 +56,6 @@ import functionalTests.security.keygeneration.SecurityTestKeyGen;
 import functionalTests.security.policyserver.SecurityTestPolicyServer;
 import functionalTests.security.securitymanager.SecurityTestSecurityManager;
 import functionalTests.security.sessionkeyexchange.SecurityTestSessionKeyExchange;
-import static junit.framework.Assert.assertTrue;
 
 
 @RunWith(Suite.class)

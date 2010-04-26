@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,9 +36,13 @@
  */
 package org.objectweb.proactive;
 
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.proactive.api.PAVersion;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.PAProperty;
 import org.objectweb.proactive.core.util.ProActiveInet;
 
 
@@ -75,9 +80,13 @@ public class Main {
         System.out.println();
 
         System.out.println("Available properties:");
-        for (PAProperties p : PAProperties.values()) {
-            String type = p.isBoolean() ? "Boolean" : "String";
-            System.out.println("\t" + type + "\t" + p.getKey() + " [" + p.getValue() + "]");
+        Map<Class<?>, List<PAProperty>> allProperties = PAProperties.getAllProperties();
+        for (Class<?> cl : allProperties.keySet()) {
+            System.out.println("From class " + cl.getCanonicalName());
+            for (PAProperty prop : allProperties.get(cl)) {
+                System.out.println("\t" + prop.getType() + "\t" + prop.getName() + " [" +
+                    prop.getValueAsString() + "]");
+            }
         }
     }
 }

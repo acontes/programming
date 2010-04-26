@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,15 +36,16 @@
  */
 package functionalTests.activeobject.acontinuation;
 
+import static junit.framework.Assert.assertTrue;
+
 import java.util.Vector;
 
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperties;
 
 import functionalTests.FunctionalTest;
-
-import static junit.framework.Assert.assertTrue;
 
 
 /**
@@ -62,14 +64,14 @@ public class TestAContinuation extends FunctionalTest {
 
     @org.junit.Test
     public void action() throws Exception {
-        String initial_ca_setting = PAProperties.PA_FUTURE_AC.getValue();
-        if (!PAProperties.PA_FUTURE_AC.isTrue()) {
-            PAProperties.PA_FUTURE_AC.setValue(PAProperties.TRUE);
+        String initial_ca_setting = CentralPAPropertyRepository.PA_FUTURE_AC.getValueAsString();
+        if (!CentralPAPropertyRepository.PA_FUTURE_AC.isTrue()) {
+            CentralPAPropertyRepository.PA_FUTURE_AC.setValue(true);
         }
         ACThread acthread = new ACThread();
         acthread.start();
         acthread.join();
-        PAProperties.PA_FUTURE_AC.setValue(initial_ca_setting);
+        CentralPAPropertyRepository.PA_FUTURE_AC.setValue(initial_ca_setting);
 
         assertTrue(futureByResult && a.isSuccessful());
         assertTrue(a.getFinalResult().equals("dummy"));

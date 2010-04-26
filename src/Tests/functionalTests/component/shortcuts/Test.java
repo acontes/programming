@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -45,7 +46,7 @@ import org.objectweb.fractal.api.control.IllegalContentException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAFuture;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.I1;
@@ -216,11 +217,11 @@ public class Test extends ComponentTest {
 
     @Before
     public void initTest() throws Exception {
-        PAProperties.PA_COMPONENT_USE_SHORTCUTS.setValue("true");
+        CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.setValue("true");
     }
 
     @After
     public void endTest() throws Exception {
-        PAProperties.PA_COMPONENT_USE_SHORTCUTS.setValue("false");
+        CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.setValue("false");
     }
 }

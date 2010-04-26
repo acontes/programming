@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,12 +36,14 @@
  */
 package org.objectweb.proactive.core.remoteobject;
 
+import java.net.URI;
 import java.util.Hashtable;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.httpserver.ClassServerServlet;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.URIBuilder;
 
 
 /**
@@ -54,7 +57,7 @@ public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory
     static {
         activatedRemoteObjectFactories = new Hashtable<String, RemoteObjectFactory>();
 
-        if ((System.getSecurityManager() == null) && PAProperties.PA_SECURITYMANAGER.isTrue()) {
+        if ((System.getSecurityManager() == null) && CentralPAPropertyRepository.PA_SECURITYMANAGER.isTrue()) {
             System.setSecurityManager(new java.rmi.RMISecurityManager());
         }
 
@@ -68,13 +71,18 @@ public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory
         // If HTTP class server is used add its URL to the codebase
         // Otherwise, the ProActiveRMIClassloader and the ProActiveRuntime use their
         // own ProActive codebase.
-        if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
+        if (CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.isTrue()) {
             ClassServerServlet classServerServlet = ClassServerServlet.get();
             String servletCodebase = classServerServlet.getCodeBase();
 
+            // the class downloading protocol must be accorded to the
+            // selected communication protocol,
+
+            servletCodebase = adaptCodebaseToProtocol(servletCodebase);
+
             // Local class server is useful when an object migrate
             // Other class servers  are used only if local class server fail
-            String oldCodebase = PAProperties.JAVA_RMI_SERVER_CODEBASE.getValue();
+            String oldCodebase = CentralPAPropertyRepository.JAVA_RMI_SERVER_CODEBASE.getValue();
 
             String newCodebase = null;
             if (oldCodebase != null) {
@@ -83,9 +91,19 @@ public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory
             } else {
                 newCodebase = servletCodebase;
             }
-            PAProperties.JAVA_RMI_SERVER_CODEBASE.setValue(newCodebase);
+            CentralPAPropertyRepository.JAVA_RMI_SERVER_CODEBASE.setValue(newCodebase);
             ProActiveRuntimeImpl.getProActiveRuntime();
         }
+    }
+
+    public static String adaptCodebaseToProtocol(String servletCodebase) {
+
+        if (CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue().equals("rmissh")) {
+            URI httpsshservletURI = URI.create(servletCodebase);
+            httpsshservletURI = URIBuilder.setProtocol(httpsshservletURI, "httpssh");
+            return httpsshservletURI.toString();
+        }
+        return servletCodebase;
     }
 
     /**
@@ -95,7 +113,7 @@ public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory
      */
     public static RemoteObjectFactory getRemoteObjectFactory(String protocol) throws UnknownProtocolException {
         if (protocol == null) {
-            protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            protocol = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
         }
 
         try {
@@ -125,13 +143,13 @@ public abstract class AbstractRemoteObjectFactory implements RemoteObjectFactory
 
     /** Return the default RemoteObjectFactory
      * 
-     * The default ROF is controlled by the @link{PAProperties.PA_COMMUNICATION_PROTOCOL} property.
+     * The default ROF is controlled by the @link{CentralProperties.PA_COMMUNICATION_PROTOCOL} property.
      * 
      * @return return the remote object factory associated to the default protocol
      * @throws UnknownProtocolException if the default communication protocol is not known
      */
     public static RemoteObjectFactory getDefaultRemoteObjectFactory() throws UnknownProtocolException {
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String protocol = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
         return getRemoteObjectFactory(protocol);
     }
 }

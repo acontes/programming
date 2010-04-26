@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -51,7 +52,7 @@ import org.apache.log4j.spi.LoggingEvent;
 import org.objectweb.proactive.api.PARemoteObject;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 
 /**
@@ -250,7 +251,7 @@ public final class ProActiveAppender extends AppenderSkeleton {
 
     private void doLookup() {
         try {
-            String url = PAProperties.PA_LOG4J_COLLECTOR.getValue();
+            String url = CentralPAPropertyRepository.PA_LOG4J_COLLECTOR.getValue();
             if (url != null) {
                 ProActiveLogCollector collector;
                 collector = (ProActiveLogCollector) PARemoteObject.lookup(URI.create(url));
@@ -258,8 +259,8 @@ public final class ProActiveAppender extends AppenderSkeleton {
                 this.collectorKnow.set(true);
                 this.bufferedEvents.clear();
             } else {
-                System.err.println("ProActiveAppender loaed but" + PAProperties.PA_LOG4J_COLLECTOR.getKey() +
-                    " is null");
+                System.err.println("ProActiveAppender loaed but" +
+                    CentralPAPropertyRepository.PA_LOG4J_COLLECTOR.getName() + " is null");
             }
         } catch (ProActiveException e) {
             e.printStackTrace();

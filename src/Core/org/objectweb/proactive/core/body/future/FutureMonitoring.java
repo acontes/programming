@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -47,7 +48,7 @@ import org.objectweb.proactive.core.body.exceptions.FutureMonitoringPingFailureE
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.ft.servers.faultdetection.FaultDetector;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.runtime.LocalNode;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -69,13 +70,13 @@ public class FutureMonitoring implements Runnable {
     static {
 
         /* Dynamically configurable to make shorter tests */
-        String ttm = PAProperties.PA_FUTUREMONITORING_TTM.getValue();
+        String ttm = CentralPAPropertyRepository.PA_FUTUREMONITORING_TTM.getValueAsString();
         if (ttm != null) {
             int tmp = Integer.parseInt(ttm);
             if (tmp >= 0) {
                 TTM = tmp;
             } else {
-                logger.error(PAProperties.PA_FUTUREMONITORING_TTM.getKey() +
+                logger.error(CentralPAPropertyRepository.PA_FUTUREMONITORING_TTM.getName() +
                     " must be positive. This value is ignored");
             }
         }

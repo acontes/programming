@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -36,9 +37,10 @@
 package org.objectweb.proactive.core.security.securityentity;
 
 import java.io.Serializable;
-import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
+
 import org.objectweb.proactive.core.security.TypedCertificate;
 import org.objectweb.proactive.core.security.TypedCertificateList;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 
 
 public class Entity implements Serializable {

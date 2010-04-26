@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -39,7 +40,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Hashtable;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -49,6 +49,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
 import org.objectweb.proactive.core.body.ActiveBody;
 import org.objectweb.proactive.core.body.BodyImpl;
@@ -60,7 +61,7 @@ import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
 import org.objectweb.proactive.core.gc.GarbageCollector;
@@ -97,6 +98,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     protected transient UniversalBody universalBody;
     protected transient boolean isLocal;
     private transient GCTag tag;
+    private UniqueID cachedBodyId;
     private static ThreadLocal<Collection<UniversalBodyProxy>> incomingReferences = new ThreadLocal<Collection<UniversalBodyProxy>>() {
         @Override
         protected synchronized Collection<UniversalBodyProxy> initialValue() {
@@ -116,11 +118,10 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     public UniversalBodyProxy(UniversalBody body) {
         this.universalBody = body;
-        System.out.println("UniversalBodyProxy.UniversalBodyProxy(UniversalBody body)");
-        // this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
+        this.cachedBodyId = this.universalBody.getID();
     }
 
-    /*
+    /**
      * Instantiates an object of class BodyProxy, creates a body object (referenced either via the
      * instance variable <code>localBody</code> or <code>remoteBody</code>) and passes the
      * ConstructorCall object <code>c</code> to the body, which will then handle the creation of the
@@ -181,9 +182,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
                 }
             }
 
+            // cache the body ID
+            cachedBodyId = this.universalBody.getID();
+
             if (GarbageCollector.dgcIsEnabled()) {
                 ((AbstractBody) PAActiveObject.getBodyOnThis()).updateReference(this);
             }
+
         }
     }
 
@@ -227,7 +232,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             Body body = PAActiveObject.getBodyOnThis();
 
             ObjectReplacer objectReplacer = null;
-            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
+            if (CentralPAPropertyRepository.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
                 body.getClass().isAssignableFrom(ActiveBody.class)) {
 
                 try {
@@ -254,18 +259,13 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
 
             // The node is local, so is the proActiveRuntime
-            // acessing it direclty avoids to get a copy of the body
+            // accessing it directly avoids to get a copy of the body
             ProActiveRuntime part = ProActiveRuntimeImpl.getProActiveRuntime();
 
-            // return (UniversalBody) bodyConstructorCall.execute();
-            // ---------------------added lines--------------------------
-            // if (logger.isDebugEnabled()) {
-            // logger.debug("LocalBodyProxy created using " + body + " from ConstructorCall");
-            // }
             UniversalBody result = part.createBody(node.getNodeInformation().getName(), bodyConstructorCall,
                     true);
 
-            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
+            if (CentralPAPropertyRepository.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
                 try {
                     objectReplacer.restoreObject();
                 } catch (IllegalArgumentException e) {
@@ -278,7 +278,6 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             }
 
             return result;
-            // ---------------------added lines------------------------------
         } catch (ConstructorCallExecutionFailedException e) {
             throw new ProActiveException(e);
         } catch (InvocationTargetException e) {
@@ -310,7 +309,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             Object[] modifiedObject = null;
             ObjectReplacer objectReplacer = null;
             Body body = PAActiveObject.getBodyOnThis();
-            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
+            if (CentralPAPropertyRepository.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
                 body.getClass().isAssignableFrom(ActiveBody.class)) {
                 initialObject = bodyConstructorCall.getEffectiveArguments();
                 try {
@@ -335,7 +334,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             // --------------added lines
 
             // Restore Result Object
-            if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
+            if (CentralPAPropertyRepository.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
                 try {
                     objectReplacer.restoreObject();
                 } catch (IllegalArgumentException e) {
@@ -378,8 +377,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             if (sourceBody.isSterile()) {
                 // A sterile body is only authorized to send sterile requests to himself or its
                 // parent
-                if ((this.getBodyID() != sourceBody.getID()) &&
-                    (this.getBodyID() != sourceBody.getParentUID())) {
+                if ((!this.getBodyID().equals(sourceBody.getID())) &&
+                    (!this.getBodyID().equals(sourceBody.getParentUID()))) {
                     throw new java.io.IOException("Unable to send " + methodCall.getName() +
                         "(): the current service is sterile.");
                 }
@@ -477,7 +476,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         Object[] modifiedObject = null;
         ObjectReplacer objectReplacer = null;
         Body body = PAActiveObject.getBodyOnThis();
-        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
+        if (CentralPAPropertyRepository.PA_IMPLICITGETSTUBONTHIS.isTrue() &&
             body.getClass().isAssignableFrom(ActiveBody.class)) {
             initialObject = methodCall.getParameters();
             try {
@@ -534,7 +533,7 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
         }
 
         // Restore Result Object
-        if (PAProperties.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
+        if (CentralPAPropertyRepository.PA_IMPLICITGETSTUBONTHIS.isTrue() && (objectReplacer != null)) {
             try {
                 objectReplacer.restoreObject();
             } catch (IllegalArgumentException e) {
@@ -623,5 +622,9 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
     public void setGCTag(GCTag tag) {
         assert this.tag == null;
         this.tag = tag;
+    }
+
+    public UniqueID getBodyID() {
+        return cachedBodyId;
     }
 }

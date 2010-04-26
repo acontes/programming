@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -39,7 +40,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 
 
 /**
@@ -52,8 +53,7 @@ public class MessageRoutingPlainSocketFactory implements MessageRoutingSocketFac
 
     public Socket createSocket(String host, int port) throws IOException {
         Socket socket = new Socket();
-        int timeout = PAProperties.PA_PAMR_CONNECT_TIMEOUT.isSet() ? PAProperties.PA_PAMR_CONNECT_TIMEOUT
-                .getValueAsInt() : 0;
+        int timeout = PAMRConfig.PA_PAMR_CONNECT_TIMEOUT.getValue();
         socket.connect(new InetSocketAddress(host, port), timeout);
         return socket;
     }

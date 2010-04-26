@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -237,7 +238,12 @@ public class ProActiveRuntimeWrapper extends NotificationBroadcasterSupport impl
      * @see org.objectweb.proactive.core.jmx.mbean.ProActiveRuntimeWrapperMBean#getDebugInfo()
      */
     public DebuggerInformation getDebugInfo() {
-        return DebuggerConnection.getDebuggerConnection().getDebugInfo();
+        try {
+            return DebuggerConnection.getDebuggerConnection().getDebugInfo();
+        } catch (ProActiveException e) {
+            ProActiveLogger.logEatedException(ProActiveLogger.getLogger(Loggers.DEBUGGER), e);
+            return null;
+        }
     }
 
     /**

@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -46,7 +47,7 @@ import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 
 
@@ -104,8 +105,8 @@ public class Launcher {
             return ((Map) f.newComponent(pargs[1], new HashMap())).get(pargs[2]);
         } else {
             Factory f;
-            if ("org.objectweb.proactive.core.component.Fractive".equals(PAProperties.FRACTAL_PROVIDER
-                    .getValue())) {
+            if ("org.objectweb.proactive.core.component.Fractive"
+                    .equals(CentralPAPropertyRepository.FRACTAL_PROVIDER.getValue())) {
                 // return the ProActive factory as defined in
                 // org.objectweb.proactive.core.component.adl.FactoryFactory
                 f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();

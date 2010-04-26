@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -53,8 +54,10 @@ import org.objectweb.proactive.extra.messagerouting.router.Client;
 import org.objectweb.proactive.extra.messagerouting.router.MessageAssembler;
 import org.objectweb.proactive.extra.messagerouting.router.RouterInternal;
 
+import functionalTests.FunctionalTest;
 
-public class TestMessageAssembler {
+
+public class TestMessageAssembler extends FunctionalTest {
     static final private int NB_MESSAGE = 100;
 
     /* This test create several messages and split them.

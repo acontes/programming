@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,8 +36,8 @@
  */
 package org.objectweb.proactive.extensions.osgi;
 
+import org.apache.felix.servicebinder.GenericActivator;
 import org.osgi.framework.BundleContext;
-import org.ungoverned.gravity.servicebinder.GenericActivator;
 
 
 /**
@@ -47,8 +48,7 @@ public class Activator extends GenericActivator {
     @Override
     public void start(BundleContext context) throws Exception {
         super.start(context);
-        context.registerService(org.ungoverned.osgi.service.shell.Command.class.getName(),
-                new StartNodeCommand(), null);
+        context.registerService(org.apache.felix.shell.Command.class.getName(), new StartNodeCommand(), null);
     }
 
     public void bindProActiveService(ProActiveService proactiveService) {

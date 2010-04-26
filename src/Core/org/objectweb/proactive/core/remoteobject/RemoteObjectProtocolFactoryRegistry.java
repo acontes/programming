@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -65,14 +66,18 @@ public class RemoteObjectProtocolFactoryRegistry {
 
         Iterator<RemoteObjectFactorySPI> iter = ServiceRegistry.lookupProviders(RemoteObjectFactorySPI.class);
         while (iter.hasNext()) {
-            RemoteObjectFactorySPI remoteObjectFactorySPI = iter.next();
+            try {
+                RemoteObjectFactorySPI remoteObjectFactorySPI = iter.next();
 
-            String protoId = remoteObjectFactorySPI.getProtocolId();
-            Class<? extends RemoteObjectFactory> cl = remoteObjectFactorySPI.getFactoryClass();
+                String protoId = remoteObjectFactorySPI.getProtocolId();
+                Class<? extends RemoteObjectFactory> cl = remoteObjectFactorySPI.getFactoryClass();
 
-            if (!remoteObjectFactories.contains(protoId)) {
-                logger.info("Remote Object Factory provider <" + protoId + ", " + cl + "> found");
-                remoteObjectFactories.put(protoId, cl);
+                if (!remoteObjectFactories.contains(protoId)) {
+                    logger.info("Remote Object Factory provider <" + protoId + ", " + cl + "> found");
+                    remoteObjectFactories.put(protoId, cl);
+                }
+            } catch (Throwable err) {
+                logger.error("Failed to load remote object factory: " + err);
             }
         }
     }

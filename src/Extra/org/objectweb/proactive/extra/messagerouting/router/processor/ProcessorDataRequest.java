@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -68,8 +69,12 @@ public class ProcessorDataRequest extends Processor {
             AgentID sender = msg.getSender();
             long messageId = msg.getMessageID();
 
-            Client destClient = this.router.getClient(recipient);
+            Client sendClient = this.router.getClient(sender);
+            if (sendClient != null) {
+                sendClient.updateLastSeen();
+            }
 
+            Client destClient = this.router.getClient(recipient);
             if (destClient != null) {
                 /* The recipient is known. Try to forward the message.
                  * If an error occurs while sending the message, notify the sender

@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -48,7 +49,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
@@ -185,10 +186,10 @@ public class UrlBuilder {
      */
     public static String buildUrlFromProperties(String host, String name) {
         String port = null;
-        String protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        String protocol = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
         if (protocol.equals(Constants.RMI_PROTOCOL_IDENTIFIER) ||
             protocol.equals(Constants.IBIS_PROTOCOL_IDENTIFIER)) {
-            port = PAProperties.PA_RMI_PORT.getValue();
+            port = CentralPAPropertyRepository.PA_RMI_PORT.getValueAsString();
         }
         if (protocol.equals(Constants.XMLHTTP_PROTOCOL_IDENTIFIER)) {
             try {
@@ -197,7 +198,7 @@ public class UrlBuilder {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-            port = PAProperties.PA_XMLHTTP_PORT.getValue();
+            port = CentralPAPropertyRepository.PA_XMLHTTP_PORT.getValueAsString();
         }
 
         if (port == null) {
@@ -258,7 +259,7 @@ public class UrlBuilder {
     public static String getProtocol(String nodeURL) {
         String protocol = URI.create(nodeURL).getScheme();
         if (protocol == null) {
-            return PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            return CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         return protocol;
     }
@@ -318,13 +319,13 @@ public class UrlBuilder {
      * @return a String matching the corresponding InetAddress
      */
     public static String getHostNameorIP(InetAddress address) {
-        if (PAProperties.PA_HOSTNAME.getValue() != null) {
-            return PAProperties.PA_HOSTNAME.getValue();
+        if (CentralPAPropertyRepository.PA_HOSTNAME.getValue() != null) {
+            return CentralPAPropertyRepository.PA_HOSTNAME.getValue();
         }
 
         String temp = "";
 
-        if (PAProperties.PA_NET_USE_IP_ADDRESS.isTrue()) {
+        if (CentralPAPropertyRepository.PA_NET_USE_IP_ADDRESS.isTrue()) {
             temp = (address).getHostAddress();
         } else {
             temp = address.getCanonicalHostName();

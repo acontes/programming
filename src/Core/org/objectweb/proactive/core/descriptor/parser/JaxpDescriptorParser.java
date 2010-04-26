@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -60,7 +61,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorImpl;
 import org.objectweb.proactive.core.descriptor.data.VirtualMachine;
 import org.objectweb.proactive.core.descriptor.data.VirtualNodeImpl;
@@ -545,7 +546,8 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
 
             Node protocol = node.getAttributes().getNamedItem("protocol");
             String p = getNodeExpandedValue(protocol);
-            String protocolValue = (p != null) ? p : PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            String protocolValue = (p != null) ? p : CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL
+                    .getValue();
             VirtualNodeImpl vnImpl = (VirtualNodeImpl) proActiveDescriptor.createVirtualNode(
                     getNodeExpandedValue(virtualNodeName), false);
 
@@ -597,7 +599,7 @@ public class JaxpDescriptorParser implements ProActiveDescriptorConstants {
             Node protocolAttr = node.getAttributes().getNamedItem("protocol");
             String protocol = getNodeExpandedValue(protocolAttr);
             if (protocol == null) {
-                protocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+                protocol = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
             }
 
             vn.createNodeOnCurrentJvm(protocol);

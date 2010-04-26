@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -147,7 +148,7 @@ public abstract class MessageGenerator {
 
     protected byte[] alterProtoId() {
         byte[] ret = this.msg.toByteArray();
-        int badProto = nextIntNeq(Message.PROTOV1);
+        int badProto = nextIntNeq(Message.PROTOV2);
         logger.debug("invalid protoId " + badProto);
         TypeHelper.intToByteArray(badProto, ret, Field.PROTO_ID.getOffset());
         return ret;

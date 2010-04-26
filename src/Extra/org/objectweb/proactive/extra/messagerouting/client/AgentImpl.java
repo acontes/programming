@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -45,7 +46,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
@@ -57,14 +61,16 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.HeartbeatClientMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.HeartbeatMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
@@ -85,7 +91,7 @@ import org.objectweb.proactive.extra.messagerouting.router.Router;
  * @since ProActive 4.1.0
  */
 public class AgentImpl implements Agent, AgentImplMBean {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT);
+    public static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_CLIENT);
 
     /** Address of the router */
     final private InetAddress routerAddr;
@@ -103,7 +109,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
     final private WaitingRoom mailboxes;
 
     /** Current tunnel, can be null */
-    private Tunnel t = null;
+    private volatile Tunnel t = null;
     /** List of tunnel reported as failed */
     final private List<Tunnel> failedTunnels;
 
@@ -115,6 +121,10 @@ public class AgentImpl implements Agent, AgentImplMBean {
 
     /** The socket factory to use to create the Tunnel */
     final private MessageRoutingSocketFactorySPI socketFactory;
+
+    final private Timer timer;
+
+    private HeartbeatTask heartbeatTask;
 
     /**
      * Create a routing agent
@@ -163,6 +173,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
         this.requestIDGenerator = new AtomicLong(0);
         this.failedTunnels = new LinkedList<Tunnel>();
         this.socketFactory = socketFactory;
+        this.timer = new Timer("PAMR: Heartbeat timer");
 
         try {
             Constructor<? extends MessageHandler> mhConstructor;
@@ -173,8 +184,10 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
 
         // Avoid lazy connection to spot invalid host/port ASAP
-        if (this.getTunnel() == null) {
-            throw new ProActiveException("Failed to create the tunnel to " + routerAddr + ":" + routerPort);
+
+        if (this.geTunnelOrReconnect(1) == null) {
+            logger.info("Failed to create the PAMR tunnel to " + routerAddr + ":" + routerPort +
+                ". PAMR will probably not work");
         }
 
         // Start the message receiver even if connection failed
@@ -201,11 +214,36 @@ public class AgentImpl implements Agent, AgentImplMBean {
      * 
      * @return the current tunnel or null is a tunnel cannot be open
      */
-    synchronized private Tunnel getTunnel() {
+    private Tunnel getTunnel() {
+        return this.t;
+    }
+
+    synchronized private Tunnel geTunnelOrReconnect(int nbTry) {
         if (this.t != null)
             return this.t;
 
-        this.__reconnectToRouter();
+        int delay = 2000;
+        int subtry = 0;
+
+        while (this.t == null && nbTry > 0) {
+
+            this.t = this.__reconnectToRouter();
+            nbTry--;
+
+            if (this.t == null) {
+                subtry = ++subtry % 3;
+                if (subtry == 0) {
+                    if (delay < 1000 * 60) {
+                        delay *= 2;
+                    }
+                }
+
+                logger.warn("PAMR Router is unreachable. Will try to estalish a new tunnel in " +
+                    (delay / 1000) + " seconds");
+                new Sleeper(delay).sleep();
+            }
+        }
+
         return this.t;
     }
 
@@ -218,7 +256,8 @@ public class AgentImpl implements Agent, AgentImplMBean {
      * 
      * <b>This method must only be called by getTunnel</b>
      */
-    private void __reconnectToRouter() {
+    private Tunnel __reconnectToRouter() {
+        Tunnel t = null;
         try {
             Socket s = socketFactory.createSocket(this.routerAddr.getHostAddress(), this.routerPort);
             Tunnel tunnel = new Tunnel(s);
@@ -226,17 +265,18 @@ public class AgentImpl implements Agent, AgentImplMBean {
             // start router handshake
             try {
                 routerHandshake(tunnel);
+                t = tunnel;
             } catch (RouterHandshakeException e) {
-                logger.error(
+                logger.warn(
                         "Failed to reconnect to the router: the router handshake procedure failed. Reason: " +
                             e.getMessage(), e);
                 tunnel.shutdown();
             }
-            this.t = tunnel;
         } catch (IOException exception) {
             logger.debug("Failed to reconnect to the router", exception);
-            this.t = null;
         }
+
+        return t;
     }
 
     /**
@@ -254,14 +294,14 @@ public class AgentImpl implements Agent, AgentImplMBean {
      * @throws IOException
      */
     private void routerHandshake(Tunnel tunnel) throws RouterHandshakeException, IOException {
-
         try {
             // if call for the first time then agentID is null
             RegistrationRequestMessage reg = new RegistrationRequestMessage(this.agentID, requestIDGenerator
                     .getAndIncrement(), routerID);
             tunnel.write(reg.toByteArray());
 
-            // Waiting the router response
+            // Waiting the router response. The router has 10 seconds to respond
+            tunnel.setSoTimeout(10 * 1000);
             byte[] reply = tunnel.readMessage();
             Message replyMsg = Message.constructMessage(reply, 0);
 
@@ -299,11 +339,27 @@ public class AgentImpl implements Agent, AgentImplMBean {
                 throw new RouterHandshakeException("Invalid router response: previous router ID  was " +
                     this.agentID + " but server now advertises " + rrm.getRouterID());
             }
+
+            // Cancel the recurrent heartbeat task. Will be replaced by a new one if needed
+
+            int hb = rrm.getHeartbeatPeriod();
+            if (hb > 0) {
+                tunnel.setSoTimeout(hb);
+
+                // Cancel the task in case of heartbeat period change
+                if (this.heartbeatTask != null) {
+                    this.heartbeatTask.cancel();
+                    this.heartbeatTask = null;
+                }
+
+                // Reschedule the task
+                this.heartbeatTask = new HeartbeatTask();
+                this.timer.schedule(this.heartbeatTask, hb / 3, hb / 3);
+            }
         } catch (MalformedMessageException e) {
             throw new RouterHandshakeException("Invalid router response: corrupted " +
                 MessageType.REGISTRATION_REPLY.toString() + " message - " + e.getMessage());
         }
-
     }
 
     private class RouterHandshakeException extends Exception {
@@ -338,11 +394,16 @@ public class AgentImpl implements Agent, AgentImplMBean {
         if (!this.failedTunnels.contains(brokenTunnel)) {
             this.failedTunnels.add(brokenTunnel);
 
+            this.mailboxes.unlockDueToTunnelFailure();
             this.t.shutdown();
             this.t = null;
         }
+
     }
 
+    /**
+     * @return The agent Id of this VM or null the agent has never been able to connect to the router
+     */
     public AgentID getAgentID() {
         return agentID;
     }
@@ -488,7 +549,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
          * @param agentID
          *            the remote Agent ID
          */
-        private void unlockDueToDisconnection(AgentID agentID) {
+        private void unlockDueToRemoteAgentDisconnection(AgentID agentID) {
             synchronized (this.lock) {
                 MessageRoutingException e = new MessageRoutingException("Remote agent disconnected");
 
@@ -500,6 +561,21 @@ public class AgentImpl implements Agent, AgentImplMBean {
                                 patient.recipient + " disconnected");
                         }
                         patient.setAndUnlock(e);
+                    }
+                }
+            }
+        }
+
+        /**
+         * Unblock all the thread waiting for a response.
+         */
+        private void unlockDueToTunnelFailure() {
+            synchronized (this.lock) {
+                MessageRoutingException e = new MessageRoutingException("Tunnel failure");
+
+                for (Map<Long, Patient> m : this.byRemoteAgent.values()) {
+                    for (Patient p : m.values()) {
+                        p.setAndUnlock(e);
                     }
                 }
             }
@@ -628,6 +704,32 @@ public class AgentImpl implements Agent, AgentImplMBean {
         }
     }
 
+    class HeartbeatTask extends TimerTask {
+        long heartbeatId;
+        volatile boolean stop;
+
+        public HeartbeatTask() {
+            this.stop = false;
+            this.heartbeatId = 0;
+        }
+
+        public void run() {
+            try {
+                Tunnel t = getTunnel();
+                if (t != null) {
+                    HeartbeatMessage msg = new HeartbeatClientMessage(heartbeatId++, getAgentID());
+                    t.write(msg.toByteArray());
+                } else {
+                    logger.debug("Agent is not connected, heartbeat not sent");
+                }
+            } catch (IOException e) {
+                logger.debug("Failed to send heartbeat to the router", e);
+                reportTunnelFailure(t);
+            }
+        }
+
+    }
+
     /** Read incoming messages from the tunnel */
     class MessageReader implements Runnable {
         /** The local Agent */
@@ -661,8 +763,9 @@ public class AgentImpl implements Agent, AgentImplMBean {
          * @return the received message
          */
         public Message readMessage() {
+
             while (true) {
-                Tunnel tunnel = this.agent.t;
+                Tunnel tunnel = geTunnelOrReconnect(Integer.MAX_VALUE);
                 try {
                     // Blocking call
                     byte[] msgBuf = tunnel.readMessage();
@@ -672,21 +775,10 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     logger.error("Dropping the message received from the router, reason:" + e.getMessage());
                 } catch (IOException e) {
                     logger
-                            .info(
+                            .debug(
                                     "PAMR Connection lost (while waiting for a message). A new connection will be established shortly",
                                     e);
-                    // Create a new tunnel
-                    tunnel = null;
-                    do {
-                        this.agent.reportTunnelFailure(this.agent.t);
-                        tunnel = this.agent.getTunnel();
-
-                        if (tunnel == null) {
-                            logger
-                                    .error("PAMR Router is unreachable. Will try to estalish a new tunnel in 10 seconds.");
-                            new Sleeper(10000).sleep();
-                        }
-                    } while (tunnel == null);
+                    reportTunnelFailure(tunnel);
                 }
             }
         }
@@ -705,6 +797,12 @@ public class AgentImpl implements Agent, AgentImplMBean {
                     ErrorMessage error = (ErrorMessage) msg;
                     handleError(error);
                     break;
+                case HEARTBEAT_ROUTER:
+                    // Nothing to do. Heartbeat are only used to be able to set a soTimeout on the tunnel
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Heartbeat #" + ((HeartbeatMessage) msg).getHeartbeatId() + " received");
+                    }
+                    break;
                 default:
                     // Bad message type. Log it.
                     logger.error("Invalid Message received, wrong type: " + msg);
@@ -719,7 +817,7 @@ public class AgentImpl implements Agent, AgentImplMBean {
                      * An agent disconnected. To avoid blocked thread we have to
                      * unlock all thread that are waiting a response from this agent
                      */
-                    mailboxes.unlockDueToDisconnection(error.getSender());
+                    mailboxes.unlockDueToRemoteAgentDisconnection(error.getSender());
                     break;
                 case ERR_NOT_CONNECTED_RCPT:
                     /*
@@ -845,5 +943,4 @@ public class AgentImpl implements Agent, AgentImplMBean {
         return this.mailboxes.getBlockedCallers();
 
     }
-
 }

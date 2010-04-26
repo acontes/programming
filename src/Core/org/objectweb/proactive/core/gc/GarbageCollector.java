@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -51,7 +52,7 @@ import org.objectweb.proactive.core.body.HalfBody;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.body.request.BodyRequest;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 
 
 /**
@@ -90,13 +91,13 @@ public class GarbageCollector {
     static int TTA = 5 * TTB;
 
     static {
-        String ttb = PAProperties.PA_DGC_TTB.getValue();
+        String ttb = CentralPAPropertyRepository.PA_DGC_TTB.getValueAsString();
         if (ttb != null) {
             TTB = Integer.parseInt(ttb);
             TTA = 5 * TTB;
         }
 
-        String tta = PAProperties.PA_DGC_TTA.getValue();
+        String tta = CentralPAPropertyRepository.PA_DGC_TTA.getValueAsString();
         if (tta != null) {
             TTA = Integer.parseInt(tta);
         }
@@ -659,7 +660,7 @@ public class GarbageCollector {
 
     public static boolean dgcIsEnabled() {
         if (cache == null) {
-            cache = PAProperties.PA_DGC.isTrue();
+            cache = CentralPAPropertyRepository.PA_DGC.isTrue();
         }
         return cache.booleanValue();
     }

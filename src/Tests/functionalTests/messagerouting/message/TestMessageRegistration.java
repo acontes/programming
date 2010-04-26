@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -121,7 +122,7 @@ public class TestMessageRegistration extends MessageFunctionalTest {
                     this.msg = new RegistrationRequestMessage(agent, msgId, routerId);
                     break;
                 case REGISTRATION_REPLY:
-                    this.msg = new RegistrationReplyMessage(agent, msgId, routerId);
+                    this.msg = new RegistrationReplyMessage(agent, msgId, routerId, 0);
                     break;
                 default:
                     break;
@@ -131,7 +132,7 @@ public class TestMessageRegistration extends MessageFunctionalTest {
         @Override
         protected void testFields() {
             RegistrationMessage m = (RegistrationMessage) this.msg;
-            Assert.assertEquals(Message.PROTOV1, m.getProtoID());
+            Assert.assertEquals(Message.PROTOV2, m.getProtoID());
             Assert.assertEquals(type, m.getType());
             Assert.assertEquals(msgId, m.getMessageID());
             Assert.assertEquals(agent, m.getAgentID());

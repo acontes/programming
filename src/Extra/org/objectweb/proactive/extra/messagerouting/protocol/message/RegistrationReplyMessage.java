@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -45,8 +46,8 @@ import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
  */
 public class RegistrationReplyMessage extends RegistrationMessage {
 
-    public RegistrationReplyMessage(AgentID agentID, long messageId, long routerId) {
-        super(MessageType.REGISTRATION_REPLY, messageId, agentID, routerId);
+    public RegistrationReplyMessage(AgentID agentID, long messageId, long routerId, int heartbeatPeriod) {
+        super(MessageType.REGISTRATION_REPLY, messageId, agentID, routerId, heartbeatPeriod);
     }
 
     /**

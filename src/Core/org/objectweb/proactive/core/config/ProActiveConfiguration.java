@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -38,6 +39,7 @@ package org.objectweb.proactive.core.config;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -53,7 +55,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * One and only one ProActiveConfiguration object is associated to each ProActive Runtime. It
  * contains the value of all the properties known by ProActive.
  *
- * Configuration parameters may be overriden according to the following priorities:</br>
+ * Configuration parameters may be overridden according to the following priorities:</br>
  * <ol>
  * <li>System Java Properties</li>
  * <li>Custom configuration file</li>
@@ -102,6 +104,17 @@ public class ProActiveConfiguration {
 
         /* Properties are set from the lower priority to the higher priority sources. */
 
+        // -0 Default value
+        Map<Class<?>, List<PAProperty>> allProperties = PAProperties.getAllProperties();
+        for (List<PAProperty> list : allProperties.values()) {
+            for (PAProperty prop : list) {
+                if (prop.defaultValue != null) {
+                    setProperty(prop.getName(), prop.defaultValue, prop.isSystemProperty);
+                }
+            }
+        }
+
+        Properties sysProperties = this.getsystemProperties();
         // 1- Default config file
         this.properties.putAllFromConfigFile(this.getDefaultProperties());
 
@@ -109,10 +122,11 @@ public class ProActiveConfiguration {
         this.properties.putAllFromConfigFile(this.getUserProperties());
 
         // 3- System java properties
-        this.properties.putAllFromSystem(this.getsystemProperties());
+        this.properties.putAllFromSystem(sysProperties);
 
         // Can't use setValue in this constructor
-        System.setProperty(PAProperties.PA_OS.getKey(), OperatingSystem.getOperatingSystem().toString());
+        System.setProperty(CentralPAPropertyRepository.PA_OS.getName(), OperatingSystem.getOperatingSystem()
+                .toString());
     }
 
     class CustomProperties extends Properties {
@@ -140,7 +154,7 @@ public class ProActiveConfiguration {
              * If the value is invalid, a warning message is printed and the value is SET.
              */
 
-            PAProperties prop = PAProperties.getProperty(key);
+            PAProperty prop = PAProperties.getProperty(key);
             if (prop != null) {
                 if (!prop.isValid(value)) {
                     logger.warn("Invalid value, " + value + " for key " + key + ". Must be a " +
@@ -229,8 +243,8 @@ public class ProActiveConfiguration {
      * @param value
      *            the value of the property
      */
-    protected void setProperty(String key, String value) {
-        this.properties.put(key, value, true);
+    public void setProperty(String key, String value, boolean exportAsSystem) {
+        this.properties.put(key, value, exportAsSystem);
     }
 
     private Properties getDefaultProperties() {
@@ -247,7 +261,7 @@ public class ProActiveConfiguration {
         Properties userProps = new Properties();
 
         /* Filename of the user configuration file */
-        String fname = System.getProperty(PAProperties.PA_CONFIGURATION_FILE.getKey());
+        String fname = System.getProperty(CentralPAPropertyRepository.PA_CONFIGURATION_FILE.getName());
         if (fname == null) {
             defaultFile = true;
             fname = PROACTIVE_USER_CONFIG_FILENAME;

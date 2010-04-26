@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -48,7 +49,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
@@ -182,7 +183,7 @@ public class GCMFunctionalDataSpacesBase extends GCMFunctionalTest {
         // set scratch configuration for local node
         final File scratchDir = new File(rootTmpDir, "scratch");
         scratchDir.mkdirs();
-        PAProperties.PA_DATASPACES_SCRATCH_PATH.setValue(scratchDir.getAbsolutePath());
+        CentralPAPropertyRepository.PA_DATASPACES_SCRATCH_PATH.setValue(scratchDir.getAbsolutePath());
     }
 
     @Before

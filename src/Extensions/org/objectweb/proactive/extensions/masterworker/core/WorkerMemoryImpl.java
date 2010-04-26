@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,11 +36,11 @@
  */
 package org.objectweb.proactive.extensions.masterworker.core;
 
-import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
-
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.objectweb.proactive.extensions.masterworker.interfaces.WorkerMemory;
 
 
 /**

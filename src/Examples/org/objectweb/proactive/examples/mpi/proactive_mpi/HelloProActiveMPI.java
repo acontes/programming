@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -38,9 +39,9 @@ package org.objectweb.proactive.examples.mpi.proactive_mpi;
 import java.io.File;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.api.PALifeCycle; //import org.objectweb.proactive.core.util.ProActiveInet;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger; //import org.objectweb.proactive.core.util.wrapper.StringMutableWrapper;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 

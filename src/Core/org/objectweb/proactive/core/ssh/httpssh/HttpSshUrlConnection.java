@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -277,9 +278,9 @@ public class HttpSshUrlConnection extends java.net.HttpURLConnection {
         logger.debug("create http " + url.toString());
         String host = u.getHost();
         int port = u.getPort();
-        String path = u.getPath();
         Socket socket = tunnelPool.getSocket(host, port);
-        URL httpURL = new URL("http://" + socket.getInetAddress().getHostName() + ":" + socket.getPort());
+        URL httpURL = new URL("http://" + socket.getInetAddress().getHostName() + ":" + socket.getPort() +
+            u.getPath());
         _httpConnection = (HttpURLConnection) httpURL.openConnection();
         ensureSetup(_httpConnection);
     }

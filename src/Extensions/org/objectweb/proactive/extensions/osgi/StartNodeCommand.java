@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -39,9 +40,9 @@ import java.io.PrintStream;
 import java.rmi.AlreadyBoundException;
 import java.util.StringTokenizer;
 
+import org.apache.felix.shell.Command;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
-import org.ungoverned.osgi.service.shell.Command;
 
 
 public class StartNodeCommand implements Command {

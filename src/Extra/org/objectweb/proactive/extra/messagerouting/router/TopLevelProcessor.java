@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -39,8 +40,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
@@ -48,6 +49,7 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.messagerouting.router.processor.Processor;
+import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorClientHeartbeat;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDataReply;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDataRequest;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDebug;
@@ -63,7 +65,7 @@ import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorRe
  * @since ProActive 4.1.0
  */
 class TopLevelProcessor implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
 
     /** The message to process */
     final private ByteBuffer message;
@@ -106,6 +108,9 @@ class TopLevelProcessor implements Runnable {
                     break;
                 case DEBUG_:
                     processor = new ProcessorDebug(this.message, this.attachment, this.router);
+                    break;
+                case HEARTBEAT_CLIENT:
+                    processor = new ProcessorClientHeartbeat(this.message, router);
                     break;
                 default:
                     logger.error("Unexpected message type: " + type + ". Dropping message " + message);

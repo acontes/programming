@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -40,6 +41,8 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
@@ -58,8 +61,6 @@ import functionalTests.component.conform.components.MasterImpl;
 import functionalTests.component.conform.components.Slave;
 import functionalTests.component.conform.components.SlaveImpl;
 import functionalTests.component.conform.components.SlaveMulticast;
-
-import junit.framework.Assert;
 
 
 public class TestMulticast extends Conformtest {

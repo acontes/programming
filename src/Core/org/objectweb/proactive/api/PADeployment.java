@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -41,7 +42,7 @@ import java.rmi.RemoteException;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptorInternal;
 import org.objectweb.proactive.core.descriptor.data.VirtualNode;
@@ -144,7 +145,7 @@ public class PADeployment {
     private static ProActiveDescriptorInternal internalGetProActiveDescriptor(String xmlDescriptorUrl,
             VariableContractImpl variableContract, boolean hierarchicalSearch) throws ProActiveException {
         ProActiveDescriptorInternal descriptor;
-        if (PAProperties.PA_LEGACY_PARSER.isTrue()) {
+        if (CentralPAPropertyRepository.PA_LEGACY_PARSER.isTrue()) {
             descriptor = internalGetProActiveDescriptor_old(xmlDescriptorUrl, variableContract,
                     hierarchicalSearch);
         } else {
@@ -309,7 +310,7 @@ public class PADeployment {
             throw new ProActiveException("Cannot register such virtualNode since it results from a lookup!");
         }
         if (registrationProtocol == null) {
-            registrationProtocol = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+            registrationProtocol = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
         }
         String virtualnodeName = virtualNode.getName();
         ProActiveRuntime part = RuntimeFactory.getProtocolSpecificRuntime(registrationProtocol);

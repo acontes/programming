@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -40,7 +41,7 @@ import java.io.Serializable;
 import org.junit.Test;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.api.PAActiveObject;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.NodeException;
 
 import performanceTests.HudsonReport;
@@ -112,9 +113,9 @@ public abstract class Throughput extends GCMFunctionalTestDefaultNodes {
             }
 
             long startTime = System.currentTimeMillis();
+            final long testDuration = CentralPAPropertyRepository.PA_TEST_PERF_DURATION.getValue();
             while (true) {
-                if (System.currentTimeMillis() - startTime > PAProperties.PA_TEST_PERF_DURATION
-                        .getValueAsInt())
+                if (System.currentTimeMillis() - startTime > testDuration)
                     break;
 
                 for (int i = 0; i < 50; i++) {

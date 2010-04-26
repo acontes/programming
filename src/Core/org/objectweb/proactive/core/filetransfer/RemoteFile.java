@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -43,14 +44,15 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.node.Node;
 
 
+// @snippet-start RemoteFile
 /**
- * This class represent the result of a file transfer operation.
+ * This class represents the result of a file transfer operation.
  *
  * When a file transfer operation is invoked, for example by using the
  * {@link org.objectweb.proactive.api.PAFileTransfer  PAFileTransfer} API, a RemoteFile instance
  * is returned. A RemoteFile can be used, among others, to determine
- * if the file transfer operation has been completed, wait for the
- * file transfer operation to finish, obtain a reference on the node
+ * if the file transfer operation has been completed, to wait for the
+ * file transfer operation to finish, to obtain a reference on the node
  * where the file is stored, etc...
  *
  * Additionally, new file transfer operations can be triggered from
@@ -133,3 +135,4 @@ public interface RemoteFile extends Serializable {
      */
     public boolean isFile() throws IOException;
 }
+// @snippet-end RemoteFile

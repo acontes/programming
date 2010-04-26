@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -36,7 +37,7 @@
 package org.objectweb.proactive.extra.rmissl;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -52,7 +53,8 @@ public class SSLCONSTANTS {
     public static String[] enabled_ciphers;
 
     static {
-        enabled_ciphers = PAProperties.PA_SSL_CIPHER_SUITES.getValue().split(CIPHERS_SEPARATOR);
+        enabled_ciphers = CentralPAPropertyRepository.PA_SSL_CIPHER_SUITES.getValue()
+                .split(CIPHERS_SEPARATOR);
         if (logger.isDebugEnabled()) {
             for (String cipher : enabled_ciphers) {
                 logger.debug("enabled cipher for SSL connections " + cipher);

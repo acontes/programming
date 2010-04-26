@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -36,13 +37,13 @@
 package org.objectweb.proactive.examples.timitspmd.jacobi;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.extensions.annotation.ActiveObject;
 import org.objectweb.proactive.extensions.timitspmd.TimIt;
 import org.objectweb.proactive.extensions.timitspmd.util.Timed;
 import org.objectweb.proactive.extensions.timitspmd.util.TimerCounter;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.EventObserver;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.CommEvent;
 import org.objectweb.proactive.extensions.timitspmd.util.observing.commobserv.CommEventObserver;
-import org.objectweb.proactive.extensions.annotation.ActiveObject;
 
 
 /**

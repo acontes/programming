@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -49,15 +50,21 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveConnection extends URLConnection {
 
     final static private Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
-    final private byte[] bytes;
+    //    final private byte[] bytes;
+    final private InputStream is;
 
     public ProActiveConnection(URL url) {
-        this(url, null);
+        this(url, (InputStream) null);
     }
 
     public ProActiveConnection(URL url, byte[] bytes) {
         super(url);
-        this.bytes = bytes;
+        this.is = new ByteArrayInputStream(bytes);
+    }
+
+    public ProActiveConnection(URL url, InputStream is) {
+        super(url);
+        this.is = is;
     }
 
     @Override
@@ -67,8 +74,8 @@ public class ProActiveConnection extends URLConnection {
 
     @Override
     public InputStream getInputStream() throws IOException {
-        if (bytes != null) {
-            return new ByteArrayInputStream(bytes);
+        if (this.is != null) {
+            return is;
         } else {
             throw new IOException("This method must not be called when bytes is null");
         }

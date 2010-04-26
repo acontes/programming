@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -56,7 +57,7 @@ import org.apache.commons.vfs.util.RandomAccessMode;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.extensions.dataspaces.vfs.VFSFactory;
 import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
@@ -121,8 +122,10 @@ public class TestProActiveProviderAutoclosing extends AbstractIOOperationsBase {
         writer.close();
 
         // start FileSystemServer with proper settings
-        PAProperties.PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS.setValue(CHECKING_TIME);
-        PAProperties.PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS.setValue(AUTOCLOSE_TIME);
+        CentralPAPropertyRepository.PA_VFSPROVIDER_SERVER_STREAM_AUTOCLOSE_CHECKING_INTERVAL_MILLIS
+                .setValue(CHECKING_TIME);
+        CentralPAPropertyRepository.PA_VFSPROVIDER_SERVER_STREAM_OPEN_MAXIMUM_PERIOD_MILLIS
+                .setValue(AUTOCLOSE_TIME);
         serverDeployer = new FileSystemServerDeployer(testDir.getAbsolutePath(), true);
 
         // set up VFS manager with ProActiveProvider

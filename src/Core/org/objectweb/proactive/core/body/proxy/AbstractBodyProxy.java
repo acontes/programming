@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -46,7 +47,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.Constants;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.FutureCreationException;
 import org.objectweb.proactive.core.body.exceptions.SendRequestCommunicationException;
 import org.objectweb.proactive.core.body.future.Future;
@@ -84,12 +84,6 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
     //
     // -- PUBLIC METHODS -----------------------------------------------
     //
-    //
-    // -- implements BodyProxy -----------------------------------------------
-    //
-    public UniqueID getBodyID() {
-        return getBody().getID();
-    }
 
     //
     // -- implements Proxy -----------------------------------------------

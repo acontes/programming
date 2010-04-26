@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -44,10 +45,12 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequest
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
 
+import functionalTests.FunctionalTest;
+
 import unitTests.UnitTests;
 
 
-public class TestMessageInvalidConstructor extends UnitTests {
+public class TestMessageInvalidConstructor extends FunctionalTest {
     /*
      *  NOTE: Does not test all the combinations
      *  

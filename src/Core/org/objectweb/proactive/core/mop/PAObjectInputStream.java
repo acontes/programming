@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -54,7 +55,14 @@ public class PAObjectInputStream extends SunMarshalInputStream {
             //let's see if the mop has seen this class before		
             //		System.out.println("Calling resolClass on " + desc);
             //		System.out.println("Calling resolClass  FAILED trying MOP ");
-            return MOP.loadClass(desc.getName());
+
+            Class<?> clazz = MOPClassLoader.getMOPClassLoader().loadClass(desc.getName());
+
+            if (clazz == null) {
+                clazz = MOP.loadClass(desc.getName());
+            }
+
+            return clazz;
         }
     }
 }

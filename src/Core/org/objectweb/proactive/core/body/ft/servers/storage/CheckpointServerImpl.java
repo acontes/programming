@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -47,7 +48,7 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.ft.checkpointing.Checkpoint;
 import org.objectweb.proactive.core.body.ft.servers.FTServer;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.httpserver.ClassServerServlet;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.node.NodeFactory;
@@ -84,7 +85,7 @@ public abstract class CheckpointServerImpl implements CheckpointServer {
 
         this.checkpointStorage = new Hashtable<UniqueID, List<Checkpoint>>();
 
-        if (PAProperties.PA_CLASSLOADING_USEHTTP.isTrue()) {
+        if (CentralPAPropertyRepository.PA_CLASSLOADING_USEHTTP.isTrue()) {
             ClassServerServlet.get();
             this.codebase = ClassServerServlet.get().getCodeBase();
         } else {

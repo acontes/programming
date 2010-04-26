@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,9 +36,13 @@
  */
 package functionalTests.masterworker.faulttolerance;
 
-import functionalTests.FunctionalTest;
-import functionalTests.masterworker.A;
 import static junit.framework.Assert.assertTrue;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.junit.After;
 import org.junit.Before;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
@@ -47,10 +52,8 @@ import org.objectweb.proactive.extensions.masterworker.interfaces.Master;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import functionalTests.FunctionalTest;
+import functionalTests.masterworker.A;
 
 
 /**

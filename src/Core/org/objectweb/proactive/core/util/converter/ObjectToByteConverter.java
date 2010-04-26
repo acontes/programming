@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -43,7 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.objectweb.proactive.core.Constants;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.mop.PAObjectOutputStream;
 import org.objectweb.proactive.core.mop.SunMarshalOutputStream;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
@@ -116,7 +117,7 @@ public class ObjectToByteConverter {
     }
 
     private static byte[] convert(Object o, ConversionMode conversionMode) throws IOException {
-        final String mode = PAProperties.PA_COMMUNICATION_PROTOCOL.getValue();
+        final String mode = CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue();
 
         //here we check wether or not we are running in ibis
         if (Constants.IBIS_PROTOCOL_IDENTIFIER.equals(mode)) {

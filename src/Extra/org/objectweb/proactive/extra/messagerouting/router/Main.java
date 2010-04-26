@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -49,8 +50,8 @@ import org.apache.commons.cli.PosixParser;
 import org.apache.commons.cli.UnrecognizedOptionException;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 
 
 /** Start a router.
@@ -58,7 +59,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @since ProActive 4.1.0
  */
 class Main {
-    static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    static final private Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
 
     private RouterConfig config;
     private Options options;
@@ -160,7 +161,7 @@ class Main {
             }
 
             if (line.hasOption("v")) {
-                Logger l = Logger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
+                Logger l = Logger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER_ADMIN);
                 l.setLevel(Level.DEBUG);
             }
         } catch (UnrecognizedOptionException e) {

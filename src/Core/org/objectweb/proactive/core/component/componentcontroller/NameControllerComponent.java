@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -37,8 +38,8 @@ package org.objectweb.proactive.core.component.componentcontroller;
 
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
 import org.objectweb.proactive.core.component.controller.ControllerState;
+import org.objectweb.proactive.core.component.controller.ControllerStateDuplication;
 
 
 /**

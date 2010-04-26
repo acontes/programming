@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -47,7 +48,7 @@ import org.objectweb.proactive.Service;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestFilter;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
@@ -64,8 +65,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class FileTransferEngine implements ProActiveInternalObject, InitActive, RunActive {
     //Not Serializable on purpose: This is a service AO that cannot migrate!!
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.FILETRANSFER);
-    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = PAProperties.PA_FILETRANSFER_MAX_SERVICES
-            .getValueAsInt();
+    static public final int DEFAULT_MAX_FILE_TRANSFER_SERVICES = CentralPAPropertyRepository.PA_FILETRANSFER_MAX_SERVICES
+            .getValue();
     static FileTransferEngine singletonFTE = getFileTransferEngine();
     Vector<FileTransferService> ftsPool;
     int maxFTS;

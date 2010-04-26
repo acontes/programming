@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -35,13 +36,14 @@
  */
 package performanceTests.bandwidth;
 
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 
 
 public class TestMessageRouting extends Bandwidth {
     static {
-        PAProperties.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
-        PAProperties.PA_NET_ROUTER_ADDRESS.setValue("localhost");
+        CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.setValue("pamr");
+        PAMRConfig.PA_NET_ROUTER_ADDRESS.setValue("localhost");
     }
 
     public TestMessageRouting() {

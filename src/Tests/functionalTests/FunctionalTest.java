@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -50,10 +51,11 @@ import org.apache.log4j.Logger;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.xml.VariableContractImpl;
 import org.objectweb.proactive.core.xml.VariableContractType;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.MessageRoutingRemoteObjectFactory;
 import org.objectweb.proactive.extra.messagerouting.router.Router;
 import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
@@ -70,16 +72,15 @@ public class FunctionalTest {
     static public void configureMessageRouting() {
         try {
             // Configure the Message routing
-            if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
-                    .getValue())) {
+            if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID
+                    .equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue())) {
                 RouterConfig config = new RouterConfig();
 
-                if (!PAProperties.PA_NET_ROUTER_PORT.isSet() ||
-                    PAProperties.PA_NET_ROUTER_PORT.getValueAsInt() == 0) {
+                if (!PAMRConfig.PA_NET_ROUTER_PORT.isSet() || PAMRConfig.PA_NET_ROUTER_PORT.getValue() == 0) {
                     router = Router.createAndStart(config);
-                    PAProperties.PA_NET_ROUTER_PORT.setValue(router.getPort());
+                    PAMRConfig.PA_NET_ROUTER_PORT.setValue(router.getPort());
                 } else {
-                    config.setPort(PAProperties.PA_NET_ROUTER_PORT.getValueAsInt());
+                    config.setPort(PAMRConfig.PA_NET_ROUTER_PORT.getValue());
                     router = Router.createAndStart(config);
                 }
             }
@@ -98,27 +99,27 @@ public class FunctionalTest {
     static public String getJvmParameters() {
         StringBuilder jvmParameters = new StringBuilder(" ");
 
-        jvmParameters.append(PAProperties.PA_TEST.getCmdLine());
+        jvmParameters.append(CentralPAPropertyRepository.PA_TEST.getCmdLine());
         jvmParameters.append("true ");
 
         // Jetty: avoid to use SecureRandom for session tracking
-        jvmParameters.append(PAProperties.PA_HTTP_JETTY_XML.getCmdLine());
-        jvmParameters.append(PAProperties.PA_HTTP_JETTY_XML.getValue());
+        jvmParameters.append(CentralPAPropertyRepository.PA_HTTP_JETTY_XML.getCmdLine());
+        jvmParameters.append(CentralPAPropertyRepository.PA_HTTP_JETTY_XML.getValue());
 
         jvmParameters.append(" -Dproactive.test=true ");
 
-        jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getCmdLine());
-        jvmParameters.append(PAProperties.PA_COMMUNICATION_PROTOCOL.getValue());
+        jvmParameters.append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine());
+        jvmParameters.append(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue());
         jvmParameters.append(" ");
 
-        if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID.equals(PAProperties.PA_COMMUNICATION_PROTOCOL
-                .getValue())) {
-            jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getCmdLine());
-            jvmParameters.append(PAProperties.PA_NET_ROUTER_ADDRESS.getValue());
+        if (MessageRoutingRemoteObjectFactory.PROTOCOL_ID
+                .equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue())) {
+            jvmParameters.append(PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine());
+            jvmParameters.append(PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue());
             jvmParameters.append(" ");
 
-            jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getCmdLine());
-            jvmParameters.append(PAProperties.PA_NET_ROUTER_PORT.getValue());
+            jvmParameters.append(PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine());
+            jvmParameters.append(PAMRConfig.PA_NET_ROUTER_PORT.getValue());
             jvmParameters.append(" ");
         }
 
@@ -156,7 +157,7 @@ public class FunctionalTest {
         // Set PA_TEST to automatically flag child processes
         // When PA_TEST is set GCM Deployment framework will add it to 
         // started JVM. 
-        PAProperties.PA_TEST.setValue(true);
+        CentralPAPropertyRepository.PA_TEST.setValue(true);
 
         logger.trace("beforeClass");
 
@@ -241,17 +242,18 @@ public class FunctionalTest {
 
     static private void killProActiveWithJPS() throws IOException {
         String javaHome = System.getProperty("java.home");
-        File jpsBin = null;
-        switch (OperatingSystem.getOperatingSystem()) {
+        final OperatingSystem os = OperatingSystem.getOperatingSystem();
+        String jpsFilename = null;
+        switch (os) {
             case unix:
-                jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
-                    "jps");
+                jpsFilename = "jps";
                 break;
             case windows:
-                jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
-                    "jps.exe");
+                jpsFilename = "jps.exe";
                 break;
         }
+        File jpsBin = new File(javaHome + File.separator + ".." + File.separator + "bin" + File.separator +
+            jpsFilename);
         if (!jpsBin.exists()) {
             throw new FileNotFoundException("JPS not found: " + jpsBin.toString());
         }
@@ -268,12 +270,23 @@ public class FunctionalTest {
 
                 String pid = line.substring(0, line.indexOf(" "));
                 Process kill = null;
-                switch (OperatingSystem.getOperatingSystem()) {
+                switch (os) {
                     case unix:
                         kill = Runtime.getRuntime().exec(new String[] { "kill", "-9", pid });
                         break;
                     case windows:
                         kill = Runtime.getRuntime().exec(new String[] { "taskkill", "/PID", pid });
+                        // If the the exit value is incorrect try tskill command
+                        int exitValue = -1;
+                        try {
+                            exitValue = kill.waitFor();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                            Thread.currentThread().interrupt();
+                        }
+                        if (exitValue != 0) {
+                            kill = Runtime.getRuntime().exec(new String[] { "tskill", pid });
+                        }
                         break;
                     default:
                         logger.info("Unsupported operating system");
@@ -293,7 +306,7 @@ public class FunctionalTest {
     }
 
     static private void killProActiveWithScript() throws Exception {
-        File dir = new File(PAProperties.PA_HOME.getValue());
+        File dir = new File(CentralPAPropertyRepository.PA_HOME.getValue());
         File command = null;
         switch (OperatingSystem.getOperatingSystem()) {
             case unix:

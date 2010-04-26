@@ -1,8 +1,9 @@
 /*
  * ################################################################
  *
- * ProActive: The Java(TM) library for Parallel, Distributed,
- *            Concurrent computing with Security and Mobility
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds 
  *
  * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
@@ -62,7 +63,7 @@ import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.BodyTerminatedException;
 import org.objectweb.proactive.core.body.ft.internalmsg.Heartbeat;
 import org.objectweb.proactive.core.body.proxy.BodyProxy;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.ProActiveConfiguration;
 import org.objectweb.proactive.core.mop.MOP;
 import org.objectweb.proactive.core.mop.MOPException;
@@ -615,7 +616,7 @@ public class PAActiveObject {
 
         threadPool.shutdown();
         try {
-            threadPool.awaitTermination(PAProperties.PA_COMPONENT_CREATION_TIMEOUT.getValueAsInt(),
+            threadPool.awaitTermination(CentralPAPropertyRepository.PA_COMPONENT_CREATION_TIMEOUT.getValue(),
                     TimeUnit.SECONDS);
         } catch (InterruptedException e1) {
             // TODO Auto-generated catch block
@@ -1192,7 +1193,7 @@ public class PAActiveObject {
                     PAActiveObject.logger.debug("Terminating already terminated body : " + e);
                 }
             } catch (Throwable e) {
-                e.printStackTrace();
+                PAActiveObject.logger.debug("An exception occurs while sending termination request.", e);
             }
         } else {
             throw new ProActiveRuntimeException("The given object " + ao + " is not a reified object");
