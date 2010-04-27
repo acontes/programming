@@ -49,7 +49,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,12 +61,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.MagicCookie;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.HeartbeatMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.HeartbeatRouterMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 
 
@@ -72,13 +79,16 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
  * @since ProActive 4.1.0
  */
 public class RouterImpl extends RouterInternal implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
-    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
+    public static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger
+            .getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER_ADMIN);
 
     static final public int DEFAULT_PORT = 33647;
 
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
+
+    public final static long DEFAULT_ROUTER_ID = Long.MIN_VALUE;
 
     /** True is the router must stop or is stopped*/
     private final AtomicBoolean stopped = new AtomicBoolean(false);
@@ -134,6 +144,20 @@ public class RouterImpl extends RouterInternal implements Runnable {
     }
 
     private void init(RouterConfig config) throws IOException {
+        // Creates reserved agents
+        Map<AgentID, MagicCookie> rAgents = config.getReservedAgentId();
+        if (rAgents != null) {
+            for (AgentID agentID : rAgents.keySet()) {
+                MagicCookie magicCookie = rAgents.get(agentID);
+                Client client = new Client(agentID, magicCookie);
+                this.clientMap.put(agentID, client);
+
+                if (admin_logger.isDebugEnabled()) {
+                    admin_logger.debug("Added reserved client: " + agentID + " " + magicCookie);
+                }
+            }
+        }
+
         // Create a new selector
         selector = Selector.open();
 
@@ -161,6 +185,86 @@ public class RouterImpl extends RouterInternal implements Runnable {
             logger.error("A select thread has already been started, aborting the current thread ",
                     new Exception());
             return;
+        }
+
+        // Start the thread in charge of sending the heartbeat
+        final int heartbeatPeriod = PAMRConfig.PA_PAMR_HEARTBEAT_TIMEOUT.getValue();
+        final int period = heartbeatPeriod / 3;
+        if (period > 0) {
+            Thread t = new Thread() {
+                public void run() {
+                    long heartbeatId = 0;
+
+                    while (!stopped.get()) {
+                        try { // preventive try/catch. This thread MUST NOT stop or exit
+                            long startTime = System.currentTimeMillis();
+
+                            Collection<Client> clients;
+                            synchronized (clientMap) {
+                                clients = clientMap.values();
+                            }
+
+                            sendHeartbeat(clients, heartbeatId);
+                            checkHeartbeat(clients);
+
+                            long willSleep = period - (System.currentTimeMillis() - startTime);
+                            if (willSleep > 0) {
+                                new Sleeper(willSleep).sleep();
+                            } else {
+                                logger
+                                        .info("Router is late. Sending heartbeat to every clients took more than " +
+                                            period + "ms");
+                            }
+                        } catch (Throwable t) {
+                            logger.warn("Failed to send heartbeat #" + heartbeatId, t);
+                        } finally {
+                            heartbeatId++;
+                        }
+                    }
+                }
+
+                public void sendHeartbeat(final Collection<Client> clients, long heartbeatId) {
+                    HeartbeatMessage hbMessage = new HeartbeatRouterMessage(heartbeatId);
+                    byte[] msg = hbMessage.toByteArray();
+                    for (Client client : clients) {
+                        try {
+                            if (client.isConnected()) {
+                                client.sendMessage(msg);
+                            }
+                        } catch (IOException e) {
+                            admin_logger.debug("Failed to send heartbeat #" + heartbeatId + " to " + client);
+                        }
+                    }
+                }
+
+                public void checkHeartbeat(final Collection<Client> clients) {
+                    long currentTime = System.currentTimeMillis();
+
+                    for (Client client : clients) {
+                        if (client.isConnected()) {
+                            if ((currentTime - client.getLastSeen()) > heartbeatPeriod) {
+                                // Disconnect
+                                logger.info("Client " + client + " disconnected due to late heartbeat");
+                                try {
+                                    client.disconnect();
+                                } catch (IOException e) {
+                                    logger.info("Failed to disconnected client " + client, e);
+                                }
+
+                                // Broadcast the disconnection to every client
+                                // If client is null, then the handshake has not completed and we
+                                // don't need to broadcast the disconnection
+                                AgentID disconnectedAgent = client.getAgentId();
+                                tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
+                            }
+                        }
+                    }
+                }
+            };
+            t.setDaemon(true);
+            t.setPriority(Thread.MAX_PRIORITY);
+            t.setName("PAMR: heartbeat sender");
+            t.start();
         }
 
         Set<SelectionKey> selectedKeys = null;

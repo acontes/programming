@@ -55,6 +55,7 @@ import org.objectweb.proactive.core.xml.VariableContractType;
 import org.objectweb.proactive.extensions.gcmdeployment.PAGCMDeployment;
 import org.objectweb.proactive.extensions.gcmdeployment.GCMApplication.GCMApplicationSnapshot;
 import org.objectweb.proactive.extensions.gcmdeployment.core.GCMVirtualNodeSnapshot;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
@@ -70,7 +71,7 @@ public class TestSnapshot extends GCMFunctionalTestDefaultNodes {
     }
 
     @Test
-    public void test() throws ProActiveException {
+    public void test() throws ProActiveException, InterruptedException {
         Root r = PAActiveObject.newActive(Root.class, new Object[] {}, super.getANode());
 
         GCMApplicationSnapshot app = r.deploy();
@@ -101,10 +102,18 @@ public class TestSnapshot extends GCMFunctionalTestDefaultNodes {
         app.kill();
 
         for (Node node : nodes) {
-            try {
-                RuntimeFactory.getRuntime(node.getProActiveRuntime().getURL());
+            int retry = 3;
+            while (retry-- > 0) {
+                try {
+                    RuntimeFactory.getRuntime(node.getProActiveRuntime().getURL());
+                    new Sleeper(500).sleep();
+                } catch (ProActiveException e) {
+                    break;
+                }
+            }
+
+            if (retry == 0) {
                 Assert.fail("This call must fail since the runtime has been killed");
-            } catch (ProActiveException e) {
             }
         }
     }
@@ -118,9 +127,14 @@ public class TestSnapshot extends GCMFunctionalTestDefaultNodes {
             VariableContractImpl vc = new VariableContractImpl();
             vc.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_HOSTCAPACITY, Integer.valueOf(NB_VMS)
                     .toString(), VariableContractType.DescriptorDefaultVariable);
-            String value = CentralPAPropertyRepository.PA_NET_ROUTER_PORT.getCmdLine() +
-                CentralPAPropertyRepository.PA_NET_ROUTER_PORT.getValue() + " " +
-                CentralPAPropertyRepository.PA_NET_ROUTER_ADDRESS.getCmdLine() + "localhost";
+            String value = "";
+            value += CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getCmdLine() +
+                CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue() + " ";
+            if ("pamr".equals(CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.getValue())) {
+                value += PAMRConfig.PA_NET_ROUTER_PORT.getCmdLine() +
+                    PAMRConfig.PA_NET_ROUTER_PORT.getValue() + " " +
+                    PAMRConfig.PA_NET_ROUTER_ADDRESS.getCmdLine() + "localhost";
+            }
             vc.setVariableFromProgram(GCMFunctionalTestDefaultNodes.VAR_JVMARG, value,
                     VariableContractType.DescriptorDefaultVariable);
             File f = new File(this.getClass().getResource("/functionalTests/_CONFIG/JunitApp.xml").getFile());

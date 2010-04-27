@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.core.config;
 
+import org.objectweb.proactive.core.config.PAProperties.PAPropertiesLoaderSPI;
 import org.objectweb.proactive.core.filetransfer.FileTransferService;
 import org.objectweb.proactive.core.util.OperatingSystem;
 
@@ -48,7 +49,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
  * possible to declare a ProActive property in a centralized enumeration. This
  * central repository contains all the already existing properties.
  */
-public class CentralPAPropertyRepository {
+public class CentralPAPropertyRepository implements PAPropertiesLoaderSPI {
     /**
      * Java security policy file location
      */
@@ -84,8 +85,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyString JAVAX_XML_TRANSFORM_TRANSFORMERFACTORY = new PAPropertyString(
         "javax.xml.transform.TransformerFactory", true);
 
-    /*
-     * ------------------------------------ PROACTIVE
+    /* ------------------------------------
+     *  PROACTIVE
      */
 
     /**
@@ -185,8 +186,8 @@ public class CentralPAPropertyRepository {
      */
     static public PAPropertyBoolean PA_LEGACY_PARSER = new PAPropertyBoolean("proactive.legacy.parser", false);
 
-    /*
-     * ------------------------------------ NETWORK
+    /* ------------------------------------
+     *  NETWORK
      */
 
     /**
@@ -265,25 +266,6 @@ public class CentralPAPropertyRepository {
 
     static public PAPropertyBoolean SCHEMA_VALIDATION = new PAPropertyBoolean("schema.validation", true);
 
-    /** The address of the router to use. Must be set if message routing is enabled
-     *
-     * Can be FQDN or an IP address
-     */
-    static public PAPropertyString PA_NET_ROUTER_ADDRESS = new PAPropertyString(
-        "proactive.net.router.address", false);
-
-    /** The port of the router to use. Must be set if message routing is enabled
-     *
-     */
-    static public PAPropertyInteger PA_NET_ROUTER_PORT = new PAPropertyInteger("proactive.net.router.port",
-        false);
-
-    /** The Socket Factory to use by the message routing protocol
-     *
-     */
-    static public PAPropertyString PA_PAMR_SOCKET_FACTORY = new PAPropertyString(
-        "proactive.communication.pamr.socketfactory", false);
-
     /** SSL cipher suites used for RMISSL communications.
      * List of cipher suites used for RMISSL, separated by commas.
      * default is SSL_DH_anon_WITH_RC4_128_MD5. This cipher suite is used only
@@ -297,8 +279,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyString PA_SSL_CIPHER_SUITES = new PAPropertyString("proactive.ssl.cipher.suites",
         false);
 
-    /*
-     * ------------------------------------ RMI
+    /* ------------------------------------
+     *  RMI
      */
 
     /**
@@ -323,8 +305,8 @@ public class CentralPAPropertyRepository {
 
     static public PAPropertyBoolean PA_CLASSLOADING_USEHTTP = new PAPropertyBoolean(
         "proactive.classloading.useHTTP", false);
-    /*
-     * ------------------------------------ HTTP
+    /* ------------------------------------
+     *  HTTP
      */
 
     /**
@@ -369,8 +351,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyInteger PA_HTTP_CONNECT_TIMEOUT = new PAPropertyInteger(
         "proactive.http.connect_timeout", false);
 
-    /*
-     * ------------------------------------ COMPONENTS
+    /* ------------------------------------
+     *  COMPONENTS
      */
 
     /** Timeout in seconds for parallel creation of components */
@@ -381,8 +363,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyBoolean PA_COMPONENT_USE_SHORTCUTS = new PAPropertyBoolean(
         "proactive.components.use_shortcuts", false);
 
-    /*
-     * ------------------------------------ MIGRATION
+    /* ------------------------------------
+     *  MIGRATION
      */
 
     /** The class or interface of the location server to be looked up */
@@ -410,8 +392,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyInteger PA_MIXEDLOCATION_MAXTIMEONSITE = new PAPropertyInteger(
         "proactive.mixedlocation.maxTimeOnSite", false);
 
-    /*
-     * ------------------------------------ RMISSH
+    /* ------------------------------------
+     *  RMISSH
      */
 
     /** this property identifies the location of RMISSH key directory */
@@ -457,63 +439,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyInteger PA_RMISSH_REMOTE_PORT = new PAPropertyInteger(
         "proactive.communication.rmissh.port", false);
 
-    /*
-     * ------------------------------------ PAMR
-     */
-
-    /**
-     * Sockets used by the PAMR remote object factory connect to the remote server
-     * with a specified timeout value. A timeout of zero is interpreted as an infinite timeout.
-     * The connection will then block until established or an error occurs.
-     */
-    static public PAPropertyInteger PA_PAMR_CONNECT_TIMEOUT = new PAPropertyInteger(
-        "proactive.communication.pamr.connect_timeout", false);
-
-    /*
-     * ------------------------------------ PAMR over SSH
-     */
-
-    /** this property identifies the location of RMISSH key directory */
-    static public PAPropertyString PA_PAMRSSH_KEY_DIR = new PAPropertyString(
-        "proactive.communication.pamrssh.key_directory", false);
-
-    /** this property identifies the PAMR over SSH garbage collector period
-     *
-     * If set to 0, tunnels and connections are not garbage collected
-     */
-    static public PAPropertyInteger PA_PAMRSSH_GC_PERIOD = new PAPropertyInteger(
-        "proactive.communication.pamrssh.gc_period", false);
-
-    /** this property identifies the maximum idle time before a SSH tunnel or a connection is garbage collected */
-    static public PAPropertyInteger PA_PAMRSSH_GC_IDLETIME = new PAPropertyInteger(
-        "proactive.communication.pamrssh.gc_idletime", false);
-
-    /** this property identifies the know hosts file location when using ssh tunneling
-     *  if undefined, the default value is user.home property concatenated to SSH_TUNNELING_DEFAULT_KNOW_HOSTS
-     */
-    static public PAPropertyString PA_PAMRSSH_KNOWN_HOSTS = new PAPropertyString(
-        "proactive.communication.pamrssh.known_hosts", false);
-
-    /** Sock connect timeout, in ms
-     *
-     * The timeout to be used when a SSH Tunnel is opened. 0 is interpreted
-     * as an infinite timeout. This timeout is also used for plain socket when try_normal_first is set to true
-     *
-     * @see Socket
-     */
-    static public PAPropertyInteger PA_PAMRSSH_CONNECT_TIMEOUT = new PAPropertyInteger(
-        "proactive.communication.pamrssh.connect_timeout", false);
-
-    // Not documented, temporary workaround until 4.3.0
-    static public PAPropertyString PA_PAMRSSH_REMOTE_USERNAME = new PAPropertyString(
-        "proactive.communication.pamrssh.username", false);
-
-    // Not documented, temporary workaround until 4.3.0
-    static public PAPropertyInteger PA_PAMRSSH_REMOTE_PORT = new PAPropertyInteger(
-        "proactive.communication.pamrssh.port", false);
-
-    /*
-     * ------------------------------------ SECURITY
+    /* ------------------------------------
+     *  SECURITY
      */
 
     /** this property indicates if a RMISecurityManager has to be instanciated*/
@@ -528,16 +455,16 @@ public class CentralPAPropertyRepository {
     static public PAPropertyString PA_RUNTIME_DOMAIN_URL = new PAPropertyString(
         "proactive.runtime.domain.url", false);
 
-    /*
-     * ------------------------------------ TIMIT
+    /* ------------------------------------
+     *  TIMIT
      */
 
     /** this property indicates the list (comma separated) of the TimIt counters to activate */
     static public PAPropertyString PA_TIMIT_ACTIVATION = new PAPropertyString("proactive.timit.activation",
         false);
 
-    /*
-     * ------------------------------------ MASTER/WORKER
+    /* ------------------------------------
+     *  MASTER/WORKER
      */
 
     /**
@@ -557,8 +484,8 @@ public class CentralPAPropertyRepository {
     static public PAPropertyBoolean PA_MASTERWORKER_COMPRESSTASKS = new PAPropertyBoolean(
         "proactive.masterworker.compresstasks", false);
 
-    /*
-     * ------------------------------------ DISTRIBUTED GARBAGE COLLECTOR
+    /* ------------------------------------
+     *  DISTRIBUTED GARBAGE COLLECTOR
      */
 
     /** Enable the distributed garbage collector */
@@ -578,15 +505,15 @@ public class CentralPAPropertyRepository {
      */
     static public PAPropertyInteger PA_DGC_TTB = new PAPropertyInteger("proactive.dgc.ttb", false);
 
-    /*
-     * ------------------------------------ DISTRIBUTED DEBUGGER
+    /* ------------------------------------
+     *  DISTRIBUTED DEBUGGER
      */
 
     /** Enable the distributed debugger */
     static public PAPropertyBoolean PA_DEBUG = new PAPropertyBoolean("proactive.debug", false);
 
-    /*
-     * ------------------------------------ MESSAGE TAGGING
+    /* ------------------------------------
+     *  MESSAGE TAGGING
      */
     /** Set the max period for LocalMemoryTag lease time */
     static public PAPropertyInteger PA_MAX_MEMORY_TAG_LEASE = new PAPropertyInteger(
@@ -599,8 +526,8 @@ public class CentralPAPropertyRepository {
     /** Enable or disable the Distributed Service ID Tag */
     static public PAPropertyBoolean PA_TAG_DSF = new PAPropertyBoolean("proactive.tag.dsf", false);
 
-    /*
-     * ------------------------------------ FILE TRANSFER
+    /* ------------------------------------
+     *  FILE TRANSFER
      */
 
     /**

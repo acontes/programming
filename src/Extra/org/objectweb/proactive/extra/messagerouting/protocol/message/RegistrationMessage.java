@@ -38,6 +38,7 @@ package org.objectweb.proactive.extra.messagerouting.protocol.message;
 
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.MagicCookie;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 
@@ -62,7 +63,22 @@ public abstract class RegistrationMessage extends Message {
      * These fields are put after the {@link Message} header.
      */
     public enum Field {
-        AGENT_ID(8, Long.class), ROUTER_ID(8, Long.class);
+        /** The Agent ID assigned to the client (must be set and not 0) */
+        AGENT_ID(8, Long.class),
+        /** The ID of the router
+         *
+         * If the client wants to reconnect later, it must know this id
+         */
+        ROUTER_ID(8, Long.class),
+        /** The heartbeat period to use. Both clients and router use the
+         * same heartbeat period. Since clients and router must agree on the
+         * same period, the client must use this value.
+         *
+         * Can be 0.
+         */
+        HEARTBEAT_PERIOD(4, Integer.class),
+        /** The magic cookie used to unlock the client slot on the router */
+        MAGIC_COOKIE(MagicCookie.COOKIE_SIZE, MagicCookie.class);
 
         private int length;
         private Class<?> type;
@@ -108,6 +124,10 @@ public abstract class RegistrationMessage extends Message {
                     return "AGENT_ID";
                 case ROUTER_ID:
                     return "ROUTER_ID";
+                case HEARTBEAT_PERIOD:
+                    return "HEARTBEAT_PERIOD";
+                case MAGIC_COOKIE:
+                    return "MAGIC_COOKIE";
                 default:
                     return super.toString();
             }
@@ -123,6 +143,15 @@ public abstract class RegistrationMessage extends Message {
      */
     final private long routerID;
 
+    /** The heartbeatPeriod
+     *
+     * 0 if unknown
+     */
+    final private int heartbeatPeriod;
+
+    /** The magic cookie or null if not set */
+    final private MagicCookie magicCookie;
+
     /** Create a registration message.
      * 
      * @param type
@@ -135,11 +164,14 @@ public abstract class RegistrationMessage extends Message {
      * @param routerID
      * 		The router id
      */
-    public RegistrationMessage(MessageType type, long messageId, AgentID agentID, long routerID) {
+    public RegistrationMessage(MessageType type, long messageId, AgentID agentID, long routerID,
+            MagicCookie magicCookie, int heartbeatPeriod) {
         super(type, messageId);
 
         this.agentID = agentID;
         this.routerID = routerID;
+        this.heartbeatPeriod = heartbeatPeriod;
+        this.magicCookie = magicCookie;
         super.setLength(Message.Field.getTotalOffset() + Field.getTotalOffset());
 
     }
@@ -156,6 +188,8 @@ public abstract class RegistrationMessage extends Message {
         try {
             this.agentID = readAgentID(byteArray, offset);
             this.routerID = readRouterID(byteArray, offset);
+            this.heartbeatPeriod = readHeartbeatPeriod(byteArray, offset);
+            this.magicCookie = readMagicCookie(byteArray, offset);
         } catch (MalformedMessageException e) {
             throw new MalformedMessageException("Malformed " + this.getType() + " message:" + e.getMessage());
         }
@@ -167,6 +201,14 @@ public abstract class RegistrationMessage extends Message {
 
     public long getRouterID() {
         return this.routerID;
+    }
+
+    public int getHeartbeatPeriod() {
+        return this.heartbeatPeriod;
+    }
+
+    public MagicCookie getMagicCookie() {
+        return this.magicCookie;
     }
 
     @Override
@@ -184,6 +226,10 @@ public abstract class RegistrationMessage extends Message {
         TypeHelper.longToByteArray(id, buff, Message.Field.getTotalOffset() + Field.AGENT_ID.getOffset());
         TypeHelper.longToByteArray(routerID, buff, Message.Field.getTotalOffset() +
             Field.ROUTER_ID.getOffset());
+        TypeHelper.intToByteArray(heartbeatPeriod, buff, Message.Field.getTotalOffset() +
+            Field.HEARTBEAT_PERIOD.getOffset());
+        System.arraycopy(this.magicCookie.getBytes(), 0, buff, Message.Field.getTotalOffset() +
+            Field.MAGIC_COOKIE.getOffset(), (int) Field.MAGIC_COOKIE.getLength());
         return buff;
     }
 
@@ -223,6 +269,30 @@ public abstract class RegistrationMessage extends Message {
         return id;
     }
 
+    /**
+     * Reads the heartbeat period of a formatted message beginning at a certain offset inside a buffer.
+     * @param byteArray the buffer in which to read
+     * @param offset the offset at which to find the beginning of the message in the buffer
+     * @return the heartbeat period of the formatted message
+     */
+    static public int readHeartbeatPeriod(byte[] byteArray, int offset) throws MalformedMessageException {
+        int hb = TypeHelper.byteArrayToInt(byteArray, offset + Message.Field.getTotalOffset() +
+            Field.HEARTBEAT_PERIOD.getOffset());
+
+        if (hb < 0) {
+            throw new MalformedMessageException(
+                "Invalid registration message. The hearbeat field must be positive");
+        }
+        return hb;
+    }
+
+    static public MagicCookie readMagicCookie(byte[] byteArray, int offset) {
+        byte[] cBuf = new byte[MagicCookie.COOKIE_SIZE];
+        System.arraycopy(byteArray, offset + Message.Field.getTotalOffset() + Field.MAGIC_COOKIE.getOffset(),
+                cBuf, 0, (int) Field.MAGIC_COOKIE.getLength());
+        return new MagicCookie(cBuf);
+    }
+
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -251,13 +321,19 @@ public abstract class RegistrationMessage extends Message {
         } else if (routerID != other.routerID)
             // different router
             return false;
+        if (heartbeatPeriod == 0) {
+            if (other.heartbeatPeriod != 0)
+                return false;
+        } else if (heartbeatPeriod != other.heartbeatPeriod)
+            return false;
         return true;
     }
 
     @Override
     public String toString() {
         return super.toString() + Field.AGENT_ID.toString() + ":" + this.agentID + ";" +
-            Field.ROUTER_ID.toString() + ":" + this.routerID + ";";
+            Field.ROUTER_ID.toString() + ":" + this.routerID + ";" + Field.HEARTBEAT_PERIOD.toString() + ":" +
+            this.heartbeatPeriod;
     }
 
 }

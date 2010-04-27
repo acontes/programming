@@ -53,6 +53,7 @@ abstract public class PAProperty {
     final String name;
     final PropertyType type;
     final boolean isSystemProperty;
+    volatile String defaultValue;
 
     PAProperty(String name, PropertyType type, boolean isSystemProp) {
         this.name = name;
@@ -89,7 +90,23 @@ abstract public class PAProperty {
      * @param value new value of the property
      */
     public void setValue(String value) {
-        ProActiveConfiguration.getInstance().setProperty(this.name, value);
+        ProActiveConfiguration.getInstance().setProperty(this.name, value, this.isSystemProperty);
+    }
+
+    /**
+     * Set the default value of this property
+     * @param value new value of the property
+     */
+    protected void setDefaultValue(String value) {
+        this.defaultValue = value;
+    }
+
+    /**
+     * Set the default value of this property
+     * @param value new value of the property
+     */
+    protected String getDefaultValue() {
+        return this.defaultValue;
     }
 
     /**

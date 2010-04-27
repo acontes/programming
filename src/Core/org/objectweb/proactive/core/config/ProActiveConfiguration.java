@@ -39,6 +39,7 @@ package org.objectweb.proactive.core.config;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
@@ -54,7 +55,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * One and only one ProActiveConfiguration object is associated to each ProActive Runtime. It
  * contains the value of all the properties known by ProActive.
  *
- * Configuration parameters may be overriden according to the following priorities:</br>
+ * Configuration parameters may be overridden according to the following priorities:</br>
  * <ol>
  * <li>System Java Properties</li>
  * <li>Custom configuration file</li>
@@ -102,6 +103,16 @@ public class ProActiveConfiguration {
         this.properties = new CustomProperties();
 
         /* Properties are set from the lower priority to the higher priority sources. */
+
+        // -0 Default value
+        Map<Class<?>, List<PAProperty>> allProperties = PAProperties.getAllProperties();
+        for (List<PAProperty> list : allProperties.values()) {
+            for (PAProperty prop : list) {
+                if (prop.defaultValue != null) {
+                    setProperty(prop.getName(), prop.defaultValue, prop.isSystemProperty);
+                }
+            }
+        }
 
         Properties sysProperties = this.getsystemProperties();
         // 1- Default config file
@@ -232,8 +243,8 @@ public class ProActiveConfiguration {
      * @param value
      *            the value of the property
      */
-    public void setProperty(String key, String value) {
-        this.properties.put(key, value, true);
+    public void setProperty(String key, String value, boolean exportAsSystem) {
+        this.properties.put(key, value, exportAsSystem);
     }
 
     private Properties getDefaultProperties() {

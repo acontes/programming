@@ -40,11 +40,13 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.MagicCookie;
 
 
 /** A remote agent 
@@ -65,8 +67,9 @@ import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
  * @since ProActive 4.1.0
  */
 public class Client {
-    static final private Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
-    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
+    static final private Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger
+            .getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER_ADMIN);
 
     /** This client represents one remote Agent. */
     final private AgentID agentId;
@@ -92,17 +95,51 @@ public class Client {
     /** List of messages to be sent when the client will reconnect */
     final private Queue<ByteBuffer> pendingMessage;
 
-    public Client(Attachment attachment, AgentID agentID) {
-        this.attachment = attachment;
-        this.attachment.setClient(this);
+    /** The timestamp of the last client activity
+     *
+     * Used to determine if the tunnel is broken
+     */
+    private AtomicLong lastSeen;
+
+    final private MagicCookie magicCookie;
+
+    public Client(AgentID agentID, MagicCookie magicCookie) {
+        this(null, agentID, magicCookie);
+    }
+
+    public Client(Attachment attachment, AgentID agentID, MagicCookie magicCookie) {
         this.agentId = agentID;
         this.pendingMessage = new ConcurrentLinkedQueue<ByteBuffer>();
-
-        if (admin_logger.isDebugEnabled()) {
-            admin_logger.debug("AgentID " + this.getAgentId() + " connected from " +
-                this.attachment.getRemoteEndpointName());
+        this.lastSeen = new AtomicLong(0);
+        this.magicCookie = magicCookie;
+        if (attachment != null) {
+            this.setAttachment(attachment);
         }
+    }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((agentId == null) ? 0 : agentId.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Client other = (Client) obj;
+        if (agentId == null) {
+            if (other.agentId != null)
+                return false;
+        } else if (!agentId.equals(other.agentId))
+            return false;
+        return true;
     }
 
     public AgentID getAgentId() {
@@ -194,7 +231,7 @@ public class Client {
      */
     public void discardAttachment() {
         synchronized (this.attachment_lock) {
-            if (admin_logger.isDebugEnabled()) {
+            if (admin_logger.isDebugEnabled() && this.attachment != null) {
                 admin_logger.debug("AgentID " + this.getAgentId() + " disconnected");
             }
 
@@ -221,8 +258,13 @@ public class Client {
             this.attachment.setClient(this);
 
             if (admin_logger.isDebugEnabled()) {
-                admin_logger.debug("AgentID " + this.getAgentId() + " reconnected from " +
-                    this.attachment.getRemoteEndpointName());
+                if (this.lastSeen.get() == 0) {
+                    admin_logger.debug("AgentID " + this.getAgentId() + " connected from " +
+                        this.attachment.getRemoteEndpointName());
+                } else {
+                    admin_logger.debug("AgentID " + this.getAgentId() + " reconnected from " +
+                        this.attachment.getRemoteEndpointName());
+                }
             }
 
         }
@@ -252,5 +294,66 @@ public class Client {
                 }
             }
         }
+    }
+
+    /**
+     * 
+     * @return true if the attachment is not null.
+     */
+    public boolean isConnected() {
+        synchronized (this.attachment_lock) {
+            return this.attachment != null;
+        }
+    }
+
+    /**
+     * Update the lastseen timestamp
+     *
+     * This timestamp can be used to know when the router saw
+     * network traffic from the client for the last time.
+     */
+    public void updateLastSeen() {
+        this.lastSeen.set(System.currentTimeMillis());
+
+    }
+
+    /**
+     * @return the lastseen timestamp
+     */
+    public long getLastSeen() {
+        return this.lastSeen.get();
+    }
+
+    /** Close the connection to the remote client and discard the attachment.
+     *
+     * This method can be used to disconnect a client if something goes wrong
+     * (invalid message, late heartbeat etc.).
+     *
+     * Once the connection is closed, the client will detect a broken Tunnel and
+     * reopen a new one.
+     *
+     * @throws IOException If the client cannot be disconneted. The attachement
+     * is discarded anyway.
+     */
+    public void disconnect() throws IOException {
+        synchronized (attachment_lock) {
+            if (this.attachment != null) {
+                try {
+                    this.attachment.disconnect();
+                } finally {
+                    discardAttachment();
+                }
+            }
+        }
+    }
+
+    public MagicCookie getMagicCookie() {
+        return this.magicCookie;
+    }
+
+    @Override
+    public String toString() {
+        return "Agent id=" + this.agentId + " remote endpoint=" +
+            (isConnected() ? this.attachment.getRemoteEndpointName() : "not connected");
     }
 }

@@ -45,8 +45,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 
 
 /**
@@ -67,7 +67,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class Attachment {
 
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
 
     /** The id of this attachment
      * 
@@ -126,7 +126,7 @@ public class Attachment {
     protected void finalize() throws Throwable {
         if (this.dtored.get() == false) {
             logger
-                    .info("File descriptor leak detected. Attachment.dtor() must be called. Please fill a bug report");
+                    .trace("File descriptor leak detected. Attachment.dtor() must be called. Please fill a bug report");
             this.dtor();
             super.finalize();
         }
@@ -179,7 +179,7 @@ public class Attachment {
         SocketAddress sa = socketChannel.socket().getRemoteSocketAddress();
         if (sa == null)
             return unknown;
-        if (!(sa instanceof InetSocketAddress)) {
+        if (sa instanceof InetSocketAddress) {
             // InetSocketAddress is THE implementation for SocketAddress
             return (InetSocketAddress) sa;
         }
@@ -213,5 +213,13 @@ public class Attachment {
         static public long getId() {
             return generator.getAndIncrement();
         }
+    }
+
+    /** Close the underlying {@link SocketChannel}
+     *
+     * @throws IOException if the connexion cannot be closed
+     */
+    public void disconnect() throws IOException {
+        this.socketChannel.close();
     }
 }
