@@ -24,6 +24,8 @@ public class CallRecord extends AbstractRecord implements Serializable {
 	private boolean finished;
 	private boolean voidRequest;
 	
+	public CallRecord() {
+	}
 
 	public CallRecord(ComponentRequestID requestID, ComponentRequestID parentID, String calledComponent, String interfaceName, String methodName,
 			long sentTime, boolean voidRequest) {

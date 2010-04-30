@@ -21,6 +21,9 @@ public class RequestRecord extends AbstractRecord implements Serializable {
 	
 	private boolean finished;
 	
+	public RequestRecord() {
+	}
+	
 	public RequestRecord(ComponentRequestID requestID, String callerComponent, String calledComponent, String interfaceName, String methodName, long arrivalTime) {
 		super(RecordType.RequestRecord, requestID);
 		this.callerComponent = callerComponent;

@@ -63,11 +63,13 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 	@Override
 	public AbstractRecord fetch(Object key, RecordType rt) {
 		if(rt == RecordType.RequestRecord) {
-			return requestLog.get(key);
-			
+			return requestLog.get(key);	
 		}
-		if(rt == RecordType.CallRecord) {
-			return null; //callLog.get(key);
+		else if(rt == RecordType.CallRecord) {
+			return callLog.get(key);
+		}
+		else {
+			logger.debug("ERROR. Fetch: Unrecognized RecordType");
 		}
 		return null;
 	}
@@ -76,37 +78,48 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 	public RequestRecord fetchRequestRecord(Object key) {
 		return requestLog.get(key);
 	}
+	
 	public CallRecord fetchCallRecord(Object key) {
 		return callLog.get(key);
 	}
 
 	@Override
 	public void insert(AbstractRecord record) {
-		if(record.recordType == RecordType.RequestRecord) {
-			requestLog.put(record.requestID, (RequestRecord) record);
+		if(record.getRecordType() == RecordType.RequestRecord) {
+			//logger.debug("INSERTING IN REQ LOG: ID: "+ record.getRequestID() + " -- " + ((RequestRecord)record).getCalledComponent() + "." + ((RequestRecord)record).getInterfaceName() + "." + ((RequestRecord)record).getMethodName() + " -- " + ((RequestRecord)record).getArrivalTime() + ", "+ ((RequestRecord)record).getServingStartTime() + ", "+ ((RequestRecord)record).getReplyTime());
+			requestLog.put(record.getRequestID(), (RequestRecord) record);
 		}
-		else if(record.recordType == RecordType.CallRecord) {
-			//callLog.put(record.requestID, (CallRecord) record);
-			//logger.debug("INSERTED IN LOG: "+ ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() + " ID: "+ record.requestID );
+		else if(record.getRecordType() == RecordType.CallRecord) {
+			//logger.debug("INSERTING IN CALL LOG: ID: "+ record.getRequestID() + " -- " + ((CallRecord)record).getCalledComponent() + "." + ((CallRecord)record).getInterfaceName() + "." + ((CallRecord)record).getMethodName() + " -- " + ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() );
+			callLog.put(record.getRequestID(), (CallRecord) record);
+		}
+		else {
+			logger.debug("ERROR. Insert: Unrecognized RecordType, ID:"+ record.getRequestID() + ", ");
 		}
 	}
 	
+	/*
 	public void insertRequestRecord(RequestRecord record) {
-		requestLog.put(record.requestID, record);
+		//logger.debug("INSERTING IN REQ LOG: ID: "+ record.getRequestID() + " -- " + record.getCalledComponent() + "." + record.getInterfaceName() + "." + record.getMethodName() + " -- " + record.getArrivalTime() + ", "+ record.getServingStartTime() + ", "+ record.getReplyTime());
+		requestLog.put(record.getRequestID(), record);
 	}
+	
 	public void insertCallRecord(CallRecord record) {
-		logger.debug("INSERTING IN CALL LOG: "+ record.getCalledComponent() + "." + record.getInterfaceName() + "." + record.getMethodName() + " -- " + ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() + " ID: "+ record.getRequestID() );
+		//logger.debug("INSERTING IN CALL LOG: ID: "+ record.getRequestID() + " -- " + record.getCalledComponent() + "." + record.getInterfaceName() + "." + record.getMethodName() + " -- " + ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() );
 		callLog.put(record.getRequestID(), record);
-	}
+	}*/
 
 	// the same from above... because HashMap.put() replaces old value!!
 	@Override
 	public void update(Object key, AbstractRecord record) {
 		if(record.recordType == RecordType.RequestRecord) {
-			requestLog.put(record.requestID, (RequestRecord) record);
+			requestLog.put(record.getRequestID(), (RequestRecord) record);
 		}
 		else if(record.recordType == RecordType.CallRecord) {
-			callLog.put(record.requestID, (CallRecord) record);
+			callLog.put(record.getRequestID(), (CallRecord) record);
+		}
+		else {
+			logger.debug("ERROR. Update: Unrecognized RecordType");
 		}
 	} 
 	

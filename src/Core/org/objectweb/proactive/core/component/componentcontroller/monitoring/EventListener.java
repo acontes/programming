@@ -10,7 +10,6 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -259,8 +258,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	// checks if the request data has already been entered in the map
     	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
     		// if the key was already there, it has to modify it to add the arrival time
-    		logger.debug("Updating RequestRecord on LogStore, component "+ this.monitoredComponentName);
-    		rs = (RequestRecord) logHandler.fetch(current, RecordType.RequestRecord);
+    		//logger.debug("Updating RequestRecord on LogStore, component "+ this.monitoredComponentName);
+    		//rs = (RequestRecord) logHandler.fetch(current, RecordType.RequestRecord);
+    		rs = logHandler.fetchRequestRecord(current);
     		rs.setArrivalTime(notification.getTimeStamp());
     	}
     	else {
@@ -268,7 +268,6 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		//logger.debug("Creating new RequestRecord on LogStore, component "+ this.monitoredComponentName);
     		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
     	}
-    	//logger.debug("Inserting RequestRecord on LogStore, component "+ this.monitoredComponentName);
     	logHandler.insert(rs);
     }
     
@@ -390,11 +389,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
     		//cs.setReplyReceptionTime(notification.getTimeStamp());
     	}
-    	logHandler.insertCallRecord(cs);
-    	//logHandler.insert(cs);
-    	
-    	//cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
-    	//logStore.insert(cs);
+    	logHandler.insert(cs);
     }
     
     /**
@@ -437,10 +432,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		cs.setReplyReceptionTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
     	}
-    	//logStore.insert(cs);
-    	logHandler.insertCallRecord(cs);
-    	//logger.debug("INSERTED "+ cs.getReplyReceptionTime() + ", ID: "+ current);
-    	//logger.debug("READ     "+ logStore.fetchCallRecord(current).getReplyReceptionTime() + ", ID: "+ current);
+    	logHandler.insert(cs);
     }
     
     /**
@@ -477,8 +469,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
     		cs.setWbnStartTime(notification.getTimeStamp());
     	}
-    	//logStore.insert(cs);
-    	logHandler.insertCallRecord(cs);
+    	logHandler.insert(cs);
     }
     
     /**

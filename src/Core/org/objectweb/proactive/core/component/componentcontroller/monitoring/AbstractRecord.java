@@ -26,6 +26,10 @@ public abstract class AbstractRecord implements Serializable {
 		this.requestID = requestID;
 	}
 	
+	public RecordType getRecordType() {
+		return recordType;
+	}
+	
 	public ComponentRequestID getRequestID() {
 		return requestID;
 	}
