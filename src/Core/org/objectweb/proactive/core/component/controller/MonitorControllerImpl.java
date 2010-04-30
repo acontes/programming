@@ -66,6 +66,7 @@ import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -797,4 +798,22 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         in.defaultReadObject();
         jmxNotificationManager = JMXNotificationManager.getInstance();
     }
+
+	@Override
+	public List<ComponentRequestID> getListOfRequestIDs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestPath getPathForID(ComponentRequestID id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public RequestPath getPathStatisticsForId(ComponentRequestID id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

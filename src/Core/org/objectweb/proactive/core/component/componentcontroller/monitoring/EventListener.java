@@ -10,6 +10,7 @@ import javax.management.Notification;
 import javax.management.NotificationListener;
 
 import org.apache.log4j.Logger;
+import org.jfree.util.Log;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
@@ -46,7 +47,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 
-	private LogHandler logStore;
+	private LogHandler logHandler;
 	private String[] itfs = {"log-handler-nf"};
 
 	/** Connection to a ProActive BodyWrapperMBean 
@@ -90,6 +91,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
 		}
 	}
 	
+	
 	public void setBodyToMonitor(UniqueID objectID, String runtimeURL, String componentName) {
 		this.monitoredBodyID = objectID;
 		this.runtimeURL = runtimeURL;
@@ -117,13 +119,6 @@ public class EventListener extends AbstractProActiveComponentController implemen
 		// Handling for SERVING STARTED
 		else if (type.equals(NotificationType.servingStarted)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
- /*           logger.debug("["+componentName+"][servingStar] " + //From:" + data.getSource() +
-            		//" To:"+ data.getDestination() +
-            		" Method:" + data.getMethodName() +
-            		" SeqNumber: " + data.getSequenceNumber() +
-            		" Timestamp: " + notification.getTimeStamp() +
-            		" NotifSeqNbr: " + notification.getSequenceNumber() +
-            		" Tags: " + data.getTags());*/
             processServingStarted(notification);
         } 
 		// Handling for REPLY SENT
@@ -178,6 +173,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" Tags: " + data.getTags());
         }
 		// TODO Handling for RECEIVED FUTURE RESULT
+		// This only happen when the thread is doing a WbN, and receives the Future update.
+		// If there is no WbN, then this does not happen
+		// see ... FutureProxy.waitfor()
         else if(type.equals(NotificationType.receivedFutureResult)) {
         	FutureNotificationData data = (FutureNotificationData) notification.getUserData();
         	logger.debug(
@@ -193,6 +191,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		);
         }
 		// Handling for REAL REPLY RECEIVED
+		// This happens when the reply received does not have any more Futures (all the reply data is available)
         else if(type.equals(NotificationType.realReplyReceived)) {
         	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
             logger.debug(
@@ -205,6 +204,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" Tags: " + data.getTags());
             processRealReplyReceived(notification);
         }
+		// TODO
         else if(type.equals(NotificationType.requestWbN)) {
         	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
         	logger.debug(
@@ -227,7 +227,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             }
         }
 		else {
-			logger.debug("Other: ["+ type +"]");
+			logger.debug(" Other: ["+ type +"]");
 		}
 		
 	}
@@ -257,10 +257,10 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map
-    	if(logStore.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
     		// if the key was already there, it has to modify it to add the arrival time
     		logger.debug("Updating RequestRecord on LogStore, component "+ this.monitoredComponentName);
-    		rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
+    		rs = (RequestRecord) logHandler.fetch(current, RecordType.RequestRecord);
     		rs.setArrivalTime(notification.getTimeStamp());
     	}
     	else {
@@ -269,7 +269,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
     	}
     	//logger.debug("Inserting RequestRecord on LogStore, component "+ this.monitoredComponentName);
-    	logStore.insert(rs);
+    	logHandler.insert(rs);
     }
     
 	/**
@@ -298,9 +298,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	String methodName = cmTagFields[5];
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map (should exist already)
-    	if(logStore.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logStore.fetchRequestRecord(current);	
+    		rs = logHandler.fetchRequestRecord(current);	
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and be updated later,
@@ -309,7 +309,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0);
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
-    	logStore.insert(rs);
+    	logHandler.insert(rs);
     }
     
     /**
@@ -336,9 +336,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	String methodName = cmTagFields[5];
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map
-    	if(logStore.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logStore.fetchRequestRecord(current);
+    		rs = logHandler.fetchRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
@@ -347,7 +347,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
-    	logStore.insert(rs);
+    	logHandler.insert(rs);
     }
     
     /**
@@ -364,6 +364,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
     	// TODO: Move this processing to the CMTag part
     	String cmTag = extractCMTag(data);
+    	if(cmTag == null) {
+    		return;
+    	}
     	String[] cmTagFields = cmTag.split("::");
     	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
     	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
@@ -375,9 +378,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	CallRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logStore.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logStore.fetchCallRecord(current);
+    		cs = logHandler.fetchCallRecord(current);
     		cs.setSentTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
@@ -386,10 +389,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		//logger.debug("Creating new CallRecord on LogStore, component "+ this.monitoredComponentName + ", ID: "+ current);
     		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
     		//cs.setReplyReceptionTime(notification.getTimeStamp());
-    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
     	}
-    	logStore.insertCallRecord(cs);
-    	//logStore.insert(cs);
+    	logHandler.insertCallRecord(cs);
+    	//logHandler.insert(cs);
     	
     	//cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
     	//logStore.insert(cs);
@@ -409,6 +411,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
     	// TODO: Move this processing to the CMTag part
     	String cmTag = extractCMTag(data);
+    	if(cmTag == null) {
+    		return;
+    	}
     	String[] cmTagFields = cmTag.split("::");
     	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
     	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
@@ -420,9 +425,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	CallRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logStore.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logStore.fetchCallRecord(current);
+    		cs = logHandler.fetchCallRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
@@ -433,7 +438,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
     	}
     	//logStore.insert(cs);
-    	logStore.insertCallRecord(cs);
+    	logHandler.insertCallRecord(cs);
     	//logger.debug("INSERTED "+ cs.getReplyReceptionTime() + ", ID: "+ current);
     	//logger.debug("READ     "+ logStore.fetchCallRecord(current).getReplyReceptionTime() + ", ID: "+ current);
     }
@@ -448,6 +453,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
     	// TODO: Move this processing to the CMTag part
     	String cmTag = extractCMTag(data);
+    	if(cmTag == null) {
+    		return;
+    	}
     	String[] cmTagFields = cmTag.split("::");
     	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
     	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
@@ -459,9 +467,9 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	CallRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logStore.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logStore.fetchCallRecord(current);
+    		cs = logHandler.fetchCallRecord(current);
     		cs.setWbnStartTime(notification.getTimeStamp());
     	}
     	else {
@@ -470,7 +478,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		cs.setWbnStartTime(notification.getTimeStamp());
     	}
     	//logStore.insert(cs);
-    	logStore.insertCallRecord(cs);
+    	logHandler.insertCallRecord(cs);
     }
     
     /**
@@ -505,7 +513,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
 		if(cItf.equals("log-handler-nf")) {
-			logStore = (LogHandler) sItf;
+			logHandler = (LogHandler) sItf;
 			return;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
@@ -519,7 +527,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
 	@Override
 	public Object lookupFc(String cItf) throws NoSuchInterfaceException {
 		if(cItf.equals("log-handler-nf")) {
-			return logStore;
+			return logHandler;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
@@ -528,7 +536,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
 	public void unbindFc(String cItf) throws NoSuchInterfaceException,
 			IllegalBindingException, IllegalLifeCycleException {
 		if(cItf.equals("log-handler-nf")) {
-			logStore = null;
+			logHandler = null;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}

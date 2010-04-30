@@ -903,9 +903,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 }
             }
             // Check the presence of the DSI Tag if enabled
-            // Ohterwise add it
+            // Otherwise, add it
             if (CentralPAPropertyRepository.PA_TAG_DSF.isTrue()) {
-            	System.out.println("And THIS TAGS ????-------------------");
                 if (!nextTags.check(DsiTag.IDENTIFIER)) {
                     nextTags.addTag(new DsiTag(bodyID, sequenceID));
                 }
@@ -915,7 +914,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if(currentreq != null) {
             	if(currentreq instanceof ComponentRequestImpl) {
             		String componentSourceName = "-";
-            		String componentDestName = "";
+            		String componentDestName = "-";
             		String interfaceName = "-";
             		String methodName = "-";
             		// ugly!
@@ -958,16 +957,22 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         			methodName = methodCall.getName();
             		//System.out.println("Call from " + componentSourceName + " to " + interfaceName + "." + methodName);
 
-            		// Replace the current CMTag (if exists) for a new CMTag with the data of the requestSent
+            		// Remove the current CMTag (if exists), and keep the ID of the previous, as it will be used for the new CMTag attached to this request
         			long oldSeqID = 0;
             		if(nextTags.check(CMTag.IDENTIFIER)) {
             			CMTag oldTag = (CMTag) nextTags.removeTag(CMTag.IDENTIFIER);
             			oldSeqID = oldTag.getNewSeqID();
             		}
             		
-            		// sequenceID is the new one, just generated (in sendRequest).
-            		// need to find the request that was being served, to be able to associate it in the callLog
-            		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName));
+            		// Avoid the propagation of tag through NF requests.
+            		// How to identify such a request? ... if componentDestName is "-". That happens if Utils.isControllerInterfaceName(interfaceName) OR interfaceName.endsWith("-nf")
+            		// The tag has already been removed, so it's enough not to add it to stop the propagation
+            		if(!componentDestName.equals("-")) {
+                		// sequenceID is the new one, just generated (in sendRequest).
+                		// needed to find the request that was being served, to be able to associate it in the callLog
+                		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName));            			
+            		}
+            		
 
             	}
             }

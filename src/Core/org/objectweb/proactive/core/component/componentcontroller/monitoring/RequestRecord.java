@@ -1,13 +1,14 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.io.Serializable;
+
 /**
  * Stores the data and timestamps for a request.
  * 
  * @author cruz
  *
  */
-
-public class RequestRecord extends AbstractRecord {
+public class RequestRecord extends AbstractRecord implements Serializable {
 
 	private String callerComponent;
 	private String calledComponent;
@@ -30,10 +31,6 @@ public class RequestRecord extends AbstractRecord {
 		this.finished = false;
 	}
 	
-	public ComponentRequestID getRequestID() {
-		return requestID;
-	}
-
 	public long getServingStartTime() {
 		return servingStartTime;
 	}

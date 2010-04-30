@@ -36,10 +36,12 @@
  */
 package org.objectweb.proactive.core.component.controller;
 
+import java.util.List;
 import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
@@ -112,4 +114,36 @@ public interface MonitorController {
      * @see MonitorControllerHelper#generateKey(String, String, Class[])
      */
     public Map<String, MethodStatistics> getAllStatistics();
+    
+    //--------------------------------------------------------------------------------------------
+    // Extensions for the Monitoring Framework
+    //
+    
+    /**
+     * Get the list of all requests that have been entered this component
+     * 
+     */
+    List<ComponentRequestID> getListOfRequestIDs();
+    
+    
+    /** 
+     * Get the path followed by an specific request
+     * 
+     * @param id
+     * @return
+     */
+    RequestPath getPathForID(ComponentRequestID id);
+    
+    /**
+     * Same from above, but with statistical information attached
+     * 
+     * @param id
+     * @return
+     */
+    RequestPath getPathStatisticsForId(ComponentRequestID id);
+    
+
+    
+    
+    
 }

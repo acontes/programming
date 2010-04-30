@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -12,6 +13,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
+import org.objectweb.proactive.core.component.controller.ComponentRequestID;
 import org.objectweb.proactive.core.component.controller.MethodStatistics;
 import org.objectweb.proactive.core.component.controller.MonitorController;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -107,9 +109,26 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
 	}
 	
-	
-	
+	// TODO
+	public List<ComponentRequestID> getListOfRequestIDs() {
+		return null;
+	}
 
+	// TODO
+    public RequestPath getPathForID(ComponentRequestID id) {
+    	return null;
+    }
+    
+	// TODO
+    public RequestPath getPathStatisticsForId(ComponentRequestID id) {
+    	return null;
+    }
+
+	
+	
+	//----------------------------------------------------------------------------------------
+	// BindingController interface
+	//
 	@Override
 	public void bindFc(String cItf, Object sItf)
 			throws NoSuchInterfaceException, IllegalBindingException,
@@ -152,5 +171,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
 	}
+	
+	
 
 }

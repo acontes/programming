@@ -95,6 +95,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		requestLog.put(record.requestID, record);
 	}
 	public void insertCallRecord(CallRecord record) {
+		logger.debug("INSERTING IN CALL LOG: "+ record.getCalledComponent() + "." + record.getInterfaceName() + "." + record.getMethodName() + " -- " + ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() + " ID: "+ record.getRequestID() );
 		callLog.put(record.getRequestID(), record);
 	}
 
@@ -105,7 +106,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			requestLog.put(record.requestID, (RequestRecord) record);
 		}
 		else if(record.recordType == RecordType.CallRecord) {
-			//callLog.put(record.requestID, (CallRecord) record);
+			callLog.put(record.requestID, (CallRecord) record);
 		}
 	} 
 	
@@ -115,12 +116,12 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		if(hostComponent != null) {
 			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
 		}
-		System.out.println("============ Component ["+ hostComponentName +"] ===============");
-		System.out.println("=====================Call Log===================================");
+		System.out.println("===================== Component ["+ hostComponentName +"] ===============");
+		System.out.println("===================== Call Log ===================================");
 		displayCallLog();
-		System.out.println("=====================Request Log================================");
+		System.out.println("===================== Request Log ================================");
 		displayRequestLog();
-		System.out.println("================================================================");
+		System.out.println("==================================================================");
 		System.out.println();
 	}
 	
