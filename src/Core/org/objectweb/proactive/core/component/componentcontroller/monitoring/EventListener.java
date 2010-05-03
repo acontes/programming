@@ -86,7 +86,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
                 throw new ProActiveRuntimeException("JMX subscription for the MonitorController has failed", e);
             }
             started = true;
-            logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "]");		
+            logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);		
 		}
 	}
 	
@@ -204,6 +204,8 @@ public class EventListener extends AbstractProActiveComponentController implemen
             processRealReplyReceived(notification);
         }
 		// TODO
+		// This notification is "new" ... because the existent "waitByNecessity" notification has a "FutureNotificationData" attached,
+		// which doesn't include all the information I need to find the appropriate entry in the logs.
         else if(type.equals(NotificationType.requestWbN)) {
         	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
         	logger.debug(
@@ -214,7 +216,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
         			" SeqNumber: " + data.getSequenceNumber() +
         			" NotifSeqNbr: " + notification.getSequenceNumber() +
         			" Tags: " + data.getTags());
-        	//processWaitByNecessity(notification);
+        	processWaitByNecessity(notification);
         	
         }
         else if (type.equals(NotificationType.setOfNotifications)) {
