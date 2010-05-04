@@ -41,7 +41,9 @@ import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.CallRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestRecord;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
@@ -123,7 +125,7 @@ public interface MonitorController {
      * Get the list of all requests that have been entered this component
      * 
      */
-    List<ComponentRequestID> getListOfRequestIDs();
+    List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfRequestIDs();
     
     
     /** 
@@ -132,7 +134,7 @@ public interface MonitorController {
      * @param id
      * @return
      */
-    RequestPath getPathForID(ComponentRequestID id);
+    RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
     
     /**
      * Same from above, but with statistical information attached
@@ -140,10 +142,19 @@ public interface MonitorController {
      * @param id
      * @return
      */
-    RequestPath getPathStatisticsForId(ComponentRequestID id);
+    RequestPath getPathStatisticsForId(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
     
-
+    /**
+     * Get the list of entries in the Request Log
+     * @return
+     */
+    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, RequestRecord> getRequestLog();
     
+    /**
+     * Get the list of entries in the Call Log
+     * @return
+     */
+    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, CallRecord> getCallLog();
     
     
 }

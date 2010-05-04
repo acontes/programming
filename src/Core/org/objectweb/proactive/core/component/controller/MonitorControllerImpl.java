@@ -66,7 +66,9 @@ import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ProActiveInterface;
 import org.objectweb.proactive.core.component.Utils;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.CallRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestRecord;
 import org.objectweb.proactive.core.component.type.ProActiveInterfaceType;
 import org.objectweb.proactive.core.component.type.ProActiveTypeFactoryImpl;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -800,19 +802,31 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
     }
 
 	@Override
-	public List<ComponentRequestID> getListOfRequestIDs() {
+	public List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfRequestIDs() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public RequestPath getPathForID(ComponentRequestID id) {
+	public RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public RequestPath getPathStatisticsForId(ComponentRequestID id) {
+	public RequestPath getPathStatisticsForId(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, CallRecord> getCallLog() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, RequestRecord> getRequestLog() {
 		// TODO Auto-generated method stub
 		return null;
 	}

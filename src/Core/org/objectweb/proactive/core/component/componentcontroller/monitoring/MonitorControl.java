@@ -1,6 +1,5 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -13,10 +12,8 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
-import org.objectweb.proactive.core.component.controller.ComponentRequestID;
 import org.objectweb.proactive.core.component.controller.MethodStatistics;
 import org.objectweb.proactive.core.component.controller.MonitorController;
-import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -86,7 +83,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	@Override
 	public void startMonitoring() {
 		started = true;
-		logger.debug("[Monitor Controll] Start ... ");
+		logger.debug("[Monitor Control] Start ... ");
 		String hostComponentName = null;
 		if(hostComponent != null) {
 			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
@@ -171,7 +168,16 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
 	}
-	
+
+	@Override
+	public Map<ComponentRequestID, CallRecord> getCallLog() {
+		return logHandler.getCallLog();
+	}
+
+	@Override
+	public Map<ComponentRequestID, RequestRecord> getRequestLog() {
+		return logHandler.getRequestLog();
+	}
 	
 
 }

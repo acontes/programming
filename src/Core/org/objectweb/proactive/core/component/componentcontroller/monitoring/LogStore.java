@@ -1,7 +1,9 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -98,17 +100,6 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		}
 	}
 	
-	/*
-	public void insertRequestRecord(RequestRecord record) {
-		//logger.debug("INSERTING IN REQ LOG: ID: "+ record.getRequestID() + " -- " + record.getCalledComponent() + "." + record.getInterfaceName() + "." + record.getMethodName() + " -- " + record.getArrivalTime() + ", "+ record.getServingStartTime() + ", "+ record.getReplyTime());
-		requestLog.put(record.getRequestID(), record);
-	}
-	
-	public void insertCallRecord(CallRecord record) {
-		//logger.debug("INSERTING IN CALL LOG: ID: "+ record.getRequestID() + " -- " + record.getCalledComponent() + "." + record.getInterfaceName() + "." + record.getMethodName() + " -- " + ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() );
-		callLog.put(record.getRequestID(), record);
-	}*/
-
 	// the same from above... because HashMap.put() replaces old value!!
 	@Override
 	public void update(Object key, AbstractRecord record) {
@@ -176,5 +167,23 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
     				" TOT: "+ (rs.getReplyTime() - rs.getArrivalTime()));	
     	}
     }
+
+	@Override
+	public Map<ComponentRequestID, CallRecord> getCallLog() {
+		
+		Map<ComponentRequestID, CallRecord> callRecords = new HashMap<ComponentRequestID, CallRecord>(callLog.size());
+		// copy all entries of the log
+		callRecords.putAll(callLog);
+		return callRecords;
+	}
+
+	@Override
+	public Map<ComponentRequestID, RequestRecord> getRequestLog() {
+		
+		Map<ComponentRequestID, RequestRecord> requestRecords = new HashMap<ComponentRequestID, RequestRecord>(callLog.size());
+		// copy all entries of the log
+		requestRecords.putAll(requestLog);
+		return requestRecords;
+	}
     
 }

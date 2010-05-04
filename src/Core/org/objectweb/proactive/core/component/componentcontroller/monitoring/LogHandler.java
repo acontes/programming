@@ -1,5 +1,8 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.List;
+import java.util.Map;
+
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 /**
@@ -29,7 +32,11 @@ public interface LogHandler {
 	// updates an existing record
 	void update(Object key, AbstractRecord record);
 	
-	// display Logs (only for testing)
+	// test: display Logs
 	void displayLogs();
+	
+	// test: obtain logs
+	Map<ComponentRequestID, RequestRecord> getRequestLog();
+	Map<ComponentRequestID, CallRecord> getCallLog();
 	
 }
