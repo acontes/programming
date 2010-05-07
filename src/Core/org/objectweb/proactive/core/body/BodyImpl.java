@@ -60,6 +60,7 @@ import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.ProActiveInternalObject;
 import org.objectweb.proactive.annotation.ImmediateService;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.benchmarks.timit.util.CoreTimersContainer;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -660,7 +661,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 // END JMX Notification
                 return;
             }
-
+            
             if (Profiling.TIMERS_COMPILED) {
                 TimerWarehouse.startTimer(BodyImpl.this.bodyID, TimerWarehouse.SEND_REPLY);
             }
@@ -677,7 +678,18 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
                     tagNotification);
                 mbean.sendNotification(NotificationType.replySent, data);
+
+                // if I'm sending the actual result, instead of something that contains Futures, notify it
+            	if( !PAFuture.isAwaited(reply.getResult().getResultObjet()) ) {
+            		tagNotification = createTagNotification(request.getTags());
+                    data = new RequestNotificationData(request.getSourceBodyID(), request
+                            .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+                            .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+                        tagNotification);
+                    mbean.sendNotification(NotificationType.realReplySent, data);
+            	}
             }
+            //--cruz
 
             // END JMX Notification
             ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
@@ -812,6 +824,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 //TO CONSERVER: adds the tags of the Request to the local Future.
                 //This way it's possible to know which method is the Future waiting for, and generate
                 //the notification when the final reply arrives.
+                //    Also add the tags of the request that was being server (the parent Request).
+                //    This way, when sending a reply (via AC) the server knows which request has been finished.  
+                future.setParentTags(LocalBodyStore.getInstance().getContext().getCurrentRequest().getTags());
                 future.setTags(tags);
                 this.futures.receiveFuture(future);
             }

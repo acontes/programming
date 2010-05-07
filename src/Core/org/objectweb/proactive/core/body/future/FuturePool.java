@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.AbstractBody;
+import org.objectweb.proactive.core.body.BodyImpl;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
@@ -57,7 +58,11 @@ import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.reply.ReplyImpl;
 import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.Tag;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -270,6 +275,7 @@ public class FuturePool extends Object implements java.io.Serializable {
             Reply reply) throws java.io.IOException {
 
     	// cruz
+    	// This is only for debugging, (for printing the next debug message) and can be safely deleted
     	Body b = PAActiveObject.getBodyOnThis();
     	String bodyName = null;
     	String methodName = null;
@@ -285,7 +291,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     	if(b != null) {
     		bodyName = b.getName();
     	}
-    	logger.debug("[FuturePool ] receiveFutureValue1. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] methodName: ["+ methodName +"] isAwaited? "+ !real);
+    	logger.debug("[FuturePool ] receiveFutureValue1. Owner: ["+ownerBody.getName()+/*" ..." + ownerBody.getID() +*/ "] methodName: ["+ methodName +"] isAwaited? "+ !real + " RcvTags: "+ mt);
     	// --cruz
     	
     	// get all awaited futures
@@ -297,11 +303,16 @@ public class FuturePool extends Object implements java.io.Serializable {
             if ((reply != null) && (reply.getFTManager() != null)) {
                 ftres = reply.getFTManager().onDeliverReply(reply);
             }
-
+            
+            // cruz
+            // Store the tags of the parent request of this Future. Use it case that an AutomaticContinuation must be created
+            MessageTags oldTags = null;
+            // --cruz
             Future future = (futuresToUpdate.get(0));
             if (future != null) {
-            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ future.getFutureID().getID()+"]");
-                future.receiveReply(result);
+            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ future.getFutureID().getID()+"], oldTags: "+ future.getTags());
+                oldTags = future.getParentTags();
+            	future.receiveReply(result);
             }
 
             // if there are more than one future to update, we "give" deep copy
@@ -353,12 +364,16 @@ public class FuturePool extends Object implements java.io.Serializable {
                     this.removeDestinations();
 
                     // add the deepcopied AC
+                    
                     //cruz: reply.getMethodName() was null
-                    // maybe here I can "tweak" the reply that will be later copied by AC, by changing the methodName.
-                    // But for that I should've to find the appropriate methodName ... urgh ... looking at the list of futures ?
-                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Adding AC for method ["+ reply.getMethodName()+"]");
+                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Adding AC for method ["+ reply.getMethodName()+"], with (old)tags "+ oldTags);
+                    // Here is when an Automatic Continuation is created. 
+                    // Then, I can change the tags in the reply and copy the tags of the FutureProxy I'm updating
+                    
+                    /*queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
+                        newResult, psm, true, reply.getTags())));*/                    
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
-                        newResult, psm, true, reply.getTags())));
+                            newResult, psm, true, oldTags )));
                     //--cruz
                 }
             }
@@ -384,7 +399,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Received Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sent by ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] and calling FutureMap.receiveFuture");
+    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+/*" ..." + ownerBody.getID() +*/ "] New Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sender ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] --> FutureMap.receiveFuture. Tags:"+ futureObject.getTags() + " PARENTTags "+ futureObject.getParentTags() );
     	futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
@@ -406,7 +421,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param bodyDest body destination of this continuation
      */
     public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {    	
-    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"...] ID:[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
+    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"] ID[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
         futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
 
@@ -702,11 +717,41 @@ public class FuturePool extends Object implements java.io.Serializable {
                             reply.getResult(), psm, true, reply.getTags());
                         //--cruz
                     } else {
-                        // last sending : the orignal can ben sent
+                        // last sending : the original can be sent
                         toSend = reply;
                     }
 
-                    FuturePool.this.logger.debug("[ACService  ] doAC Owner: ["+FuturePool.this.ownerBody.getID()+"] for method ["+ reply.getMethodName()+"] dest:["+dest.getID()+"]");
+                    FuturePool.this.logger.debug("[ACService  ] doAC Owner: ["+FuturePool.this.ownerBody.getID()+"] Reply for ["+ reply.getMethodName()+"] dest:["+dest.getID()+"] tags:"+reply.getTags() );
+                    
+                    //cruz
+                    // before sending I could send a notification that I'm executing and AC.
+                    Body body = FuturePool.this.getOwnerBody();
+                    if(body != null) {
+                        UniqueID bodyId = body.getID();
+                        BodyWrapperMBean mbean = body.getMBean();
+                        if(mbean != null) {
+                        	
+                        	// notify that I'm sending a reply because of Automatic Continuation
+                        	String tagNotification = createTagNotification(reply.getTags());
+                            RequestNotificationData data = new RequestNotificationData(reply.getSourceBodyID(), null,
+                                    bodyId, null, reply.getMethodName(), body.getRequestQueue().size(), reply.getSequenceNumber(),
+                                tagNotification);
+                            mbean.sendNotification(NotificationType.replyAC, data);
+
+                            // if I'm doing an AC with the final result, send the notification that the real reply was sent
+                            if(reply.getResult() != null) {
+                            	if( !PAFuture.isAwaited(reply.getResult().getResultObjet()) ) {
+                            		tagNotification = createTagNotification(reply.getTags());
+                            		data = new RequestNotificationData(reply.getSourceBodyID(), null,
+                            				bodyId, null, reply.getMethodName(), body.getRequestQueue().size(), reply.getSequenceNumber(),
+                            				tagNotification);
+                            		mbean.sendNotification(NotificationType.realReplySent, data);
+                            	}
+                            }
+                        }
+                    }
+                    //--cruz
+                    
                     
                     // send the reply
                     if (ftm != null) {
@@ -722,5 +767,18 @@ public class FuturePool extends Object implements java.io.Serializable {
                 }
             }
         }
+        
+        //cruz
+        private String createTagNotification(MessageTags tags) {
+            String result = "";
+            if (tags != null) {
+                for (Tag tag : tags.getTags()) {
+                    result += tag.getNotificationMessage();
+                }
+            }
+            return result;
+        }
+        //--cruz
+        
     } //ACService
 }

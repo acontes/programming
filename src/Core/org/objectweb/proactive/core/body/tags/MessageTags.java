@@ -143,7 +143,7 @@ public class MessageTags implements Serializable {
     public String toString() {
         String res = "";
         for (Entry<String, Tag> e : messagestags.entrySet()) {
-            res += e.getKey() + "" + e.getValue() + "\n";
+            res += e.getKey() + "" + e.getValue() /*+ "\n"*/;
         }
         return res;
     }

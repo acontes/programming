@@ -149,6 +149,8 @@ public interface Future extends LocalFuture {
     public UniqueID getSenderID();
     public void setTags(MessageTags m);
     public MessageTags getTags();
+    public void setParentTags(MessageTags m);
+    public MessageTags getParentTags();
     //--cruz
     
 }

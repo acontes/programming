@@ -145,6 +145,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private String methodName = null;
     private String parentMethodName = null;
     private MessageTags tags;
+    private MessageTags parentTags;
     //--cruz
     
     //
@@ -238,19 +239,21 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         
         
-        logger.debug("[FutureProxy] receiveReply. ID:" + this.getID()+ ", MethodCallResult type: ["+resultTypeName+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"]" );
+        logger.debug("[FutureProxy] receiveReply. This: ID[" + this.getID()+ "], MethodCallResult type: ["+resultTypeName+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"] FutureTags "+ this.getTags() + ", FutureParentTargs "+ this.getParentTags() );
         if(isAwaited(target.getResult())) {       	
-        	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy
+        	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy, so he will know how to generate (later) the realReplyReceived notification
         	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
-        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", was previously for method: [" + futureReceived.getMethodName() +"]");
+        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", not realReply. Had [" + futureReceived.getMethodName() +"] Tags "+ futureReceived.getTags() + ", ParentTags "+ futureReceived.getParentTags() );
         	futureReceived.setMethodName(this.methodName);
         	// propagation of the tags to the new pair stub-proxy
         	futureReceived.setTags(this.tags);
+        	futureReceived.setParentTags(this.parentTags);
+        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", not realReply. Now [" + futureReceived.getMethodName() +"] Tags "+ futureReceived.getTags() + ", ParentTags "+ futureReceived.getParentTags() );
         }
         else {
         	Body body = LocalBodyStore.getInstance().getLocalBody(senderID);        	
         	// TODO now I can generate the JMX notification RealReplyReceived :D
-        	logger.debug("[FutureProxy] receiveReply. ID:" + this.getID() + ", received REAL REPLY for method "+ methodName + " in body ["+ senderID +"]");
+        	logger.debug("[FutureProxy] receiveReply. ID[" + this.getID() + "], received REAL REPLY for method "+ methodName + " in body ["+ senderID +"]");
         	// generates the JMX RealReplyReceived
         	//Body body = PAActiveObject.getBodyOnThis();
     		if(body != null) {
@@ -387,7 +390,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
 
         // END JMX Notification
-        logger.debug("[FutureProxy] ID:"+ id.getID() + " WaitByNecessity, method ["+ methodName+"]");
+        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
         TimeoutAccounter time = TimeoutAccounter.getAccounter(timeout);
         while (!isAvailable()) {
             if (time.isTimeoutElapsed()) {
@@ -410,7 +413,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                 getCreatorID()));
         }
         if(target.getResult() != null) {
-        	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "]");
+        	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags() );
         }
         // This is the place to detect WaitByNecessity, but not the place if we want to detect all Future updates,
         // because, if the value is already available, the execution will not arrive to this place.
@@ -581,6 +584,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         out.writeObject(methodName);
         out.writeObject(parentMethodName);
         out.writeObject(tags);
+        out.writeObject(parentTags);
         //--cruz
     }
 
@@ -598,6 +602,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         methodName = (String) in.readObject();
         parentMethodName = (String) in.readObject();
         tags = (MessageTags) in.readObject();
+        parentTags = (MessageTags) in.readObject();
         //--cruz
         // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
@@ -706,6 +711,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 	
 	public void setTags(MessageTags messageTags) {
 		this.tags = messageTags;
+	}
+	
+	public MessageTags getParentTags()  {
+		return parentTags;	
+	}
+	
+	public void setParentTags(MessageTags messageTags) {
+		this.parentTags = messageTags;
 	}
 	
     private String createTagNotification(MessageTags tags) {

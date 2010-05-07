@@ -131,7 +131,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" SeqNumber: " + data.getSequenceNumber() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
-            processReplySent(notification);
+            //processReplySent(notification);
         } 
 		// TODO Handling for VOID REQUEST SERVED
         else if (type.equals(NotificationType.voidRequestServed)) {
@@ -217,6 +217,35 @@ public class EventListener extends AbstractProActiveComponentController implemen
         			" NotifSeqNbr: " + notification.getSequenceNumber() +
         			" Tags: " + data.getTags());
         	processWaitByNecessity(notification);
+        	
+        }
+		// TODO
+		// This notification is "new" ... 
+        else if(type.equals(NotificationType.replyAC)) {
+        	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+        	logger.debug(
+        			" Timestamp: " + notification.getTimeStamp() +
+        			"["+monitoredComponentName+"][replySentAC] " + //From:" + data.getSource() +
+        			//                		" To:"+ data.getDestination() +
+        			" Method:" + data.getMethodName() +
+        			" SeqNumber: " + data.getSequenceNumber() +
+        			" NotifSeqNbr: " + notification.getSequenceNumber() +
+        			" Tags: " + data.getTags());
+        	//processWaitByNecessity(notification);
+        }
+		// TODO
+		// This notification is "new" ... 
+        else if(type.equals(NotificationType.realReplySent)) {
+        	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+        	logger.debug(
+        			" Timestamp: " + notification.getTimeStamp() +
+        			"["+monitoredComponentName+"][RRreplySent] " + //From:" + data.getSource() +
+        			//                		" To:"+ data.getDestination() +
+        			" Method:" + data.getMethodName() +
+        			" SeqNumber: " + data.getSequenceNumber() +
+        			" NotifSeqNbr: " + notification.getSequenceNumber() +
+        			" Tags: " + data.getTags());
+        	processRealReplySent(notification);
         	
         }
         else if (type.equals(NotificationType.setOfNotifications)) {
@@ -440,6 +469,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     /**
      * Process the waitByNecessity notification.
      * Sets the time when this request (?) became blocked doing wait by necessity, so it possible to compute the WaitByNecessity time
+     * Think: there maybe a possibly mistake (conceptually), if the Body is unblocked and then blocks in another WbN (I'm counting only from the first one)
      * @param notification
      */
     private void processWaitByNecessity(Notification notification) {
@@ -472,6 +502,46 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		cs.setWbnStartTime(notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
+    }
+    
+    /**
+     * Process the realReplySent notification.
+     * This notification is generated when the final reply is sent to the caller component as an answer to a non-void request.
+     * It can happen immediately from BodyImpl.ActiveLocalBodyStrategy.serveInternal(Request),
+     *    or well from an AC, in FuturePool.ACService.doAutomaticContinuation() 
+     * @param notification
+     */
+    private void processRealReplySent(Notification notification) {
+    	// modifies the request in the requestLog, to add the time at which the reply was sent
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	String cmTag = extractCMTag(data);
+    	// the request may not have a CMTag, when the request was invoked directly on the component
+    	// (not from another component).
+    	// In that case no "requestReceived" notification was generated either
+    	if(cmTag == null) {
+    		return;
+    	}
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String sourceName = cmTagFields[2];
+    	String destName = cmTagFields[3];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	RequestRecord rs;
+    	// checks if the request data has already been entered in the map
+    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
+    		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
+    		rs = logHandler.fetchRequestRecord(current);
+    		rs.setReplyTime(notification.getTimeStamp());
+    	}
+    	// else, the data should be added (without the arrival time), and the arrival time added later,
+    	// when the corresponding requestReceived notification be processed
+    	else {
+    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0);
+    		rs.setReplyTime(notification.getTimeStamp());
+    	}
+    	logHandler.insert(rs);
     }
     
     /**

@@ -60,6 +60,8 @@ public class NotificationType {
     // cruz
     public final static String realReplyReceived = "realReplyReceived";
     public final static String requestWbN = "requestWaitByNecessity";
+    public final static String replyAC = "replyAutomaticContinuation";
+    public final static String realReplySent = "realReplySent";
     // -- cruz
 
     // --- Corresponds to the MigrationEvent -----------------------
