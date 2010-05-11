@@ -39,12 +39,18 @@ package org.objectweb.proactive.core.body.reply;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
 import org.objectweb.proactive.core.body.message.MessageImpl;
 import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.Tag;
+import org.objectweb.proactive.core.jmx.mbean.BodyWrapperMBean;
+import org.objectweb.proactive.core.jmx.notification.NotificationType;
+import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.mop.Utils;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
 import org.objectweb.proactive.core.security.crypto.Session;
@@ -155,7 +161,31 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
                 e.printStackTrace();
             }
         }
-
+        //cruz
+        boolean awaited=false;
+        if(result != null) {
+        	awaited = PAFuture.isAwaited(result.getResultObjet());
+        }
+        if(!isAC && !awaited) {
+        	// REAL REPLY SENT from Automatic Continuations are sent by the AC Thread.
+        	// That's because this Reply object has the sourceBodyID of the body that created the response,
+        	// and not the ID of the of the sender of the response.
+        	// The Automatic Continuations thread can get the ID of the sender from the owner of the FuturePool. Here I can't (or don't know how to)
+        	Body body = LocalBodyStore.getInstance().getLocalBody(this.getSourceBodyID());
+        	BodyWrapperMBean mbean = body.getMBean();
+            if(mbean != null) {
+            	String tagNotification = createTagNotification(this.getTags());
+            	// TODO correct the parameters for source and destination
+            	//      the MonitorController is not reading them for the moment
+            	RequestNotificationData requestNotificationData = new RequestNotificationData(
+            			null, null, null, null,
+            			this.methodName, -1, this.sequenceNumber,
+            			tagNotification);
+            	mbean.sendNotification(NotificationType.realReplySent, requestNotificationData);
+            }
+        }
+        //ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).debug("++++++++++++++++++++++++++++++++++++++ Sending reply from "+ this.getSourceBodyID() + " to "+ destinationBody.getID()+"... AC?"+ isAC + " isAwaited? "+ awaited +" tags "+ this.getTags() ) ;
+        //--cruz
         // end security
         // fault-tolerance returned value
         return destinationBody.receiveReply(this);
@@ -195,4 +225,17 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
     public boolean isAutomaticContinuation() {
         return this.isAC;
     }
+
+    //cruz
+    private String createTagNotification(MessageTags tags) {
+        String result = "";
+        if (tags != null) {
+            for (Tag tag : tags.getTags()) {
+                result += tag.getNotificationMessage();
+            }
+        }
+        return result;
+    }
+    //--cruz
+
 }

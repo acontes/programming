@@ -110,6 +110,8 @@ import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenException;
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.profiling.Profiling;
 import org.objectweb.proactive.core.util.profiling.TimerWarehouse;
 
@@ -322,7 +324,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
      */
     @Override
     protected int internalReceiveReply(Reply reply) throws java.io.IOException {
-    	// cruz ... only want to treat replies that have the Future instead of more automatic continuations...
+    	// cruz ... only want to treat replies that have the Future instead of more automatic continuations... ... but an Automatic Continuation can also have the final reply
     	//          Before, this if didn't exist and the notification was sent on any reply. (also the reply.getResultObject()!=null was not checked)
     	if(!reply.isAutomaticContinuation()) {
     		// JMX Notification
@@ -681,12 +683,15 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 
                 // if I'm sending the actual result, instead of something that contains Futures, notify it
             	if( !PAFuture.isAwaited(reply.getResult().getResultObjet()) ) {
-            		tagNotification = createTagNotification(request.getTags());
-                    data = new RequestNotificationData(request.getSourceBodyID(), request
-                            .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-                            .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
-                        tagNotification);
-                    mbean.sendNotification(NotificationType.realReplySent, data);
+//            		String tagNotification2 = createTagNotification(request.getTags());
+//                    RequestNotificationData data2 = new RequestNotificationData(request.getSourceBodyID(), request
+//                            .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
+//                            .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
+//                        tagNotification2);
+//                    mbean.sendNotification(NotificationType.realReplySent, data2);
+                    //ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).debug("--------------------------------------> id = "+ BodyImpl.this.getName() +" ... Will try to send the REAL REPLY (bodyImpl), parentTags="+request.getTags());
+            	} else {
+            		//ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).debug("--------------------------------------> id = "+ BodyImpl.this.getName() +" ... REAL REPLY NOT ready yet (bodyImpl), parentTags="+request.getTags());
             	}
             }
             //--cruz
