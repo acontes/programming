@@ -52,60 +52,24 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     
 	final static protected Logger logger = ProActiveLogger.getLogger(Loggers.BODY);
+	final static protected Logger futureLogger = ProActiveLogger.getLogger(Loggers.FUTURE);
 	
 	public ReplyReceiverImpl() {
     }
 
     public int receiveReply(Reply r, Body receiverBody, FuturePool futurePool) throws java.io.IOException {
-    	int n = -1;
     	boolean awaited = false;
-    	MethodCallResult mcr = r.getResult();
-    	String className = "";
-    	String name = PAActiveObject.getBodyOnThis().getName();
     	if(r.getResult() != null) {
     		Object res = r.getResult().getResult();
     		if(res != null) {
     			awaited = PAFuture.isAwaited(res);
-    			if(!awaited) {
-    				n = 0;
-    			}
-    			else {
-    				n = 1;
-    			}
-    			className = r.getResult().getResult().getClass().getName();
     		}
     	}
-    	    	
-    	// Here, I know if the result is really available (awaited == false).
-    	// If it is, then I should generate a notification realReplyReceived, and read it
-    	// No, it is not here, ... it's in FutureProxy.receiveReply ... (TO DELETE)
-    	if(n == 0) {
-    		Body body = PAActiveObject.getBodyOnThis();
-    		BodyWrapperMBean mbean = null;
-//    		if(body != null) {
-//    			mbean = body.getMBean();
-//    			if(mbean != null) {
-//    				String tagNotification = createTagNotification(r.getTags());
-//    				RequestNotificationData requestNotificationData = new RequestNotificationData(
-//    						body.getID(), body.getNodeURL(), r.getSourceBodyID(), body.getNodeURL(),
-//    						r.getMethodName(), body.getRequestQueue().size() + 1, r.getSequenceNumber(),
-//    						tagNotification);
-//    				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
-//    			}
-//    		}
-    	}
-    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "]");
+    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "], isAwaited? "+ awaited);
+    	futureLogger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "], isAwaited? "+ awaited);
+    	
     	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
     	return a;
     }
-    
-    private String createTagNotification(MessageTags tags) {
-        String result = "";
-        if (tags != null) {
-            for (Tag tag : tags.getTags()) {
-                result += tag.getNotificationMessage();
-            }
-        }
-        return result;
-    }        
+            
 }

@@ -54,6 +54,7 @@ import javax.management.ObjectName;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.UniqueID;
@@ -403,6 +404,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                     e.printStackTrace();
                 }
             }
+            ProActiveLogger.getLogger(Loggers.FUTURE).debug("[AbstractBdy] ReceiveReply with ID ["+ reply.getSequenceNumber() +"], isAwaited? " + PAFuture.isAwaited(reply.getResult().getResult()) + " Tags: "+ reply.getTags() );
             this.registerIncomingFutures();
             ftres = internalReceiveReply(reply);
             if (GarbageCollector.dgcIsEnabled()) {
@@ -431,6 +433,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 java.util.Iterator<Future> it = incomingFutures.iterator();
                 while (it.hasNext()) {
                     Future current = it.next();
+                    ProActiveLogger.getLogger(Loggers.FUTURE).debug("[AbstractBdy] Registering Incoming Future ID ["+ current.getID() +"], creator ["+ current.getCreatorID() +"] isAwaited? " + PAFuture.isAwaited(current) + " Tags "+ current.getTags() + " ParentTags" + current.getParentTags() );
                     getFuturePool().receiveFuture(current);
                 }
                 FuturePool.removeIncomingFutures();

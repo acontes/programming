@@ -39,6 +39,7 @@ package org.objectweb.proactive.core.body.reply;
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.UniqueID;
@@ -60,10 +61,13 @@ import org.objectweb.proactive.core.security.exceptions.CommunicationForbiddenEx
 import org.objectweb.proactive.core.security.exceptions.RenegotiateSessionException;
 import org.objectweb.proactive.core.security.exceptions.SecurityNotAvailableException;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 public class ReplyImpl extends MessageImpl implements Reply, Serializable {
 
+	private static Logger CMlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
     /**
      * The hypothetic result
      */
@@ -183,8 +187,12 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
             			tagNotification);
             	mbean.sendNotification(NotificationType.realReplySent, requestNotificationData);
             }
+            else {
+            	CMlogger.debug("+++++++++> Notification NOT SENT (ReplyImpl) from ["+ body.getName() +"] sequenceNumber ["+ this.getSequenceNumber() );    	
+            }
+            
+            CMlogger.debug("REAL REPLY SENT (ReplyImpl) from ["+ body.getName() +"] to ["+ destinationBody.getID() +"], sequenceNumber ["+ this.getSequenceNumber() +"] tags "+ this.getTags());
         }
-        //ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).debug("++++++++++++++++++++++++++++++++++++++ Sending reply from "+ this.getSourceBodyID() + " to "+ destinationBody.getID()+"... AC?"+ isAC + " isAwaited? "+ awaited +" tags "+ this.getTags() ) ;
         //--cruz
         // end security
         // fault-tolerance returned value

@@ -151,6 +151,8 @@ public interface Future extends LocalFuture {
     public MessageTags getTags();
     public void setParentTags(MessageTags m);
     public MessageTags getParentTags();
+    public boolean isFromOrphan();
+    public void setFromOrphan(boolean b);
     //--cruz
     
 }

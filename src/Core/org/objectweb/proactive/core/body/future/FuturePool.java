@@ -75,6 +75,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     // -- STATIC MEMBERS -----------------------------------------------
     //
     private static Logger logger = ProActiveLogger.getLogger(Loggers.FUTURE);
+    private static Logger CMlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 
     // set to true each time any future is updated
     protected boolean newState;
@@ -276,22 +277,17 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     	// cruz
     	// This is only for debugging, (for printing the next debug message) and can be safely deleted
-    	Body b = PAActiveObject.getBodyOnThis();
-    	String bodyName = null;
     	String methodName = null;
     	boolean real = false;
     	MessageTags mt = null;
     	if(reply != null) {
     		methodName = reply.getMethodName();
     		if(reply.getResult() != null) {
-    			real = !PAFuture.isAwaited(reply.getResult().getResult());	
-    		}    		
+    			real = !PAFuture.isAwaited(reply.getResult().getResult());
+    		}
     		mt = reply.getTags();
     	}
-    	if(b != null) {
-    		bodyName = b.getName();
-    	}
-    	logger.debug("[FuturePool ] receiveFutureValue1. Owner: ["+ownerBody.getName()+/*" ..." + ownerBody.getID() +*/ "] methodName: ["+ methodName +"] isAwaited? "+ !real + " RcvTags: "+ mt);
+    	logger.debug("[FuturePool ] receiveFutureValue1. Owner: ["+ownerBody.getName()+"] id["+ id +"] creator:["+ creatorID +"] methodName: ["+ methodName +"] replyNull? "+ (reply==null) +" isAwaited? "+ ((reply!=null)?!real:"---") + " RcvTags: "+ mt);
     	// --cruz
     	
     	// get all awaited futures
@@ -305,13 +301,20 @@ public class FuturePool extends Object implements java.io.Serializable {
             }
             
             // cruz
-            // Store the tags of the parent request of this Future. Use it case that an AutomaticContinuation must be created
             MessageTags oldTags = null;
             // --cruz
+            
             Future future = (futuresToUpdate.get(0));
             if (future != null) {
-            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ future.getFutureID().getID()+"], oldTags: "+ future.getTags());
-                oldTags = future.getParentTags();
+            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+"] Found FutureProxy ["+ future.getFutureID().getID()+"], creator ["+ future.getFutureID().getCreatorID() +"] tags: "+ future.getTags() + " parentTags: "+ future.getParentTags() );
+                // old tags are used to set the Automatic Continuations that can be created from the Future value received
+            	// if the result does not contain the final value, the tags of the incoming future are replaced by those of this Future (which will be removed)
+            	oldTags = future.getParentTags();
+                // The way to recognize an orphan value is because the method receiveFutureValue() is called with reply==null  (from this.receiveFuture)
+            	// If that is changed, this will not work.
+                if(reply == null) {
+                	future.setFromOrphan(true);
+                }
             	future.receiveReply(result);
             }
 
@@ -325,6 +328,9 @@ public class FuturePool extends Object implements java.io.Serializable {
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
                     logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID().getID()+"]");
+                    if(reply ==null) {
+                    	otherFuture.setFromOrphan(true);
+                    }
                     otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
                 }
                 setCopyMode(false);
@@ -366,10 +372,9 @@ public class FuturePool extends Object implements java.io.Serializable {
                     // add the deepcopied AC
                     
                     //cruz: reply.getMethodName() was null
-                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Adding AC for method ["+ reply.getMethodName()+"], with (old)tags "+ oldTags);
+                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+"] Adding AC for method ["+ reply.getMethodName()+"], with tags "+ oldTags);
                     // Here is when an Automatic Continuation is created. 
                     // Then, I can change the tags in the reply and copy the tags of the FutureProxy I'm updating
-                    
                     /*queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
                         newResult, psm, true, reply.getTags())));*/                    
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
@@ -399,14 +404,14 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+/*" ..." + ownerBody.getID() +*/ "] New Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sender ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] --> FutureMap.receiveFuture. Tags:"+ futureObject.getTags() + " PARENTTags "+ futureObject.getParentTags() );
+    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+"] New Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sender ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] --> FutureMap.receiveFuture. Tags:"+ futureObject.getTags() + " PARENTTags "+ futureObject.getParentTags() );
     	futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         if (valuesForFutures.get("" + id + creatorID) != null) {
             try {
-            	logger.debug("[FuturePool ] receiveFuture (previously arrived). Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveFutureValue ["+ futureObject.getFutureID().getID() +"]");
+            	logger.debug("[FuturePool ] receiveFuture (previously arrived). Owner: ["+ownerBody.getName()+"] Calling receiveFutureValue ["+ futureObject.getFutureID().getID() +"] creator ["+ futureObject.getFutureID().getCreatorID() +"]");
                 this.receiveFutureValue(id, creatorID, valuesForFutures.remove("" + id + creatorID), null);
             } catch (java.io.IOException e) {
                 e.printStackTrace();
@@ -721,10 +726,10 @@ public class FuturePool extends Object implements java.io.Serializable {
                         toSend = reply;
                     }
 
-                    FuturePool.this.logger.debug("[ACService  ] doAC Owner: ["+FuturePool.this.ownerBody.getID()+"] Reply for ["+ reply.getMethodName()+"] dest:["+dest.getID()+"] tags:"+reply.getTags() );
+                    FuturePool.logger.debug("[ACService  ] doAC Owner: ["+FuturePool.this.ownerBody.getID()+"] Reply for ["+ reply.getMethodName()+"] dest:["+dest.getID()+"] tags:"+reply.getTags() );
                     
                     //cruz
-                    // before sending I could send a notification that I'm executing and AC.
+                    //send a notification that I'm executing and AC.
                     Body body = FuturePool.this.getOwnerBody();
                     if(body != null) {
                         UniqueID bodyId = body.getID();
@@ -748,6 +753,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                             		mbean.sendNotification(NotificationType.realReplySent, data);
                             	}
                             }
+                            FuturePool.CMlogger.debug("REAL REPLY SENT (doAC) from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
                         }
                     }
                     //--cruz

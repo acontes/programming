@@ -53,6 +53,7 @@ import javax.management.MBeanServer;
 import javax.management.NotCompliantMBeanException;
 import javax.management.ObjectName;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.util.Fractal;
@@ -151,6 +152,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
     //
     // -- STATIC MEMBERS -----------------------------------------------
     //
+	private static Logger CMlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 
     //
     // -- PROTECTED MEMBERS -----------------------------------------------
@@ -680,19 +682,6 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
                     tagNotification);
                 mbean.sendNotification(NotificationType.replySent, data);
-
-                // if I'm sending the actual result, instead of something that contains Futures, notify it
-            	if( !PAFuture.isAwaited(reply.getResult().getResultObjet()) ) {
-//            		String tagNotification2 = createTagNotification(request.getTags());
-//                    RequestNotificationData data2 = new RequestNotificationData(request.getSourceBodyID(), request
-//                            .getSenderNodeURL(), BodyImpl.this.bodyID, BodyImpl.this.nodeURL, request
-//                            .getMethodName(), getRequestQueue().size(), request.getSequenceNumber(),
-//                        tagNotification2);
-//                    mbean.sendNotification(NotificationType.realReplySent, data2);
-                    //ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).debug("--------------------------------------> id = "+ BodyImpl.this.getName() +" ... Will try to send the REAL REPLY (bodyImpl), parentTags="+request.getTags());
-            	} else {
-            		//ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).debug("--------------------------------------> id = "+ BodyImpl.this.getName() +" ... REAL REPLY NOT ready yet (bodyImpl), parentTags="+request.getTags());
-            	}
             }
             //--cruz
 
@@ -859,6 +848,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                                     .getSequenceNumber(), tagNotification));
 //                    }
 //                }
+                        BodyImpl.CMlogger.debug("REQUEST SENT (ReplyImpl) from ["+ this.getName() +"] to ["+ destinationBody.getID() +"], tags "+ tags);
             }
 
             // END JMX Notification
