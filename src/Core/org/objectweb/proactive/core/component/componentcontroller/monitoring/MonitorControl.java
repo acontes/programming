@@ -76,8 +76,8 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
 	@Override
 	public void resetMonitoring() {
-		// TODO reset
-
+		this.logHandler.reset();
+		this.eventControl.reset();
 	}
 
 	@Override
@@ -108,7 +108,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	
 	// TODO
 	public List<ComponentRequestID> getListOfRequestIDs() {
-		return null;
+		return logHandler.getListOfRequestIDs();
 	}
 
 	// TODO
@@ -121,6 +121,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     	return null;
     }
 
+    public List<String> getNotificationsReceived() {
+    	return eventControl.getNotifications();
+    }
 	
 	
 	//----------------------------------------------------------------------------------------

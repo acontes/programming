@@ -1,13 +1,19 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.management.Notification;
 import javax.management.NotificationListener;
+import javax.management.remote.JMXConnector;
+import javax.management.remote.JMXConnectorFactory;
+import javax.management.remote.JMXServiceURL;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -20,12 +26,15 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
+import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
+import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.FutureNotificationData;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
 import org.objectweb.proactive.core.jmx.notification.RequestNotificationData;
 import org.objectweb.proactive.core.jmx.util.JMXNotificationManager;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
+import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -60,33 +69,67 @@ public class EventListener extends AbstractProActiveComponentController implemen
 	/** Name of the component monitored by this listener */
 	private String monitoredComponentName;
 	
+	/** This is just for debugging. I want to know if this guy received all the notifications I sent */
+	private List<String> notificationStore = null;
+	
 	private boolean started = false;
 	
 	public EventListener() {
 		super();
 		
 	}
-	
+	/*
 	public void init() {
 		logger.debug("[EventListener] Init ...");
 		jmxNotificationManager = JMXNotificationManager.getInstance();
-	}
+	}*/
 	
 	public void start() {
 		if(!started) {
 			logger.debug("[EventListener] Starting Monitoring for component ["+ monitoredComponentName + "]");
+			if(notificationStore == null) {
+				notificationStore = new ArrayList<String>();
+			}
 			try {
             	// subscribes this class as a listener to JMX notifications from the BodyWrapperMBean
             	// from the AO implementing this Component
                 if(jmxNotificationManager == null) {
                 	jmxNotificationManager = JMXNotificationManager.getInstance();
                 }
+                                
 				jmxNotificationManager.subscribe(FactoryName.createActiveObjectName(monitoredBodyID), this, FactoryName.getCompleteUrl(runtimeURL));
             } catch (IOException e) {
                 throw new ProActiveRuntimeException("JMX subscription for the MonitorController has failed", e);
             }
             started = true;
-            logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);		
+            logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);
+//            System.out.println("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL+" @ " +FactoryName.getJMXServerName(runtimeURL) + " ... " + FactoryName.getJMXServerName(runtimeURL));
+            
+            // trying to find lost JMX Notifications (but it's not so important now)
+//            ConnectionTest ct = new ConnectionTest();
+//            JMXServiceURL jmxUrl = null;
+//            String url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(FactoryName.getCompleteUrl(runtimeURL)),
+//                    ProActiveJMXConstants.SERVER_REGISTERED_NAME+"_"+FactoryName.getJMXServerName(runtimeURL), "service:jmx:proactive",
+//                    URIBuilder.getPortNumber(FactoryName.getCompleteUrl(runtimeURL))).toString();
+//            System.out.println("URL: "+ url);
+//            try {
+//				jmxUrl = new JMXServiceURL(url);
+//			} catch (MalformedURLException e1) {
+//				// TODO Auto-generated catch block
+//				e1.printStackTrace();
+//			}
+//			System.out.println("JMXServiceURL = "+ jmxUrl);
+//
+//            JMXConnector connector = null;
+//            try {
+//				connector = JMXConnectorFactory.connect(jmxUrl, ProActiveJMXConstants.PROACTIVE_JMX_ENV);
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//			}
+//            if(connector != null) {
+//            	connector.addConnectionNotificationListener(ct, null, null);
+//            }
+//            System.out.println("-----------------------------------------------------------------------------------");
 		}
 	}
 	
@@ -113,6 +156,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" SeqNumber: " + data.getSequenceNumber() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
+            notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][requestRecv] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
             processRequestReceived(notification);
         }
 		// Handling for SERVING STARTED
@@ -156,6 +200,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" SeqNumber: " + data.getSequenceNumber() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
+            notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][requestSent] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
             processRequestSent(notification);
         } 
 		// TODO Handling for REPLY RECEIVED
@@ -201,6 +246,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" SeqNumber: " + data.getSequenceNumber() +
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
+            notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][RRreplyRecv] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
             processRealReplyReceived(notification);
         }
 		// TODO
@@ -245,6 +291,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
         			" SeqNumber: " + data.getSequenceNumber() +
         			" NotifSeqNbr: " + notification.getSequenceNumber() +
         			" Tags: " + data.getTags());
+        	notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][RRreplySent] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
         	processRealReplySent(notification);
         	
         }
@@ -570,6 +617,14 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	
     	return null;
     }
+    
+    public List<String> getNotifications() {
+    	return notificationStore;
+    }
+    
+    public void reset() {
+    	notificationStore.clear();
+    }
 
 	@Override
 	public void bindFc(String cItf, Object sItf)
@@ -604,5 +659,15 @@ public class EventListener extends AbstractProActiveComponentController implemen
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
 	
+	
+}
+
+class ConnectionTest implements NotificationListener {
+
+	@Override
+	public void handleNotification(Notification notification, Object handback) {
+		System.out.println("+++++++++++++++++++++++++++++++++++++++ Notification: "+ notification);
+		
+	}
 	
 }

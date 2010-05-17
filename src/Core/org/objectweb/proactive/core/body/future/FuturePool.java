@@ -315,6 +315,16 @@ public class FuturePool extends Object implements java.io.Serializable {
                 if(reply == null) {
                 	future.setFromOrphan(true);
                 }
+                // another possibility is that this Value was about to be orphan, but was lucky enough to have the Future arrive to the map in time
+                // the bad thing is that the Future that arrived to the map was not processed before and their tags are incorrect, so a wrong REAL REPLY NOTIFICATION
+                // will be created.
+                // The option is to ignore, as the correct notification will be generated afterwards by the Future update mechanism
+                // The to recognize it is that the tags of the incoming reply are different than the values of the Future found
+                if(reply != null) {
+                	if(!reply.getTags().equals(future.getTags())) {
+                		future.setIgnoreNotification(true);
+                	}
+                }
             	future.receiveReply(result);
             }
 
@@ -391,7 +401,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         	// In that case, as the corresponding Future has already been updated, there's no update to wait for.
         	// In this implementation, it seems that the awaited case is when the update arrives before the Future.
         	logger.debug("[FuturePool ] receiveFutureValue. Reply arrived, and there's no future to update. (ORPHAN)");
-        	
+        	CMlogger.debug("[FuturePool ] ORPHAN reply received for Future "+ id + ", from "+ creatorID);
             // we have to store the result received by AC until future arrive
             this.valuesForFutures.put("" + id + creatorID, result);
             // OR this reply might be an orphan reply (return value is ignored if not)
@@ -753,7 +763,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                             		mbean.sendNotification(NotificationType.realReplySent, data);
                             	}
                             }
-                            FuturePool.CMlogger.debug("REAL REPLY SENT (doAC) from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
+                            FuturePool.CMlogger.debug("REAL REPLY SENT (doAC) ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
                         }
                     }
                     //--cruz

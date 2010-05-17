@@ -801,6 +801,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
         jmxNotificationManager = JMXNotificationManager.getInstance();
     }
 
+    /** Monitoring Framework Extension */
 	@Override
 	public List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfRequestIDs() {
 		// TODO Auto-generated method stub
@@ -827,6 +828,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 
 	@Override
 	public Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, RequestRecord> getRequestLog() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<String> getNotificationsReceived() {
 		// TODO Auto-generated method stub
 		return null;
 	}

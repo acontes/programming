@@ -148,6 +148,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private MessageTags tags;
     private MessageTags parentTags;
     private transient boolean fromOrphan = false;
+    private transient boolean ignoreNotification = false;
     //--cruz
     
     //
@@ -241,7 +242,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         
         
-        logger.debug("[FutureProxy] receiveReply. This: ID[" + this.getID()+ "], MethodCallResult type: ["+resultTypeName+"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"] FutureTags "+ this.getTags() + ", FutureParentTargs "+ this.getParentTags() );
+        logger.debug("[FutureProxy] receiveReply. This: ID[" + this.getID()+ "], SenderID ["+ senderID +"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"] FutureTags "+ this.getTags() + ", FutureParentTargs "+ this.getParentTags() );
         
         if(isAwaited(target.getResult())) {       	
         	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy, so he will know how to generate (later) the realReplyReceived notification
@@ -265,7 +266,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         	// A subsequent call to receiveReply will send the notification.
         	// This relies on the fact that the reception of orphans is done by calling FuturePool.receiveFutureValue with reply==null.
         	// If that is changed, this is not guaranteed to work properly.
-    		if(body != null && !fromOrphan) {
+        	// 
+    		if(body != null && !fromOrphan && !ignoreNotification) {
     			// if it's a half body, it won't have an mbean to send notifications
     			BodyWrapperMBean mbean = body.getMBean();
     			if(mbean != null) {
@@ -277,14 +279,19 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     						this.methodName, -1, this.id.getID(),
     						tagNotification);
     				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
-            		CMlogger.debug("REAL REPLY RECEIVED (FutureProxy) in ["+ body.getName() +" tags "+ this.getTags());
+            		CMlogger.debug("REAL REPLY RECEIVED (FutureProxy) ["+id.getID()+"] in ["+ body.getName() +"] tags "+ this.getTags() + " sent to mbean ["+ mbean.getName() +"]");
     			}
     			else {
-    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) in ["+ body.getName() +" tags "+ this.getTags());
+    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --no mbean-- ["+id.getID()+"] in ["+ body.getName() +" tags "+ this.getTags());
     			}
     		}
-    		else if (fromOrphan) {
-    			CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value-- in ["+ body.getName() +" tags "+ this.getTags());
+    		else if(body != null) {
+    			if (fromOrphan) {
+    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
+    			}
+    			else if(ignoreNotification) {
+    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --different tags-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
+    			}
     		}
         }
         // -- cruz
@@ -373,8 +380,11 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     public synchronized void waitFor(long timeout) throws ProActiveTimeoutException {
         if (isAvailable()) {
         	// may I say here that the Real Reply has arrived?
-        	// Yes, but it is not necessarily the moment when the Reply arrived. It may have arrived a long time before,
-        	// and we will get here on each call, for example, to "getResult"
+        	// Yes, but it is not necessarily the moment when the Reply arrived. It may have arrived a long time before, because it is anothe
+        	// thread who updates it (the sender of the value, or an ACThread)
+        	// Moreover, we will get here on each call, for example, to "getResult" (tough this specific case could be solved with a boolean)
+        	
+        	// This is the place where I am using it, but no necessarily the moment when it arrived.
             return;
         }
 
@@ -434,12 +444,15 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         if(target.getResult() != null) {
         	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags() );
+        	//CMlogger.debug("[FutureProxy] +++++++> DEFINITIVE REPLY RECEIVED (waitFor.futureUpdated) ... ID:["+ id.getID() + "] in ["+(body==null?"---":body.getName())+"] method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
         }
         // if it is the final result, I could check here too... for the REAL REPLY RECEIVED ...
         // The problem is that this method is not always called. If the result was already available, then the call never arrived to this place.
         
         // This is the place to detect WaitByNecessity, but not the place if we want to detect all Future updates,
         // because, if the value is already available, the execution will not arrive to this place.
+        
+    	// This is the place where I am using the value (if it is not awaited), but no necessarily the moment when it arrived.
 
         // END JMX Notification
         if (Profiling.TIMERS_COMPILED) {
@@ -578,7 +591,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                     } else {
                         // its not a copy and not a continuation: wait for the result
                         this.waitFor();
-                        logger.debug("-------------------> [FutureProxy].writeObj. body["+sender.getName()+"]Real? should be TRUE" );
+                        logger.debug("-------------------> [FutureProxy].writeObj, after waiting. Body["+sender.getName()+"]Real? should be TRUE" );
 
                     }
                 }
@@ -763,6 +776,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     
     public void setFromOrphan(boolean b) {
     	fromOrphan = b;
+    }
+    
+    public boolean isIgnoreNotification() {
+    	return this.ignoreNotification;
+    }
+    
+    public void setIgnoreNotification(boolean b) {
+    	ignoreNotification = b;
     }
 
 }

@@ -39,4 +39,9 @@ public interface LogHandler {
 	Map<ComponentRequestID, RequestRecord> getRequestLog();
 	Map<ComponentRequestID, CallRecord> getCallLog();
 	
+	// clean the logs
+	void reset();
+	
+	public List<ComponentRequestID> getListOfRequestIDs();
+	
 }

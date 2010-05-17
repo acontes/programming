@@ -1,10 +1,12 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
@@ -184,6 +186,21 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		// copy all entries of the log
 		requestRecords.putAll(requestLog);
 		return requestRecords;
+	}
+
+	@Override
+	public void reset() {
+		requestLog.clear();
+		callLog.clear();
+	}
+	
+	
+	public List<ComponentRequestID> getListOfRequestIDs() {
+		Set<ComponentRequestID> keyset = requestLog.keySet();
+		List<ComponentRequestID> keylist = new ArrayList<ComponentRequestID>(keyset.size());
+		keylist.addAll(keyset);
+		//Collections.sort(keylist);
+		return keylist;
 	}
     
 }
