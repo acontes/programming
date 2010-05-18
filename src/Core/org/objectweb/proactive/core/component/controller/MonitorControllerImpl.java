@@ -837,4 +837,8 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	public void setPALogging(boolean b) {
+		
+	}
 }

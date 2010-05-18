@@ -280,17 +280,21 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     						tagNotification);
     				mbean.sendNotification(NotificationType.realReplyReceived, requestNotificationData);
             		CMlogger.debug("REAL REPLY RECEIVED (FutureProxy) ["+id.getID()+"] in ["+ body.getName() +"] tags "+ this.getTags() + " sent to mbean ["+ mbean.getName() +"]");
+            		//System.out.println("REAL REPLY RECEIVED (FutureProxy) ["+id.getID()+"] in ["+ body.getName() +"] tags "+ this.getTags() + " sent to mbean ["+ mbean.getName() +"]");
     			}
     			else {
     				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --no mbean-- ["+id.getID()+"] in ["+ body.getName() +" tags "+ this.getTags());
+    				//System.out.println("NOT SENT REAL REPLY RECEIVED (FutureProxy) --no mbean-- ["+id.getID()+"] in ["+ body.getName() +" tags "+ this.getTags());
     			}
     		}
     		else if(body != null) {
     			if (fromOrphan) {
     				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
+    				//System.out.println("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
     			}
     			else if(ignoreNotification) {
     				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --different tags-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
+    				//System.out.println("NOT SENT REAL REPLY RECEIVED (FutureProxy) --different tags-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
     			}
     		}
         }
@@ -416,7 +420,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 						tagNotification);
 				mbean.sendNotification(NotificationType.requestWbN, requestNotificationData);
 		        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
-		        CMlogger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
+		        //System.out.println("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
             }
         }
 
@@ -444,7 +448,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         if(target.getResult() != null) {
         	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags() );
-        	//CMlogger.debug("[FutureProxy] +++++++> DEFINITIVE REPLY RECEIVED (waitFor.futureUpdated) ... ID:["+ id.getID() + "] in ["+(body==null?"---":body.getName())+"] method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
+        	//System.out.println("[FutureProxy] +++++++> DEFINITIVE REPLY RECEIVED (waitFor.futureUpdated) ... ID:["+ id.getID() + "] in ["+(body==null?"---":body.getName())+"] method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
         }
         // if it is the final result, I could check here too... for the REAL REPLY RECEIVED ...
         // The problem is that this method is not always called. If the result was already available, then the call never arrived to this place.

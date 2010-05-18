@@ -157,6 +157,6 @@ public interface MonitorController {
     Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, CallRecord> getCallLog();
     
     List<String> getNotificationsReceived(); 
-    
-    
+	
+    public void setPALogging(boolean b);
 }

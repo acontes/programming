@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
@@ -180,6 +181,17 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	@Override
 	public Map<ComponentRequestID, RequestRecord> getRequestLog() {
 		return logHandler.getRequestLog();
+	}
+	
+	public void setPALogging(boolean b) {
+		if(b) {
+			ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).setLevel(Level.DEBUG);
+			ProActiveLogger.getLogger(Loggers.FUTURE).setLevel(Level.DEBUG);
+		}
+		else {
+			ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).setLevel(Level.INFO);
+			ProActiveLogger.getLogger(Loggers.FUTURE).setLevel(Level.INFO);
+		}
 	}
 	
 
