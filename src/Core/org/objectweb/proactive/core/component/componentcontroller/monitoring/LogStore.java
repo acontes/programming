@@ -166,7 +166,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
     				" Arr: " + rs.getArrivalTime() + " Serv: " + rs.getServingStartTime() + " Repl: " + rs.getReplyTime() +
     				" WQ: " + (rs.getServingStartTime()-rs.getArrivalTime()) + 
     				" SRV: " + (rs.getReplyTime()-rs.getServingStartTime()) +
-    				" TOT: "+ (rs.getReplyTime() - rs.getArrivalTime()));	
+    				" TOT: "+ (rs.getReplyTime() - rs.getArrivalTime()));
     	}
     }
 

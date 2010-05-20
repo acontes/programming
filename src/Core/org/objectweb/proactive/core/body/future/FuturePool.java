@@ -128,10 +128,10 @@ public class FuturePool extends Object implements java.io.Serializable {
     // this table is used to register destination before sending.
     // So, a future could retreive its destination during serialization
     // this table indexed by the thread which perform the registration.
-    static private ThreadLocal<ArrayList<UniversalBody>> bodiesDestination;
+    static private ThreadLocal<ArrayList<BodiesAndTags>> bodiesDestination;
 
     // to register in the table
-    static public void registerBodiesDestination(ArrayList<UniversalBody> dests) {
+    static public void registerBodiesDestination(ArrayList<BodiesAndTags> dests) {
         bodiesDestination.set(dests);
     }
 
@@ -141,7 +141,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     }
 
     // to get a destination
-    static public ArrayList<UniversalBody> getBodiesDestination() {
+    static public ArrayList<BodiesAndTags> getBodiesDestination() {
         return bodiesDestination.get();
     }
 
@@ -163,7 +163,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     static public ArrayList<Future> getIncomingFutures() {
         return (incomingFutures.get());
     }
-
+    
     // body forwarders
 
     // map of threads that are running a body forwarder
@@ -185,7 +185,7 @@ public class FuturePool extends Object implements java.io.Serializable {
     }
 
     static {
-        bodiesDestination = new ThreadLocal<ArrayList<UniversalBody>>();
+        bodiesDestination = new ThreadLocal<ArrayList<BodiesAndTags>>();
         incomingFutures = new ThreadLocal<ArrayList<Future>>() {
             @Override
             protected synchronized ArrayList<Future> initialValue() {
@@ -319,17 +319,19 @@ public class FuturePool extends Object implements java.io.Serializable {
                 // the bad thing is that the Future that arrived to the map was not processed before and their tags are incorrect, so a wrong REAL REPLY NOTIFICATION
                 // will be created.
                 // The option is to ignore, as the correct notification will be generated afterwards by the Future update mechanism
-                // The to recognize it is that the tags of the incoming reply are different than the values of the Future found
+                // The way to recognize it is that the tags of the incoming reply are different than the values of the Future found
                 if(reply != null) {
                 	String replyTags = "";
                 	String futureTags = "";
                 	if(reply.getTags() != null) replyTags = reply.getTags().toString();
                 	if(future.getTags() != null) futureTags = future.getTags().toString();
                 	if(!replyTags.equals(futureTags)) {
-                			logger.debug("[FuturePool ] Will ignore possible RR notification. ReplyTags "+ reply.getTags() + " futureTags "+ future.getTags());
-                			future.setIgnoreNotification(true);
-                		}
-                	
+                		logger.debug("[FuturePool ] Will ignore possible RR notification. ReplyTags "+ reply.getTags() + " futureTags "+ future.getTags());
+                		future.setIgnoreNotification(true);
+                	}
+                	// if the reply didn't arrive from an orphan, use the tags from the reply in an eventual notification
+                	logger.debug("[FuturePool ] Setting tags of ["+future.getID()+"] to tags of the reply "+reply.getTags());
+                	future.setTags(reply.getTags());
                 }
             	future.receiveReply(result);
             }
@@ -344,7 +346,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
                     logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID().getID()+"]");
-                    if(reply ==null) {
+                    if(reply == null) {
                     	otherFuture.setFromOrphan(true);
                     }
                     otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
@@ -357,7 +359,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
             // 2) create and put ACservices
             if (this.registerACs) {
-                ArrayList<UniversalBody> bodiesToContinue = (ArrayList<UniversalBody>) (futures
+                ArrayList<BodiesAndTags> bodiesToContinue = (ArrayList<BodiesAndTags>) (futures
                         .getAutomaticContinuation(id, creatorID).clone());
                 if ((bodiesToContinue != null) && (bodiesToContinue.size() != 0)) {
                     ProActiveSecurityManager psm = ((AbstractBody) PAActiveObject.getBodyOnThis())
@@ -394,7 +396,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     /*queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
                         newResult, psm, true, reply.getTags())));*/                    
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
-                            newResult, psm, true, oldTags )));
+                            newResult, psm, true, oldTags ))); // now the tags created here don't care, because they're updated in doAutomaticContinuation
                     //--cruz
                 }
             }
@@ -403,9 +405,6 @@ public class FuturePool extends Object implements java.io.Serializable {
             return ftres;
         } else {
         	// one way for an orphan reply to arrive, is that the reply has arrived through another.
-        	// The Future may have arrived to the caller, f.e. in the case of a request that travels through a Composite AO.
-        	// In that case, as the corresponding Future has already been updated, there's no update to wait for.
-        	// In this implementation, it seems that the awaited case is when the update arrives before the Future.
         	logger.debug("[FuturePool ] receiveFutureValue. Reply arrived, and there's no future to update. (ORPHAN)");
         	CMlogger.debug("[FuturePool ] ORPHAN reply received for Future "+ id + ", from "+ creatorID);
             // we have to store the result received by AC until future arrive
@@ -441,8 +440,8 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the body which creates futureObject
      * @param bodyDest body destination of this continuation
      */
-    public void addAutomaticContinuation(FutureID id, UniversalBody bodyDest) {    	
-    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"] ID[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getID() + "]");
+    public void addAutomaticContinuation(FutureID id, BodiesAndTags bodyDest) {    	
+    	logger.debug("[FuturePool ] addAutomaticContinuation Owner: ["+ownerBody.getName()+"] ID[" + id.getID() +"] creator: ["+ id.getCreatorID() +"] bodyDest ["+ bodyDest.getBody().getID() + "] + destTags ["+ bodyDest.getTags() +"]");
         futures.addAutomaticContinuation(id.getID(), id.getCreatorID(), bodyDest);
     }
 
@@ -469,7 +468,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * To register a destination before sending a reques or a reply
      * Registration key is the calling thread.
      */
-    public void registerDestinations(ArrayList<UniversalBody> dests) {
+    public void registerDestinations(ArrayList<BodiesAndTags> dests) {
         if (registerACs) {
             FuturePool.registerBodiesDestination(dests);
         }
@@ -699,7 +698,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      */
     private class ACService implements java.io.Serializable {
         // bodies that have to be updated
-        private ArrayList<UniversalBody> dests;
+        private ArrayList<BodiesAndTags> dests;
 
         // reply to send
         private Reply reply;
@@ -707,7 +706,7 @@ public class FuturePool extends Object implements java.io.Serializable {
         //
         // -- CONSTRUCTORS -----------------------------------------------
         //
-        public ACService(ArrayList<UniversalBody> dests, Reply reply) {
+        public ACService(ArrayList<BodiesAndTags> dests, Reply reply) {
             this.dests = dests;
             this.reply = reply;
         }
@@ -726,8 +725,13 @@ public class FuturePool extends Object implements java.io.Serializable {
                         .getBodyOnThis()).getProActiveSecurityManager()) : null;
 
                 for (int i = 0; i < dests.size(); i++) {
-                    UniversalBody dest = (dests.get(i));
-
+                	//cruz
+                	// use the tags corresponding to the destination when creating the reply
+                    UniversalBody dest = (dests.get(i).getBody());
+                    MessageTags tags = (dests.get(i).getTags());
+                    reply.setTags(tags);
+                    //--cruz
+                    
                     // FAULT-TOLERANCE
                     FTManager ftm = ((AbstractBody) FuturePool.this.getOwnerBody()).getFTManager();
 
@@ -735,7 +739,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                         // create a new reply to keep the original copy unchanged for next sending ... 
                     	//cruz: reply.getMethodName() was previously set to null
                         toSend = new ReplyImpl(reply.getSourceBodyID(), reply.getSequenceNumber(), reply.getMethodName(),
-                            reply.getResult(), psm, true, reply.getTags());
+                            reply.getResult(), psm, true, reply.getTags()); 
                         //--cruz
                     } else {
                         // last sending : the original can be sent

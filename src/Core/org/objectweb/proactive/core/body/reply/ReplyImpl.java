@@ -190,18 +190,18 @@ public class ReplyImpl extends MessageImpl implements Reply, Serializable {
             	//System.out.println("REAL REPLY SENT (ReplyImpl) from ["+ body.getName() +"] to ["+ destinationBody.getID() +"], sequenceNumber ["+ this.getSequenceNumber() +"] tags "+ this.getTags());
             }
             else {
-            	CMlogger.debug("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --no mbean-- from ["+ body.getName() +"] sequenceNumber ["+ this.getSequenceNumber() );    	
+            	CMlogger.debug("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --no mbean-- from ["+ body.getName() +"] sequenceNumber ["+ this.getSequenceNumber() + "]" );    	
             	//System.out.println("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --no mbean-- from ["+ body.getName() +"] sequenceNumber ["+ this.getSequenceNumber() );
             }
         }
         else {
         	Body body=LocalBodyStore.getInstance().getLocalBody(this.getSourceBodyID());
         	if(isAC) {
-        		CMlogger.debug("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --is AC-- from ["+ (body==null?"---":body.getName()) +"] sequenceNumber ["+ this.getSequenceNumber() );
+        		CMlogger.debug("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --is AC-- from ["+ (body==null?"---":body.getName()) +"] sequenceNumber ["+ this.getSequenceNumber() + "]");
         		//System.out.println("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --is AC-- from ["+ (body==null?"---":body.getName()) +"] sequenceNumber ["+ this.getSequenceNumber() );
         	}
         	if(awaited) {
-        		CMlogger.debug("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --awaited-- from ["+ (body==null?"---":body.getName()) +"] sequenceNumber ["+ this.getSequenceNumber() );
+        		CMlogger.debug("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --awaited-- from ["+ (body==null?"---":body.getName()) +"] sequenceNumber ["+ this.getSequenceNumber() + "]");
         		//System.out.println("+++++++++> Notification REAL REPLY NOT SENT (ReplyImpl) --awaited-- from ["+ (body==null?"---":body.getName()) +"] sequenceNumber ["+ this.getSequenceNumber() );
         	}
         }

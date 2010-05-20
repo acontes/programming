@@ -589,7 +589,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
                     if (continuation) {
                         /* The written future will be updated by the writing body */
                         writtenUpdater = PAActiveObject.getBodyOnThis();
-                        for (UniversalBody dest : FuturePool.getBodiesDestination()) {
+                        for (BodiesAndTags dest : FuturePool.getBodiesDestination()) {
                             sender.getFuturePool().addAutomaticContinuation(id, dest);
                         }
                     } else {

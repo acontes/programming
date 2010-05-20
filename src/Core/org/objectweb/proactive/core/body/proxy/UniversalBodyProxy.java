@@ -58,6 +58,7 @@ import org.objectweb.proactive.core.body.MetaObjectFactory;
 import org.objectweb.proactive.core.body.SendingQueue;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
+import org.objectweb.proactive.core.body.future.BodiesAndTags;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
@@ -466,8 +467,8 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
             this.universalBody = newBody;
             this.isLocal = LocalBodyStore.getInstance().getLocalBody(getBodyID()) != null;
         }
-        ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-        destinations.add(this.universalBody.getRemoteAdapter());
+        ArrayList<BodiesAndTags> destinations = new ArrayList<BodiesAndTags>();
+        destinations.add(new BodiesAndTags(this.universalBody.getRemoteAdapter()));
         sourceBody.getFuturePool().registerDestinations(destinations);
 
         // Modify result object

@@ -65,8 +65,8 @@ public class ReplyReceiverImpl implements ReplyReceiver, java.io.Serializable {
     			awaited = PAFuture.isAwaited(res);
     		}
     	}
-    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "], isAwaited? "+ awaited);
-    	futureLogger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "], isAwaited? "+ awaited);
+    	logger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "], isAwaited? "+ awaited + " tags "+ r.getTags());
+    	futureLogger.debug("[ReplyReceiv] receiveReply for Future ["+ r.getSequenceNumber()+"] from body ["+r.getSourceBodyID()+"] Receiver ["+ receiverBody +"] Method ["+ r.getMethodName() + "], isAwaited? "+ awaited + " tags "+ r.getTags());
     	
     	int a = futurePool.receiveFutureValue(r.getSequenceNumber(), r.getSourceBodyID(), r.getResult(), r);
     	return a;

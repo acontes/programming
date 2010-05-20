@@ -182,4 +182,8 @@ public class MessageImpl implements Message, java.io.Serializable {
         }
         return tags;
     }
+    
+    public void setTags(MessageTags tags) {
+    	this.tags = tags;
+    }
 }

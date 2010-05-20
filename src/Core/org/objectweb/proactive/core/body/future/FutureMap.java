@@ -76,7 +76,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param creatorID UniqueID of the creator body of the future
      * @param bodyDest body which receives the future (id, bodyID)
      */
-    public synchronized void addAutomaticContinuation(long id, UniqueID creatorID, UniversalBody bodyDest) {
+    public synchronized void addAutomaticContinuation(long id, UniqueID creatorID, BodiesAndTags bodyDest) {
     	
     	java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(creatorID));
         if (indexedByID == null) {
@@ -149,9 +149,9 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param id sequence id of the future
      * @param bodyID UniqueID of the creator body of the future
      */
-    public synchronized ArrayList<UniversalBody> getAutomaticContinuation(long id, UniqueID bodyID) {
+    public synchronized ArrayList<BodiesAndTags> getAutomaticContinuation(long id, UniqueID bodyID) {
         java.util.HashMap<Long, FuturesAndACs> indexedByID = (indexedByBodyID.get(bodyID));
-        ArrayList<UniversalBody> result = null;
+        ArrayList<BodiesAndTags> result = null;
         if (indexedByID != null) {
             FuturesAndACs listes = indexedByID.get(Long.valueOf(id));
             if (listes != null) {
@@ -228,7 +228,7 @@ public class FutureMap extends Object implements java.io.Serializable {
         private ArrayList<Future> futures;
 
         // destinations of ACs if any
-        private ArrayList<UniversalBody> destinationsAC;
+        private ArrayList<BodiesAndTags> destinationsAC;
 
         /**
          * Create a FuturesAndACs
@@ -236,7 +236,7 @@ public class FutureMap extends Object implements java.io.Serializable {
          */
         public FuturesAndACs(boolean isACEnabled) {
             futures = new ArrayList<Future>();
-            destinationsAC = isACEnabled ? new ArrayList<UniversalBody>() : null;
+            destinationsAC = isACEnabled ? new ArrayList<BodiesAndTags>() : null;
         }
 
         /**
@@ -266,7 +266,7 @@ public class FutureMap extends Object implements java.io.Serializable {
          * Return the list of registred ACs, i.e. target bodies
          * @return the list of registred ACs, i.e. target bodies
          */
-        public ArrayList<UniversalBody> getDestinationsAC() {
+        public ArrayList<BodiesAndTags> getDestinationsAC() {
             return destinationsAC;
         }
 
@@ -274,7 +274,7 @@ public class FutureMap extends Object implements java.io.Serializable {
          * Register an AC
          * @param f the target body for the registred AC
          */
-        public void addDestinationsAC(UniversalBody d) {
+        public void addDestinationsAC(BodiesAndTags d) {
             this.destinationsAC.add(d);
         }
     }

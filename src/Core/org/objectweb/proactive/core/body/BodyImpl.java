@@ -69,6 +69,7 @@ import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.exceptions.InactiveBodyException;
 import org.objectweb.proactive.core.body.ft.protocols.FTManager;
 import org.objectweb.proactive.core.body.ft.service.FaultToleranceTechnicalService;
+import org.objectweb.proactive.core.body.future.BodiesAndTags;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.MethodCallResult;
@@ -686,8 +687,8 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             //--cruz
 
             // END JMX Notification
-            ArrayList<UniversalBody> destinations = new ArrayList<UniversalBody>();
-            destinations.add(request.getSender());
+            ArrayList<BodiesAndTags> destinations = new ArrayList<BodiesAndTags>();
+            destinations.add(new BodiesAndTags(request.getSender(), request.getTags()));
             this.getFuturePool().registerDestinations(destinations);
 
             // cruz: what is this part for?... why it has to "modify result object?",
@@ -818,10 +819,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 //TO CONSERVER: adds the tags of the Request to the local Future.
                 //This way it's possible to know which method is the Future waiting for, and generate
                 //the notification when the final reply arrives.
-                //    Also add the tags of the request that was being server (the parent Request).
+                //    Also add the tags of the request that was being served (the parent Request).
                 //    This way, when sending a reply (via AC) the server knows which request has been finished.  
                 future.setParentTags(LocalBodyStore.getInstance().getContext().getCurrentRequest().getTags());
                 future.setTags(tags);
+                
+                // add the tags to the destinations stored 
+                for(BodiesAndTags bt : FuturePool.getBodiesDestination()) {
+                	if(bt.getBody().getID() == destinationBody.getID() ) {
+                		bt.setTags(tags);
+                	}
+                }
                 this.futures.receiveFuture(future);
             }
 

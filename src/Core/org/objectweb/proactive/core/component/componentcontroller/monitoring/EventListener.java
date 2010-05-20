@@ -262,7 +262,8 @@ public class EventListener extends AbstractProActiveComponentController implemen
         			" SeqNumber: " + data.getSequenceNumber() +
         			" NotifSeqNbr: " + notification.getSequenceNumber() +
         			" Tags: " + data.getTags());
-        	processWaitByNecessity(notification);
+        	notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][WaitByNeces] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
+            processWaitByNecessity(notification);
         	
         }
 		// TODO
