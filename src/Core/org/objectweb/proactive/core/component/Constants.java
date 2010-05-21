@@ -67,6 +67,7 @@ public interface Constants {
     public final static String NAME_CONTROLLER = "name-controller";
     public final static String PRIORITY_CONTROLLER = "priority-controller";
     public final static String REQUEST_QUEUE_CONTROLLER = "request-queue-controller";
+    public final static String SCA_PROPERTY_CONTROLLER = "sca-property-controller";
     public final static String SUPER_CONTROLLER = "super-controller";
 
     public final static String FACTORY = "factory";

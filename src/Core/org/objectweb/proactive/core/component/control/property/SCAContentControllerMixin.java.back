@@ -1,0 +1,509 @@
+/***
+ * OW2 FraSCAti Tinfi
+ * Copyright (C) 2007-2010 INRIA, USTL
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * Contact: frascati@ow2.org
+ *
+ * Author: Lionel Seinturier
+ */
+
+package org.objectweb.proactive.core.component.control.property;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.control.NameController;
+import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.julia.Controller;
+import org.objectweb.fractal.julia.InitializationContext;
+import org.objectweb.fractal.julia.factory.ChainedInstantiationException;
+import org.osoa.sca.RequestContext;
+import org.osoa.sca.annotations.Destroy;
+import org.osoa.sca.annotations.Property;
+import org.ow2.frascati.tinfi.TinfiRuntimeException;
+import org.ow2.frascati.tinfi.control.component.ReconfigurableComponentContext;
+import org.ow2.frascati.tinfi.control.content.scope.CompositeScopeManager;
+import org.ow2.frascati.tinfi.control.content.scope.ConversationScopeManager;
+import org.ow2.frascati.tinfi.control.content.scope.RequestScopeManager;
+import org.ow2.frascati.tinfi.control.content.scope.ScopeManager;
+import org.ow2.frascati.tinfi.control.content.scope.StatelessScopeManager;
+import org.ow2.frascati.tinfi.control.property.SCAPropertyController;
+
+/**
+ * Mixin layer for implementing the {@link SCAContentController} interface.
+ * 
+ * @author Lionel Seinturier <Lionel.Seinturier@univ-lille1.fr>
+ */
+public abstract class SCAContentControllerMixin
+implements Controller, SCAContentController {
+    
+    // -------------------------------------------------------------------------
+    // Private constructor
+    // -------------------------------------------------------------------------
+
+    private SCAContentControllerMixin () {}
+
+    
+    // -------------------------------------------------------------------------
+    // Implementation of the Controller interface
+    // -------------------------------------------------------------------------
+
+    /**
+     * The metadata for the content class associated to the component controlled
+     * by the current controller.
+     */
+    private ContentClassMetaData ccmd;
+    
+    /**
+     * The scope manager for the component controlled by the current controller.
+     */
+    private ScopeManager sm;
+
+    /**
+     * Initialize the fields of this mixin and then calls the overriden method.
+     *
+     * @param ic information about the component to which this controller object
+     *      belongs.
+     * @throws InstantiationException if the initialization fails.
+     */
+    public void initFcController( final InitializationContext ic )
+    throws InstantiationException {
+        
+        /*
+         * Propagate the invocation to other mixin layers.
+         */
+        _super_initFcController(ic);
+        
+        /*
+         * Initialize this layer.
+         * Do it after the propagation in order for _this_XXX fields to be
+         * initialized.
+         */
+        Class<?> c = (Class<?>) ic.content;
+        try {
+            innerSetFcContentClassName(c);
+        }
+        catch (IllegalContentClassMetaData e) {
+            throw new ChainedInstantiationException(e,null,e.getMessage());
+        }
+    }
+  
+    /**
+     * Declare the content class which should be used.
+     * 
+     * This operation can only be performed if the component is stopped.
+     * This method is synchronized to prevent inconsistent concurrent changes.
+     * 
+     * @since 1.0
+     */
+    private synchronized void innerSetFcContentClassName( Class<?> c )
+    throws IllegalContentClassMetaData {
+        
+        /*
+         * Content class meta data and scope manager retrievals.
+         */
+        ccmd = ContentClassMetaData.get(c);
+        
+        if( ccmd.scope == null ||
+            ccmd.scope.value().toUpperCase().equals("STATELESS") ) {
+            
+            sm = new StatelessScopeManager(
+                _this_weaveableC, _this_weaveableSCAPC, _this_weaveableCompCtx,
+                _this_weaveableOptNC, ccmd );
+        }
+        else if( ccmd.scope.value().toUpperCase().equals("REQUEST") ) {
+            sm = new RequestScopeManager(
+                _this_weaveableC, _this_weaveableSCAPC, _this_weaveableCompCtx,
+                _this_weaveableOptNC, ccmd );
+        }
+        else if( ccmd.scope.value().toUpperCase().equals("COMPOSITE") ) {
+            sm = new CompositeScopeManager(
+                _this_weaveableC, _this_weaveableSCAPC, _this_weaveableCompCtx,
+                _this_weaveableOptNC, ccmd );
+        }
+        else if( ccmd.scope.value().toUpperCase().equals("CONVERSATION") ) {
+            sm = new ConversationScopeManager(
+                _this_weaveableC, _this_weaveableSCAPC, _this_weaveableCompCtx,
+                _this_weaveableOptNC, ccmd );
+        }
+        else {
+            String msg = "Unsupported scope: "+ccmd.scope.value();
+            throw new IllegalContentClassMetaData(msg);
+        }
+        
+        /*
+         * Initialize property names and types.
+         * 
+         * First, search in the @Property annotated elements (fields and
+         * setters.)
+         */
+        props = new HashMap<String,Class<?>>();
+        InjectionPointMap<Property> ipm = ccmd.props;
+        Set<String> ipnames = ipm.keySet();
+        for (String ipname : ipnames) {
+			InjectionPoint<Property> ip = ipm.get(ipname);
+			Class<?> type = ip.getType();
+			props.put(ipname,type);
+		}
+        
+        /*
+         * Second, search in the property values injected via the @Constructor
+         * annotated constructor.
+         */
+        Constructor<?> ctr = ccmd.constructorAnnotatedElement;
+        if( ctr != null ) {
+            
+            Class<?>[] ptypes = ctr.getParameterTypes();
+            org.osoa.sca.annotations.Constructor annot =
+                ctr.getAnnotation(org.osoa.sca.annotations.Constructor.class);
+            String[] values = annot.value();
+            
+        	// Check that @Constructor defines at least one non-empty value
+            // value() for @Constructor defaults to [""]
+            if( values.length > 1 || values[0].length() != 0 ) {
+                if( values.length != ptypes.length ) {
+                	String msg =
+                		"Annotation @Constructor and "+ctr.toString()+
+                		" should declare the same number of parameters";
+                	throw new IllegalContentClassMetaData(msg);
+                }
+                for (int i = 0; i < values.length; i++) {
+    				String value = values[i];
+    				Class<?> ptype = ptypes[i];
+    				props.put(value,ptype);
+    			}
+            }
+            
+            /*
+             * Third, search in the @Property annotated parameters of the
+             * @Constructor annotated constructor.
+             */
+            Annotation[][] psannots = ctr.getParameterAnnotations();            
+            for (int i = 0; i < ptypes.length; i++) {
+            	// By definition, ptypes.length == psannots.length
+				Class<?> ptype = ptypes[i];
+				Annotation[] pannots = psannots[i];
+                for (Annotation pannot : pannots) {
+                    if( pannot instanceof Property ) {
+                        Property prop = (Property) pannot;
+                        String propname = prop.name();
+                        props.put(propname,ptype);
+                    }
+                }
+			}
+        }
+    }
+    
+    /**
+     * The properties declared by the content class associated with this
+     * controller. The index is the property name and the value is the property
+     * type.
+     */
+    private Map<String,Class<?>> props = new HashMap<String,Class<?>>();
+    
+    
+    // -------------------------------------------------------------------------
+    // Implementation of the SCAContentController interface
+    // -------------------------------------------------------------------------
+    
+    /**
+     * @since 1.0
+     */
+    public void setFcContentClass( Class<?> c )
+    throws IllegalLifeCycleException, ContentInstantiationException {
+        
+        /*
+         * Lifecycle check.
+         */
+        String state = _this_weaveableOptLC.getFcState();
+        if( ! state.equals(LifeCycleController.STOPPED) ) {
+            String msg = "Component should be stopped";
+            throw new IllegalLifeCycleException(msg);
+        }
+        
+        /*
+         * Content class meta data and scope manager retrievals.
+         */
+        try {
+            innerSetFcContentClassName(c);
+        }
+        catch (IllegalContentClassMetaData e) {
+            throw new ContentInstantiationException(e);
+        }
+    }
+    
+    /**
+     * Notify the content controller that the specified content instance is no
+     * longer needed. If relevant with the the scope policy, this gives the
+     * opportunity to the controller to call the {@link Destroy} annotated
+     * method on the content instance.
+     * 
+     * @param content  the content instance which is released
+     * @param isEndMethod
+     *      <code>true</code> if the method which releases the content instance
+     *      is annotated with {@link org.osoa.sca.annotations.EndsConversation}
+     */
+    public void releaseFcContent( Object content, boolean isEndMethod ) {
+        sm.releaseFcContent(content,isEndMethod);
+    }
+    
+    /**
+     * Push a new request context on the request context stack. This request
+     * context is returned by {@link
+     * org.osoa.sca.ComponentContext#getRequestContext()}. The stack is needed
+     * in case of reentrant component operation invocations.
+     * 
+     * @param rc  the request context to be pushed
+     * @since 1.1.1
+     */
+    public void pushRequestContext( RequestContext rc ) {
+        sm.pushRequestContext(rc);
+    }
+    
+    /**
+     * Pop the previously pushed request context.
+     * 
+     * @since 1.1.1
+     */
+    public void popRequestContext() {
+        sm.popRequestContext();
+    }
+    
+    /**
+     * Return the request context on top of the request context stack.
+     * 
+     * @return  the request context on top of the request context stack
+     * @since 1.1.1
+     */
+    public RequestContext peekRequestContext() {
+        return sm.peekRequestContext();
+    }
+    
+    /**
+     * Return a content instance according to the scope policy defined for this
+     * component.
+     */
+    public Object getFcContent() throws ContentInstantiationException {
+        return sm.getFcContent();
+    }
+    
+    /**
+     * Eager initialize the content instance associated with this component.
+     * Relevant only for composite-scoped components.
+     * 
+     * @throws ContentInstantiationException
+     *      if the content can not be instantiated or if the component is not
+     *      composite-scoped
+     */
+    public void eagerInit() throws ContentInstantiationException {
+        
+    	if( ccmd.eagerinit == null ) {
+        	return;
+        }
+        
+        if( !(sm instanceof CompositeScopeManager) ) {
+            String msg =
+                "Eager initialization is meaningless in scopes other than "+
+                "COMPOSITE (scope is: "+ccmd.scope.value()+")";
+            throw new ContentInstantiationException(msg);
+        }
+        
+        /*
+         * Retrieve the content to trigger its initialization.
+         */
+        sm.getFcContent();
+    }
+    
+    /**
+     * Invoke the @{@link org.ow2.frascati.tinfi.annotations.Start} annotated
+     * method on all current content instances associated with the component.
+     * 
+     * @throws ContentInstantiationException
+     * 				in case of exception when invoking the method
+     * @since 1.3
+     */
+    public void start() throws ContentInstantiationException {
+        
+    	if( ccmd.startMethod == null ) {
+        	return;
+        }
+        
+        Object[] contents = sm.getFcCurrentContents();
+        for (Object content : contents) {
+			try {
+				ccmd.startMethod.invoke(content);
+			}
+			catch (IllegalAccessException e) {
+				throw new ContentInstantiationException(e);
+			}
+			catch (InvocationTargetException e) {
+				throw new ContentInstantiationException(e);
+			}
+		}
+    }
+
+    /**
+     * Invoke the @{@link org.ow2.frascati.tinfi.annotations.Stop} annotated
+     * method on all current content instances associated with the component.
+     * 
+     * @throws ContentInstantiationException
+     * 				in case of exception when invoking the method
+     * @since 1.3
+     */
+    public void stop() throws ContentInstantiationException {
+        
+    	if( ccmd.stopMethod == null ) {
+        	return;
+        }
+        
+        Object[] contents = sm.getFcCurrentContents();
+        for (Object content : contents) {
+			try {
+				ccmd.stopMethod.invoke(content);
+			}
+			catch (IllegalAccessException e) {
+				throw new ContentInstantiationException(e);
+			}
+			catch (InvocationTargetException e) {
+				throw new ContentInstantiationException(e);
+			}
+		}
+    }
+
+    /**
+     * Return <code>true</code> if the specified property is declared by the
+     * content class managed by this controller.
+     * 
+     * @param name  the property name
+     * @return      <code>true</code> if the property is declared,
+     *              <code>false</code> otherwise
+     * @since 1.1.2
+     */
+    public boolean containsPropertyName( String name ) {
+        boolean b = props.containsKey(name);
+        return b;
+    }
+    
+    /**
+     * Return the names of the properties declared by the content class
+     * managed by this controller.
+     * 
+     * @return  the propery names
+     * @since 1.1.1
+     */
+    public String[] getPropertyNames() {
+    	Set<String> propnames = props.keySet();
+        String[] names = propnames.toArray( new String[propnames.size()] );
+        return names;
+    }
+    
+    /**
+     * Return the type of the specified property declared by the content class
+     * managed by this controller.
+     * 
+     * @param name  the property name
+     * @return      the property type
+     * @since 1.1.2
+     */
+    public Class<?> getPropertyType( String name ) {
+    	Class<?> type = props.get(name);
+    	return type;
+    }
+
+    /**
+     * Inject on all current content instances associated with the component,
+     * the specified value for the specified property.
+     *  
+     * @param name   the property name
+     * @param value  the property value
+     * @since 1.2.1
+     */
+    public void setPropertyValue( String name, Object value ) {
+    	
+    	InjectionPoint<Property> ip = ccmd.props.get(name);
+    	if( ip == null ) {
+    		// No such property. Do nothing.
+    		return;
+    	}
+    	
+    	Object[] contents = sm.getFcCurrentContents();    	
+    	for (Object content : contents) {
+    		try {
+				ip.set(content,value);
+			}
+    		catch (IllegalAccessException e) {
+    			throw new TinfiRuntimeException(e);
+			}
+    		catch (InvocationTargetException e) {
+    			throw new TinfiRuntimeException(e);
+			}
+		}
+    }
+    
+    
+    // -------------------------------------------------------------------------
+    // Fields and methods required by the mixin class in the base class
+    // -------------------------------------------------------------------------
+
+    /**
+     * The {@link Controller#initFcController initFcController} method overriden
+     * by this mixin.
+     *
+     * @param ic information about the component to which this controller object
+     *      belongs.
+     * @throws InstantiationException if the initialization fails.
+     */
+    public abstract void _super_initFcController(InitializationContext ic)
+    throws InstantiationException;
+    
+    /**
+     * The {@link Component} interface of the component to which this controller
+     * object belongs.
+     */
+    public Component _this_weaveableC;
+
+    /**
+     * The {@link NameController} interface of the component to which this
+     * controller object belongs.
+     */
+    public NameController _this_weaveableOptNC;
+
+    /**
+     * The {@link ReconfigurableComponentContext} interface of the component to
+     * which this controller object belongs.
+     */
+    public ReconfigurableComponentContext _this_weaveableCompCtx;
+    
+    /**
+     * The {@link SCAPropertyController} interface of the component to which
+     * this controller object belongs.
+     */
+    public SCAPropertyController _this_weaveableSCAPC;
+
+    /**
+     * The {@link LifeCycleController} interface of the component to which
+     * this controller object belongs.
+     */
+    public LifeCycleController _this_weaveableOptLC;
+}

@@ -59,6 +59,7 @@ import org.objectweb.proactive.core.component.control.PAMembraneController;
 import org.objectweb.proactive.core.component.control.PAMigrationController;
 import org.objectweb.proactive.core.component.control.PAMulticastController;
 import org.objectweb.proactive.core.component.control.PASuperController;
+import org.objectweb.proactive.core.component.control.property.SCAPropertyController;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
@@ -217,6 +218,18 @@ public class Utils {
     public static PAMembraneController getPAMembraneController(final Component component)
             throws NoSuchInterfaceException {
         return (PAMembraneController) component.getFcInterface(Constants.MEMBRANE_CONTROLLER);
+    }
+
+    /**
+     * Returns the {@link PAMembraneController} interface of the given component.
+     *
+     * @param component Reference on a component.
+     * @return {@link PAMembraneController} interface of the given component.
+     * @throws NoSuchInterfaceException If there is no such interface.
+     */
+    public static SCAPropertyController getSCAPropertyController(final Component component)
+            throws NoSuchInterfaceException {
+        return (SCAPropertyController) component.getFcInterface(Constants.SCA_PROPERTY_CONTROLLER);
     }
 
     /**
