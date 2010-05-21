@@ -147,7 +147,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     private String parentMethodName = null;
     private MessageTags tags;
     private MessageTags parentTags;
-    private transient boolean fromOrphan = false;
     private transient boolean ignoreNotification = false;
     //--cruz
     
@@ -267,7 +266,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         	// This relies on the fact that the reception of orphans is done by calling FuturePool.receiveFutureValue with reply==null.
         	// If that is changed, this is not guaranteed to work properly.
         	// 
-    		if(body != null && !fromOrphan && !ignoreNotification) {
+    		if(body != null && !ignoreNotification) {
     			// if it's a half body, it won't have an mbean to send notifications
     			BodyWrapperMBean mbean = body.getMBean();
     			if(mbean != null) {
@@ -288,13 +287,9 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
     			}
     		}
     		else if(body != null) {
-    			if (fromOrphan) {
-    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
+    			if (ignoreNotification) {
+    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value (ignored)-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
     				//System.out.println("NOT SENT REAL REPLY RECEIVED (FutureProxy) --orphan value-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
-    			}
-    			else if(ignoreNotification) {
-    				CMlogger.debug("NOT SENT REAL REPLY RECEIVED (FutureProxy) --different tags-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
-    				//System.out.println("NOT SENT REAL REPLY RECEIVED (FutureProxy) --different tags-- ["+id.getID()+"] in ["+ (body==null?"---":body.getName()) +" tags "+ this.getTags());
     			}
     		}
         }
@@ -645,7 +640,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         parentMethodName = (String) in.readObject();
         tags = (MessageTags) in.readObject();
         parentTags = (MessageTags) in.readObject();
-        fromOrphan = false;
+        ignoreNotification = false;
         //--cruz
         // register all incoming futures, even for migration or checkpointing
         if (this.isAwaited()) {
@@ -772,14 +767,6 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             }
         }
         return result;
-    }
-    
-    public boolean isFromOrphan() {
-    	return this.fromOrphan;
-    }
-    
-    public void setFromOrphan(boolean b) {
-    	fromOrphan = b;
     }
     
     public boolean isIgnoreNotification() {

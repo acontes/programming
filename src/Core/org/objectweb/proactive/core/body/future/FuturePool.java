@@ -313,7 +313,8 @@ public class FuturePool extends Object implements java.io.Serializable {
                 // The way to recognize an orphan value is because the method receiveFutureValue() is called with reply==null  (from this.receiveFuture)
             	// If that is changed, this will not work.
                 if(reply == null) {
-                	future.setFromOrphan(true);
+                	logger.debug("[FuturePool ] Received Future Value from ORPHAN. Found Future with Tags "+ future.getTags());
+                	future.setIgnoreNotification(true);
                 }
                 // another possibility is that this Value was about to be orphan, but was lucky enough to have the Future arrive to the map in time
                 // the bad thing is that the Future that arrived to the map was not processed before and their tags are incorrect, so a wrong REAL REPLY NOTIFICATION
@@ -321,14 +322,14 @@ public class FuturePool extends Object implements java.io.Serializable {
                 // The option is to ignore, as the correct notification will be generated afterwards by the Future update mechanism
                 // The way to recognize it is that the tags of the incoming reply are different than the values of the Future found
                 if(reply != null) {
-                	String replyTags = "";
-                	String futureTags = "";
-                	if(reply.getTags() != null) replyTags = reply.getTags().toString();
-                	if(future.getTags() != null) futureTags = future.getTags().toString();
-                	if(!replyTags.equals(futureTags)) {
-                		logger.debug("[FuturePool ] Will ignore possible RR notification. ReplyTags "+ reply.getTags() + " futureTags "+ future.getTags());
-                		future.setIgnoreNotification(true);
-                	}
+//                	String replyTags = "";
+//                	String futureTags = "";
+//                	if(reply.getTags() != null) replyTags = reply.getTags().toString();
+//                	if(future.getTags() != null) futureTags = future.getTags().toString();
+//                	if(!replyTags.equals(futureTags)) {
+//                		logger.debug("[FuturePool ] Will ignore possible RR notification. ReplyTags "+ reply.getTags() + " futureTags "+ future.getTags());
+//                		future.setIgnoreNotification(true);
+//                	}
                 	// if the reply didn't arrive from an orphan, use the tags from the reply in an eventual notification
                 	logger.debug("[FuturePool ] Setting tags of ["+future.getID()+"] to tags of the reply "+reply.getTags());
                 	future.setTags(reply.getTags());
@@ -347,7 +348,9 @@ public class FuturePool extends Object implements java.io.Serializable {
                     Future otherFuture = (futuresToUpdate.get(i));
                     logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID().getID()+"]");
                     if(reply == null) {
-                    	otherFuture.setFromOrphan(true);
+                    	otherFuture.setIgnoreNotification(true);
+                    } else {
+                    	otherFuture.setTags(reply.getTags());
                     }
                     otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
                 }
@@ -396,7 +399,7 @@ public class FuturePool extends Object implements java.io.Serializable {
                     /*queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
                         newResult, psm, true, reply.getTags())));*/                    
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
-                            newResult, psm, true, oldTags ))); // now the tags created here don't care, because they're updated in doAutomaticContinuation
+                            newResult, psm, true, null /*oldTags*/ ))); // now the tags given here don't care, because they're updated in doAutomaticContinuation, from the values in bodiesToContinue
                     //--cruz
                 }
             }
