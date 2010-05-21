@@ -81,7 +81,7 @@ public class TestAttributesSCAComposite extends Conformtest {
     // -----------------------------------------------------------------------------------
     @Test
     public void testCompositeWithAttributeController() throws Exception {
-        Component c = gf.newFcInstance(t, "composite", CAttributesCompositeImpl.class.getName());
+        Component c = gf.newFcInstance(t, "primitive", CAttributesCompositeImpl.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
         //AttributeController ca = (AttributeController) GCM.getAttributeController(c);
         //SCAPropertyControllerImpl scac = new SCAPropertyControllerImpl(c); 
