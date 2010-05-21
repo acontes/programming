@@ -34,24 +34,9 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.control.property;
-
-import org.objectweb.fractal.api.control.AttributeController;
-import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.fractal.julia.type.BasicInterfaceType;
-import org.objectweb.proactive.core.component.control.AbstractPAController;
-import org.objectweb.proactive.core.component.control.PAPropertyController;
-
+package org.objectweb.proactive.core.component.control.sca;
 
 public interface SCAPropertyController {
-
-    /** <code>NAME</code> of the content controller. */
-    final public static String NAME = "sca-property-controller";
-
-    /** <code>TYPE</code> of the content controller. */
-    final public static InterfaceType TYPE = new BasicInterfaceType(NAME, SCAPropertyController.class
-            .getName(), false, false, false);
-
     public void init();
 
     /**
@@ -139,7 +124,6 @@ public interface SCAPropertyController {
      *                  <code>null</code> to unregister the promoter
      * @throws IllegalPromoterException
      *      thrown when attempting to set a cycle between property promoters
-     * @since 0.4.3
      */
     //public void setPromoter( String name, SCAPropertyController promoter )
     //throws Exception;
@@ -150,7 +134,6 @@ public interface SCAPropertyController {
      * 
      * @param name  the promoter property name
      * @return      the promoter component or <code>null</code>
-     * @since 0.4.3
      */
     //public SCAPropertyController getPromoter( String name );
 }

@@ -34,38 +34,32 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.conform;
+package functionalTests.component.sca;
 
 import static org.junit.Assert.assertEquals;
-
-import java.lang.reflect.Field;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.AttributeController;
 import org.objectweb.fractal.api.factory.GenericFactory;
-import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.control.property.SCAPropertyController;
-import org.objectweb.proactive.core.component.control.property.SCAPropertyControllerImpl;
+import org.objectweb.proactive.core.component.control.sca.SCAPropertyController;
 
-import functionalTests.component.conform.components.CAttributes;
-import functionalTests.component.conform.components.CAttributesCompositeImpl;
-import functionalTests.component.conform.components.J;
+import functionalTests.component.conform.Conformtest;
+import functionalTests.component.sca.components.CAttributes;
+import functionalTests.component.sca.components.C;
 
 
-public class TestAttributesSCAComposite extends Conformtest {
+public class TestSCAPropertyController extends Conformtest {
     protected Component boot;
     protected GCMTypeFactory tf;
     protected GenericFactory gf;
     protected ComponentType t;
-    public String coom;
 
     @Before
     public void setUp() throws Exception {
@@ -80,8 +74,8 @@ public class TestAttributesSCAComposite extends Conformtest {
     // Full test
     // -----------------------------------------------------------------------------------
     @Test
-    public void testCompositeWithAttributeController() throws Exception {
-        Component c = gf.newFcInstance(t, "primitive", CAttributesCompositeImpl.class.getName());
+    public void testSCAPropertyController() throws Exception {
+        Component c = gf.newFcInstance(t, "primitive", C.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
         //AttributeController ca = (AttributeController) GCM.getAttributeController(c);
         //SCAPropertyControllerImpl scac = new SCAPropertyControllerImpl(c); 
@@ -105,13 +99,5 @@ public class TestAttributesSCAComposite extends Conformtest {
          assertEquals(new Long(1), scac.getValue("x8"));
          scac.setValue("x9", "1");
          assertEquals("1", scac.getValue("x9"));*/
-    }
-
-    // -----------------------------------------------------------------------------------
-    // Test composite with content do not extends AttributeController
-    // -----------------------------------------------------------------------------------
-    @Test(expected = InstantiationException.class)
-    public void testCompositeWithContentError() throws Exception {
-        gf.newFcInstance(t, "composite", J.class.getName());
     }
 }

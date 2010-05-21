@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.control.property;
+package org.objectweb.proactive.core.component.control.sca;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -57,12 +57,6 @@ import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
-/**
- * Mixin layer for implementing the {@link SCAContentController} interface for
- * scaPrimitive components.
- * 
- * @author Lionel Seinturier <Lionel.Seinturier@univ-lille1.fr>
- */
 public class SCAPropertyControllerImpl extends AbstractPAController implements SCAPropertyController {
 
     private AttributeController buildInAttributeController;
@@ -103,7 +97,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
 
     public void init() {
         try {
-            buildInAttributeController = (AttributeController) GCM.getAttributeController(owner);
+            buildInAttributeController = GCM.getAttributeController(owner);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -209,7 +203,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * 
      * @param name  the property name
      * @return      the property value
-     * @since 1.1.1
      */
     public Class<?> getType(String name) {
         return types.get(name);
@@ -240,8 +233,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     /**
      * Return the names of the properties whose values have been set by invoking
      * {@link #setValue(String, Object)}.
-     * 
-     * @since 1.1.1
      */
     public String[] getPropertyNames() {
         Set<String> keys = values.keySet();
@@ -256,7 +247,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @param name  the property name
      * @return      <code>true</code> if the property can be injected,
      *              <code>false</code> otherwise
-     * @since 1.1.2
      */
     public boolean containsDeclaredPropertyName(String name) {
         return propertyNames.contains(name);
@@ -265,8 +255,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     /**
      * Return the names of the properties which can be injected in the content
      * class.
-     * 
-     * @since 1.1.1
      */
     private List<String> getDeclaredPropertyNamesInList() {
         Method methods[] = buildInAttributeController.getClass().getMethods();
@@ -290,8 +278,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     /**
      * Return the names of the properties which can be injected in the content
      * class.
-     * 
-     * @since 1.1.1
      */
     public String[] getDeclaredPropertyNames() {
         String[] names = (String[]) propertyNames.toArray();
@@ -307,7 +293,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * 
      * @param name  the property name
      * @return      the property type
-     * @since 1.1.2
      */
     public Class<?> getDeclaredPropertyType(String name) {
         if (containsDeclaredPropertyName(name)) {
@@ -327,7 +312,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      *                  <code>null</code> to unregister the promoter
      * @throws IllegalPromoterException
      *      thrown when attempting to set a cycle between property promoters
-     * @since 0.4.3
      */
     /*
         public void setPromoter( String name, SCAPropertyController promoter )
@@ -351,7 +335,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * 
      * @param name  the promoter property name
      * @return      the promoter component or <code>null</code>
-     * @since 0.4.3
      */
     /*public SCAPropertyController getPromoter( String name ) {
         return promoters.get(name);
