@@ -45,8 +45,8 @@
             <implementation>org.objectweb.proactive.core.component.control.PAPriorityControllerImpl</implementation>
         </controller>
         <controller>
-            <interface>org.objectweb.proactive.core.component.control.property.SCAPropertyController</interface>
-            <implementation>org.objectweb.proactive.core.component.control.property.SCAPropertyControllerImpl</implementation>
+            <interface>org.objectweb.proactive.core.component.control.sca.SCAPropertyController</interface>
+            <implementation>org.objectweb.proactive.core.component.control.sca.SCAPropertyControllerImpl</implementation>
         </controller>
     </controllers>
 </componentConfiguration>
