@@ -416,6 +416,14 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 				mbean.sendNotification(NotificationType.requestWbN, requestNotificationData);
 		        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
 		        //System.out.println("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
+		        
+		        // is it possible to determine here the current request?
+		        // it should be a matter of obtaining the current request from the current body... or not?
+		        // if it is possible, I can modify here the tags of the Future, in order to send the correct notification always.
+		        // But the tags that I get are from the request I'm serving while I wait. Not the request I'm waiting for :(
+		        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, in body ["+ body.getName()+"], RequestID ["+ LocalBodyStore.getInstance().getContext().getCurrentRequest().getSequenceNumber() + "] Method ["+LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName()+"] RequestTags " + LocalBodyStore.getInstance().getContext().getCurrentRequest().getTags() );
+		        
+            
             }
         }
 

@@ -277,6 +277,7 @@ public class FuturePool extends Object implements java.io.Serializable {
 
     	// cruz
     	// This is only for debugging, (for printing the next debug message) and can be safely deleted
+    	// ... mmhh... not anymore ... I may need to know if the value received is real or not
     	String methodName = null;
     	boolean real = false;
     	MessageTags mt = null;
@@ -331,8 +332,13 @@ public class FuturePool extends Object implements java.io.Serializable {
 //                		future.setIgnoreNotification(true);
 //                	}
                 	// if the reply didn't arrive from an orphan, use the tags from the reply in an eventual notification
-                	logger.debug("[FuturePool ] Setting tags of ["+future.getID()+"] to tags of the reply "+reply.getTags());
-                	future.setTags(reply.getTags());
+                	if(!real) {
+                		logger.debug("[FuturePool ] Setting tags of ["+future.getID()+"] to tags of the reply "+reply.getTags());
+                		future.setTags(reply.getTags());
+                	}
+                	else {
+                		logger.debug("[FuturePool ] Leaving the tag ["+future.getID()+"] as "+ future.getTags() );
+                	}
                 }
             	future.receiveReply(result);
             }
@@ -350,7 +356,9 @@ public class FuturePool extends Object implements java.io.Serializable {
                     if(reply == null) {
                     	otherFuture.setIgnoreNotification(true);
                     } else {
-                    	otherFuture.setTags(reply.getTags());
+                    	if(!real) {
+                    		otherFuture.setTags(reply.getTags());
+                    	}
                     }
                     otherFuture.receiveReply((MethodCallResult) Utils.makeDeepCopy(result));
                 }
@@ -775,21 +783,17 @@ public class FuturePool extends Object implements java.io.Serializable {
                             				tagNotification);
                             		mbean.sendNotification(NotificationType.realReplySent, data);
                             		FuturePool.CMlogger.debug("REAL REPLY SENT (doAC) ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
-                            		//System.out.println("REAL REPLY SENT (doAC) ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
                             	}
                             	else {
                             		FuturePool.CMlogger.debug("++++++++++++> REAL REPLY NOT SENT (doAC) --awaited-- ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
-                            		//System.out.println("++++++++++++> REAL REPLY NOT SENT (doAC) --awaited-- ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
                             	}
                             }
                             else {
                             	FuturePool.CMlogger.debug("++++++++++++> REAL REPLY NOT SENT (doAC) --resultNull-- ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
-                            	//System.out.println("++++++++++++> REAL REPLY NOT SENT (doAC) --resultNull-- ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
                             }
                         }
                         else {
                         	FuturePool.CMlogger.debug("++++++++++++> REAL REPLY NOT SENT (doAC) --no mbean-- ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
-                        	//System.out.println("++++++++++++> REAL REPLY NOT SENT (doAC) --no mbean-- ["+ reply.getSequenceNumber() +"] from ["+ body.getName() +"] to ["+ dest.getID() +"], isAwaited? "+ PAFuture.isAwaited(reply.getResult().getResultObjet()) +" tags "+ reply.getTags() );
                         }
                     }
                     //--cruz
