@@ -176,7 +176,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
             		" NotifSeqNbr: " + notification.getSequenceNumber() +
             		" Tags: " + data.getTags());
             //processReplySent(notification);
-        } 
+        }
 		// TODO Handling for VOID REQUEST SERVED
         else if (type.equals(NotificationType.voidRequestServed)) {
             RequestNotificationData data = (RequestNotificationData) notification.getUserData();
@@ -295,6 +295,22 @@ public class EventListener extends AbstractProActiveComponentController implemen
         			" Tags: " + data.getTags());
         	notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][RRreplySent] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
         	processRealReplySent(notification);
+        	
+        }
+		// TODO
+		// This notification is "new" ... 
+        else if(type.equals(NotificationType.requestFutureUpdate)) {
+        	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+        	logger.debug(
+        			" Timestamp: " + notification.getTimeStamp() +
+        			"["+monitoredComponentName+"][FutureUpdat] " + //From:" + data.getSource() +
+        			//                		" To:"+ data.getDestination() +
+        			" Method:" + data.getMethodName() +
+        			" SeqNumber: " + data.getSequenceNumber() +
+        			" NotifSeqNbr: " + notification.getSequenceNumber() +
+        			" Tags: " + data.getTags());
+        	notificationStore.add(notification.getTimeStamp()+" ["+monitoredComponentName+"][FutureUpdat] Seq["+data.getSequenceNumber()+"] Tags "+data.getTags());
+        	processFutureUpdate(notification);
         	
         }
         else if (type.equals(NotificationType.setOfNotifications)) {
@@ -543,12 +559,12 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = logHandler.fetchCallRecord(current);
-    		cs.setWbnStartTime(notification.getTimeStamp());
+    		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
-    		cs.setWbnStartTime(notification.getTimeStamp());
+    		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
     }
@@ -591,6 +607,46 @@ public class EventListener extends AbstractProActiveComponentController implemen
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
+    }
+    
+    /**
+     * Process the requestFutureUpdate notification.
+     * This notification is generated when an update is done on a Future that is been waited for.
+     * It indicate that the WbN on this Future has finished.
+     * If no one was waiting for this Future, this notification is never sent (for example,
+     * it could have an AC that will be done, but it is not waiting)
+     * @param notification
+     */
+    private void processFutureUpdate(Notification notification) {
+    	// modifies the request in the callLog, to add the time at which the WbN happened
+    	RequestNotificationData data = (RequestNotificationData) notification.getUserData();
+    	// TODO: Move this processing to the CMTag part
+    	String cmTag = extractCMTag(data);
+    	if(cmTag == null) {
+    		return;
+    	}
+    	String[] cmTagFields = cmTag.split("::");
+    	ComponentRequestID parent = new ComponentRequestID(Long.parseLong(cmTagFields[0]));
+    	ComponentRequestID current = new ComponentRequestID(Long.parseLong(cmTagFields[1]));
+    	String destComponentName = cmTagFields[3];
+    	String interfaceName = cmTagFields[4];
+    	String methodName = cmTagFields[5];
+    	if(interfaceName.equals("-")) {
+    		return;
+    	}
+    	CallRecord cs;
+    	// checks if the call data has already been entered in the map
+    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
+    		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
+    		cs = logHandler.fetchCallRecord(current);
+    		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
+    	}
+    	else {
+    		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
+    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
+    		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
+    	}
+    	logHandler.insert(cs);
     }
     
     /**

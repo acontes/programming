@@ -144,9 +144,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 
     //cruz
     private String methodName = null;
-    private String parentMethodName = null;
     private MessageTags tags;
-    private MessageTags parentTags;
     private transient boolean ignoreNotification = false;
     //--cruz
     
@@ -241,18 +239,17 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         }
         
         
-        logger.debug("[FutureProxy] receiveReply. This: ID[" + this.getID()+ "], SenderID ["+ senderID +"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"] FutureTags "+ this.getTags() + ", FutureParentTargs "+ this.getParentTags() );
+        logger.debug("[FutureProxy] receiveReply. This: ID[" + this.getID()+ "], SenderID ["+ senderID +"]. IsAwaited? "+isAwaited(obj.getResult()) + " methodName:["+ methodName +"] FutureTags "+ this.getTags() );
         
         if(isAwaited(target.getResult())) {       	
         	// now I can give the name of method I'm still waiting for, to the new pair stub-proxy, so he will know how to generate (later) the realReplyReceived notification
         	FutureProxy futureReceived = ((FutureProxy)((StubObject)target.getResult()).getProxy());
-        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", not realReply. Had [" + futureReceived.getMethodName() +"] Tags "+ futureReceived.getTags() + ", ParentTags "+ futureReceived.getParentTags() );
+        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", not realReply. Had [" + futureReceived.getMethodName() +"] Tags "+ futureReceived.getTags() );
         	futureReceived.setMethodName(this.methodName);
 
         	// propagation of the tags to the new pair stub-proxy
         	futureReceived.setTags(this.tags);
-        	futureReceived.setParentTags(this.parentTags);
-        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", not realReply. Now [" + futureReceived.getMethodName() +"] Tags "+ futureReceived.getTags() + ", ParentTags "+ futureReceived.getParentTags() );
+        	logger.debug("[FutureProxy] receiveReply. ID:" + futureReceived.getID()+ ", not realReply. Now [" + futureReceived.getMethodName() +"] Tags "+ futureReceived.getTags() );
         }
         else {
         	Body body = LocalBodyStore.getInstance().getLocalBody(senderID);        	
@@ -405,7 +402,8 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
             if (mbean != null) {
                 mbean.sendNotification(NotificationType.waitByNecessity, new FutureNotificationData(bodyId,
                     getCreatorID()));
-                // send "custom" requestWbN notification, with info related to the request
+
+                // send requestWbN notification, with info related to the request
                 String tagNotification = createTagNotification(this.tags);
 				// TODO correct the parameters for source and destination
 				//      the MonitorController is not reading them for the moment
@@ -414,16 +412,13 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 						this.methodName, -1, this.id.getID(),
 						tagNotification);
 				mbean.sendNotification(NotificationType.requestWbN, requestNotificationData);
-		        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
-		        //System.out.println("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
+		        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, method ["+ methodName+"], Tags "+ this.getTags() );
 		        
 		        // is it possible to determine here the current request?
 		        // it should be a matter of obtaining the current request from the current body... or not?
 		        // if it is possible, I can modify here the tags of the Future, in order to send the correct notification always.
 		        // But the tags that I get are from the request I'm serving while I wait. Not the request I'm waiting for :(
-		        logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, in body ["+ body.getName()+"], RequestID ["+ LocalBodyStore.getInstance().getContext().getCurrentRequest().getSequenceNumber() + "] Method ["+LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName()+"] RequestTags " + LocalBodyStore.getInstance().getContext().getCurrentRequest().getTags() );
-		        
-            
+		        //logger.debug("[FutureProxy] ID:["+ id.getID() + "] WaitByNecessity, in body ["+ body.getName()+"], RequestID ["+ LocalBodyStore.getInstance().getContext().getCurrentRequest().getSequenceNumber() + "] Method ["+LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName()+"] RequestTags " + LocalBodyStore.getInstance().getContext().getCurrentRequest().getTags() );            
             }
         }
 
@@ -448,10 +443,26 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         if (mbean != null) {
             mbean.sendNotification(NotificationType.receivedFutureResult, new FutureNotificationData(bodyId,
                 getCreatorID()));
+            
+            // WARNING. If this is Future has been updated with the final value, then a Real Reply Received notification
+            // has already been sent. 
+            // That means that this notification will have a timestamp LATER than the Real Reply Received.
+            // We can ignore that notification, or take care when computing the times for the last WbN
+            //if(isAwaited(target.getResult())) {
+            	// send request Future Update notification, with info related to the request
+            	String tagNotification = createTagNotification(this.tags);
+            	// TODO correct the parameters for source and destination
+            	//      the MonitorController is not reading them for the moment
+            	RequestNotificationData requestNotificationData = new RequestNotificationData(
+            			null, null, null, null,
+            			this.methodName, -1, this.id.getID(),
+            			tagNotification);
+            	mbean.sendNotification(NotificationType.requestFutureUpdate, requestNotificationData);
+            	logger.debug("[FutureProxy] ID:["+ id.getID() + "] FUTURE UPDATE SENT, method ["+ methodName+"], Tags "+ this.getTags() );
+            //}
         }
         if(target.getResult() != null) {
-        	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags() );
-        	//System.out.println("[FutureProxy] +++++++> DEFINITIVE REPLY RECEIVED (waitFor.futureUpdated) ... ID:["+ id.getID() + "] in ["+(body==null?"---":body.getName())+"] method ["+ methodName+"], Tags "+ this.getTags() + ", ParentTags "+ this.getParentTags());
+        	logger.debug("[FutureProxy] Future updated after waiting. ID:["+this.getID() +"], target type: ["+target.getResult().getClass().getName()+"]. IsAwaited?" + isAwaited(target.getResult()) + " Method ["+ methodName + "], Tags "+ this.getTags()  );
         }
         // if it is the final result, I could check here too... for the REAL REPLY RECEIVED ...
         // The problem is that this method is not always called. If the result was already available, then the call never arrived to this place.
@@ -627,9 +638,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         out.writeObject(writtenUpdater.getRemoteAdapter());
         //cruz
         out.writeObject(methodName);
-        out.writeObject(parentMethodName);
         out.writeObject(tags);
-        out.writeObject(parentTags);
         //--cruz
     }
 
@@ -645,9 +654,7 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
         updater = (UniversalBody) in.readObject();
         //cruz
         methodName = (String) in.readObject();
-        parentMethodName = (String) in.readObject();
         tags = (MessageTags) in.readObject();
-        parentTags = (MessageTags) in.readObject();
         ignoreNotification = false;
         //--cruz
         // register all incoming futures, even for migration or checkpointing
@@ -743,28 +750,12 @@ public class FutureProxy implements Future, Proxy, java.io.Serializable {
 		this.methodName = methodName;
 	}
 	
-	public String getParentMethodName() {
-		return parentMethodName;
-	}
-
-	public void setParentMethodName(String parentMethodName) {
-		this.parentMethodName = parentMethodName;
-	}
-	
 	public MessageTags getTags()  {
 		return tags;	
 	}
 	
 	public void setTags(MessageTags messageTags) {
 		this.tags = messageTags;
-	}
-	
-	public MessageTags getParentTags()  {
-		return parentTags;	
-	}
-	
-	public void setParentTags(MessageTags messageTags) {
-		this.parentTags = messageTags;
 	}
 	
     private String createTagNotification(MessageTags tags) {

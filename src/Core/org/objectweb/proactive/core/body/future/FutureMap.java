@@ -98,7 +98,7 @@ public class FutureMap extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FutureMap  ] receiveFuture ID:[" + futureObject.getID()+"] creator: ["+ futureObject.getCreatorID()+"] sender:["+ futureObject.getSenderID() +"] method:["+ futureObject.getMethodName()+"], Tags: "+ futureObject.getTags() + ", ParentTags: "+ futureObject.getParentTags());
+    	logger.debug("[FutureMap  ] receiveFuture ID:[" + futureObject.getID()+"] creator: ["+ futureObject.getCreatorID()+"] sender:["+ futureObject.getSenderID() +"] method:["+ futureObject.getMethodName()+"], Tags: "+ futureObject.getTags() );
         long id = futureObject.getID();
         UniqueID creatorID = futureObject.getCreatorID();
         java.util.HashMap<Long, FuturesAndACs> indexedByID = indexedByBodyID.get(creatorID);

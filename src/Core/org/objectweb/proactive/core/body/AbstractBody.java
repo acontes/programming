@@ -443,7 +443,7 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
                 java.util.Iterator<Future> it = incomingFutures.iterator();
                 while (it.hasNext()) {
                     Future current = it.next();
-                    ProActiveLogger.getLogger(Loggers.FUTURE).debug("[AbstractBdy] Registering Incoming Future ID ["+ current.getID() +"], creator ["+ current.getCreatorID() +"] isAwaited? " + PAFuture.isAwaited(current) + " Tags "+ current.getTags() + " ParentTags" + current.getParentTags() );
+                    ProActiveLogger.getLogger(Loggers.FUTURE).debug("[AbstractBdy] Registering Incoming Future ID ["+ current.getID() +"], creator ["+ current.getCreatorID() +"] isAwaited? " + PAFuture.isAwaited(current) + " Tags "+ current.getTags() );
                     getFuturePool().receiveFuture(current);
                 }
                 FuturePool.removeIncomingFutures();

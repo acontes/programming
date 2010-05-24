@@ -115,7 +115,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			logger.debug("ERROR. Update: Unrecognized RecordType");
 		}
 	} 
-	
+	/*
 	// only for testing
 	public void displayLogs() {
 		String hostComponentName = null;
@@ -124,7 +124,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		}
 		System.out.println("===================== Component ["+ hostComponentName +"] ===============");
 		System.out.println("===================== Call Log ===================================");
-		displayCallLog();
+		//displayCallLog();
 		System.out.println("===================== Request Log ================================");
 		displayRequestLog();
 		System.out.println("==================================================================");
@@ -170,6 +170,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
     	}
     }
 
+*/
 	@Override
 	public Map<ComponentRequestID, CallRecord> getCallLog() {
 		

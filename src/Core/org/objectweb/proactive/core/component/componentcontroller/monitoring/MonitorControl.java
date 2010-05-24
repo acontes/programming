@@ -43,16 +43,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     public MonitorControl() {
     	super();
     }
-    /*
-    public void init() {
-    	// This is not called now!!!
-    	logger.debug("[Monitor Controll] Init ... !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-    }*/
-
     
 	@Override
 	public Map<String, MethodStatistics> getAllStatistics() {
-		logHandler.displayLogs();
 		return null;
 	}
 

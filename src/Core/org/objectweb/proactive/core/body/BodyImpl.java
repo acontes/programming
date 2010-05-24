@@ -815,13 +815,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 //TO DELETE: add the methodName to the future
                 future.setMethodName(methodCall.getName());
                 //TO DELETE: now I would need to add the name of the request that is currently being served
-                future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
+                //future.setParentMethodName(LocalBodyStore.getInstance().getContext().getCurrentRequest().getMethodName());
                 //TO CONSERVER: adds the tags of the Request to the local Future.
                 //This way it's possible to know which method is the Future waiting for, and generate
                 //the notification when the final reply arrives.
-                //    Also add the tags of the request that was being served (the parent Request).
-                //    This way, when sending a reply (via AC) the server knows which request has been finished.  
-                future.setParentTags(LocalBodyStore.getInstance().getContext().getCurrentRequest().getTags());
                 future.setTags(tags);
                 
                 // add the tags to the destinations stored 

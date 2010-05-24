@@ -144,13 +144,9 @@ public interface Future extends LocalFuture {
     //cruz
     public void setMethodName(String n);
     public String getMethodName();
-    public void setParentMethodName(String n);
-    public String getParentMethodName();
     public UniqueID getSenderID();
     public void setTags(MessageTags m);
     public MessageTags getTags();
-    public void setParentTags(MessageTags m);
-    public MessageTags getParentTags();
     public boolean isIgnoreNotification();    
     public void setIgnoreNotification(boolean b);
     //--cruz

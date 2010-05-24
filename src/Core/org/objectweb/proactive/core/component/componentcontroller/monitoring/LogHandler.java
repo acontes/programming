@@ -33,7 +33,7 @@ public interface LogHandler {
 	void update(Object key, AbstractRecord record);
 	
 	// test: display Logs
-	void displayLogs();
+	//void displayLogs();
 	
 	// test: obtain logs
 	Map<ComponentRequestID, RequestRecord> getRequestLog();

@@ -307,30 +307,21 @@ public class FuturePool extends Object implements java.io.Serializable {
             
             Future future = (futuresToUpdate.get(0));
             if (future != null) {
-            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+"] Found FutureProxy ["+ future.getFutureID().getID()+"], creator ["+ future.getFutureID().getCreatorID() +"] tags: "+ future.getTags() + " parentTags: "+ future.getParentTags() );
-                // old tags are used to set the Automatic Continuations that can be created from the Future value received
+            	logger.debug("[FuturePool ] receiveFutureValue2. Owner: ["+ownerBody.getName()+"] Found FutureProxy ["+ future.getFutureID().getID()+"], creator ["+ future.getFutureID().getCreatorID() +"] tags: "+ future.getTags()  );
+                
+            	
+            	// old tags are used to set the Automatic Continuations that can be created from the Future value received
             	// if the result does not contain the final value, the tags of the incoming future are replaced by those of this Future (which will be removed)
-            	oldTags = future.getParentTags();
-                // The way to recognize an orphan value is because the method receiveFutureValue() is called with reply==null  (from this.receiveFuture)
+            	//oldTags = future.getParentTags();
+                
+            	// The way to recognize an orphan value is because the method receiveFutureValue() is called with reply==null  (from this.receiveFuture)
             	// If that is changed, this will not work.
                 if(reply == null) {
                 	logger.debug("[FuturePool ] Received Future Value from ORPHAN. Found Future with Tags "+ future.getTags());
                 	future.setIgnoreNotification(true);
                 }
-                // another possibility is that this Value was about to be orphan, but was lucky enough to have the Future arrive to the map in time
-                // the bad thing is that the Future that arrived to the map was not processed before and their tags are incorrect, so a wrong REAL REPLY NOTIFICATION
-                // will be created.
-                // The option is to ignore, as the correct notification will be generated afterwards by the Future update mechanism
-                // The way to recognize it is that the tags of the incoming reply are different than the values of the Future found
+                
                 if(reply != null) {
-//                	String replyTags = "";
-//                	String futureTags = "";
-//                	if(reply.getTags() != null) replyTags = reply.getTags().toString();
-//                	if(future.getTags() != null) futureTags = future.getTags().toString();
-//                	if(!replyTags.equals(futureTags)) {
-//                		logger.debug("[FuturePool ] Will ignore possible RR notification. ReplyTags "+ reply.getTags() + " futureTags "+ future.getTags());
-//                		future.setIgnoreNotification(true);
-//                	}
                 	// if the reply didn't arrive from an orphan, use the tags from the reply in an eventual notification
                 	if(!real) {
                 		logger.debug("[FuturePool ] Setting tags of ["+future.getID()+"] to tags of the reply "+reply.getTags());
@@ -352,6 +343,9 @@ public class FuturePool extends Object implements java.io.Serializable {
                 setCopyMode(true);
                 for (int i = 1; i < numOfFuturesToUpdate; i++) {
                     Future otherFuture = (futuresToUpdate.get(i));
+                    // It may happen that a component has several copies of the same Future.
+                    // For example, a composite, where all the interal components have finished serving the request and are waiting only
+                    // for a value that will be passed as Automatic Continuation
                     logger.debug("[FuturePool ] receiveFutureValue3. Owner: ["+ownerBody.getName()+" ..." + ownerBody.getID() + "] Calling receiveReply on FutureProxy ["+ otherFuture.getFutureID().getID()+"]");
                     if(reply == null) {
                     	otherFuture.setIgnoreNotification(true);
@@ -400,12 +394,9 @@ public class FuturePool extends Object implements java.io.Serializable {
 
                     // add the deepcopied AC
                     
-                    //cruz: reply.getMethodName() was null
-                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+"] Adding AC for method ["+ reply.getMethodName()+"], with tags "+ oldTags);
-                    // Here is when an Automatic Continuation is created. 
-                    // Then, I can change the tags in the reply and copy the tags of the FutureProxy I'm updating
-                    /*queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
-                        newResult, psm, true, reply.getTags())));*/                    
+                    //cruz:
+                    logger.debug("[FuturePool ] receiveFutureValue4. Owner: ["+ownerBody.getName()+"] Adding AC for method ["+ reply.getMethodName()+"]");
+                    // Here is when an Automatic Continuation is created.                  
                     queueAC.addACRequest(new ACService(bodiesToContinue, new ReplyImpl(creatorID, id, reply.getMethodName(),
                             newResult, psm, true, null /*oldTags*/ ))); // now the tags given here don't care, because they're updated in doAutomaticContinuation, from the values in bodiesToContinue
                     //--cruz
@@ -430,7 +421,7 @@ public class FuturePool extends Object implements java.io.Serializable {
      * @param futureObject future to register
      */
     public synchronized void receiveFuture(Future futureObject) {
-    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+"] New Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sender ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] --> FutureMap.receiveFuture. Tags:"+ futureObject.getTags() + " PARENTTags "+ futureObject.getParentTags() );
+    	logger.debug("[FuturePool ] receiveFuture. Owner: ["+ownerBody.getName()+"] New Future for FutureMap ["+ futureObject.getFutureID().getID() +"] sender ["+futureObject.getSenderID()+"] method ["+ futureObject.getMethodName() +"] --> FutureMap.receiveFuture. Tags:"+ futureObject.getTags() );
     	futureObject.setSenderID(ownerBody.getID());
         futures.receiveFuture(futureObject);
         long id = futureObject.getID();
