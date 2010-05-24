@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -8,7 +9,7 @@ import java.util.ArrayList;
  * @author cruz
  *
  */
-public class RequestPath {
+public class RequestPath implements Serializable {
 
 	/** The component request that this path is built for */
 	ComponentRequestID requestID;
@@ -17,7 +18,7 @@ public class RequestPath {
 	ArrayList<PathItem> path;
 	
 	public RequestPath() {
-		
+		path = new ArrayList<PathItem>();
 	}
 	
 	public void init() {
@@ -25,7 +26,10 @@ public class RequestPath {
 	}
 	
 	public void add(PathItem newItem) {
-		
+		path.add(newItem);
 	}
 	
+	public ArrayList<PathItem> getPath() {
+		return path;
+	}
 }

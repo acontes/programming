@@ -158,5 +158,4 @@ public interface MonitorController {
     
     List<String> getNotificationsReceived(); 
 	
-    public void setPALogging(boolean b);
 }

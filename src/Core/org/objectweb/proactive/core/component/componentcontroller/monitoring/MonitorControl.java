@@ -33,9 +33,11 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 	
-	private EventControl eventControl;
-	private LogHandler logHandler;
-	private String itfs[] = {"events-control-nf", "log-handler-nf"};
+	private EventControl eventControl = null;
+	private LogHandler logHandler = null;
+	private MonitorController externalMonitor = null;
+	private String itfs[] = {"events-control-nf", "log-handler-nf", "external-monitoring-api-nf"};
+
 	
 	/** Monitoring status */
     private boolean started = false;
@@ -107,7 +109,17 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
 	// TODO
     public RequestPath getPathForID(ComponentRequestID id) {
-    	return null;
+    	RequestPath result;
+    	// end of the path
+    	if(externalMonitor == null) {
+    		result = new RequestPath();    		
+    	}
+    	else {
+    		result = externalMonitor.getPathForID(id);
+    	}
+    	String name = this.hostComponent.getComponentParameters().getName();
+		result.add(new PathItem(name,id.toString(),name));
+		return result;
     }
     
 	// TODO
@@ -135,6 +147,10 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 			logHandler = (LogHandler) sItf;
 			return;
 		}
+		if(cItf.equals("external-monitoring-api-nf")) {
+			externalMonitor = (MonitorController) sItf;
+			return;
+		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
 
@@ -148,8 +164,11 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		if(cItf.equals("events-control-nf")) {
 			return eventControl;
 		}
-		if(cItf.equals("log-handler-nf")) {;
+		if(cItf.equals("log-handler-nf")) {
 			return logHandler;
+		}
+		if(cItf.equals("external-monitoring-api-nf")) {
+			return externalMonitor;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
@@ -163,6 +182,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		if(cItf.equals("log-handler-nf")) {;
 			logHandler = null;
 		}
+		if(cItf.equals("external-monitoring-api-nf")) {
+			externalMonitor = null;
+		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
 	}
 
@@ -174,17 +196,6 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	@Override
 	public Map<ComponentRequestID, RequestRecord> getRequestLog() {
 		return logHandler.getRequestLog();
-	}
-	
-	public void setPALogging(boolean b) {
-		if(b) {
-			ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).setLevel(Level.DEBUG);
-			ProActiveLogger.getLogger(Loggers.FUTURE).setLevel(Level.DEBUG);
-		}
-		else {
-			ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING).setLevel(Level.INFO);
-			ProActiveLogger.getLogger(Loggers.FUTURE).setLevel(Level.INFO);
-		}
 	}
 	
 

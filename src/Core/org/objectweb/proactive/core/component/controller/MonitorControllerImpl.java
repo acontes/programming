@@ -838,7 +838,4 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		return null;
 	}
 	
-	public void setPALogging(boolean b) {
-		
-	}
 }

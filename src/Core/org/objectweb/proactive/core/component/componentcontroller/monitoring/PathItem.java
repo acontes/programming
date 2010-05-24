@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.io.Serializable;
+
 /**
  * This class represents an element in the path of a request.
  * It should, at least, include:
@@ -11,15 +13,20 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
  * @author cruz
  *
  */
-public class PathItem {
+public class PathItem implements Serializable {
 
 	String componentName;
 	String interfaceName;
 	String methodName;
 	
-	public PathItem() {
-		
+	public PathItem(String c, String i, String m) {
+		this.componentName = c;
+		this.interfaceName = i;
+		this.methodName = m;
 	}
-	
+
+	public String toString() {
+		return componentName + "." + interfaceName + "." + methodName;
+	}
 	
 }
