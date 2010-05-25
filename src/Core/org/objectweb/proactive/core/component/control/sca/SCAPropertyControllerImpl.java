@@ -55,15 +55,13 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 public class SCAPropertyControllerImpl extends AbstractPAController implements SCAPropertyController {
 
     private AttributeController buildInAttributeController;
-    /**
-     * properties which have been injected into components
-     */
-    private Map<String, Object> values = new HashMap<String, Object>();
+   
     /**
      * declared properties' types
      */
@@ -76,7 +74,12 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * all getter and setter methodes from user build propertyController
      */
     private Map<String, Method> ListMethodes = new HashMap<String, Method>();
-
+    /**
+     * name of all initialized properties
+     */
+    private List<String> initilizedProperties=new ArrayList<String>();
+    
+    private Component ownerRef;
     /**
      * initialize all private fields .
      * @param owner owner component
@@ -84,6 +87,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      */
     public SCAPropertyControllerImpl(Component owner) {
         super(owner);
+        this.ownerRef=owner;
         /*try {
         	buildInAttributeController=(AttributeController)owner.getFcInterface(Constants.ATTRIBUTE_CONTROLLER);
         } catch (NoSuchInterfaceException e) {
@@ -97,7 +101,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
 
     public void init() {
         try {
-            buildInAttributeController = GCM.getAttributeController(owner);
+            buildInAttributeController = GCM.getAttributeController(ownerRef);
         } catch (NoSuchInterfaceException e) {
             e.printStackTrace();
         }
@@ -175,11 +179,12 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         try {
             Object args[] = new Object[1];
             args[0] = value;
+            System.out.println("Debug1 type "+ value.getClass().getSimpleName());
             Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);//ListMethodes.get(setterName);
             System.out.println("DEBUGG SETTER NAME  " + setter.getName());
+            initilizedProperties.add(name);
             try {
                 setter.invoke(buildInAttributeController, args);
-                values.put(name, value);
             } catch (IllegalArgumentException e) {
                 System.err.println("problem on invoking arguments!! " + args);
             } catch (IllegalAccessException e) {
@@ -192,7 +197,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -216,7 +220,29 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @return      the property value
      */
     public Object getValue(String name) {
-        return values.get(name);
+    	String NameUp = NameUp(name);
+        String getterName = "get" + NameUp;
+        try {
+            Method getter = buildInAttributeController.getClass().getMethod(getterName,null);//ListMethodes.get(setterName);
+            System.out.println("DEBUGG SETTER NAME  " + getter.getName());
+            initilizedProperties.add(name);
+            try {
+                Object res =getter.invoke(buildInAttributeController, new Object[0]);
+                return res;
+            }  catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                System.err.println("problem on invoking object !!" +
+                    buildInAttributeController.getClass().getName());
+                e.printStackTrace();
+            }
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            
+            e.printStackTrace();
+        }
+		return null;
     }
 
     /**
@@ -227,7 +253,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      *              <code>false</code> otherwise
      */
     public boolean containsPropertyName(String name) {
-        return values.containsKey(name);
+        return initilizedProperties.contains(name);
     }
 
     /**
@@ -235,9 +261,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * {@link #setValue(String, Object)}.
      */
     public String[] getPropertyNames() {
-        Set<String> keys = values.keySet();
-        String[] names = keys.toArray(new String[keys.size()]);
-        return names;
+        return (String[]) initilizedProperties.toArray();
     }
 
     /**

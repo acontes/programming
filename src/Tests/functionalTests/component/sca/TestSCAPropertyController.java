@@ -43,14 +43,19 @@ import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.control.AttributeController;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.control.sca.SCAPropertyController;
+import org.objectweb.proactive.core.component.control.sca.SCAPropertyControllerImpl;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.component.conform.Conformtest;
+import functionalTests.component.sca.components.C2;
+import functionalTests.component.sca.components.C2Attribute;
 import functionalTests.component.sca.components.CAttributes;
 import functionalTests.component.sca.components.C;
 
@@ -67,7 +72,7 @@ public class TestSCAPropertyController extends Conformtest {
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
         t = tf.createFcType(new InterfaceType[] { tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER,
-                CAttributes.class.getName(), false, false, false) });
+                C2Attribute.class.getName(), false, false, false) });
     }
 
     // -----------------------------------------------------------------------------------
@@ -75,17 +80,25 @@ public class TestSCAPropertyController extends Conformtest {
     // -----------------------------------------------------------------------------------
     @Test
     public void testSCAPropertyController() throws Exception {
-        Component c = gf.newFcInstance(t, "primitive", C.class.getName());
+        Component c = gf.newFcInstance(t, "primitive", C2.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
-        //AttributeController ca = (AttributeController) GCM.getAttributeController(c);
-        //SCAPropertyControllerImpl scac = new SCAPropertyControllerImpl(c); 
+        AttributeController ca = (AttributeController) GCM.getAttributeController(c);
+        //SCAPropertyController scac = new SCAPropertyControllerImpl(c); 
         SCAPropertyController scac = Utils.getSCAPropertyController(c);
         scac.init();
-        scac.setValue("x1", true);
-        assertEquals(true, scac.getValue("x1"));
-        /* scac.setValue("x2", (byte) 1);
-         assertEquals(new Byte((byte) 1), scac.getValue("x2"));
-         scac.setValue("x3", (char) 1);
+        scac.setValue("x1", new BooleanWrapper(true));
+        System.out.println("Debug + " + ca.getClass().getSimpleName() + " 2 + " + scac.getClass().getSimpleName());
+        BooleanWrapper bw = (BooleanWrapper) scac.getValue("x1");
+        //assertEquals(new Boolean(true), (Boolean)scac.getValue("x1"));
+         //scac.setValue("x2", new Byte((byte) 1));
+         //Object res =scac.getValue("x2");
+         //System.out.println("debug 3 type "+res.getClass().getSimpleName());
+         //Byte res =  (Byte) scac.getValue("x2");
+         //byte x = ((CAttributes) ca).getX2();
+         //System.out.println("DEBUGGG "+x);
+         //Byte x = (Byte) cla.cast(res);
+        // assertEquals((Object)new Byte((byte) 1), res);
+        /* scac.setValue("x3", (char) 1);
          assertEquals(new Character((char) 1), scac.getValue("x3"));
          scac.setValue("x4", (short) 1);
          assertEquals((short) 1, scac.getValue("x4"));

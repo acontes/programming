@@ -103,7 +103,7 @@ public class Test extends FunctionalTest {
         this.longNumber = this.ao.testLongWrapper();
         this.string = this.ao.testStringWrapper();
         this.flt = this.ao.testFloatWrapper();
-
+        
         assertTrue(PAFuture.isAwaited(this.boolMutable));
         assertTrue(PAFuture.isAwaited(this.dbleMutable));
         assertTrue(PAFuture.isAwaited(this.integerMutable));
