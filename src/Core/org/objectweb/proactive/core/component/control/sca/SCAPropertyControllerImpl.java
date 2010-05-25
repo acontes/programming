@@ -37,15 +37,13 @@
 package org.objectweb.proactive.core.component.control.sca;
 
 import java.lang.reflect.InvocationTargetException;
-
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import org.etsi.uri.gcm.util.GCM;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.AttributeController;
@@ -55,13 +53,12 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 public class SCAPropertyControllerImpl extends AbstractPAController implements SCAPropertyController {
 
     private AttributeController buildInAttributeController;
-   
+
     /**
      * declared properties' types
      */
@@ -77,9 +74,10 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     /**
      * name of all initialized properties
      */
-    private List<String> initilizedProperties=new ArrayList<String>();
-    
+    private List<String> initilizedProperties = new ArrayList<String>();
+
     private Component ownerRef;
+
     /**
      * initialize all private fields .
      * @param owner owner component
@@ -87,7 +85,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      */
     public SCAPropertyControllerImpl(Component owner) {
         super(owner);
-        this.ownerRef=owner;
+        this.ownerRef = owner;
         /*try {
         	buildInAttributeController=(AttributeController)owner.getFcInterface(Constants.ATTRIBUTE_CONTROLLER);
         } catch (NoSuchInterfaceException e) {
@@ -179,7 +177,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         try {
             Object args[] = new Object[1];
             args[0] = value;
-            System.out.println("Debug1 type "+ value.getClass().getSimpleName());
+            System.out.println("Debug1 type " + value.getClass().getSimpleName());
             Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);//ListMethodes.get(setterName);
             System.out.println("DEBUGG SETTER NAME  " + setter.getName());
             initilizedProperties.add(name);
@@ -220,16 +218,16 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @return      the property value
      */
     public Object getValue(String name) {
-    	String NameUp = NameUp(name);
+        String NameUp = NameUp(name);
         String getterName = "get" + NameUp;
         try {
-            Method getter = buildInAttributeController.getClass().getMethod(getterName,null);//ListMethodes.get(setterName);
+            Method getter = buildInAttributeController.getClass().getMethod(getterName, null);//ListMethodes.get(setterName);
             System.out.println("DEBUGG SETTER NAME  " + getter.getName());
             initilizedProperties.add(name);
             try {
-                Object res =getter.invoke(buildInAttributeController, new Object[0]);
+                Object res = getter.invoke(buildInAttributeController, new Object[0]);
                 return res;
-            }  catch (IllegalAccessException e) {
+            } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 System.err.println("problem on invoking object !!" +
@@ -239,10 +237,10 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         } catch (SecurityException e) {
             e.printStackTrace();
         } catch (NoSuchMethodException e) {
-            
+
             e.printStackTrace();
         }
-		return null;
+        return null;
     }
 
     /**

@@ -87,16 +87,17 @@ public class TestSCAPropertyController extends Conformtest {
         SCAPropertyController scac = Utils.getSCAPropertyController(c);
         scac.init();
         scac.setValue("x1", new BooleanWrapper(true));
-        System.out.println("Debug + " + ca.getClass().getSimpleName() + " 2 + " + scac.getClass().getSimpleName());
+        System.out.println("Debug + " + ca.getClass().getSimpleName() + " 2 + " +
+            scac.getClass().getSimpleName());
         BooleanWrapper bw = (BooleanWrapper) scac.getValue("x1");
         //assertEquals(new Boolean(true), (Boolean)scac.getValue("x1"));
-         //scac.setValue("x2", new Byte((byte) 1));
-         //Object res =scac.getValue("x2");
-         //System.out.println("debug 3 type "+res.getClass().getSimpleName());
-         //Byte res =  (Byte) scac.getValue("x2");
-         //byte x = ((CAttributes) ca).getX2();
-         //System.out.println("DEBUGGG "+x);
-         //Byte x = (Byte) cla.cast(res);
+        //scac.setValue("x2", new Byte((byte) 1));
+        //Object res =scac.getValue("x2");
+        //System.out.println("debug 3 type "+res.getClass().getSimpleName());
+        //Byte res =  (Byte) scac.getValue("x2");
+        //byte x = ((CAttributes) ca).getX2();
+        //System.out.println("DEBUGGG "+x);
+        //Byte x = (Byte) cla.cast(res);
         // assertEquals((Object)new Byte((byte) 1), res);
         /* scac.setValue("x3", (char) 1);
          assertEquals(new Character((char) 1), scac.getValue("x3"));

@@ -36,8 +36,6 @@
  */
 package org.objectweb.proactive.core.component.control.sca;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-
 public interface SCAPropertyController {
     public void init();
 
