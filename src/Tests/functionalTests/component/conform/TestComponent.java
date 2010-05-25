@@ -50,7 +50,6 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.CAttributes;

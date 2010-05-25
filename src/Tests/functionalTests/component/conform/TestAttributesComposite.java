@@ -49,7 +49,6 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 import functionalTests.component.conform.components.CAttributes;
 import functionalTests.component.conform.components.CAttributesCompositeImpl;
@@ -80,7 +79,7 @@ public class TestAttributesComposite extends Conformtest {
         GCM.getGCMLifeCycleController(c).startFc();
         CAttributes ca = (CAttributes) GCM.getAttributeController(c);
         ca.setX1(true);
-        assertEquals(new BooleanWrapper(true), ca.getX1());
+        assertEquals(true, ca.getX1());
         ca.setX2((byte) 1);
         assertEquals((byte) 1, ca.getX2());
         ca.setX3((char) 1);

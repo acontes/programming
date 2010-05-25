@@ -36,8 +36,6 @@
  */
 package functionalTests.component.conform.components;
 
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
-
 public class CAttributesCompositeImpl implements CAttributes {
     private boolean x1;
     private byte x2;

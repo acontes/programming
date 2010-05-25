@@ -40,7 +40,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 public class C implements CAttributes, BindingController, I, J {

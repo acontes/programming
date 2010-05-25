@@ -37,7 +37,6 @@
 package functionalTests.component.conform.components;
 
 import org.objectweb.fractal.api.control.AttributeController;
-import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 
 public interface CAttributes extends AttributeController {
