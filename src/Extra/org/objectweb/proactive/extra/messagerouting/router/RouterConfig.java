@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.extra.messagerouting.router;
 
+import java.io.File;
 import java.net.InetAddress;
 import java.util.Map;
 
@@ -66,13 +67,16 @@ public class RouterConfig {
 
     private InetAddress inetAddress;
 
-    private Map<AgentID, MagicCookie> reservedAgentId;
+    private File reservedAgentConfigFile;
+
+    private int heartbeatTimeout;
 
     public RouterConfig() {
         this.port = 0;
         this.isDaemon = false;
         this.nbWorkerThreads = 4;
         this.inetAddress = null;
+        this.heartbeatTimeout = 1000;
     }
 
     public void setReadOnly() {
@@ -140,12 +144,20 @@ public class RouterConfig {
         this.inetAddress = inetAddress;
     }
 
-    public void setReservedAgentId(Map<AgentID, MagicCookie> reservedAgents) {
-        this.reservedAgentId = reservedAgents;
+    public void setReservedAgentConfigFile(File file) {
+        this.reservedAgentConfigFile = file;
     }
 
-    public Map<AgentID, MagicCookie> getReservedAgentId() {
-        return this.reservedAgentId;
+    public File getReservedAgentConfigFile() {
+        return this.reservedAgentConfigFile;
+    }
+
+    public int getHeartbeatTimeout() {
+        return heartbeatTimeout;
+    }
+
+    public void setHeartbeatTimeout(int heartbeatTimeout) {
+        this.heartbeatTimeout = heartbeatTimeout;
     }
 
 }

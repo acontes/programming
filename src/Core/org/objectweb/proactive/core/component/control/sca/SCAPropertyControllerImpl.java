@@ -221,11 +221,11 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         String NameUp = NameUp(name);
         String getterName = "get" + NameUp;
         try {
-            Method getter = buildInAttributeController.getClass().getMethod(getterName, null);//ListMethodes.get(setterName);
-            System.out.println("DEBUGG SETTER NAME  " + getter.getName());
+            Method getter = buildInAttributeController.getClass().getMethod(getterName);//ListMethodes.get(setterName);
+            System.out.println("DEBUGG GETTER NAME  " + getter.getName());
             initilizedProperties.add(name);
             try {
-                Object res = getter.invoke(buildInAttributeController, new Object[0]);
+                Object res = getter.invoke(buildInAttributeController);
                 return res;
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
