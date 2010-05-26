@@ -45,6 +45,7 @@ public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
     public static final String GENERATED_CLASSNAME_SUFFIX = GEN_ESCAPE_CHAR + "SCAClass";
 
     public static String getPropertyClassName(String className) {
-        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "Property" + GENERATED_CLASSNAME_SUFFIX;
+        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "Property" +
+            GENERATED_CLASSNAME_SUFFIX;
     }
 }

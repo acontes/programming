@@ -173,13 +173,10 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         String NameUp = NameUp(name);
         String setterName = "set" + NameUp;
         Class<?> typeAttribute = types.get(name);
-        System.out.println("DEBUG setvalue " + setterName + " type: " + typeAttribute.getName());
         try {
             Object args[] = new Object[1];
             args[0] = value;
-            System.out.println("Debug1 type " + value.getClass().getSimpleName());
-            Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);//ListMethodes.get(setterName);
-            System.out.println("DEBUGG SETTER NAME  " + setter.getName());
+            Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);
             initilizedProperties.add(name);
             try {
                 setter.invoke(buildInAttributeController, args);
@@ -221,8 +218,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         String NameUp = NameUp(name);
         String getterName = "get" + NameUp;
         try {
-            Method getter = buildInAttributeController.getClass().getMethod(getterName);//ListMethodes.get(setterName);
-            System.out.println("DEBUGG GETTER NAME  " + getter.getName());
+            Method getter = buildInAttributeController.getClass().getMethod(getterName);
             initilizedProperties.add(name);
             try {
                 Object res = getter.invoke(buildInAttributeController);

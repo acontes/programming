@@ -73,7 +73,7 @@ public interface SCAPropertyController {
      * @param name  the property name
      * @return      the property value
      */
-    public Object getValue(String name);
+    public Object getValue(String name) throws Exception;
 
     /**
      * Return <code>true</code> if the specified property has been set.
