@@ -1,15 +1,15 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
@@ -36,8 +36,11 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	private EventControl eventControl = null;
 	private LogHandler logHandler = null;
 	private MonitorController externalMonitor = null;
-	private String itfs[] = {"events-control-nf", "log-handler-nf", "external-monitoring-api-nf"};
-
+	private MonitorController internalMonitor = null;
+	private Map<String, MonitorController> externalMonitors = null;
+	private Map<String, MonitorController> internalMonitors = null;
+	
+	private String itfs[] = {"events-control-nf", "log-handler-nf", "external-monitoring-api-nf", "internal-monitoring-api-nf"};
 	
 	/** Monitoring status */
     private boolean started = false;
@@ -106,20 +109,82 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	public List<ComponentRequestID> getListOfRequestIDs() {
 		return logHandler.getListOfRequestIDs();
 	}
-
+	
 	// TODO
+	public List<ComponentRequestID> getListOfCallIDs() {
+		return logHandler.getListOfCallIDs();
+	}
+
+	/** 
+     * Builds the Request path starting from request with ID id. 
+     */
     public RequestPath getPathForID(ComponentRequestID id) {
     	RequestPath result;
+
+    	// start the call locally
+    	result = getPathForID(id, null);
+    	
+    	
+    	//----------------------------------------------------------------
+    	// TO CHECK (delete?)
+    	if(internalMonitor != null ) {
+    		System.out.println("Path from "+ hostComponent.getComponentParameters().getControllerDescription().getName() + " (internal)");
+    		result = internalMonitor.getPathForID(id);
+    	}
     	// end of the path
-    	if(externalMonitor == null) {
+    	else if(externalMonitor == null) {
+    		System.out.println("Path from "+ hostComponent.getComponentParameters().getControllerDescription().getName() + " (external)");
     		result = new RequestPath();    		
     	}
     	else {
+    		System.out.println("Path from "+ hostComponent.getComponentParameters().getControllerDescription().getName() + " (final)");
     		result = externalMonitor.getPathForID(id);
     	}
     	String name = this.hostComponent.getComponentParameters().getName();
 		result.add(new PathItem(name,id.toString(),name));
 		return result;
+    }
+    
+    /** 
+     * Builds the Request path starting from request with ID id. 
+     */
+    public RequestPath getPathForID(ComponentRequestID id, Set<String> visited) {
+
+    	RequestPath result = null;
+    	String localName = this.hostComponent.getComponentParameters().getName();
+    	if(visited == null) {
+    		visited = new HashSet<String>();
+    	}
+    	// add itself to the list of visited components
+    	visited.add(localName);
+    	
+    	// find, in the call log, the list of all request call from this one
+    	Map<ComponentRequestID, CallRecord> children = logHandler.getCallRecordsFromParent(id);
+    	
+    	// if there are no children, then this is a "leaf" component in the request path.
+    	// create a new one and return it
+    	if(children.size() == 0) {
+    		result = new RequestPath();
+    	}
+    	else {
+        	// call each children to fill the request path
+    		for(ComponentRequestID crid : children.keySet()) {
+    			
+    		}
+    	}
+    	
+
+    	
+
+
+
+    	
+    	
+    	//if(rp == null) {
+    	//	result = new RequestPath();
+    	//}
+    	
+    	return result;    	
     }
     
 	// TODO
@@ -151,7 +216,11 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 			externalMonitor = (MonitorController) sItf;
 			return;
 		}
-		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
+		if(cItf.equals("internal-monitoring-api-nf")) {
+			internalMonitor = (MonitorController) sItf;
+			return;
+		}
+		throw new NoSuchInterfaceException("Interface ["+ cItf +"] not found ... Type received: "+ sItf.getClass().getName());
 	}
 
 	@Override
@@ -170,6 +239,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		if(cItf.equals("external-monitoring-api-nf")) {
 			return externalMonitor;
 		}
+		if(cItf.equals("internal-monitoring-api-nf")) {
+			return internalMonitor;
+		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
 
@@ -184,6 +256,9 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		}
 		if(cItf.equals("external-monitoring-api-nf")) {
 			externalMonitor = null;
+		}
+		if(cItf.equals("internal-monitoring-api-nf")) {
+			internalMonitor = null;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
 	}

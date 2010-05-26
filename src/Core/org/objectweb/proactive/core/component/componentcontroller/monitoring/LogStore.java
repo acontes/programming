@@ -115,62 +115,7 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 			logger.debug("ERROR. Update: Unrecognized RecordType");
 		}
 	} 
-	/*
-	// only for testing
-	public void displayLogs() {
-		String hostComponentName = null;
-		if(hostComponent != null) {
-			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
-		}
-		System.out.println("===================== Component ["+ hostComponentName +"] ===============");
-		System.out.println("===================== Call Log ===================================");
-		//displayCallLog();
-		System.out.println("===================== Request Log ================================");
-		displayRequestLog();
-		System.out.println("==================================================================");
-		System.out.println();
-	}
-	
-	public void displayCallLog() {
-		String hostComponentName = null;
-		if(hostComponent != null) {
-			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
-		}
-    	Iterator<ComponentRequestID> i = callLog.keySet().iterator();
-    	ComponentRequestID crID;
-    	CallRecord cs;
-    	while(i.hasNext()) {
-    		crID = i.next();
-    		cs = callLog.get(crID);
-    		System.out.println("[callLog:"+hostComponentName+"] Parent: "+ cs.getParentID() + " Current: "+ crID + 
-    				" Call: "+ cs.getCalledComponent() + "." + cs.getInterfaceName()+"."+cs.getMethodName()+ 
-    				" SentTime: " + cs.getSentTime() + " RealReplyReceivedTime: " + cs.getReplyReceptionTime() +
-    				" WbN: " + (cs.getWbnStartTime()==0 ? 0 : (cs.getReplyReceptionTime() - cs.getWbnStartTime())) + 
-    				" SRV: " + (cs.getReplyReceptionTime() - cs.getSentTime()));
-    	}
-    }
 
-    public void displayRequestLog() {
-    	String hostComponentName = null;
-		if(hostComponent != null) {
-			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
-		}
-    	Iterator<ComponentRequestID> i = requestLog.keySet().iterator();
-    	ComponentRequestID crID;
-    	RequestRecord rs;
-    	while(i.hasNext()) {
-    		crID = i.next();
-    		rs = requestLog.get(crID);
-    		System.out.println("[reqsLog:"+hostComponentName+"] ID: "+ crID + " Sender: "+ rs.getCallerComponent() +
-    				" Call: "+ rs.getCalledComponent() + "." + rs.getInterfaceName()+"."+rs.getMethodName() +
-    				" Arr: " + rs.getArrivalTime() + " Serv: " + rs.getServingStartTime() + " Repl: " + rs.getReplyTime() +
-    				" WQ: " + (rs.getServingStartTime()-rs.getArrivalTime()) + 
-    				" SRV: " + (rs.getReplyTime()-rs.getServingStartTime()) +
-    				" TOT: "+ (rs.getReplyTime() - rs.getArrivalTime()));
-    	}
-    }
-
-*/
 	@Override
 	public Map<ComponentRequestID, CallRecord> getCallLog() {
 		
@@ -189,6 +134,27 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		return requestRecords;
 	}
 
+	/**
+	 * Returns a subset of all the entries in the Call Log with an specific parent ID
+	 */
+	@Override
+	public Map<ComponentRequestID, CallRecord> getCallRecordsFromParent(
+			ComponentRequestID id) {
+
+		Map<ComponentRequestID, CallRecord> selectedRecords = new HashMap<ComponentRequestID, CallRecord>();
+		CallRecord cr;
+		
+		// TODO Perform the query in a more efficient way
+		for(ComponentRequestID crid: callLog.keySet()) {
+			cr = callLog.get(crid);
+			// put all the records that have 'id' as parent
+			if(cr.getParentID().equals(id)) {
+				selectedRecords.put(crid, cr);
+			}
+		}
+		return selectedRecords;
+	}
+
 	@Override
 	public void reset() {
 		requestLog.clear();
@@ -204,4 +170,14 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		return keylist;
 	}
     
+	public List<ComponentRequestID> getListOfCallIDs() {
+		Set<ComponentRequestID> keyset = callLog.keySet();
+		List<ComponentRequestID> keylist = new ArrayList<ComponentRequestID>(keyset.size());
+		keylist.addAll(keyset);
+		//Collections.sort(keylist);
+		return keylist;
+	}
+
+
+	
 }

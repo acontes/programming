@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -807,9 +808,21 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		// TODO Auto-generated method stub
 		return null;
 	}
+	
+	@Override
+	public List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfCallIDs() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, Set<String> visited) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -837,5 +850,5 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 		// TODO Auto-generated method stub
 		return null;
 	}
-	
+
 }

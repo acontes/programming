@@ -38,6 +38,7 @@ package org.objectweb.proactive.core.component.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -126,7 +127,7 @@ public interface MonitorController {
      * 
      */
     List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfRequestIDs();
-    
+    List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfCallIDs();
     
     /** 
      * Get the path followed by an specific request
@@ -135,6 +136,7 @@ public interface MonitorController {
      * @return
      */
     RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
+    RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, Set<String> visited);
     
     /**
      * Same from above, but with statistical information attached

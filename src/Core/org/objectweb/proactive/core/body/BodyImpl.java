@@ -973,10 +973,17 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             		//System.out.println("Call from " + componentSourceName + " to " + interfaceName + "." + methodName);
 
             		// Remove the current CMTag (if exists), and keep the ID of the previous, as it will be used for the new CMTag attached to this request
+        			// Also keep the root ID
         			long oldSeqID = 0;
+        			long rootID = 0;
             		if(nextTags.check(CMTag.IDENTIFIER)) {
             			CMTag oldTag = (CMTag) nextTags.removeTag(CMTag.IDENTIFIER);
             			oldSeqID = oldTag.getNewSeqID();
+            			rootID = oldTag.getRootID();
+            		}
+            		// if there was no CMTag
+            		else {
+            			rootID = sequenceID;
             		}
             		
             		// Avoid the propagation of tag through NF requests.
@@ -985,7 +992,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             		if(!componentDestName.equals("-")) {
                 		// sequenceID is the new one, just generated (in sendRequest).
                 		// needed to find the request that was being served, to be able to associate it in the callLog
-                		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName));            			
+                		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName, rootID));            			
             		}
             		
 
