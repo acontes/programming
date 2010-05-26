@@ -36,8 +36,6 @@
  */
 package functionalTests.component.sca;
 
-import static org.junit.Assert.assertEquals;
-
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
@@ -48,19 +46,17 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.control.sca.SCAPropertyController;
-import org.objectweb.proactive.core.component.control.sca.SCAPropertyControllerImpl;
+import org.objectweb.proactive.core.component.sca.SCAConfig;
+import org.objectweb.proactive.core.component.sca.Utils;
+import org.objectweb.proactive.core.component.sca.control.SCAPropertyController;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
-import functionalTests.component.conform.Conformtest;
+import functionalTests.ComponentTest;
 import functionalTests.component.sca.components.C2;
 import functionalTests.component.sca.components.C2Attribute;
-import functionalTests.component.sca.components.CAttributes;
-import functionalTests.component.sca.components.C;
 
 
-public class TestSCAPropertyController extends Conformtest {
+public class TestSCAPropertyController extends ComponentTest {
     protected Component boot;
     protected GCMTypeFactory tf;
     protected GenericFactory gf;
@@ -68,6 +64,8 @@ public class TestSCAPropertyController extends Conformtest {
 
     @Before
     public void setUp() throws Exception {
+        //-Dsca.provider=org.objectweb.proactive.core.component.sca.SCAFractive
+        SCAConfig.SCA_PROVIDER.setValue("org.objectweb.proactive.core.component.sca.SCAFractive");
         boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
@@ -99,19 +97,14 @@ public class TestSCAPropertyController extends Conformtest {
         //System.out.println("DEBUGGG "+x);
         //Byte x = (Byte) cla.cast(res);
         // assertEquals((Object)new Byte((byte) 1), res);
-        /* scac.setValue("x3", (char) 1);
-         assertEquals(new Character((char) 1), scac.getValue("x3"));
-         scac.setValue("x4", (short) 1);
-         assertEquals((short) 1, scac.getValue("x4"));
-         scac.setValue("x5", 1);
-         assertEquals(1, scac.getValue("x5"));
-         scac.setValue("x6", (long) 1);
-         assertEquals((long) 1, scac.getValue("x6"));
-         scac.setValue("x7", 1);
-         assertEquals(new Float(1), scac.getValue("x7"));
-         scac.setValue("x8", 1);
-         assertEquals(new Long(1), scac.getValue("x8"));
-         scac.setValue("x9", "1");
-         assertEquals("1", scac.getValue("x9"));*/
+        /*
+         * scac.setValue("x3", (char) 1); assertEquals(new Character((char) 1),
+         * scac.getValue("x3")); scac.setValue("x4", (short) 1); assertEquals((short) 1,
+         * scac.getValue("x4")); scac.setValue("x5", 1); assertEquals(1, scac.getValue("x5"));
+         * scac.setValue("x6", (long) 1); assertEquals((long) 1, scac.getValue("x6"));
+         * scac.setValue("x7", 1); assertEquals(new Float(1), scac.getValue("x7"));
+         * scac.setValue("x8", 1); assertEquals(new Long(1), scac.getValue("x8"));
+         * scac.setValue("x9", "1"); assertEquals("1", scac.getValue("x9"));
+         */
     }
 }

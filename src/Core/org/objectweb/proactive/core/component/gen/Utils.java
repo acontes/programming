@@ -275,7 +275,7 @@ public class Utils {
      * @param str a name
      * @return an escaped String
      */
-    private static String escapeString(String str) {
+    protected static String escapeString(String str) {
         StringBuilder sb = new StringBuilder(str.length() * 2);
         for (int i = 0; i < str.length(); i++) {
             switch (str.charAt(i)) {
@@ -302,8 +302,8 @@ public class Utils {
      * @return
      * @throws IllegalArgumentException if the given escapedClassesName aren't well escaped
      */
-    private static ArrayList<CharSequence> unEscapeClassesName(String generatedClassName, boolean withItfName)
-            throws IllegalArgumentException {
+    protected static ArrayList<CharSequence> unEscapeClassesName(String generatedClassName,
+            boolean withItfName) throws IllegalArgumentException {
         ArrayList<CharSequence> result = new ArrayList<CharSequence>();
         StringBuilder sb = new StringBuilder(generatedClassName.length());
         boolean middleFlag = false;
