@@ -34,14 +34,14 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.control;
+package org.objectweb.proactive.core.component.sca.control;
 
 import org.objectweb.fractal.api.control.AttributeController;
 
 
 /**
-* This interface simply extends the generic AttributeController defined in fractal api.
-* any component which need an attribute controller have to implement this interface
+* This interface simply extends the generic AttributeController defined in Fractal API.
+* Any component which need an attribute controller have to implement this interface.
 *
 * @author The ProActive Team
 */

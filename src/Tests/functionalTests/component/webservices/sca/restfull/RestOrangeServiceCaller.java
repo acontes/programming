@@ -1,18 +1,9 @@
 package functionalTests.component.webservices.sca.restfull;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 import org.objectweb.proactive.core.component.webservices.PAWSCaller;
-import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
@@ -26,7 +17,6 @@ public class RestOrangeServiceCaller implements PAWSCaller{
 		return rootUrl+"?id=["+id+"]&from=["+from+"]&to=["+to+"]&content=["+content+"]";
 	}
 	
-	@Override
 	public Object callWS(String methodName, Object[] args, Class<?> returnType) {
 		if(!methodName.equals("sendSMS"))
 		{
@@ -49,7 +39,6 @@ public class RestOrangeServiceCaller implements PAWSCaller{
 		return false;
 	}
 
-	@Override
 	public void setup(Class<?> serviceClass, String wsUrl) {
 		rootUrl=wsUrl;
 	}
