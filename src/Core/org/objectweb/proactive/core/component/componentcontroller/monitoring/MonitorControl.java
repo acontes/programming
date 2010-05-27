@@ -138,22 +138,26 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     	String destName = cr.getCalledComponent();
     	MonitorController child = null;
     	
-    	RPlogger.debug("["+this.getMonitoredComponentName()+"] Record:["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
+    	RPlogger.debug("["+this.getMonitoredComponentName()+"] Record ["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
     	
     	for(String monitorItfName : internalMonitors.keySet()) {
+    		RPlogger.debug("["+this.getMonitoredComponentName()+"] Looking internal interface ["+monitorItfName+"]");
 			if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
 				child = internalMonitors.get(monitorItfName);
 			}
 		}
 		// try the external monitor controllers
 		for(String monitorItfName : externalMonitors.keySet()) {
-			if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+    		RPlogger.debug("["+this.getMonitoredComponentName()+"] Looking external interface ["+monitorItfName+"]");
+    		if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+    			RPlogger.debug("Selected!");
 				child = externalMonitors.get(monitorItfName);
 			}
 		}
-		RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + child==null?"NOBODY":child.getMonitoredComponentName() );
+		RPlogger.debug("-------------------------------------------------------------");
+		RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
     	result = child.getPathForID(id, rootID, visited);
-    	
+    	RPlogger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     	return result;
     	
     }
@@ -178,61 +182,74 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     	PathItem pi;
     	MonitorController child = null;
 
-    	
+
     	// find, in the call log, the list of all calls that were made here, related to the same rootID
     	branches = logHandler.getRequestRecordsFromRoot(rootID);
-    	
-    	// if there are no children, then this is a "leaf" component in the request path.
-    	// create a new RequestPath, and add the "local" pathItem
-    	if(branches.size() == 0) {
-        	// rr shouldn't be null, because I know that the request was sent here
-        	rr = logHandler.fetchRequestRecord(id);
-        	// this path item represents the fact that the call arrived here
-        	pi = new PathItem(rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
-        	// add this PathItem
-    		result.add(pi); // ?????
-    	}
-    	else {
-        	// call each branch that starts here and has the same rootID
-    		for(ComponentRequestID crid : branches.keySet()) {
-    			// get the record of the request
-    			rr = logHandler.fetchRequestRecord(crid);
-    			// get all the calls that were sent while serving this request
-    			children = logHandler.getCallRecordsFromParent(crid);
-    			// call each component to which a request was sent
-    			for(ComponentRequestID childID : children.keySet()) {
-    				cr = logHandler.fetchCallRecord(childID);
-        			// get the name of the component to call
-    				destName = cr.getCalledComponent();
-        			// if it is in the visited list, don't call it
-    				if(!visited.contains(destName)) {
-    					// select the client interface (can be external or internal) where this component is connected
-    					// try the internal monitor controllers
-    					for(String monitorItfName : internalMonitors.keySet()) {
-    						if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    							child = internalMonitors.get(monitorItfName);
-    						}
+
+    	RPlogger.debug("["+localName+"] Branches: "+ branches.size());
+
+
+
+    	// call each branch that starts here and has the same rootID
+    	for(ComponentRequestID crid : branches.keySet()) {
+    		RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
+    		// get the record of the request
+    		rr = logHandler.fetchRequestRecord(crid);
+    		// get all the calls that were sent while serving this request
+    		children = logHandler.getCallRecordsFromParent(crid);
+
+
+    		// this path item represents the fact that the call arrived here
+    		pi = new PathItem(rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
+    		// add this PathItem
+    		RPlogger.debug("["+localName+"] Adding pathItem ["+ pi.toString() +"]");
+    		result.add(pi);
+
+
+    		// call each component to which a request was sent
+    		for(ComponentRequestID childID : children.keySet()) {
+    			cr = logHandler.fetchCallRecord(childID);
+    			// get the name of the component to call
+    			destName = cr.getCalledComponent();
+    			RPlogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
+    			// if it is in the visited list, don't call it
+    			if(!visited.contains(destName)) {
+    				// select the client interface (can be external or internal) where this component is connected
+    				// try the internal monitor controllers
+    				for(String monitorItfName : internalMonitors.keySet()) {
+    					RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying internal interface ["+monitorItfName+"]");
+    					if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+    						RPlogger.debug("Found!");
+    						child = internalMonitors.get(monitorItfName);
     					}
-    					// try the external monitor controllers
-    					for(String monitorItfName : externalMonitors.keySet()) {
-    						if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    							child = externalMonitors.get(monitorItfName);
-    						}
+    				}
+    				// try the external monitor controllers
+    				for(String monitorItfName : externalMonitors.keySet()) {
+    					RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying external interface ["+monitorItfName+"]");
+    					if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+    						RPlogger.debug("Found!");
+    						child = externalMonitors.get(monitorItfName);
     					}
-    					
-    					// and call it
-    					branch = child.getPathForID(childID, rootID, visited);
-    					
-    					// add the result to the current RequestPath
-    					result.add(branch);	
-    				}    				
+    				}
+
+    				// and call it
+    				RPlogger.debug("["+this.getMonitoredComponentName()+"] calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
+    				branch = child.getPathForID(childID, rootID, visited);
+
+    				// add the result to the current RequestPath
+    				result.add(branch);	
+    			}  
+    			else {
+    				RPlogger.debug("["+this.getMonitoredComponentName()+"] Component ["+destName+"] already visited.");
     			}
     		}
     	}
-    	
+
+    	RPlogger.debug("["+localName+"] Returning results with "+ result.getPath().size() +" pathItems");
+
     	return result;    	
     }
-    
+
 	// TODO
     public RequestPath getPathStatisticsForId(ComponentRequestID id) {
     	return null;
