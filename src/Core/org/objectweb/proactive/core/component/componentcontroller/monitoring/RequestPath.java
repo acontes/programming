@@ -32,4 +32,10 @@ public class RequestPath implements Serializable {
 	public ArrayList<PathItem> getPath() {
 		return path;
 	}
+	
+	public void add(RequestPath rp) {
+		path.addAll(rp.getPath());
+	}
+	
+	
 }

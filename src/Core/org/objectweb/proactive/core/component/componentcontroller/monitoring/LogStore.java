@@ -154,6 +154,27 @@ public class LogStore extends AbstractProActiveComponentController implements Lo
 		}
 		return selectedRecords;
 	}
+	
+	/**
+	 * Returns a subset of all the entries in the Request Log with the same root ID
+	 */
+	@Override
+	public Map<ComponentRequestID, RequestRecord> getRequestRecordsFromRoot(
+			ComponentRequestID rootID) {
+
+		Map<ComponentRequestID, RequestRecord> selectedRecords = new HashMap<ComponentRequestID, RequestRecord>();
+		RequestRecord rr;
+		
+		// TODO Perform the query in a more efficient way
+		for(ComponentRequestID crid: requestLog.keySet()) {
+			rr = requestLog.get(crid);
+			// put all the records that have 'rootID' as root
+			if(rr.getRootID().equals(rootID)) {
+				selectedRecords.put(crid, rr);
+			}
+		}
+		return selectedRecords;
+	}
 
 	@Override
 	public void reset() {

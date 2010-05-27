@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +33,20 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public class MonitorControl extends AbstractProActiveComponentController implements MonitorController, BindingController {
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
+	private static final Logger RPlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST_PATH);
 	
 	private EventControl eventControl = null;
 	private LogHandler logHandler = null;
 	private MonitorController externalMonitor = null;
 	private MonitorController internalMonitor = null;
-	private Map<String, MonitorController> externalMonitors = null;
-	private Map<String, MonitorController> internalMonitors = null;
+	private Map<String, MonitorController> externalMonitors = new HashMap<String, MonitorController>();
+	private Map<String, MonitorController> internalMonitors = new HashMap<String, MonitorController>();
 	
-	private String itfs[] = {"events-control-nf", "log-handler-nf", "external-monitoring-api-nf", "internal-monitoring-api-nf"};
+	private String itfs[] = {"events-control-nf", "log-handler-nf",
+			"external-0-monitoring-api-nf", 
+			"external-1-monitoring-api-nf",
+			"internal-0-monitoring-api-nf",
+			"internal-1-monitoring-api-nf"};
 	
 	/** Monitoring status */
     private boolean started = false;
@@ -120,69 +126,109 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
      */
     public RequestPath getPathForID(ComponentRequestID id) {
     	RequestPath result;
-
-    	// start the call locally
-    	result = getPathForID(id, null);
+    	CallRecord cr;
     	
+    	RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+")");
+    	cr = logHandler.fetchCallRecord(id);
     	
-    	//----------------------------------------------------------------
-    	// TO CHECK (delete?)
-    	if(internalMonitor != null ) {
-    		System.out.println("Path from "+ hostComponent.getComponentParameters().getControllerDescription().getName() + " (internal)");
-    		result = internalMonitor.getPathForID(id);
-    	}
-    	// end of the path
-    	else if(externalMonitor == null) {
-    		System.out.println("Path from "+ hostComponent.getComponentParameters().getControllerDescription().getName() + " (external)");
-    		result = new RequestPath();    		
-    	}
-    	else {
-    		System.out.println("Path from "+ hostComponent.getComponentParameters().getControllerDescription().getName() + " (final)");
-    		result = externalMonitor.getPathForID(id);
-    	}
-    	String name = this.hostComponent.getComponentParameters().getName();
-		result.add(new PathItem(name,id.toString(),name));
-		return result;
+    	ComponentRequestID rootID = cr.getRootID();
+    	Set<String> visited = new HashSet<String>();
+    	visited.add(this.getMonitoredComponentName());
+    	
+    	String destName = cr.getCalledComponent();
+    	MonitorController child = null;
+    	
+    	RPlogger.debug("["+this.getMonitoredComponentName()+"] Record:["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
+    	
+    	for(String monitorItfName : internalMonitors.keySet()) {
+			if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+				child = internalMonitors.get(monitorItfName);
+			}
+		}
+		// try the external monitor controllers
+		for(String monitorItfName : externalMonitors.keySet()) {
+			if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+				child = externalMonitors.get(monitorItfName);
+			}
+		}
+		RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + child==null?"NOBODY":child.getMonitoredComponentName() );
+    	result = child.getPathForID(id, rootID, visited);
+    	
+    	return result;
+    	
     }
     
     /** 
      * Builds the Request path starting from request with ID id. 
      */
-    public RequestPath getPathForID(ComponentRequestID id, Set<String> visited) {
+    public RequestPath getPathForID(ComponentRequestID id, ComponentRequestID rootID, Set<String> visited) {
 
-    	RequestPath result = null;
+    	RequestPath result = new RequestPath();
+    	RequestPath branch = null;
     	String localName = this.hostComponent.getComponentParameters().getName();
-    	if(visited == null) {
-    		visited = new HashSet<String>();
-    	}
+    	String destName;
     	// add itself to the list of visited components
     	visited.add(localName);
     	
-    	// find, in the call log, the list of all request call from this one
-    	Map<ComponentRequestID, CallRecord> children = logHandler.getCallRecordsFromParent(id);
+ 
+    	Map<ComponentRequestID, RequestRecord> branches = null; //logHandler.getCallRecordsFromParent(rootID);
+    	Map<ComponentRequestID, CallRecord> children = null; 
+    	RequestRecord rr;
+    	CallRecord cr;
+    	PathItem pi;
+    	MonitorController child = null;
+
+    	
+    	// find, in the call log, the list of all calls that were made here, related to the same rootID
+    	branches = logHandler.getRequestRecordsFromRoot(rootID);
     	
     	// if there are no children, then this is a "leaf" component in the request path.
-    	// create a new one and return it
-    	if(children.size() == 0) {
-    		result = new RequestPath();
+    	// create a new RequestPath, and add the "local" pathItem
+    	if(branches.size() == 0) {
+        	// rr shouldn't be null, because I know that the request was sent here
+        	rr = logHandler.fetchRequestRecord(id);
+        	// this path item represents the fact that the call arrived here
+        	pi = new PathItem(rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
+        	// add this PathItem
+    		result.add(pi); // ?????
     	}
     	else {
-        	// call each children to fill the request path
-    		for(ComponentRequestID crid : children.keySet()) {
-    			
+        	// call each branch that starts here and has the same rootID
+    		for(ComponentRequestID crid : branches.keySet()) {
+    			// get the record of the request
+    			rr = logHandler.fetchRequestRecord(crid);
+    			// get all the calls that were sent while serving this request
+    			children = logHandler.getCallRecordsFromParent(crid);
+    			// call each component to which a request was sent
+    			for(ComponentRequestID childID : children.keySet()) {
+    				cr = logHandler.fetchCallRecord(childID);
+        			// get the name of the component to call
+    				destName = cr.getCalledComponent();
+        			// if it is in the visited list, don't call it
+    				if(!visited.contains(destName)) {
+    					// select the client interface (can be external or internal) where this component is connected
+    					// try the internal monitor controllers
+    					for(String monitorItfName : internalMonitors.keySet()) {
+    						if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+    							child = internalMonitors.get(monitorItfName);
+    						}
+    					}
+    					// try the external monitor controllers
+    					for(String monitorItfName : externalMonitors.keySet()) {
+    						if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+    							child = externalMonitors.get(monitorItfName);
+    						}
+    					}
+    					
+    					// and call it
+    					branch = child.getPathForID(childID, rootID, visited);
+    					
+    					// add the result to the current RequestPath
+    					result.add(branch);	
+    				}    				
+    			}
     		}
     	}
-    	
-
-    	
-
-
-
-    	
-    	
-    	//if(rp == null) {
-    	//	result = new RequestPath();
-    	//}
     	
     	return result;    	
     }
@@ -212,12 +258,20 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 			logHandler = (LogHandler) sItf;
 			return;
 		}
-		if(cItf.equals("external-monitoring-api-nf")) {
-			externalMonitor = (MonitorController) sItf;
+		if(cItf.equals("external-0-monitoring-api-nf")) {
+			externalMonitors.put(cItf, (MonitorController)sItf);
 			return;
 		}
-		if(cItf.equals("internal-monitoring-api-nf")) {
-			internalMonitor = (MonitorController) sItf;
+		if(cItf.equals("external-1-monitoring-api-nf")) {
+			externalMonitors.put(cItf, (MonitorController) sItf);
+			return;
+		}
+		if(cItf.equals("internal-0-monitoring-api-nf")) {
+			internalMonitors.put(cItf, (MonitorController) sItf);
+			return;
+		}
+		if(cItf.equals("internal-1-monitoring-api-nf")) {
+			internalMonitors.put(cItf, (MonitorController) sItf);
 			return;
 		}
 		throw new NoSuchInterfaceException("Interface ["+ cItf +"] not found ... Type received: "+ sItf.getClass().getName());
@@ -236,11 +290,17 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		if(cItf.equals("log-handler-nf")) {
 			return logHandler;
 		}
-		if(cItf.equals("external-monitoring-api-nf")) {
-			return externalMonitor;
+		if(cItf.equals("external-0-monitoring-api-nf")) {
+			return externalMonitors.get(cItf);
 		}
-		if(cItf.equals("internal-monitoring-api-nf")) {
-			return internalMonitor;
+		if(cItf.equals("external-1-monitoring-api-nf")) {
+			return externalMonitors.get(cItf);
+		}
+		if(cItf.equals("internal-0-monitoring-api-nf")) {
+			return internalMonitors.get(cItf);
+		}
+		if(cItf.equals("internal-1-monitoring-api-nf")) {
+			return internalMonitors.get(cItf);
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
@@ -254,11 +314,17 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		if(cItf.equals("log-handler-nf")) {;
 			logHandler = null;
 		}
-		if(cItf.equals("external-monitoring-api-nf")) {
-			externalMonitor = null;
+		if(cItf.equals("external-0-monitoring-api-nf")) {
+			externalMonitors.put(cItf,null);
 		}
-		if(cItf.equals("internal-monitoring-api-nf")) {
-			internalMonitor = null;
+		if(cItf.equals("external-1-monitoring-api-nf")) {
+			externalMonitors.put(cItf,null);
+		}
+		if(cItf.equals("internal-0-monitoring-api-nf")) {
+			internalMonitors.put(cItf,null);
+		}
+		if(cItf.equals("internal-1-monitoring-api-nf")) {
+			internalMonitors.put(cItf,null);
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
 	}
@@ -271,6 +337,11 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 	@Override
 	public Map<ComponentRequestID, RequestRecord> getRequestLog() {
 		return logHandler.getRequestLog();
+	}
+
+	@Override
+	public String getMonitoredComponentName() {
+		return hostComponent.getComponentParameters().getName();
 	}
 	
 

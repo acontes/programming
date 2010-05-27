@@ -19,12 +19,14 @@ public class RequestRecord extends AbstractRecord implements Serializable {
 	private long servingStartTime;
 	private long replyTime;
 	
+	private ComponentRequestID rootID;
+	
 	private boolean finished;
 	
 	public RequestRecord() {
 	}
 	
-	public RequestRecord(ComponentRequestID requestID, String callerComponent, String calledComponent, String interfaceName, String methodName, long arrivalTime) {
+	public RequestRecord(ComponentRequestID requestID, String callerComponent, String calledComponent, String interfaceName, String methodName, long arrivalTime, ComponentRequestID rootID) {
 		super(RecordType.RequestRecord, requestID);
 		this.callerComponent = callerComponent;
 		this.calledComponent = calledComponent;
@@ -32,6 +34,7 @@ public class RequestRecord extends AbstractRecord implements Serializable {
 		this.methodName = methodName;
 		this.arrivalTime = arrivalTime;
 		this.finished = false;
+		this.rootID = rootID;
 	}
 	
 	public long getServingStartTime() {
@@ -78,8 +81,8 @@ public class RequestRecord extends AbstractRecord implements Serializable {
 		return finished;
 	}
 	
-	
-	
-	
+	public ComponentRequestID getRootID() {
+		return rootID;
+	}
 	
 }

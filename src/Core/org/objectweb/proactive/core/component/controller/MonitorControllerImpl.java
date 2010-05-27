@@ -822,7 +822,7 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 	}
 	
 	@Override
-	public RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, Set<String> visited) {
+	public RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID rootID, Set<String> visited) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -847,6 +847,12 @@ public class MonitorControllerImpl extends AbstractProActiveController implement
 
 	@Override
 	public List<String> getNotificationsReceived() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String getMonitoredComponentName() {
 		// TODO Auto-generated method stub
 		return null;
 	}

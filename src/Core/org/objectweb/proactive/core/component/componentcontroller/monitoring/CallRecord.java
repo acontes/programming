@@ -19,6 +19,8 @@ public class CallRecord extends AbstractRecord implements Serializable {
 	private String interfaceName;
 	private String methodName;
 	
+	private ComponentRequestID rootID;
+	
 	private long sentTime;
 	private long replyReceptionTime;
 
@@ -34,7 +36,7 @@ public class CallRecord extends AbstractRecord implements Serializable {
 	}
 
 	public CallRecord(ComponentRequestID requestID, ComponentRequestID parentID, String calledComponent, String interfaceName, String methodName,
-			long sentTime, boolean voidRequest) {
+			long sentTime, boolean voidRequest, ComponentRequestID rootID) {
 		super(RecordType.CallRecord, requestID);
 		this.parentID = parentID;
 		this.calledComponent = calledComponent;
@@ -45,6 +47,7 @@ public class CallRecord extends AbstractRecord implements Serializable {
 		this.voidRequest = voidRequest;
 		this.wbnStartTime = new HashMap<Long, Long>();
 		this.wbnStopTime = new HashMap<Long, Long>();
+		this.rootID = rootID;
 	}
 
 	public long getSentTime() {
@@ -103,7 +106,8 @@ public class CallRecord extends AbstractRecord implements Serializable {
 		return voidRequest;
 	}
 	
-	
-	
+	public ComponentRequestID getRootID() {
+		return rootID;
+	}
 
 }

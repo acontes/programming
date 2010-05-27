@@ -136,7 +136,7 @@ public interface MonitorController {
      * @return
      */
     RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
-    RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, Set<String> visited);
+    RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID rootID, Set<String> visited);
     
     /**
      * Same from above, but with statistical information attached
@@ -159,5 +159,7 @@ public interface MonitorController {
     Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, CallRecord> getCallLog();
     
     List<String> getNotificationsReceived(); 
+    
+    String getMonitoredComponentName();
 	
 }

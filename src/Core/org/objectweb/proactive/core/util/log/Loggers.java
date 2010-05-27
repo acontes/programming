@@ -72,6 +72,7 @@ public interface Loggers {
     static final public String COMPONENTS = CORE + ".components";
     static final public String COMPONENTS_CONTROLLERS = COMPONENTS + ".controllers";
     static final public String COMPONENTS_MONITORING = COMPONENTS + ".monitoring";
+    static final public String COMPONENTS_REQUEST_PATH = COMPONENTS + ".requestpath";
     static final public String COMPONENTS_REQUESTS = COMPONENTS + ".requests";
     static final public String COMPONENTS_ACTIVITY = COMPONENTS + ".activity";
     static final public String COMPONENTS_GEN_ITFS = COMPONENTS + ".gen.interface";

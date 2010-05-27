@@ -350,6 +350,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	if(interfaceName.equals("-")) {
     		return;
     	}
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map
     	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
@@ -362,7 +363,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	else {
     		// if there was no key, then it has to insert a new one
     		//logger.debug("Creating new RequestRecord on LogStore, component "+ this.monitoredComponentName);
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp());
+    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp(), root);
     	}
     	logHandler.insert(rs);
     }
@@ -391,6 +392,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	String destName = cmTagFields[3];
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map (should exist already)
     	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
@@ -401,7 +403,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	// else, the data should be added (without the arrival time), and be updated later,
     	// when the corresponding requestReceived notification be processed
     	else {
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0);
+    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
@@ -429,6 +431,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	String destName = cmTagFields[3];
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map
     	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
@@ -439,7 +442,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed
     	else {
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0);
+    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
@@ -471,6 +474,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	if(interfaceName.equals("-")) {
     		return;
     	}
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	CallRecord cs;
     	// checks if the call data has already been entered in the map
     	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
@@ -482,7 +486,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		//logger.debug("Creating new CallRecord on LogStore, component "+ this.monitoredComponentName + ", ID: "+ current);
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false);
+    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false, root);
     		//cs.setReplyReceptionTime(notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
@@ -514,6 +518,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	if(interfaceName.equals("-")) {
     		return;
     	}
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	CallRecord cs;
     	// checks if the call data has already been entered in the map
     	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
@@ -524,7 +529,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
+    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
     	}
@@ -554,6 +559,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	if(interfaceName.equals("-")) {
     		return;
     	}
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	CallRecord cs;
     	// checks if the call data has already been entered in the map
     	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
@@ -563,7 +569,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
+    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
@@ -593,6 +599,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	String destName = cmTagFields[3];
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	RequestRecord rs;
     	// checks if the request data has already been entered in the map
     	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
@@ -603,7 +610,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed
     	else {
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0);
+    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
@@ -631,6 +638,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	String destComponentName = cmTagFields[3];
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
+    	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
     	if(interfaceName.equals("-")) {
     		return;
     	}
@@ -643,7 +651,7 @@ public class EventListener extends AbstractProActiveComponentController implemen
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false);
+    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	logHandler.insert(cs);

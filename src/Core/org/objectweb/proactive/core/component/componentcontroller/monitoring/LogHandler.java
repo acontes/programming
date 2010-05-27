@@ -38,6 +38,7 @@ public interface LogHandler {
 	
 	// obtain subset of entries
 	Map<ComponentRequestID, CallRecord> getCallRecordsFromParent(ComponentRequestID id);
+	Map<ComponentRequestID, RequestRecord> getRequestRecordsFromRoot(ComponentRequestID rootID);
 	
 	// clean the logs
 	void reset();

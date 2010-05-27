@@ -15,18 +15,20 @@ import java.io.Serializable;
  */
 public class PathItem implements Serializable {
 
-	String componentName;
+	String callerComponentName;
+	String calledComponentName;
 	String interfaceName;
 	String methodName;
 	
-	public PathItem(String c, String i, String m) {
-		this.componentName = c;
+	public PathItem(String c1, String c2, String i, String m) {
+		this.callerComponentName = c1;
+		this.calledComponentName = c2;
 		this.interfaceName = i;
 		this.methodName = m;
 	}
 
 	public String toString() {
-		return componentName + "." + interfaceName + "." + methodName;
+		return callerComponentName +" --> "+ calledComponentName + "." + interfaceName + "." + methodName;
 	}
 	
 }
