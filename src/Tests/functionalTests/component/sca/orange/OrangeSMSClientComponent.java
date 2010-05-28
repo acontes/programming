@@ -1,4 +1,4 @@
-package functionalTests.component.webservices.sca.restfull;
+package functionalTests.component.sca.orange;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;

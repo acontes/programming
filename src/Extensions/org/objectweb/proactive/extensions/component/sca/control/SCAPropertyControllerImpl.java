@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca.control;
+package org.objectweb.proactive.extensions.component.sca.control;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -50,9 +50,9 @@ import org.objectweb.fractal.api.control.AttributeController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.sca.Constants;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
+import org.objectweb.proactive.extensions.component.sca.Constants;
 
 
 public class SCAPropertyControllerImpl extends AbstractPAController implements SCAPropertyController {

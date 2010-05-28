@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca.control;
+package org.objectweb.proactive.extensions.component.sca.control;
 
 public interface SCAPropertyController {
     public void init();

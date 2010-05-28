@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca;
+package org.objectweb.proactive.extensions.component.sca;
 
 import java.util.Map;
 
@@ -44,7 +44,7 @@ import org.objectweb.fractal.api.factory.Factory;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
 
 /**

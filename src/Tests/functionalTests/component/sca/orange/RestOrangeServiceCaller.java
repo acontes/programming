@@ -1,4 +1,4 @@
-package functionalTests.component.webservices.sca.restfull;
+package functionalTests.component.sca.orange;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -14,17 +14,17 @@ public class RestOrangeServiceCaller implements PAWSCaller{
 	
 	private String constructUrl(String id,String from,String to,String content)
 	{
-		return rootUrl+"?id=["+id+"]&from=["+from+"]&to=["+to+"]&content=["+content+"]";
+		return rootUrl+"?id="+id+"&from="+from+"&to="+to+"&content="+content;
 	}
 	
 	public Object callWS(String methodName, Object[] args, Class<?> returnType) {
 		if(!methodName.equals("sendSMS"))
 		{
-			System.err.println("NoSuchMethode on webservice "+ methodName);
+			System.err.println("NoSuchMethode on this RESTful webservice: "+ methodName);
 		}
 		if(args.length!=4)
 		{
-			System.err.println("Nb of arguments are not correct!");
+			System.err.println("Nb of arguments is not correct!");
 		}
 		String url = constructUrl((String)args[0], (String)args[1], (String)args[2], (String)args[3]);
 		ResultatParseur resP = new ResultatParseur(url);
@@ -44,6 +44,7 @@ public class RestOrangeServiceCaller implements PAWSCaller{
 	}
 
 }
+
 class ResultatParseur extends DefaultHandler
 {
 	private String url;

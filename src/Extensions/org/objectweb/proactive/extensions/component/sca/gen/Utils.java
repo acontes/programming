@@ -34,32 +34,18 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca.gen;
-
-import org.objectweb.proactive.core.component.sca.exceptions.ClassGenerationFailedException;
-
+package org.objectweb.proactive.extensions.component.sca.gen;
 
 /**
+ * Utility class for bytecode generation operations.
  *
  * @author The ProActive Team
  */
-public class PropertyClassGenerator extends AbstractClassGenerator {
-    private static PropertyClassGenerator instance;
+public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
+    public static final String GENERATED_CLASSNAME_SUFFIX = GEN_ESCAPE_CHAR + "SCAClass";
 
-    public static PropertyClassGenerator instance() {
-        if (instance == null) {
-            return new PropertyClassGenerator();
-        } else {
-            return instance;
-        }
-    }
-
-    /**
-     *
-     * @param className Name of the component class.
-     * @return The generated class.
-     */
-    public String generateClass(String className) throws ClassGenerationFailedException {
-        return className;
+    public static String getPropertyClassName(String className) {
+        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "Property" +
+            GENERATED_CLASSNAME_SUFFIX;
     }
 }

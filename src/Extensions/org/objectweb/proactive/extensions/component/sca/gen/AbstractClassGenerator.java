@@ -34,14 +34,14 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca.gen;
+package org.objectweb.proactive.extensions.component.sca.gen;
 
 import javassist.ClassPool;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 
 
 /**

@@ -47,9 +47,9 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.sca.SCAConfig;
-import org.objectweb.proactive.core.component.sca.Utils;
-import org.objectweb.proactive.core.component.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.Utils;
+import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.sca.components.C;
@@ -65,7 +65,7 @@ public class TestSCAPropertyController extends ComponentTest {
     @Before
     public void setUp() throws Exception {
         //-Dsca.provider=org.objectweb.proactive.core.component.sca.SCAFractive
-        SCAConfig.SCA_PROVIDER.setValue("org.objectweb.proactive.core.component.sca.SCAFractive");
+        SCAConfig.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);

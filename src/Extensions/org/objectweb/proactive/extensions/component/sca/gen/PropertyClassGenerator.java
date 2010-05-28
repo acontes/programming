@@ -34,8 +34,32 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.webservices.sca.restfull;
+package org.objectweb.proactive.extensions.component.sca.gen;
 
-public interface Runner {
-	public boolean execute();
+import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
+
+
+/**
+ *
+ * @author The ProActive Team
+ */
+public class PropertyClassGenerator extends AbstractClassGenerator {
+    private static PropertyClassGenerator instance;
+
+    public static PropertyClassGenerator instance() {
+        if (instance == null) {
+            return new PropertyClassGenerator();
+        } else {
+            return instance;
+        }
+    }
+
+    /**
+     *
+     * @param className Name of the component class.
+     * @return The generated class.
+     */
+    public String generateClass(String className) throws ClassGenerationFailedException {
+        return className;
+    }
 }

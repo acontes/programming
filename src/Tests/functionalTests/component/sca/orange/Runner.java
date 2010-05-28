@@ -34,17 +34,8 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca;
+package functionalTests.component.sca.orange;
 
-import org.objectweb.proactive.annotation.PublicAPI;
-
-
-/**
- * Constant strings used throughout the SCA components implementation.
- *
- * @author The ProActive Team
- */
-@PublicAPI
-public interface Constants extends org.objectweb.proactive.core.component.Constants {
-    public final static String SCA_PROPERTY_CONTROLLER = "sca-property-controller";
+public interface Runner {
+	public boolean execute();
 }

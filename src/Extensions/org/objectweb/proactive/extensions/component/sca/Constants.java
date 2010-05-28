@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of
+ * Copyright (C) 1997-2010 INRIA/University of 
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2
+ * If needed, contact us to obtain a release under GPL Version 2 
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,17 +34,17 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca.control;
+package org.objectweb.proactive.extensions.component.sca;
 
-import org.objectweb.fractal.api.control.AttributeController;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
-* This interface simply extends the generic AttributeController defined in Fractal API.
-* Any component which need an attribute controller have to implement this interface.
-*
-* @author The ProActive Team
-*/
-public interface PAPropertyController extends AttributeController {
-
+ * Constant strings used throughout the SCA components implementation.
+ *
+ * @author The ProActive Team
+ */
+@PublicAPI
+public interface Constants extends org.objectweb.proactive.core.component.Constants {
+    public final static String SCA_PROPERTY_CONTROLLER = "sca-property-controller";
 }

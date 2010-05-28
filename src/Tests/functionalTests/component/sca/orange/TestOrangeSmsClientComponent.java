@@ -1,4 +1,4 @@
-package functionalTests.component.webservices.sca.restfull;
+package functionalTests.component.sca.orange;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
@@ -9,9 +9,9 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.sca.SCAConfig;
-import org.objectweb.proactive.core.component.sca.Utils;
-import org.objectweb.proactive.core.component.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.Utils;
+import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
 import functionalTests.FunctionalTest;
 
@@ -25,7 +25,7 @@ public class TestOrangeSmsClientComponent extends FunctionalTest {
 	@Before
 	public void setUp() throws Exception {
 		SCAConfig.SCA_PROVIDER
-				.setValue("org.objectweb.proactive.core.component.sca.SCAFractive");
+				.setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
 		boot = Utils.getBootstrapComponent();
 		tf = GCM.getGCMTypeFactory(boot);
 		gf = GCM.getGenericFactory(boot);
@@ -43,7 +43,7 @@ public class TestOrangeSmsClientComponent extends FunctionalTest {
 	public void testOrangeSmsClient() throws Exception {
 		Component c = gf.newFcInstance(t, "primitive",
 				OrangeSMSClientComponent.class.getName());
-		String url = "http://sms.beta.orange-api.net/sms/sendSMS.xml?";
+		String url = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
 		SCAPropertyController scap = Utils.getSCAPropertyController(c);
 		scap.init();
 		scap.setValue("id", "test");

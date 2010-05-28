@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.core.component.sca;
+package org.objectweb.proactive.extensions.component.sca;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
@@ -44,9 +44,9 @@ import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
-import org.objectweb.proactive.core.component.sca.exceptions.ClassGenerationFailedException;
-import org.objectweb.proactive.core.component.sca.gen.PropertyClassGenerator;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
+import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
 
 
 /**
@@ -62,7 +62,7 @@ import org.objectweb.proactive.core.node.Node;
 @PublicAPI
 public class SCAFractive extends Fractive {
     private static SCAFractive instance = null;
-    public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/core/component/sca/config/default-component-config.xml";
+    public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/extensions/component/sca/config/default-component-config.xml";
 
     /**
      * no-arg constructor (used by Fractal to get a bootstrap component)
