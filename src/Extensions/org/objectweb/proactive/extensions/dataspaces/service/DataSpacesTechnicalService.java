@@ -46,7 +46,7 @@ import javax.management.ObjectName;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.descriptor.services.TechnicalService;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
 import org.objectweb.proactive.core.jmx.notification.NotificationType;
@@ -229,8 +229,8 @@ public class DataSpacesTechnicalService implements TechnicalService {
     }
 
     private BaseScratchSpaceConfiguration readScratchConfiguration() {
-        final String scratchPath = PAProperties.PA_DATASPACES_SCRATCH_PATH.getValue();
-        final String scratchURL = PAProperties.PA_DATASPACES_SCRATCH_URL.getValue();
+        final String scratchPath = CentralPAPropertyRepository.PA_DATASPACES_SCRATCH_PATH.getValue();
+        final String scratchURL = CentralPAPropertyRepository.PA_DATASPACES_SCRATCH_URL.getValue();
 
         if (scratchURL == null && scratchPath == null) {
             logger.warn("No scratch space configuration specified for this node.");

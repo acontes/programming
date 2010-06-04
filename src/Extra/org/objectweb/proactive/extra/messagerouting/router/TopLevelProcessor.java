@@ -40,8 +40,8 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
@@ -49,10 +49,12 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.Message.MessageType;
 import org.objectweb.proactive.extra.messagerouting.router.processor.Processor;
+import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorClientHeartbeat;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDataReply;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDataRequest;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorDebug;
 import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorRegistrationRequest;
+import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorReloadConfiguration;
 
 
 /** Asynchronous message handler.
@@ -64,7 +66,7 @@ import org.objectweb.proactive.extra.messagerouting.router.processor.ProcessorRe
  * @since ProActive 4.1.0
  */
 class TopLevelProcessor implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
+    public static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
 
     /** The message to process */
     final private ByteBuffer message;
@@ -107,6 +109,12 @@ class TopLevelProcessor implements Runnable {
                     break;
                 case DEBUG_:
                     processor = new ProcessorDebug(this.message, this.attachment, this.router);
+                    break;
+                case HEARTBEAT_CLIENT:
+                    processor = new ProcessorClientHeartbeat(this.message, router);
+                    break;
+                case RELOAD_CONFIGURATION:
+                    processor = new ProcessorReloadConfiguration(this.message, router);
                     break;
                 default:
                     logger.error("Unexpected message type: " + type + ". Dropping message " + message);

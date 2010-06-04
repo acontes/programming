@@ -41,7 +41,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.body.request.RequestReceiverImpl;
 import org.objectweb.proactive.core.component.body.ComponentBody;
-import org.objectweb.proactive.core.config.PAProperties;
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -70,10 +70,9 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
     public int receiveRequest(Request r, Body bodyReceiver) {
         if (r instanceof ComponentRequest) {
             if (!((ComponentRequest) r).isControllerRequest()) {
-                if (PAProperties.PA_COMPONENT_USE_SHORTCUTS.isTrue()) {
-                    if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl().getInputInterceptors()
-                            .isEmpty() ||
-                        !((ComponentBody) bodyReceiver).getProActiveComponentImpl().getOutputInterceptors()
+                if (CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.isTrue()) {
+                    if (!((ComponentBody) bodyReceiver).getPAComponentImpl().getInputInterceptors().isEmpty() ||
+                        !((ComponentBody) bodyReceiver).getPAComponentImpl().getOutputInterceptors()
                                 .isEmpty()) {
                         if (logger.isDebugEnabled()) {
                             logger
@@ -87,7 +86,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
                     ((ComponentRequest) r).shortcutNotification(r.getSender(), bodyReceiver
                             .getRemoteAdapter());
 
-                    // TODO_M leave a ref of the shortcut
+                    // TODO leave a ref of the shortcut
                     if (logger.isDebugEnabled()) {
                         logger
                                 .debug("directly executing request " +
@@ -99,7 +98,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
                     }
                 }
                 bodyReceiver.serve(r);
-                // TODO_M check with FT
+                // TODO check with FT
                 return SynchronousComponentRequestReceiver.SHORTCUT;
             }
         }

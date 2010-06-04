@@ -49,9 +49,7 @@ public class SshRMIClientSocketFactory implements RMIClientSocketFactory, Serial
 
     public SshRMIClientSocketFactory(SshConfig config) {
         synchronized (tunnelLock) {
-            if (tunnelPool == null) {
-                tunnelPool = new SshTunnelPool(config);
-            }
+            tunnelPool = new SshTunnelPool(config);
         }
     }
 

@@ -38,14 +38,13 @@ package org.objectweb.proactive.extra.messagerouting.client;
 
 import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.Socket;
+import java.net.SocketException;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
-import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingSocketFactorySelector;
 
 
 /** The entity in charge to send and receive data on the wire
@@ -61,7 +60,7 @@ import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfact
  * @since ProActive 4.1.0
  */
 public class Tunnel {
-    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_CLIENT_TUNNEL);
+    static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_CLIENT_TUNNEL);
 
     final private Socket socket;
     final private BufferedInputStream bis;
@@ -128,7 +127,7 @@ public class Tunnel {
         return this.socket.isConnected();
     }
 
-    public void shutdown() {
+    public synchronized void shutdown() {
         try {
             this.socket.close();
         } catch (IOException e) {
@@ -166,5 +165,13 @@ public class Tunnel {
 
     String getRemoteAddress() {
         return this.socket.getInetAddress().toString();
+    }
+
+    public void setSoTimeout(int l) {
+        try {
+            this.socket.setSoTimeout(l);
+        } catch (SocketException e) {
+            logger.warn("Failed to set the socket timeout on PAMR tunnel", e);
+        }
     }
 }

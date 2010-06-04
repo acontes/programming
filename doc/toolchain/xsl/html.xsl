@@ -14,7 +14,7 @@
 	<!-- Configure the html stylesheet to use -->
 	<xsl:param name="html.stylesheet" select="'main.css'" />
 	<!-- Just use the image size for the html output. Width=... has no effect. -->
-	<xsl:param name="ignore.image.scaling">1</xsl:param>
+	<xsl:param name="ignore.image.scaling">0</xsl:param>
 	<!-- Relative position for the htmlized java files -->
 	<xsl:param name="html.java.files">../ProActive_src_html/org/objectweb/proactive/</xsl:param>
 	<xsl:param name="html.java.suffix">.html</xsl:param>
@@ -570,22 +570,12 @@
 	<xsl:template match="newline">
 		<br />
 	</xsl:template>
-
+	
 
 	<xsl:template match="emphasis">
 		<xsl:choose>
 			<xsl:when test="@role='bold' or @role='' or @role='strong'">
-				<xsl:choose>
-					<!--  BOLD WITHIN PROGRAMLISTING -->
-					<xsl:when test="parent::programlisting">
-						<xsl:attribute name="color">#eaf91f</xsl:attribute>
-						<xsl:call-template name="inline.boldseq" />
-					</xsl:when>
-					<!-- NORMAL BOLD  -->
-					<xsl:otherwise>
-						<xsl:call-template name="inline.boldseq" />
-					</xsl:otherwise>
-				</xsl:choose>
+				<xsl:call-template name="inline.boldseq" />
 			</xsl:when>
 			<!--  ITALICS -->
 			<xsl:when test="@role='italics'">

@@ -36,6 +36,9 @@
  */
 package org.objectweb.proactive.extra.messagerouting.router;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -47,8 +50,11 @@ import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
@@ -57,13 +63,18 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.exceptions.IOException6;
 import org.objectweb.proactive.core.util.ProActiveRandom;
+import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.core.util.SweetCountDownLatch;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.MagicCookie;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.HeartbeatMessage;
+import org.objectweb.proactive.extra.messagerouting.protocol.message.HeartbeatRouterMessage;
 import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessage.ErrorType;
 
 
@@ -72,13 +83,16 @@ import org.objectweb.proactive.extra.messagerouting.protocol.message.ErrorMessag
  * @since ProActive 4.1.0
  */
 public class RouterImpl extends RouterInternal implements Runnable {
-    public static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER);
-    public static final Logger admin_logger = ProActiveLogger.getLogger(Loggers.FORWARDING_ROUTER_ADMIN);
+    public static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER);
+    public static final Logger admin_logger = ProActiveLogger
+            .getLogger(PAMRConfig.Loggers.FORWARDING_ROUTER_ADMIN);
 
     static final public int DEFAULT_PORT = 33647;
 
     /** Read {@link ByteBuffer} size. */
     private final static int READ_BUFFER_SIZE = 4096;
+
+    public final static long DEFAULT_ROUTER_ID = Long.MIN_VALUE;
 
     /** True is the router must stop or is stopped*/
     private final AtomicBoolean stopped = new AtomicBoolean(false);
@@ -104,6 +118,15 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
     /** An unique identifier for this router */
     private final long routerId;
+    /** The administrator magic cookie 
+     *
+     * This cookie must be provided to perform remote administrative operations
+     */
+    volatile private MagicCookie adminMagicCookie;
+
+    private final File configFile;
+
+    private final int heartbeatTimeout;
 
     /** Create a new router
      * 
@@ -121,7 +144,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
      * @param port port number to bind to
      * @throws IOException if the router failed to bind
      */
-    RouterImpl(RouterConfig config) throws IOException {
+    RouterImpl(RouterConfig config) throws Exception {
+        this.configFile = config.getReservedAgentConfigFile();
+        this.heartbeatTimeout = config.getHeartbeatTimeout();
 
         init(config);
         tpe = Executors.newFixedThreadPool(config.getNbWorkerThreads());
@@ -133,7 +158,9 @@ public class RouterImpl extends RouterInternal implements Runnable {
         this.routerId = rand;
     }
 
-    private void init(RouterConfig config) throws IOException {
+    private void init(RouterConfig config) throws Exception {
+        reloadConfigurationFile();
+
         // Create a new selector
         selector = Selector.open();
 
@@ -149,7 +176,8 @@ public class RouterImpl extends RouterInternal implements Runnable {
         serverSocket.bind(isa);
 
         this.port = serverSocket.getLocalPort();
-        logger.info("Message router listening on " + serverSocket.toString());
+        logger.info("Message router listening on " + serverSocket.toString() + ". Heartbeat timeout is " +
+            this.heartbeatTimeout + " ms");
 
         // register the listener with the selector
         ssc.register(selector, SelectionKey.OP_ACCEPT);
@@ -161,6 +189,85 @@ public class RouterImpl extends RouterInternal implements Runnable {
             logger.error("A select thread has already been started, aborting the current thread ",
                     new Exception());
             return;
+        }
+
+        // Start the thread in charge of sending the heartbeat
+        final int period = this.heartbeatTimeout / 3;
+        if (period > 0) {
+            Thread t = new Thread() {
+                public void run() {
+                    long heartbeatId = 0;
+
+                    while (!stopped.get()) {
+                        try { // preventive try/catch. This thread MUST NOT stop or exit
+                            long startTime = System.currentTimeMillis();
+
+                            Collection<Client> clients;
+                            synchronized (clientMap) {
+                                clients = clientMap.values();
+                            }
+
+                            sendHeartbeat(clients, heartbeatId);
+                            checkHeartbeat(clients);
+
+                            long willSleep = period - (System.currentTimeMillis() - startTime);
+                            if (willSleep > 0) {
+                                new Sleeper(willSleep).sleep();
+                            } else {
+                                logger
+                                        .info("Router is late. Sending heartbeat to every clients took more than " +
+                                            period + "ms");
+                            }
+                        } catch (Throwable t) {
+                            logger.warn("Failed to send heartbeat #" + heartbeatId, t);
+                        } finally {
+                            heartbeatId++;
+                        }
+                    }
+                }
+
+                public void sendHeartbeat(final Collection<Client> clients, long heartbeatId) {
+                    HeartbeatMessage hbMessage = new HeartbeatRouterMessage(heartbeatId);
+                    byte[] msg = hbMessage.toByteArray();
+                    for (Client client : clients) {
+                        try {
+                            if (client.isConnected()) {
+                                client.sendMessage(msg);
+                            }
+                        } catch (IOException e) {
+                            admin_logger.debug("Failed to send heartbeat #" + heartbeatId + " to " + client);
+                        }
+                    }
+                }
+
+                public void checkHeartbeat(final Collection<Client> clients) {
+                    long currentTime = System.currentTimeMillis();
+
+                    for (Client client : clients) {
+                        if (client.isConnected()) {
+                            if ((currentTime - client.getLastSeen()) > heartbeatTimeout) {
+                                // Disconnect
+                                logger.info("Client " + client + " disconnected due to late heartbeat");
+                                try {
+                                    client.disconnect();
+                                } catch (IOException e) {
+                                    logger.info("Failed to disconnected client " + client, e);
+                                }
+
+                                // Broadcast the disconnection to every client
+                                // If client is null, then the handshake has not completed and we
+                                // don't need to broadcast the disconnection
+                                AgentID disconnectedAgent = client.getAgentId();
+                                tpe.submit(new DisconnectionBroadcaster(clients, disconnectedAgent));
+                            }
+                        }
+                    }
+                }
+            };
+            t.setDaemon(true);
+            t.setPriority(Thread.MAX_PRIORITY);
+            t.setName("PAMR: heartbeat sender");
+            t.start();
         }
 
         Set<SelectionKey> selectedKeys = null;
@@ -373,5 +480,119 @@ public class RouterImpl extends RouterInternal implements Runnable {
 
     public long getId() {
         return this.routerId;
+    }
+
+    private Map<AgentID, MagicCookie> validateConfigFile() throws Exception {
+        Properties properties = new Properties();
+        MagicCookie configMagicCookie = null;
+
+        try {
+            FileInputStream fis = new FileInputStream(this.configFile);
+            properties.load(fis);
+        } catch (FileNotFoundException e) {
+            throw new IOException("Router configuration file does not exist: " + this.configFile);
+        } catch (IOException e) {
+            throw new IOException6("Failed to read the router configuration file: " + this.configFile, e);
+        } catch (IllegalArgumentException e) {
+            throw new IOException6("Failed to read the router configuation file: " + this.configFile, e);
+        }
+
+        Map<AgentID, MagicCookie> map = new HashMap<AgentID, MagicCookie>();
+        for (Object o : properties.keySet()) {
+            String sId = (String) o;
+            String sCookie = (String) properties.get(o);
+
+            if ("configuration".equals(sId)) {
+                if (configMagicCookie != null) {
+                    throw new Exception("Duplicated configuration magic cookie");
+                } else {
+                    try {
+                        configMagicCookie = new MagicCookie(properties.getProperty(sId));
+                    } catch (IllegalArgumentException e) {
+                        throw new Exception("Invalid configuration magic cookie", e);
+                    }
+                }
+            } else {
+
+                AgentID agentId = null;
+                try {
+                    agentId = new AgentID(Long.parseLong(sId));
+                } catch (NumberFormatException e) {
+                    throw new Exception("Invalid configuration file" + this.configFile +
+                        ": Keys must be an integer but " + sId + " is not");
+                }
+
+                MagicCookie cookie = null;
+                try {
+                    cookie = new MagicCookie(sCookie);
+                } catch (IllegalArgumentException e) {
+                    throw new Exception("Invalid configuration file " + this.configFile +
+                        ": invalid cookie value  " + sCookie + ". " + e.getMessage());
+                }
+
+                if (!agentId.isReserved()) {
+                    throw new Exception("Invalid configuration file " + this.configFile +
+                        ": invalid Agent ID " + sId + "Agent ID must be between 0 and " +
+                        (AgentID.MIN_DYNAMIC_AGENT_ID - 1));
+                }
+                map.put(agentId, cookie);
+            }
+        }
+
+        if (configMagicCookie == null) {
+            throw new Exception(
+                "Configuration magic cookie must be defined in the configuration file (key: configuration)");
+        }
+
+        admin_logger.debug("Set config magic cookie to: " + configMagicCookie);
+        this.adminMagicCookie = configMagicCookie;
+
+        return map;
+    }
+
+    synchronized public void reloadConfigurationFile() throws Exception {
+        if (this.configFile == null) {
+            return;
+        }
+
+        Map<AgentID, MagicCookie> map = validateConfigFile();
+        synchronized (this.clientMap) {
+            for (AgentID agentId : this.clientMap.keySet()) {
+                if (agentId.isReserved() && !map.containsKey(agentId)) {
+                    try {
+                        this.clientMap.get(agentId).disconnect();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        this.clientMap.remove(agentId);
+                        admin_logger.debug("Removed reserved agent " + agentId + " (configuration change)");
+                    }
+                }
+            }
+
+            for (AgentID agentID : map.keySet()) {
+                Client client = this.clientMap.get(agentID);
+                if (client != null) {
+                    // Disconnect the client and change the id
+                    client.discardAttachment();
+                }
+                client = new Client(agentID, map.get(agentID));
+                this.clientMap.put(agentID, client);
+                admin_logger.debug("Disconnected reserved agent " + agentID +
+                    " and updated magic cookie (configuration change)");
+            }
+        }
+    }
+
+    public MagicCookie getAdminMagicCookie() {
+        return this.adminMagicCookie;
+    }
+
+    public File getConfigurationFile() {
+        return this.configFile;
+    }
+
+    public int getHeartbeatTimeout() {
+        return this.heartbeatTimeout;
     }
 }

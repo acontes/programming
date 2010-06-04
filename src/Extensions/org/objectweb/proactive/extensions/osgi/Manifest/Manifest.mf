@@ -1,4 +1,5 @@
 Bundle-Name: ProActive Bundle
+Bundle-SymbolicName: ProActive Bundle
 Bundle-Description: Bundle containing proactive library
 Bundle-Vendor: OASIS - INRIA Sophia Antipolis
 Bundle-version: 1.0.0
@@ -59,7 +60,7 @@ Export-Package: org.objectweb.proactive,
  org.objectweb.proactive.core.component.body,
  org.objectweb.proactive.core.component.collectiveitfs,
  org.objectweb.proactive.core.component.config,
- org.objectweb.proactive.core.component.controller,
+ org.objectweb.proactive.core.component.control,
  org.objectweb.proactive.core.component.exceptions,
  org.objectweb.proactive.core.component.factory,
  org.objectweb.proactive.core.component.gen,
@@ -191,7 +192,14 @@ Export-Package: org.objectweb.proactive,
  org.objectweb.proactive.mpi,
  org.objectweb.proactive.mpi.control,
  org.objectweb.proactive.mpi.control.util,
-DynamicImport-Package: * 
+Import-Package: org.osgi.framework,
+ org.apache.felix.servicebinder,
+ org.osgi.service.http,
+ org.ungoverned.osgi.service.shell,
+ org.apache.log4j,
+ org.apache.log4j.spi,
+ org.bouncycastle.jce.provider
+DynamicImport-Package: *
 Bundle-Location: file:bundles/proactiveBundle.jar
 Bundle-Activator: org.objectweb.proactive.extensions.osgi.Activator
 Metadata-Location: metadata.xml

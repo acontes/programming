@@ -36,9 +36,13 @@
  */
 package org.objectweb.proactive.extra.messagerouting.router;
 
+import java.io.File;
 import java.net.InetAddress;
+import java.util.Map;
 
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
+import org.objectweb.proactive.extra.messagerouting.protocol.MagicCookie;
 
 
 /** A bean for router configuration. 
@@ -63,11 +67,16 @@ public class RouterConfig {
 
     private InetAddress inetAddress;
 
+    private File reservedAgentConfigFile;
+
+    private int heartbeatTimeout;
+
     public RouterConfig() {
         this.port = 0;
         this.isDaemon = false;
         this.nbWorkerThreads = 4;
         this.inetAddress = null;
+        this.heartbeatTimeout = 1000;
     }
 
     public void setReadOnly() {
@@ -133,6 +142,22 @@ public class RouterConfig {
     /** The {@link InetAddress} on which the router will listen */
     public void setInetAddress(InetAddress inetAddress) {
         this.inetAddress = inetAddress;
+    }
+
+    public void setReservedAgentConfigFile(File file) {
+        this.reservedAgentConfigFile = file;
+    }
+
+    public File getReservedAgentConfigFile() {
+        return this.reservedAgentConfigFile;
+    }
+
+    public int getHeartbeatTimeout() {
+        return heartbeatTimeout;
+    }
+
+    public void setHeartbeatTimeout(int heartbeatTimeout) {
+        this.heartbeatTimeout = heartbeatTimeout;
     }
 
 }

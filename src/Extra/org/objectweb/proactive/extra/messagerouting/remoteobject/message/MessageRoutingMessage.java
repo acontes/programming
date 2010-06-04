@@ -41,9 +41,10 @@ import java.io.Serializable;
 import java.net.URI;
 
 import org.apache.log4j.Logger;
+import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
-import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 import org.objectweb.proactive.extra.messagerouting.client.Agent;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
 import org.objectweb.proactive.extra.messagerouting.remoteobject.util.PamrMarshaller;
@@ -55,7 +56,7 @@ import org.objectweb.proactive.extra.messagerouting.remoteobject.util.PamrMarsha
  */
 
 public abstract class MessageRoutingMessage implements Serializable {
-    static final Logger logger = ProActiveLogger.getLogger(Loggers.FORWARDING_REMOTE_OBJECT);
+    static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_REMOTE_OBJECT);
 
     /** The recipient of this message */
     final protected URI uri;
@@ -112,13 +113,19 @@ public abstract class MessageRoutingMessage implements Serializable {
                 this.returnedObject = this.marshaller.unmarshallObject(response);
             }
         } catch (MessageRoutingException e) {
-            logger.error("Failed to send message to " + this.uri, e);
+            if (logger.isDebugEnabled()) {
+                logger.debug("Failed to send message to " + this.uri, e);
+            }
             throw e;
         } catch (IOException e) {
-            logger.error("Failed to serialize this message, reason:" + e.getMessage(), e);
+            if (logger.isDebugEnabled()) {
+                logger.error("Failed to serialize this message, reason:" + e.getMessage(), e);
+            }
             throw new MessageRoutingException(e);
         } catch (ClassNotFoundException e) {
-            logger.error("Failed to deserialize the reply for this message, reason:" + e.getMessage(), e);
+            if (logger.isDebugEnabled()) {
+                logger.error("Failed to deserialize the reply for this message, reason:" + e.getMessage(), e);
+            }
             throw new MessageRoutingException(e);
         }
     }

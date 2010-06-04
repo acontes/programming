@@ -38,7 +38,6 @@ package org.objectweb.proactive.examples.documentation.faulttolerance;
 
 import java.io.IOException;
 
-import org.objectweb.proactive.core.body.ft.servers.FTServer;
 import org.objectweb.proactive.core.process.JVMProcessImpl;
 
 
@@ -47,7 +46,8 @@ public class Main {
         //@snippet-start fault_tolerance_1
         JVMProcessImpl jvmProcessImpl = new JVMProcessImpl(
             new org.objectweb.proactive.core.process.AbstractExternalProcess.StandardOutputMessageLogger());
-        jvmProcessImpl.setClassname("org.objectweb.proactive.core.body.ft.servers.StartFTServer");
+        jvmProcessImpl.setClassname(org.objectweb.proactive.core.body.ft.servers.StartFTServer.class
+                .getName());
 
         // optional line: Default arguments
         jvmProcessImpl.setParameters("-proto cic -name FTServer -port 1100 -fdperiod 30");

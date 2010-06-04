@@ -39,7 +39,6 @@ package org.objectweb.proactive.extra.messagerouting.protocol.message;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.proactive.core.remoteobject.http.util.HttpMarshaller;
 import org.objectweb.proactive.extra.messagerouting.exceptions.MalformedMessageException;
 import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
 import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
@@ -121,7 +120,13 @@ public class ErrorMessage extends DataMessage {
          * Existing clients try to reconnect the endpoint.
          */
         ERR_INVALID_ROUTER_ID,
-
+        /** Client advertised a wrong magic cookie on (re)connection
+         *
+         * This message is send when a client send a {@link MessageType#REGISTRATION_REQUEST}
+         * with a wrong magic cookie. If so, the client is not allowed to connect and
+         * the connection is terminated.
+         */
+        ERR_WRONG_MAGIC_COOKIE,
         /** A corrupted message was received, and cannot be
          * properly treated by the receiver.
          *

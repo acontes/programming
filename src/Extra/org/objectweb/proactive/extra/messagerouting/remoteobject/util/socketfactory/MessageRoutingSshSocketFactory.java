@@ -39,9 +39,12 @@ package org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfac
 import java.io.IOException;
 import java.net.Socket;
 
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.config.PAProperties;
 import org.objectweb.proactive.core.ssh.SshConfig;
 import org.objectweb.proactive.core.ssh.SshTunnelPool;
+import org.objectweb.proactive.core.ssh.SshConfigFileParser.SshToken;
+import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 
 
 /**
@@ -61,39 +64,42 @@ public class MessageRoutingSshSocketFactory implements MessageRoutingSocketFacto
 
         this.config.setGcInterval(60000);
 
-        if (PAProperties.PA_PAMRSSH_CONNECT_TIMEOUT.isSet()) {
-            int connectTimeout = PAProperties.PA_PAMRSSH_CONNECT_TIMEOUT.getValueAsInt();
+        if (PAMRConfig.PA_PAMRSSH_CONNECT_TIMEOUT.isSet()) {
+            int connectTimeout = PAMRConfig.PA_PAMRSSH_CONNECT_TIMEOUT.getValue();
             this.config.setConnectTimeout(connectTimeout);
         }
 
-        if (PAProperties.PA_PAMRSSH_GC_IDLETIME.isSet()) {
-            int gcIdleTime = PAProperties.PA_PAMRSSH_GC_IDLETIME.getValueAsInt();
+        if (PAMRConfig.PA_PAMRSSH_GC_IDLETIME.isSet()) {
+            int gcIdleTime = PAMRConfig.PA_PAMRSSH_GC_IDLETIME.getValue();
             this.config.setGcIdleTime(gcIdleTime);
         }
 
-        if (PAProperties.PA_PAMRSSH_GC_PERIOD.isSet()) {
-            int gcInterval = PAProperties.PA_PAMRSSH_GC_PERIOD.getValueAsInt();
+        if (PAMRConfig.PA_PAMRSSH_GC_PERIOD.isSet()) {
+            int gcInterval = PAMRConfig.PA_PAMRSSH_GC_PERIOD.getValue();
             this.config.setGcInterval(gcInterval);
         }
 
-        if (PAProperties.PA_PAMRSSH_KEY_DIR.isSet()) {
-            String dir = PAProperties.PA_PAMRSSH_KEY_DIR.getValue();
+        if (PAMRConfig.PA_PAMRSSH_KEY_DIR.isSet()) {
+            String dir = PAMRConfig.PA_PAMRSSH_KEY_DIR.getValue();
             this.config.setKeyDir(dir);
         }
 
-        if (PAProperties.PA_PAMRSSH_KNOWN_HOSTS.isSet()) {
-            String knownhost = PAProperties.PA_PAMRSSH_KNOWN_HOSTS.getValue();
+        if (PAMRConfig.PA_PAMRSSH_KNOWN_HOSTS.isSet()) {
+            String knownhost = PAMRConfig.PA_PAMRSSH_KNOWN_HOSTS.getValue();
             this.config.setKnowHostFile(knownhost);
         }
 
-        if (PAProperties.PA_PAMRSSH_REMOTE_PORT.isSet()) {
-            int port = PAProperties.PA_PAMRSSH_REMOTE_PORT.getValueAsInt();
-            this.config.setPort(port);
+        if (PAMRConfig.PA_PAMRSSH_REMOTE_PORT.isSet()) {
+            int port = PAMRConfig.PA_PAMRSSH_REMOTE_PORT.getValue();
+            this.config.addHostInformation(PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue(), SshToken.PORT, String
+                    .valueOf(port));
         }
 
-        if (PAProperties.PA_PAMRSSH_REMOTE_USERNAME.isSet()) {
-            String username = PAProperties.PA_PAMRSSH_REMOTE_USERNAME.getValue();
-            this.config.setUsername(username);
+        if (PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.isSet()) {
+            String username = PAMRConfig.PA_PAMRSSH_REMOTE_USERNAME.getValue();
+
+            this.config.addHostInformation(PAMRConfig.PA_NET_ROUTER_ADDRESS.getValue(), SshToken.USERNAME,
+                    username);
         }
 
         this.tp = new SshTunnelPool(this.config);

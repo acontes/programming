@@ -58,8 +58,24 @@ import org.objectweb.proactive.extra.messagerouting.protocol.TypeHelper;
  */
 public abstract class Message {
 
-    /** Protocol version implemented by this class */
+    /** Protocol version 1
+     *
+     * The initial PAMR protocol as release with ProActive 4.2.0
+     */
+    @Deprecated
     public static final int PROTOV1 = 1;
+
+    /** Protocol version 2
+     *
+     * V2 adds an heartbeat mechanism and introduce a new message type
+     * {@link HeartbeatMessage}. Since this message type in not handled
+     * by clients supporting V1, the V2 is not backward compatible.
+     *
+     * If we want to support both V1 and V2 then the router must check
+     * the version supported by the client and sent heartbeats only to
+     * clients supporting V2.
+     */
+    public static final int PROTOV2 = 2;
 
     /** All the message types supported by the ProActive message routing protocol */
     /* ORDER MATTERS ! ordinal() is used to attribute an id to each message type */
@@ -75,7 +91,13 @@ public abstract class Message {
         /** An error notification. Send by the router to a client */
         ERR_,
         /** A message only used for debug and testing */
-        DEBUG_
+        DEBUG_,
+        /** An heartbeat send by a client to the the router to check the connection */
+        HEARTBEAT_CLIENT,
+        /** An heartbeat send by the router to the clients to check the connection */
+        HEARTBEAT_ROUTER,
+        /** A message sent by the CLI tool, to ask the router to reload its configuration file*/
+        RELOAD_CONFIGURATION
         /* That's all*/
         ;
 
@@ -109,6 +131,12 @@ public abstract class Message {
                     return "ERR";
                 case DEBUG_:
                     return "DBG";
+                case HEARTBEAT_CLIENT:
+                    return "HEARTBEAT_CLIENT";
+                case HEARTBEAT_ROUTER:
+                    return "HEARTBEAT_ROUTER";
+                case RELOAD_CONFIGURATION:
+                    return "RELOAD_CONFIGURATION";
                 default:
                     return super.toString();
             }
@@ -259,6 +287,12 @@ public abstract class Message {
                 return new ErrorMessage(buf, offset);
             case DEBUG_:
                 return new DebugMessage(buf, offset);
+            case HEARTBEAT_CLIENT:
+                return new HeartbeatClientMessage(buf, offset);
+            case HEARTBEAT_ROUTER:
+                return new HeartbeatRouterMessage(buf, offset);
+            case RELOAD_CONFIGURATION:
+                return new ReloadConfigurationMessage(buf, offset);
             default:
                 throw new MalformedMessageException("Unknown message type: " + type);
         }
@@ -338,7 +372,7 @@ public abstract class Message {
      */
     protected Message(MessageType type, long messageId) {
         this.type = type;
-        this.protoId = PROTOV1;
+        this.protoId = PROTOV2;
         this.messageId = messageId;
     }
 
@@ -365,7 +399,7 @@ public abstract class Message {
                 "Invalid value for " + Field.LENGTH + " field:" + this.length);
         }
 
-        if (this.protoId != PROTOV1) {
+        if (this.protoId != PROTOV2) {
             throw new MalformedMessageException("Malformed " + type.toString() + " message: " +
                 "Invalid value for " + Field.PROTO_ID + " field:" + this.protoId);
         }
