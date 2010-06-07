@@ -46,7 +46,10 @@ public class TestOrangeSmsClientComponent extends FunctionalTest {
 		String url = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
 		SCAPropertyController scap = Utils.getSCAPropertyController(c);
 		scap.init();
-		scap.setValue("id", "test");
+		scap.setValue("id", "test"); // Change me
+		scap.setValue("from", "38100");
+        scap.setValue("to", "33600000000"); // Change me
+        scap.setValue("content", "Respecte mon authorité!!");
 		GCM.getBindingController(c).bindFc(
 				OrangeSMSClientComponent.SERVICES_NAME,
 				url + "(" + RestOrangeServiceCaller.class.getName() + ")");

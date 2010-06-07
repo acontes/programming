@@ -57,8 +57,6 @@ import org.objectweb.proactive.extensions.component.sca.Constants;
 
 public class SCAPropertyControllerImpl extends AbstractPAController implements SCAPropertyController {
 
-    private AttributeController buildInAttributeController;
-
     /**
      * declared properties' types
      */
@@ -76,7 +74,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      */
     private List<String> initilizedProperties = new ArrayList<String>();
 
-    private Component ownerRef;
 
     /**
      * initialize all private fields .
@@ -85,24 +82,9 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      */
     public SCAPropertyControllerImpl(Component owner) {
         super(owner);
-        this.ownerRef = owner;
-        /*try {
-        	buildInAttributeController=(AttributeController)owner.getFcInterface(Constants.ATTRIBUTE_CONTROLLER);
-        } catch (NoSuchInterfaceException e) {
-        	e.printStackTrace();
-        }
-        propertyNames=getDeclaredPropertyNamesInList();
-        for (String element : propertyNames) {
-        	types.put(element, getDeclaredPropertyType(element));
-        }*/
     }
 
     public void init() {
-        try {
-            buildInAttributeController = GCM.getAttributeController(ownerRef);
-        } catch (NoSuchInterfaceException e) {
-            e.printStackTrace();
-        }
         propertyNames = getDeclaredPropertyNamesInList();
         for (String element : propertyNames) {
             types.put(element, getDeclaredPropertyType(element));
@@ -176,17 +158,19 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         try {
             Object args[] = new Object[1];
             args[0] = value;
-            Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);
+            //Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);
+            Object ObjToInvoke = owner.getReferenceOnBaseObject();
+            Method setter = ObjToInvoke.getClass().getMethod(setterName, typeAttribute);
             initilizedProperties.add(name);
             try {
-                setter.invoke(buildInAttributeController, args);
+                setter.invoke(ObjToInvoke, args);
             } catch (IllegalArgumentException e) {
                 System.err.println("problem on invoking arguments!! " + args);
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 System.err.println("problem on invoking object !!" +
-                    buildInAttributeController.getClass().getName());
+                		ObjToInvoke.getClass().getName());
                 e.printStackTrace();
             }
         } catch (SecurityException e) {
@@ -218,16 +202,17 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         String NameUp = NameUp(name);
         String getterName = "get" + NameUp;
         try {
-            Method getter = buildInAttributeController.getClass().getMethod(getterName);
+        	Object ObjToInvoke = owner.getReferenceOnBaseObject();
+            Method getter = ObjToInvoke.getClass().getMethod(getterName);           
             initilizedProperties.add(name);
             try {
-                Object res = getter.invoke(buildInAttributeController);
+                Object res = getter.invoke(ObjToInvoke);
                 return res;
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
                 System.err.println("problem on invoking object !!" +
-                    buildInAttributeController.getClass().getName());
+                		ObjToInvoke.getClass().getName());
                 e.printStackTrace();
             }
         } catch (SecurityException e) {
@@ -275,7 +260,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * class.
      */
     private List<String> getDeclaredPropertyNamesInList() {
-        Method methods[] = buildInAttributeController.getClass().getMethods();
+    	Object ObjToInvoke = owner.getReferenceOnBaseObject();
+        Method methods[] = ObjToInvoke.getClass().getMethods();
         List<String> namesList = new ArrayList<String>();
         for (int i = 0; i < methods.length; i++) {
             String tmp = methods[i].getName();
