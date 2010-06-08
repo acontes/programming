@@ -195,7 +195,7 @@ public class FastSelector {
 
         /**
          * Create a new instance of Tree using type and name
-         *
+         * 
          * @param type the type of the leaf
          * @param name the name of the new tree (leaf)
          */
@@ -209,7 +209,7 @@ public class FastSelector {
 
         /**
          * Add a tree to the list of leaves
-         *
+         * 
          * @param tree the new tree to add
          */
         void add(Tree tree) {
@@ -223,7 +223,7 @@ public class FastSelector {
         /**
          * Add this path to this tree.
          * Create every missing leaves if needed.
-         *
+         * 
          * @param path the list of directory/filename to add to the tree
          */
         void addPath(LinkedList<String> path) {
@@ -251,7 +251,7 @@ public class FastSelector {
          * Search if the given name is a leaf of this tree
          * If yes, the selected tree is returned.
          * If no, null is returned.
-         *
+         * 
          * @param name the name to search for.
          * @return the selected tree if found, null if not.
          */
@@ -266,7 +266,7 @@ public class FastSelector {
 
         /**
          * Return true if the name is "**"
-         *
+         * 
          * @return true if the name is "**", false if not
          */
         boolean hasDoubleStars() {
@@ -285,7 +285,7 @@ public class FastSelector {
          * Search if the given name matches a leaf of this tree
          * If yes, the selected tree is returned.
          * If no, null is returned.
-         *
+         * 
          * @param name the name to search for.
          * @param caseSensitive true if the match must be case sensitive, false if not
          * @return the selected tree if found, null if not.
@@ -303,7 +303,7 @@ public class FastSelector {
 
         /**
          * Get the leaves of this tree
-         *
+         * 
          * @return the leaves of this tree
          */
         Set<Tree> getLeaves() {
@@ -312,7 +312,7 @@ public class FastSelector {
 
         /**
          * Get the type of this tree
-         *
+         * 
          * @return the type of this tree
          */
         LeafType getType() {
@@ -321,7 +321,7 @@ public class FastSelector {
 
         /**
          * Get the name of this tree
-         *
+         * 
          * @return the name of this tree
          */
         String getName() {
