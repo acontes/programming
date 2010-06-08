@@ -37,7 +37,7 @@
 package functionalTests.component.sca.components;
 
 public class C implements CAttributes {
-    private boolean x1;
+    public boolean x1;
     private byte x2;
     private char x3;
     private short x4;
@@ -47,6 +47,7 @@ public class C implements CAttributes {
     private double x8;
     private String x9;
     private boolean x11;
+    public int x12;
 
     // ATTRIBUTE CONTROLLER
     public boolean getX1() {

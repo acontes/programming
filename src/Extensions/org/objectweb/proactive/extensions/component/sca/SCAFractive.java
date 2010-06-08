@@ -88,8 +88,9 @@ public class SCAFractive extends Fractive {
             controllerDesc.getHierarchicalType(), DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION);
         if (newControllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)) {
             String className = contentDesc.getClassName();
+            System.err.println("DEBUGG "+ className);
             // Test whether the component class has a property annotation
-            boolean hasSCAProperty = false;
+            boolean hasSCAProperty = true;
             if (hasSCAProperty) {
                 try {
                     contentDesc.setClassName(PropertyClassGenerator.instance().generateClass(className));

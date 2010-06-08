@@ -36,6 +36,23 @@
  */
 package org.objectweb.proactive.extensions.component.sca.gen;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Iterator;
+
+import javassist.CannotCompileException;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtField;
+import javassist.CtMember;
+import javassist.CtMethod;
+import javassist.CtNewConstructor;
+import javassist.CtNewMethod;
+import javassist.Modifier;
+import javassist.NotFoundException;
+
+import org.objectweb.proactive.core.component.PAInterfaceImpl;
+import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 
 
@@ -53,13 +70,86 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
             return instance;
         }
     }
-
+    
+    /**
+     * convert a String to another string which the first case become capital
+     * "cool" --> "Cool"
+     * @param name
+     * @return String which first case is capital letter
+     */
+    private String NameUp(String name) {
+        char[] nameUpper = name.toCharArray();
+        nameUpper[0] = Character.toUpperCase(nameUpper[0]);
+        String nameUp = new String(nameUpper);
+        //System.out.println("Debug Nameup : "+nameUp);
+        return nameUp;
+    }
+    
     /**
      *
      * @param className Name of the component class.
      * @return The generated class.
      */
     public String generateClass(String className) throws ClassGenerationFailedException {
-        return className;
+    	String CName = Utils.getPropertyClassName(className);
+    	Class<?> generatedClass = null;
+    	try {
+            generatedClass = loadClass(CName);
+        } catch (ClassNotFoundException cnfe) {
+        	try{
+        	CtClass generatedCtClass = pool.makeClass(CName);
+        	generatedCtClass.defrost();
+        	CtClass sup = pool.get(className); // get super class
+        	CtField [] decFields = sup.getDeclaredFields(); // get declared fleids of superclass
+        	ArrayList<CtField> proptyFields = new ArrayList<CtField>();
+        	// check annotated feilds
+        	for (int i = 0; i < decFields.length; i++) {
+        		Object anno = decFields[i].getAnnotation(org.osoa.sca.annotations.Property.class);
+        		if(anno != null)
+        		{
+        			proptyFields.add(decFields[i]);
+        		}
+        			
+        	}
+        	generatedCtClass.setSuperclass(sup); // set super class to generated class
+        	CtConstructor constructorNoParam = CtNewConstructor.defaultConstructor(generatedCtClass);
+            generatedCtClass.addConstructor(constructorNoParam);
+        	// create and  add getter , setter
+        	for (int i = 0; i < proptyFields.size(); i++) {
+        		CtField tmp =new CtField(proptyFields.get(i),generatedCtClass);
+				CtMethod getter = CtNewMethod.getter("get"+NameUp(tmp.getName()), tmp); 
+				CtMethod setter = CtNewMethod.setter("set"+NameUp(tmp.getName()), tmp);
+				generatedCtClass.addMethod(getter);
+				generatedCtClass.addMethod(setter);
+        	}
+
+//        	generatedCtClass.stopPruning(true);
+//        	sup.stopPruning(true);
+//        	generatedCtClass.writeFile("generated/");
+//        	sup.writeFile("generated/");
+        	System.out.println("[JAVASSIST] generated class: " + CName);
+            // Generate and add to cache the generated class
+            byte[] bytecode = generatedCtClass.toBytecode();
+            ClassDataCache.instance().addClassData(CName, bytecode);
+            if (logger.isDebugEnabled()) {
+                logger.debug("added " + CName + " to cache");
+                logger.debug("generated classes cache is: " + ClassDataCache.instance().toString());
+            }
+            generatedClass = Utils.defineClass(CName, bytecode);
+			} catch (CannotCompileException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}catch(Exception e)
+			{
+				
+			}
+        }
+    	return CName;
     }
 }
