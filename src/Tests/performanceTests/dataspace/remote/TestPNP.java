@@ -6,7 +6,7 @@
  *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of
- *              Nice-Sophia Antipolis/ActiveEon
+ * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -34,27 +34,18 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.pnp.exception;
+package performanceTests.dataspace.remote;
 
-/** An exception signaling a malformed message has been received on the wire.
- *
- * @since ProActive 4.3.0
- */
-public class PNPMalformedMessageException extends PNPException {
-    public PNPMalformedMessageException() {
-        super();
+import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+
+
+public class TestPNP extends AbstractPAProviderRemoteBenchmark {
+
+    static {
+        CentralPAPropertyRepository.PA_COMMUNICATION_PROTOCOL.setValue("pnp");
     }
 
-    public PNPMalformedMessageException(String message) {
-        super(message);
-    }
-
-    public PNPMalformedMessageException(Throwable cause) {
-        super(cause);
-    }
-
-    public PNPMalformedMessageException(String msg, Throwable cause) {
-        super(msg);
-        this.initCause(cause);
+    public TestPNP() {
+        super(TestPNP.class);
     }
 }

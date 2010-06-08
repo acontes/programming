@@ -44,8 +44,8 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.RuntimeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 
 
 /**
@@ -55,7 +55,6 @@ import org.objectweb.proactive.extra.messagerouting.PAMRConfig;
 public class ProActiveRemoteClassLoader {
 
     final static private Logger logger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
-            .getLogger(PAMRConfig.Loggers.FORWARDING_CLASSLOADING);
 
     private final Map<String, Loader> loaderCache;
 

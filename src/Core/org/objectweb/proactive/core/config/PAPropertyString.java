@@ -27,37 +27,48 @@
  * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.pnp.exception;
+package org.objectweb.proactive.core.config;
 
-import org.objectweb.proactive.core.ProActiveException;
-
-
-/** Generic PNP Exception root of all non runtime in PNP
+/**
+ * A String ProActive property
  *
  * @since ProActive 4.3.0
  */
-public class PNPException extends ProActiveException {
-    public PNPException() {
-        super();
+public class PAPropertyString extends PAProperty {
+    public PAPropertyString(String name, boolean isSystemProp) {
+        super(name, PropertyType.STRING, isSystemProp);
     }
 
-    public PNPException(String message) {
-        super(message);
+    public PAPropertyString(String name, boolean isSystemProp, String defaultValue) {
+        this(name, isSystemProp);
+        this.setDefaultValue(defaultValue);
     }
 
-    public PNPException(Throwable cause) {
-        super(cause);
+    /**
+     *
+     * @return The value of this ProActive property
+     */
+    public String getValue() {
+        return super.getValueAsString();
     }
 
-    public PNPException(String msg, Throwable cause) {
-        super(msg);
-        this.initCause(cause);
+    /**
+     * Update the value of this ProActive property
+     * @param value the new value
+     */
+    public void setValue(String value) {
+        super.setValue(value);
+    }
+
+    @Override
+    public boolean isValid(String value) {
+        return value != null;
     }
 }

@@ -34,41 +34,22 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.pnp;
+package org.objectweb.proactive.core.ssh.proxycommand;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.TimeUnit;
-
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.jboss.netty.util.HashedWheelTimer;
-import org.jboss.netty.util.Timer;
+import org.objectweb.proactive.core.config.PAPropertyBoolean;
+import org.objectweb.proactive.core.config.PAPropertyString;
+import org.objectweb.proactive.core.config.PAProperties.PAPropertiesLoaderSPI;
 
 
-class PNPServerPipelineFactory implements ChannelPipelineFactory {
-    /** The thread pool to be used to execute {@link PNPROMessage} */
-    final private Executor executor;
+public class ProxyCommandConfig implements PAPropertiesLoaderSPI {
 
-    final private Timer timer;
+    public static PAPropertyString PA_SSH_PROXY_GATEWAY = new PAPropertyString(
+        "proactive.communication.ssh.proxy.gateway", false);
 
-    public PNPServerPipelineFactory(Executor executor) {
-        this.executor = executor;
-        PNPThreadFactory tf = new PNPThreadFactory("PNP server handler timer (shared)", true,
-            Thread.MAX_PRIORITY);
-        this.timer = new HashedWheelTimer(tf, 10, TimeUnit.MILLISECONDS);
-    }
+    public static PAPropertyString PA_SSH_PROXY_USE_GATEWAY_OUT = new PAPropertyString(
+        "proactive.communication.ssh.proxy.out_gateway", false);
 
-    public ChannelPipeline getPipeline() throws Exception {
-        PNPServerHandler pnpServerHandler = new PNPServerHandler(this.executor);
+    public static PAPropertyBoolean PA_RMISSH_TRY_PROXY_COMMAND = new PAPropertyBoolean(
+        "proactive.communication.ssh.try_proxy_command", false, false);
 
-        ChannelPipeline p = Channels.pipeline();
-        p.addLast("pnpDecoder", new PNPServerFrameDecoder(pnpServerHandler, timer));
-
-        p.addLast("frameEncoder", new LengthFieldPrepender(4));
-        p.addLast("pnpEncoder", new PNPEncoder());
-        p.addLast(PNPServerHandler.NAME, pnpServerHandler);
-        return p;
-    }
 }

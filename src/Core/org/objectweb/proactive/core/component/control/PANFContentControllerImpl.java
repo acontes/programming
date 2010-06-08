@@ -34,45 +34,25 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.pnp;
+package org.objectweb.proactive.core.component.control;
 
-import java.io.Serializable;
-import java.net.URI;
+import org.objectweb.fractal.api.Component;
 
 
-/** Represents a MessageRoutingMessage.
+/**
+ * Extension of the
+ * {@link PAContentControllerImpl} class for non functional components.
  *
- * When processed, this message list all the remote objects registered on the receiver.
- *
- * @since ProActive 4.3.0
+ * @author The ProActive Team
  */
-
-class PNPROMessageListRemoteObjectsMessage extends PNPROMessage implements Serializable {
+public class PANFContentControllerImpl extends PAContentControllerImpl {
 
     /**
-     * Construct a list message
+     * Constructor for PANFContentController.
      *
-     * @param uri
-     *            the URI of the remote runtime to be retrieved, only the agent
-     *            id part is used for this type of message. The path part is ignored
-     * @param agent
-     *            the local agent to use to send the message
-     */
-    public PNPROMessageListRemoteObjectsMessage(URI uri, PNPAgent agent) {
-        super(uri, agent);
-    }
-
-    /** Get the list of the objects registered on the remote runtime */
-    public String[] getReturnedObject() {
-        return (String[]) this.returnedObject;
-    }
-
-    @Override
-    public Object processMessage() {
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing a list message");
-        }
-
-        return PNPRegistry.singleton.list();
+     * @param owner The owner component.
+    */
+    public PANFContentControllerImpl(Component owner) {
+        super(owner);
     }
 }

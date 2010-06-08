@@ -6,7 +6,7 @@
  *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of
- *              Nice-Sophia Antipolis/ActiveEon
+ * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -27,36 +27,35 @@
  * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
- *  Initial developer(s):               The ActiveEon Team
- *                        http://www.activeeon.com/
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_INITIAL_DEV$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extra.pnp.exception;
+package org.objectweb.proactive.core.component.type;
 
-/** An exception signaling an exception occurred on the channel of a call.
+import org.etsi.uri.gcm.api.type.GCMInterfaceType;
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+/**
+ * The PAGCMTypeFactory extends the {@link GCMInterfaceType} to support the stream and internal parameters.
  *
- * It usually means that the remote endpoint was unreachable or a timeout was reached.
- *
- * @since ProActive 4.3.0
+ * @author The ProActive Team
+ * @see GCMInterfaceType
  */
-public class PNPIOException extends PNPException {
-    public PNPIOException() {
-        super();
-    }
+@PublicAPI
+public interface PAGCMInterfaceType extends GCMInterfaceType {
+    public boolean isGCMCollectiveItf();
 
-    public PNPIOException(String message) {
-        super(message);
-    }
+    /**
+     * Returns true if this interface extends the {@link StreamInterface} interface, false otherwise.
+     *
+     * @return true if this interface extends the {@link StreamInterface} interface, false otherwise
+     */
+    public boolean isStreamItf();
 
-    public PNPIOException(Throwable cause) {
-        super(cause);
-    }
-
-    public PNPIOException(String msg, Throwable cause) {
-        super(msg);
-        this.initCause(cause);
-    }
+    public boolean isInternal();
 }

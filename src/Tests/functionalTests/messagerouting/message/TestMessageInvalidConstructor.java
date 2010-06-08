@@ -47,8 +47,6 @@ import org.objectweb.proactive.extensions.pamr.protocol.message.RegistrationRequ
 
 import functionalTests.FunctionalTest;
 
-import functionalTests.FunctionalTest;
-
 import unitTests.UnitTests;
 
 
