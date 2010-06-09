@@ -36,6 +36,10 @@
  */
 package org.objectweb.proactive.extensions.component.sca;
 
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -82,18 +86,48 @@ public class SCAFractive extends Fractive {
         return instance;
     }
 
+    /**
+     * Determine if a class contrain org.osoa.sca.annotations.Property annotation
+     * @param className
+     * @return
+     */
+    private boolean hasPropertyAnnotation(String className) {
+        Class<?> cla;
+        ArrayList<Annotation> annos = null;
+        try {
+            cla = Class.forName(className);
+            Field[] fields = cla.getFields();
+            annos = new ArrayList<Annotation>();
+            for (int i = 0; i < fields.length; i++) {
+                Annotation tmp = fields[i].getAnnotation(org.osoa.sca.annotations.Property.class);
+                if (tmp != null)
+                    return true;
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /*
+     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
+     *      org.objectweb.proactive.core.component.ControllerDescription,
+     *      org.objectweb.proactive.core.component.ContentDescription,
+     *      org.objectweb.proactive.core.node.Node)
+     */
     public Component newFcInstance(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, Node node) throws InstantiationException {
         ControllerDescription newControllerDesc = new ControllerDescription(controllerDesc.getName(),
             controllerDesc.getHierarchicalType(), DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION);
         if (newControllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)) {
             String className = contentDesc.getClassName();
-            System.err.println("DEBUGG "+ className);
             // Test whether the component class has a property annotation
-            boolean hasSCAProperty = true;
+            boolean hasSCAProperty = hasPropertyAnnotation(className);
             if (hasSCAProperty) {
                 try {
-                    contentDesc.setClassName(PropertyClassGenerator.instance().generateClass(className));
+                    String generatedClassName = PropertyClassGenerator.instance().generateClass(className);
+                    contentDesc.setClassName(generatedClassName);
                 } catch (ClassGenerationFailedException e) {
                     e.printStackTrace();
                 }

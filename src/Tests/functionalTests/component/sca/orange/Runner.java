@@ -37,5 +37,5 @@
 package functionalTests.component.sca.orange;
 
 public interface Runner {
-	public boolean execute();
+    public boolean execute();
 }

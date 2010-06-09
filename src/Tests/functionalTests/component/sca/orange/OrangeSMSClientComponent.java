@@ -5,83 +5,81 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 
-public class OrangeSMSClientComponent implements OrangeSMSClientAttributes,
-		BindingController, Runner {
 
-	private String id;
-	private String from;
-	private String to;
-	private String content;
-	private OrangeSMS orangeService;
+public class OrangeSMSClientComponent implements OrangeSMSClientAttributes, BindingController, Runner {
 
-	public static final String SERVICES_NAME = "Services";
+    private String id;
+    private String from;
+    private String to;
+    private String content;
+    private OrangeSMS orangeService;
 
-	public String getContent() {
-		return content;
-	}
+    public static final String SERVICES_NAME = "Services";
 
-	public String getFrom() {
-		return from;
-	}
+    public String getContent() {
+        return content;
+    }
 
-	public String getId() {
-		return id;
-	}
+    public String getFrom() {
+        return from;
+    }
 
-	public String getTo() {
-		return to;
-	}
+    public String getId() {
+        return id;
+    }
 
-	public void setContent(String content) {
-		this.content = content;
-	}
+    public String getTo() {
+        return to;
+    }
 
-	public void setFrom(String from) {
-		this.from = from;
-	}
+    public void setContent(String content) {
+        this.content = content;
+    }
 
-	public void setId(String id) {
-		this.id = id;
-	}
+    public void setFrom(String from) {
+        this.from = from;
+    }
 
-	public void setTo(String to) {
-		this.to = to;
-	}
+    public void setId(String id) {
+        this.id = id;
+    }
 
-	public void bindFc(String clientItfName, Object serverItf)
-			throws NoSuchInterfaceException, IllegalBindingException,
-			IllegalLifeCycleException {
-		if (SERVICES_NAME.equals(clientItfName)) {
-			orangeService = (OrangeSMS) serverItf;
-		} else {
-			throw new NoSuchInterfaceException(clientItfName);
-		}
-	}
+    public void setTo(String to) {
+        this.to = to;
+    }
 
-	public String[] listFc() {
-		return new String[] { SERVICES_NAME };
-	}
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
+        if (SERVICES_NAME.equals(clientItfName)) {
+            orangeService = (OrangeSMS) serverItf;
+        } else {
+            throw new NoSuchInterfaceException(clientItfName);
+        }
+    }
 
-	public Object lookupFc(String clientItfName)
-			throws NoSuchInterfaceException {
-		if (SERVICES_NAME.equals(clientItfName)) {
-			return orangeService;
-		} else {
-			throw new NoSuchInterfaceException(clientItfName);
-		}
-	}
+    public String[] listFc() {
+        return new String[] { SERVICES_NAME };
+    }
 
-	public void unbindFc(String clientItfName) throws NoSuchInterfaceException,
-			IllegalBindingException, IllegalLifeCycleException {
-		if (SERVICES_NAME.equals(clientItfName)) {
-			orangeService = null;
-		} else {
-			throw new NoSuchInterfaceException(clientItfName);
-		}
-	}
+    public Object lookupFc(String clientItfName) throws NoSuchInterfaceException {
+        if (SERVICES_NAME.equals(clientItfName)) {
+            return orangeService;
+        } else {
+            throw new NoSuchInterfaceException(clientItfName);
+        }
+    }
 
-	public boolean execute() {
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
+            IllegalLifeCycleException {
+        if (SERVICES_NAME.equals(clientItfName)) {
+            orangeService = null;
+        } else {
+            throw new NoSuchInterfaceException(clientItfName);
+        }
+    }
 
-		return orangeService.sendSMS(id, from, to, content);
-	}
+    public boolean execute() {
+
+        return orangeService.sendSMS(id, from, to, content);
+    }
 }

@@ -74,7 +74,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      */
     private List<String> initilizedProperties = new ArrayList<String>();
 
-
     /**
      * initialize all private fields .
      * @param owner owner component
@@ -169,8 +168,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
-                System.err.println("problem on invoking object !!" +
-                		ObjToInvoke.getClass().getName());
+                System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
                 e.printStackTrace();
             }
         } catch (SecurityException e) {
@@ -202,8 +200,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         String NameUp = NameUp(name);
         String getterName = "get" + NameUp;
         try {
-        	Object ObjToInvoke = owner.getReferenceOnBaseObject();
-            Method getter = ObjToInvoke.getClass().getMethod(getterName);           
+            Object ObjToInvoke = owner.getReferenceOnBaseObject();
+            Method getter = ObjToInvoke.getClass().getMethod(getterName);
             initilizedProperties.add(name);
             try {
                 Object res = getter.invoke(ObjToInvoke);
@@ -211,8 +209,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
             } catch (InvocationTargetException e) {
-                System.err.println("problem on invoking object !!" +
-                		ObjToInvoke.getClass().getName());
+                System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
                 e.printStackTrace();
             }
         } catch (SecurityException e) {
@@ -260,7 +257,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * class.
      */
     private List<String> getDeclaredPropertyNamesInList() {
-    	Object ObjToInvoke = owner.getReferenceOnBaseObject();
+        Object ObjToInvoke = owner.getReferenceOnBaseObject();
         Method methods[] = ObjToInvoke.getClass().getMethods();
         List<String> namesList = new ArrayList<String>();
         for (int i = 0; i < methods.length; i++) {

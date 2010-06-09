@@ -50,6 +50,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.extensions.component.sca.SCAConfig;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.sca.components.C;
