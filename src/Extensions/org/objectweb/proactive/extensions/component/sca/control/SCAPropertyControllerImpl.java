@@ -159,7 +159,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         try {
             Object args[] = new Object[1];
             args[0] = value;
-            //Method setter = buildInAttributeController.getClass().getMethod(setterName, typeAttribute);
             Object ObjToInvoke = owner.getReferenceOnBaseObject();
             Method setter = ObjToInvoke.getClass().getMethod(setterName, typeAttribute);
             initilizedProperties.add(name);
@@ -167,16 +166,16 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
                 setter.invoke(ObjToInvoke, args);
             } catch (IllegalArgumentException e) {
                 System.err.println("problem on invoking arguments!! " + args);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException iae) {
+            	logger.error(iae.getMessage());
+            } catch (InvocationTargetException ite) {
                 System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
-                e.printStackTrace();
+                logger.error(ite.getMessage());
             }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
+        } catch (SecurityException se) {
+        	logger.error(se.getMessage());
+        } catch (NoSuchMethodException nsme) {
+        	logger.error(nsme.getMessage());
         }
     }
 
@@ -208,17 +207,16 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             try {
                 Object res = getter.invoke(ObjToInvoke);
                 return res;
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
+            } catch (IllegalAccessException iae) {
+            	logger.error(iae.getMessage());
+            } catch (InvocationTargetException ite) {
                 System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
-                e.printStackTrace();
+                logger.error(ite.getMessage());
             }
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-
-            e.printStackTrace();
+        } catch (SecurityException se) {
+        	logger.error(se.getMessage());
+        } catch (NoSuchMethodException nsme) {
+        	logger.error(nsme.getMessage());
         }
         return null;
     }
@@ -265,8 +263,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         for (int i = 0; i < methods.length; i++) {
             String tmp = methods[i].getName();
             if (tmp.startsWith("set")) {
-                //System.out.println(tmp);
-                //System.out.println(tmp.substring(3));
                 ListMethodes.put(tmp, methods[i]);
                 namesList.add(NameLow(tmp.substring(3)));
             }
@@ -284,9 +280,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      */
     public String[] getDeclaredPropertyNames() {
         String[] names = (String[]) propertyNames.toArray();
-        for (int i = 0; i < names.length; i++) {
-            System.out.println("DEBUG: " + names[i]);
-        }
         return names;
     }
 

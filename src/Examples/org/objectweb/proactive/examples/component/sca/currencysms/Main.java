@@ -57,8 +57,6 @@ public class Main {
             GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             GenericFactory gf = GCM.getGenericFactory(boot);
             ComponentType t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER, CurrencySMSProperties.class.getName(),
-                            false, false, false),
                     tf.createFcItfType("Runner", Runner.class.getName(), false, false, false),
                     tf.createFcItfType(CurrencySMS.CURRENCY_SERVICE_NAME, CurrencyService.class.getName(),
                             true, false, false),

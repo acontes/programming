@@ -40,17 +40,23 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.osoa.sca.annotations.Property;
 
 
-public class CurrencySMS implements CurrencySMSProperties, BindingController, Runner {
+public class CurrencySMS implements BindingController, Runner {
     public static final String CURRENCY_SERVICE_NAME = "CurrencyService";
     public static final String ORANGE_SERVICE_NAME = "OrangeService";
 
     /* SCA Properties */
+    @Property
     private String fromCurrency;
+    @Property
     private String toCurrency;
+    @Property
     private String id;
+    @Property
     private String from;
+    @Property
     private String to;
 
     /* SCA References (client interfaces) */

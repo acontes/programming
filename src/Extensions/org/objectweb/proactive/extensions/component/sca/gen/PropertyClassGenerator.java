@@ -48,6 +48,7 @@ import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.NotFoundException;
 
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 
@@ -128,15 +129,11 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
                 }
                 generatedClass = Utils.defineClass(CName, bytecode);
                 generatedCtClass.defrost(); // defrost the generated class
-            } catch (CannotCompileException e) {
-                e.printStackTrace();
-            } catch (NotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
             } catch (Exception e) {
-                e.printStackTrace();
-            }
+                logger.error("Cannot generate subClass of [" + className + "] with javassist: " + e.getMessage());
+                    throw new ClassGenerationFailedException(
+                        "Cannot generate subClass of [" + className+ "] with javassist", e);
+                }
         }
         return CName;
     }
