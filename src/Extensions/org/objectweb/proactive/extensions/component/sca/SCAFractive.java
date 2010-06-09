@@ -36,10 +36,9 @@
  */
 package org.objectweb.proactive.extensions.component.sca;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -49,6 +48,8 @@ import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
 
@@ -65,6 +66,7 @@ import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerat
  */
 @PublicAPI
 public class SCAFractive extends Fractive {
+    private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     private static SCAFractive instance = null;
     public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/extensions/component/sca/config/default-component-config.xml";
 
@@ -86,35 +88,35 @@ public class SCAFractive extends Fractive {
         return instance;
     }
 
-    /**
-     * Determine if a class contrain org.osoa.sca.annotations.Property annotation
-     * @param className
-     * @return
+    /*
+     * Determine if a class contain org.osoa.sca.annotations.Property annotation
      */
-    private boolean hasPropertyAnnotation(String className) {
-        Class<?> cla;
-        ArrayList<Annotation> annos = null;
+    private boolean hasPropertyAnnotation(String className) throws InstantiationException {
         try {
-            cla = Class.forName(className);
-            Field[] fields = cla.getFields();
-            annos = new ArrayList<Annotation>();
+            Class<?> clazz = Class.forName(className);
+            Field[] fields = clazz.getFields();
             for (int i = 0; i < fields.length; i++) {
-                Annotation tmp = fields[i].getAnnotation(org.osoa.sca.annotations.Property.class);
-                if (tmp != null)
+                if (fields[i].isAnnotationPresent(org.osoa.sca.annotations.Property.class)) {
                     return true;
+                }
             }
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+        } catch (ClassNotFoundException cnfe) {
+            logger.error(cnfe.getMessage());
+            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
+                cnfe.getMessage());
+            ie.initCause(cnfe);
+            throw ie;
         }
 
         return false;
     }
 
     /*
-     * @see org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstance(org.objectweb.fractal.api.Type,
-     *      org.objectweb.proactive.core.component.ControllerDescription,
-     *      org.objectweb.proactive.core.component.ContentDescription,
-     *      org.objectweb.proactive.core.node.Node)
+     * @see
+     * org.objectweb.proactive.core.component.factory.PAGenericFactory#newNFcInstance(org.objectweb
+     * .fractal.api.Type, org.objectweb.proactive.core.component.ControllerDescription,
+     * org.objectweb.proactive.core.component.ContentDescription,
+     * org.objectweb.proactive.core.node.Node)
      */
     public Component newFcInstance(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, Node node) throws InstantiationException {
@@ -128,8 +130,12 @@ public class SCAFractive extends Fractive {
                 try {
                     String generatedClassName = PropertyClassGenerator.instance().generateClass(className);
                     contentDesc.setClassName(generatedClassName);
-                } catch (ClassGenerationFailedException e) {
-                    e.printStackTrace();
+                } catch (ClassGenerationFailedException cgfe) {
+                    logger.error(cgfe.getMessage());
+                    InstantiationException ie = new InstantiationException(
+                        "Cannot generate SCA Property class for " + className + " : " + cgfe.getMessage());
+                    ie.initCause(cgfe);
+                    throw ie;
                 }
             }
         }

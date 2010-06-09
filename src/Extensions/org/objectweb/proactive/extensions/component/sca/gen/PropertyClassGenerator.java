@@ -38,20 +38,16 @@ package org.objectweb.proactive.extensions.component.sca.gen;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
-import javassist.CtMember;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.Modifier;
 import javassist.NotFoundException;
 
-import org.objectweb.proactive.core.component.PAInterfaceImpl;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 
@@ -120,11 +116,9 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
                     generatedCtClass.addMethod(getter);
                     generatedCtClass.addMethod(setter);
                 }
-                generatedCtClass.stopPruning(true);
-                //        	sup.stopPruning(true);
+                //          generatedCtClass.stopPruning(true);
                 //        	generatedCtClass.writeFile("generated/");
-                //			System.out.println("[JAVASSIST] generated class: " + CName);
-                //        	sup.writeFile("generated/");     	
+                //			System.out.println("[JAVASSIST] generated class: " + CName); 	
                 // Generate and add to cache the generated class
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance().addClassData(CName, bytecode);

@@ -50,11 +50,9 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.extensions.component.sca.SCAConfig;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
-import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.sca.components.C;
-import functionalTests.component.sca.components.C1;
 import functionalTests.component.sca.components.CAttributes;
 
 
@@ -80,7 +78,7 @@ public class TestSCAPropertyController extends ComponentTest {
     // -----------------------------------------------------------------------------------
     @Test
     public void testSCAPropertyController() throws Exception {
-        Component c = gf.newFcInstance(t, "primitive", C1.class.getName());
+        Component c = gf.newFcInstance(t, "primitive", C.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(c);
         scac.init();

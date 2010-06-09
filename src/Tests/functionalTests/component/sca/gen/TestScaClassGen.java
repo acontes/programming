@@ -7,15 +7,15 @@ import org.junit.Test;
 import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
 import org.objectweb.proactive.extensions.component.sca.gen.Utils;
 
-import functionalTests.component.sca.components.C1;
+import functionalTests.component.sca.components.C;
 
 
 public class TestScaClassGen {
-    C1 test;
+    C test;
 
     @Before
     public void setUp() throws Exception {
-        test = new C1();
+        test = new C();
 
     }
 
