@@ -36,8 +36,11 @@
  */
 package org.objectweb.proactive.core.config;
 
+import java.net.Socket;
+
 import org.objectweb.proactive.core.config.PAProperties.PAPropertiesLoaderSPI;
 import org.objectweb.proactive.core.filetransfer.FileTransferService;
+import org.objectweb.proactive.core.runtime.broadcast.BTCallbackDefaultImpl;
 import org.objectweb.proactive.core.util.OperatingSystem;
 
 
@@ -50,6 +53,7 @@ import org.objectweb.proactive.core.util.OperatingSystem;
  * central repository contains all the already existing properties.
  */
 public class CentralPAPropertyRepository implements PAPropertiesLoaderSPI {
+
     /**
      * Java security policy file location
      */
@@ -440,6 +444,27 @@ public class CentralPAPropertyRepository implements PAPropertiesLoaderSPI {
         "proactive.communication.rmissh.port", false);
 
     /* ------------------------------------
+     *  REMOTE OBJECT - MULTI-PROTOCOL
+     */
+
+    /** Expose object using these protocols in addition to the default one (protocols separated by comma) */
+    public static PAPropertyString PA_COMMUNICATION_ADDITIONAL_PROTOCOLS = new PAPropertyString(
+        "proactive.communication.additional_protocols", false);
+
+    /** Impose a static order for protocols selection, this automatically desactivate benchmark */
+    public static PAPropertyString PA_COMMUNICATION_PROTOCOLS_ORDER = new PAPropertyString(
+        "proactive.communication.protocols.order", false);
+
+    /** Specify a parameter for benchmark */
+    public static PAPropertyString PA_BENCHMARK_PARAMETER = new PAPropertyString(
+        "proactive.communication.benchmark.parameter", false);
+
+    /** The class to use for doing remoteObject Benchmark, must implement BenchmarkObject */
+    public static PAPropertyString PA_BENCHMARK_CLASS = new PAPropertyString(
+        "proactive.communication.benchmark.class", false,
+        "org.objectweb.proactive.core.remoteobject.benchmark.SelectionOnly");
+
+    /* ------------------------------------
      *  SECURITY
      */
 
@@ -661,4 +686,40 @@ public class CentralPAPropertyRepository implements PAPropertiesLoaderSPI {
       */
     static public PAPropertyString PA_MOP_GENERATEDCLASSES_DIR = new PAPropertyString(
         "proactive.mop.generatedclassesdir", false);
+
+    /**
+     * activate or not the ping feature in ProActive -- each time a runtime
+     * starts it pings a given web server.
+     */
+    static public PAPropertyBoolean PA_RUNTIME_PING = new PAPropertyBoolean("proactive.runtime.ping", false,
+        false);
+    /**
+     * the url to ping
+     */
+    static public PAPropertyString PA_RUNTIME_PING_URL = new PAPropertyString("proactive.runtime.ping.url",
+        false, "http://pinging.activeeon.com/ping.php");
+
+    /**
+     * Add Runtime the ability to broadcast their presence on the network
+     */
+    static public PAPropertyBoolean PA_RUNTIME_BROADCAST = new PAPropertyBoolean(
+        "proactive.runtime.broadcast", false, false);
+    /**
+     * the address to use by the broadcast sockets
+     */
+    static public PAPropertyString PA_RUNTIME_BROADCAST_ADDRESS = new PAPropertyString(
+        "proactive.runtime.broadcast.address", false, "230.0.1.1");
+
+    /**
+     * the port to use by the broadcast sockets
+     */
+    static public PAPropertyInteger PA_RUNTIME_BROADCAST_PORT = new PAPropertyInteger(
+        "proactive.runtime.broadcast.port", false, 4554);
+
+    /**
+     * the address to use by the broadcast sockets
+     */
+    static public PAPropertyString PA_RUNTIME_BROADCAST_CALLBACK_CLASS = new PAPropertyString(
+        "proactive.runtime.broadcast.callback.class", false, BTCallbackDefaultImpl.class.getName());
+
 }

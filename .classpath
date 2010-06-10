@@ -21,6 +21,8 @@
 	<classpathentry kind="lib" path="lib/bcel-5.2.jar"/>
 	<classpathentry kind="lib" path="lib/bouncycastle.jar"/>
 	<classpathentry kind="lib" path="lib/bundlerepository-1.4.3.jar"/>
+	<classpathentry kind="lib" path="lib/cimom.jar"/>
+	<classpathentry kind="lib" path="lib/cimrepository.jar"/>
 	<classpathentry kind="lib" path="lib/cog-jglobus-1.2.jar"/>
 	<classpathentry kind="lib" path="lib/cog-ogce.jar"/>
 	<classpathentry kind="lib" path="lib/colobus-0.1.jar"/>
@@ -46,12 +48,15 @@
 	<classpathentry kind="lib" path="lib/ibis-1.4.jar"/>
 	<classpathentry kind="lib" path="lib/ibis-connect-1.0.jar"/>
 	<classpathentry kind="lib" path="lib/ibis-util-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/j-interop.jar"/>
+	<classpathentry kind="lib" path="lib/j-interopdeps.jar"/>
 	<classpathentry kind="lib" path="lib/jackrabbit-jcr-commons-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jackrabbit-webdav-1.5.2.jar"/>
 	<classpathentry kind="lib" path="lib/jakarta-oro-2.0.8.jar"/>
 	<classpathentry kind="lib" path="lib/javasci.jar"/>
 	<classpathentry kind="lib" path="lib/javassist.jar"/>
 	<classpathentry kind="lib" path="lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="lib/jcifs-1.2.19.jar"/>
 	<classpathentry kind="lib" path="lib/jcommon-1.0.6.jar"/>
 	<classpathentry kind="lib" path="lib/jdom.jar"/>
 	<classpathentry kind="lib" path="lib/jetty-6.1.18.jar"/>
@@ -63,15 +68,17 @@
 	<classpathentry kind="lib" path="lib/julia-mixins-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/julia-runtime-2.5.3-SNAPSHOT.jar"/>
 	<classpathentry kind="lib" path="lib/jung-1.7.4.jar"/>
-	<classpathentry kind="lib" path="lib/libs.txt"/>
 	<classpathentry kind="lib" path="lib/log4j.jar"/>
 	<classpathentry kind="lib" path="lib/mail.jar"/>
 	<classpathentry kind="lib" path="lib/moduleloader.jar"/>
+	<classpathentry kind="lib" path="lib/mofcomp.jar"/>
 	<classpathentry kind="lib" path="lib/netty-3.2.0.ALPHA2.jar"/>
 	<classpathentry kind="lib" path="lib/osgi.jar"/>
 	<classpathentry kind="lib" path="lib/osoa-java-api-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/progIdVsClsidDB.properties"/>
 	<classpathentry kind="lib" path="lib/ptolemy.jar"/>
 	<classpathentry kind="lib" path="lib/puretls.jar"/>
+	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
 	<classpathentry kind="lib" path="lib/servicebinder-0.9.0.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api-2.5-6.1.11.jar"/>
 	<classpathentry kind="lib" path="lib/servlet-api.jar"/>
@@ -94,12 +101,16 @@
 	<classpathentry kind="lib" path="lib/vim25.jar"/>
 	<classpathentry kind="lib" path="lib/virtualbox-wsdl.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-core.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-hyperv-winrm.jar"/>
+	<classpathentry kind="lib" path="lib/virtualization-hyperv-wmi.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-libvirt.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-virtualbox.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-vmware-vi.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-vmware-vix.jar"/>
 	<classpathentry kind="lib" path="lib/virtualization-xenserver.jar"/>
+	<classpathentry kind="lib" path="lib/wbem.jar"/>
 	<classpathentry kind="lib" path="lib/winp-1.5.jar"/>
+	<classpathentry kind="lib" path="lib/wiseman-tools.jar"/>
 	<classpathentry kind="lib" path="lib/ws-commons-util-1.0.2.jar"/>
 	<classpathentry kind="lib" path="lib/xenserver-5.0.0-3.jar"/>
 	<classpathentry kind="lib" path="lib/xercesImpl-2.8.1.jar"/>

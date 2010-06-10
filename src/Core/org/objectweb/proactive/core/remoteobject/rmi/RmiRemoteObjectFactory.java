@@ -57,7 +57,5 @@ public class RmiRemoteObjectFactory extends AbstractRmiRemoteObjectFactory {
     @Override
     protected Registry getRegistry(URI url) throws RemoteException {
         return LocateRegistry.getRegistry(url.getHost(), url.getPort());
-
     }
-
 }
