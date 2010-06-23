@@ -47,7 +47,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Utils;
-
 import functionalTests.ComponentTest;
 import functionalTests.component.creation.ComponentA;
 import functionalTests.component.creation.ComponentInfo;

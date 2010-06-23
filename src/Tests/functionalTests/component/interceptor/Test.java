@@ -115,6 +115,7 @@ public class Test extends ComponentTest {
         // invoke functional methods on A
         // each invocation actually triggers a modification of the dummy value of the dummy controller
         ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).foo();
+        ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).bar();
         //((FooItf) componentA.getFcInterface("fooItf")).foo();
         result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
                 .getDummyValue();

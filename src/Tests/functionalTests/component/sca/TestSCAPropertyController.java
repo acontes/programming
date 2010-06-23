@@ -49,11 +49,13 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.extensions.component.sca.SCAConfig;
 import org.objectweb.proactive.extensions.component.sca.Utils;
+import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
 import functionalTests.ComponentTest;
-import functionalTests.component.sca.components.C;
+import functionalTests.component.sca.components.PropertyControllerTestComp;
 import functionalTests.component.sca.components.CAttributes;
+import functionalTests.component.sca.components.CIntententHandler;
 
 
 public class TestSCAPropertyController extends ComponentTest {
@@ -78,7 +80,7 @@ public class TestSCAPropertyController extends ComponentTest {
     // -----------------------------------------------------------------------------------
     @Test
     public void testSCAPropertyController() throws Exception {
-        Component c = gf.newFcInstance(t, "primitive", C.class.getName());
+        Component c = gf.newFcInstance(t, "primitive", PropertyControllerTestComp.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(c);
         scac.init();

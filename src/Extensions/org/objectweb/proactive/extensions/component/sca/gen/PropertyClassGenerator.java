@@ -88,7 +88,7 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
      */
     public String generateClass(String className) throws ClassGenerationFailedException {
         String CName = Utils.getPropertyClassName(className);
-        Class<?> generatedClass = null;
+        Class<?> generatedClass;
         try {
             generatedClass = loadClass(CName);
         } catch (ClassNotFoundException cnfe) {
@@ -130,10 +130,11 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
                 generatedClass = Utils.defineClass(CName, bytecode);
                 generatedCtClass.defrost(); // defrost the generated class
             } catch (Exception e) {
-                logger.error("Cannot generate subClass of [" + className + "] with javassist: " + e.getMessage());
-                    throw new ClassGenerationFailedException(
-                        "Cannot generate subClass of [" + className+ "] with javassist", e);
-                }
+                logger.error("Cannot generate subClass of [" + className + "] with javassist: " +
+                    e.getMessage());
+                throw new ClassGenerationFailedException("Cannot generate subClass of [" + className +
+                    "] with javassist", e);
+            }
         }
         return CName;
     }

@@ -42,28 +42,21 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
+import org.objectweb.proactive.core.component.interception.InputInterceptor;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.mop.MethodCall;
-
-import functionalTests.component.controller.DummyController;
 
 
 /**
  * @author The ProActive Team
  *
  */
-public class InputInterceptor1Impl extends AbstractPAController implements InputInterceptor1 {
-
-    /**
-     *
-     */
-    private int beforeInvocationCounter = 0;
-    private int afterInvocationCounter = 0;
+public class InputInterceptor2Impl extends AbstractPAController implements InputInterceptor {
 
     /**
      * @param owner
      */
-    public InputInterceptor1Impl(Component owner) {
+    public InputInterceptor2Impl(Component owner) {
         super(owner);
     }
 
@@ -71,43 +64,20 @@ public class InputInterceptor1Impl extends AbstractPAController implements Input
     protected void setControllerItfType() {
         try {
             setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(
-                    InputInterceptor1.INPUT_INTERCEPTOR1_NAME, InputInterceptor1.class.getName(),
+                    InputInterceptor2.INPUT_INTERCEPTOR2_NAME, InputInterceptor.class.getName(),
                     TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE));
         } catch (InstantiationException e) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName());
         }
     }
 
-    public void setDummyValue(String value) {
-        try {
-            ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
-                    .setDummyValue(value);
-        } catch (NoSuchInterfaceException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getDummyValue() {
-        try {
-            return ((DummyController) getFcItfOwner().getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
-                    .getDummyValue();
-        } catch (NoSuchInterfaceException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     public void afterInputMethodInvocation(MethodCall methodCall) {
         //System.out.println("after method invocation");
-        setDummyValue(getDummyValue() + InputInterceptor1.AFTER_INTERCEPTION);
-        System.err.println("input interceptor after");
-        afterInvocationCounter++;
+        System.err.println("input interceptor2 after");
     }
 
     public void beforeInputMethodInvocation(MethodCall methodCall) {
         //        System.out.println("before method invocation");
-        setDummyValue(getDummyValue() + InputInterceptor1.BEFORE_INTERCEPTION);
-        System.err.println("input interceptor before");
-        beforeInvocationCounter++;
+        System.err.println("input interceptor2 before");
     }
 }

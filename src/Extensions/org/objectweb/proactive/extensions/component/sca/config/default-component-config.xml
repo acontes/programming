@@ -6,7 +6,7 @@
     <controllers>
         <controller>
             <interface>org.objectweb.proactive.core.component.control.PABindingController</interface>
-            <implementation>org.objectweb.proactive.core.component.control.PABindingControllerImpl</implementation>
+            <implementation>org.objectweb.proactive.extensions.component.sca.control.SCAPABindingControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.control.PAContentController</interface>
@@ -47,6 +47,10 @@
         <controller>
             <interface>org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController</interface>
             <implementation>org.objectweb.proactive.extensions.component.sca.control.SCAPropertyControllerImpl</implementation>
+        </controller>
+        <controller>
+            <interface>org.objectweb.proactive.extensions.component.sca.control.SCAIntentController</interface>
+            <implementation>org.objectweb.proactive.extensions.component.sca.control.SCAIntentControllerImpl</implementation>
         </controller>
     </controllers>
 </componentConfiguration>

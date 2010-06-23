@@ -47,4 +47,6 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public interface Constants extends org.objectweb.proactive.core.component.Constants {
     public final static String SCA_PROPERTY_CONTROLLER = "sca-property-controller";
+    public final static String SCA_INTENT_CONTROLLER = "sca-intent-controller";
+    public final static String SCA_PABINDING_CONTROLLER = "sca-pabinding-controller";
 }

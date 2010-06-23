@@ -41,4 +41,6 @@ public interface FooItf {
     public static final String SERVER_ITF_NAME = "foo-server";
 
     public void foo();
+
+    public void bar();
 }

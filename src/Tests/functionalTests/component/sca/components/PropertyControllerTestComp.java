@@ -3,7 +3,7 @@ package functionalTests.component.sca.components;
 import org.osoa.sca.annotations.Property;
 
 
-public class C {
+public class PropertyControllerTestComp {
     @Property
     public boolean x1;
     @Property
@@ -11,7 +11,7 @@ public class C {
     @Property
     protected char x3;
 
-    public C() {
+    public PropertyControllerTestComp() {
         // TODO Auto-generated constructor stub
     }
 

@@ -77,6 +77,7 @@ import org.objectweb.proactive.core.component.type.PAGCMInterfaceTypeImpl;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.component.type.WSComponent;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
+import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 
 
 /**
@@ -275,11 +276,10 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             IllegalBindingException, IllegalLifeCycleException {
         // get value of (eventual) future before casting
         serverItf = PAFuture.getFutureValue(serverItf);
-
+        //System.err.println("Bind ");
         PAInterface sItf = null;
         if (serverItf instanceof PAInterface) {
             sItf = (PAInterface) serverItf;
-
             //        if (controllerLogger.isDebugEnabled()) {
             //            String serverComponentName;
             //
@@ -377,6 +377,8 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 throw ibe;
             }
         }
+
+        //List<IntentHandler> intentHandlers = 
 
         // Multicast bindings are handled here
         if (Utils.isGCMMulticastItf(clientItfName, owner)) {

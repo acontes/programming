@@ -59,5 +59,5 @@ public abstract class AbstractClassGenerator {
         return Thread.currentThread().getContextClassLoader().loadClass(className);
     }
 
-    public abstract String generateClass(final String className) throws ClassGenerationFailedException;
+    //public abstract String generateClass(final String className) throws ClassGenerationFailedException;
 }

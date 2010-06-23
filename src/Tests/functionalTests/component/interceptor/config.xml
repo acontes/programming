@@ -31,6 +31,10 @@
             <interface>functionalTests.component.interceptor.InputInterceptor1</interface>
             <implementation>functionalTests.component.interceptor.InputInterceptor1Impl</implementation>
         </controller>
+        <controller input-interceptor="true">
+            <interface>org.objectweb.proactive.core.component.interception.InputInterceptor</interface>
+            <implementation>functionalTests.component.interceptor.InputInterceptor2Impl</implementation>
+        </controller>
         <controller input-interceptor="true" output-interceptor="true">
             <interface>functionalTests.component.interceptor.InputOutputInterceptor</interface>
             <implementation>functionalTests.component.interceptor.InputOutputInterceptorImpl</implementation>

@@ -167,15 +167,15 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             } catch (IllegalArgumentException e) {
                 System.err.println("problem on invoking arguments!! " + args);
             } catch (IllegalAccessException iae) {
-            	logger.error(iae.getMessage());
+                logger.error(iae.getMessage());
             } catch (InvocationTargetException ite) {
                 System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
                 logger.error(ite.getMessage());
             }
         } catch (SecurityException se) {
-        	logger.error(se.getMessage());
+            logger.error(se.getMessage());
         } catch (NoSuchMethodException nsme) {
-        	logger.error(nsme.getMessage());
+            logger.error(nsme.getMessage());
         }
     }
 
@@ -208,15 +208,15 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
                 Object res = getter.invoke(ObjToInvoke);
                 return res;
             } catch (IllegalAccessException iae) {
-            	logger.error(iae.getMessage());
+                logger.error(iae.getMessage());
             } catch (InvocationTargetException ite) {
                 System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
                 logger.error(ite.getMessage());
             }
         } catch (SecurityException se) {
-        	logger.error(se.getMessage());
+            logger.error(se.getMessage());
         } catch (NoSuchMethodException nsme) {
-        	logger.error(nsme.getMessage());
+            logger.error(nsme.getMessage());
         }
         return null;
     }
