@@ -46,6 +46,7 @@ import java.lang.reflect.Method;
 public class IntentJoinPoint {
     private String medName;
     private Object invokeTarget;
+    private Class paramTypes[];
     private Object args[];
 
     /**
@@ -54,10 +55,12 @@ public class IntentJoinPoint {
      * @param m method name in string 
      * @param args an array of parameter objects
      */
-    public IntentJoinPoint(Object obj, String m, Object[] args) {
+    public IntentJoinPoint(String m, Object obj, Class[] paramTypes, Object[] args) {
         this.medName = m;
         this.invokeTarget = obj;
+        this.paramTypes = paramTypes;
         this.args = args;
+        //Object [] t = new Object[] {true};
     }
 
     /**
@@ -67,11 +70,7 @@ public class IntentJoinPoint {
      * @throws NoSuchMethodException
      */
     private Method getMethodByName() throws SecurityException, NoSuchMethodException {
-        Class<?>[] parameterTypes = new Class<?>[args.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            parameterTypes[i] = args[i].getClass();
-        }
-        return invokeTarget.getClass().getMethod(medName, parameterTypes);
+        return invokeTarget.getClass().getMethod(medName, paramTypes);
     }
 
     /**

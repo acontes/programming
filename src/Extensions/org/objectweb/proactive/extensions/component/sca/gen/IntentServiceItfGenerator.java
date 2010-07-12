@@ -36,7 +36,10 @@
  */
 package org.objectweb.proactive.extensions.component.sca.gen;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import javassist.CannotCompileException;
 import javassist.CtClass;
@@ -48,8 +51,13 @@ import javassist.CtNewMethod;
 import javassist.Modifier;
 import javassist.NotFoundException;
 
+import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.PAInterfaceImpl;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.type.WSComponent;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.component.sca.gen.Utils;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
@@ -61,12 +69,12 @@ import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerati
  * @author mug
  *
  */
-public class InterceptorGenerator extends AbstractClassGenerator {
-    private static InterceptorGenerator instance;
+public class IntentServiceItfGenerator extends AbstractClassGenerator {
+    private static IntentServiceItfGenerator instance;
 
-    public static InterceptorGenerator instance() {
+    public static IntentServiceItfGenerator instance() {
         if (instance == null) {
-            return new InterceptorGenerator();
+            return new IntentServiceItfGenerator();
         } else {
             return instance;
         }
@@ -101,76 +109,120 @@ public class InterceptorGenerator extends AbstractClassGenerator {
      * @return return generated class name
      * @throws ClassGenerationFailedException
      */
-    public String generateClass(Object sItf, int numberOfIntents) throws ClassGenerationFailedException {
+    public Object generateClass(Object sItf, Component owner, int numberOfIntents)
+            throws ClassGenerationFailedException {
         String className = sItf.getClass().getSimpleName(); //extended class name
-        String CName = Utils.getInterceptorClassName(className); //generated class name
-        String serviceItfName = ((InterfaceType) ((Interface) sItf).getFcItfType()).getFcItfSignature(); //service interface name
-        //System.err.println("Debugg "+ serviceItfName);
-        Class<?> generatedClass = null;
         try {
-            generatedClass = loadClass(CName);
-        } catch (ClassNotFoundException cnfe) {
-            CtClass generatedCtClass = pool.makeClass(CName);
+            String CName = Utils.getInterceptorClassName(className); //generated class name
+            String serviceItfName = ((InterfaceType) ((Interface) sItf).getFcItfType()).getFcItfSignature(); //service interface name
+            System.err.println("Debugg " + serviceItfName);
+            Class<?> generatedClass = null;
             try {
+                generatedClass = loadClass(CName);
+            } catch (ClassNotFoundException cnfe) {
+                CtClass generatedCtClass = pool.makeClass(CName);
                 //get super class
                 CtClass superClass = pool.get(className);
                 generatedCtClass.setSuperclass(superClass);
+                // Set interfaces to implement
+                List<CtClass> itfs = new ArrayList<CtClass>();
+                itfs.add(pool.get(Serializable.class.getName()));
+                generatedCtClass.setInterfaces(itfs.toArray(new CtClass[0]));
+                addSuperInterfaces(itfs);
+
                 Class<?> serviceItf = Class.forName(serviceItfName);
                 // create intentHandlers instance fields 
                 CtField intentHanderlers = CtField
                         .make(
-                                "org.objectweb.proactive.extensions.component.sca.control.IntentHandler[] IntentHandlers"
-                                    + "=org.objectweb.proactive.extensions.component.sca.Utils.getSCAIntentController(getFcItfOwner()).listFcIntentHandler(null).toArray();",
+                                "private org.objectweb.proactive.extensions.component.sca.control.IntentHandler[] IntentHandlers;",
                                 generatedCtClass);
                 generatedCtClass.addField(intentHanderlers);
-                /*create constructor */
+                //create constructor 
                 CtConstructor constructorDefault = CtNewConstructor.defaultConstructor(generatedCtClass);
-                generatedCtClass.addConstructor(constructorDefault);
+                // generatedCtClass.addConstructor(constructorDefault);
                 // create all method calls 
                 CtMethod[] services = filtreMethods(superClass, serviceItf);
                 for (int i = 0; i < services.length; i++) {
                     // create wrapper : inside contain super.method();
                     CtMethod wrapper = CtNewMethod.delegator(services[i], generatedCtClass);
-                    System.err.println("Debugg CTMED" + wrapper.toString());
+                    System.err.println("Debugg CTMED " + wrapper.toString());
                     wrapper.setName(wrapper.getName() + 0);
-                    wrapper.setModifiers(Modifier.PRIVATE);
-                    generatedCtClass.addMethod(wrapper);
+                    //   generatedCtClass.addMethod(wrapper);
                     for (int j = 0; j < numberOfIntents; j++) {
                         CtMethod tmp = CtNewMethod.delegator(services[i], generatedCtClass);
-                        tmp.setBody("return IntentHandlers[" + j +
+                        tmp.setBody("{return ($r)IntentHandlers[" + j +
                             "].invoke(new org.objectweb.proactive.extensions.component.sca.control." +
-                            "IntentJoinPoint(this,\"" + tmp.getName() + j + "\",$args));");
+                            "IntentJoinPoint(\"" + tmp.getName() + j + "\",this,$sig,$args));}");
                         // if there are intents left, then create method wrapper, otherwise create really method
                         String MethodName = (j == numberOfIntents - 1) ? tmp.getName() : tmp.getName() +
                             (j + 1);
                         tmp.setName(MethodName);
-                        generatedCtClass.addMethod(tmp);
+                        //     generatedCtClass.addMethod(tmp);
                     }
                 }
+                //
+                CtMethod setIntentHandlers = CtNewMethod
+                        .make(
+                                "public void setIntentHandlers(){"
+                                    + "IntentHandlers=org.objectweb.proactive.extensions.component.sca.Utils.getSCAIntentController(getFcItfOwner()).listFcIntentHandler(null).toArray();}",
+                                generatedCtClass);
+                // generatedCtClass.addMethod(setIntentHandlers);
+
                 generatedCtClass.stopPruning(true);
-                generatedCtClass.writeFile("generated/");
+                generatedCtClass.writeFile("generated_intent/");
+                superClass.writeFile("generated_intent/");
                 System.out.println("[JAVASSIST] generated class: " + CName);
                 // Generate and add to cache the generated class
+                generatedCtClass.defrost(); // defrost the generated class    
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance().addClassData(CName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + CName + " to cache");
                     logger.debug("generated classes cache is: " + ClassDataCache.instance().toString());
                 }
+
                 generatedClass = Utils.defineClass(CName, bytecode);
-                generatedCtClass.defrost(); // defrost the generated class                			
-            } catch (NotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (CannotCompileException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
             }
+
+            PAInterfaceImpl reference = (PAInterfaceImpl) generatedClass.newInstance();
+            PAInterfaceImpl serviceItf = (PAInterfaceImpl) sItf;
+            reference.setFcItfOwner(owner); // set owner
+            Method tmpMed = generatedClass.getMethod("setIntentHandlers");
+            //System.err.println(tmpMed);
+            tmpMed.invoke(reference);
+            reference.setFcItfName(serviceItf.getFcItfName());
+            reference.setFcType(serviceItf.getFcItfType());
+            reference.setFcIsInternal(serviceItf.isFcInternalItf());
+            //reference.setFcItfImpl(serviceItf.getFcItfImpl());
+            reference.setProxy(serviceItf.getProxy());
+            return reference;
+        } catch (Exception e) {
+            e.printStackTrace();
+            logger.error("Cannot generate subClass of [" + className + "] with javassist: " + e.getMessage());
+            throw new ClassGenerationFailedException("Cannot generate subClass of [" + className +
+                "] with javassist", e);
         }
-        return CName;
+        //return null;
     }
 
+    public static void addSuperInterfaces(List<CtClass> interfaces) throws NotFoundException {
+        for (int i = 0; i < interfaces.size(); i++) {
+            CtClass[] super_itfs_table = interfaces.get(i).getInterfaces();
+            List<CtClass> super_itfs = new ArrayList<CtClass>(super_itfs_table.length); // resizable list
+            for (int j = 0; j < super_itfs_table.length; j++) {
+                super_itfs.add(super_itfs_table[j]);
+            }
+            addSuperInterfaces(super_itfs);
+            CtClass super_itf;
+            for (int j = 0; j < super_itfs.size(); j++) {
+                if (!interfaces.contains(super_itfs.get(j))) {
+                    super_itf = super_itfs.get(j);
+                    if (!(super_itf.equals(pool.get(PAInterface.class.getName())) || super_itf.equals(pool
+                            .get(Interface.class.getName())))) {
+                        interfaces.add(super_itfs.get(j));
+                    }
+                }
+            }
+        }
+    }
 }

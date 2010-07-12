@@ -219,7 +219,7 @@ public class OutputInterceptorClassGenerator extends AbstractInterfaceClassGener
 
                 createReifiedMethods(generatedCtClass, reifiedMethods, isFunctionalInterface);
                 //                generatedCtClass.stopPruning(true);
-                //                generatedCtClass.writeFile("generated/");
+                //                generatedCtClass.writeFile("generated_interceptor/");
                 //                System.out.println("[JAVASSIST] generated class : " +
                 //                    representativeClassName);
                 byte[] bytecode = generatedCtClass.toBytecode();

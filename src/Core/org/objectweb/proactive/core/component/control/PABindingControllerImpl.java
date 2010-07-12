@@ -479,7 +479,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
         return itfProxy;
     }
 
-    private void primitiveBindFc(String clientItfName, PAInterface serverItf)
+    protected void primitiveBindFc(String clientItfName, PAInterface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
         // delegate binding operation to the reified object
         BindingController user_binding_controller = (BindingController) ((PAComponent) getFcItfOwner())
@@ -502,7 +502,7 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
     /*
      * binding method enforcing Interface type for the server interface, for composite components
      */
-    private void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
+    protected void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
             throws NoSuchInterfaceException {
         PAInterface clientItf = null;
         clientItf = (PAInterface) getFcItfOwner().getFcInterface(clientItfName);

@@ -63,6 +63,8 @@ import functionalTests.component.conform.Conformtest;
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
+import functionalTests.component.interceptor.FooItf;
+import functionalTests.component.sca.components.CIntententHandler;
 
 
 public class TestBindingController {
@@ -124,6 +126,8 @@ public class TestBindingController {
     @Test
     public void testBindLookupUnbind() throws Exception {
         BindingController bc = GCM.getBindingController(c);
+        SCAIntentController scaic = Utils.getSCAIntentController(c);
+        scaic.addFcIntentHandler(new CIntententHandler());
         bc.bindFc("client", d.getFcInterface("server"));
         checkList(bc, new String[] { "client" });
         assertEquals(d.getFcInterface("server"), bc.lookupFc("client"));
@@ -135,6 +139,7 @@ public class TestBindingController {
     public void testCollectionBindLookupUnbind() throws Exception {
         BindingController bc = GCM.getBindingController(c);
         bc.bindFc("clients0", d.getFcInterface("server"));
+        // ((I) c.getFcInterface(I.class.getSimpleName())).m(true);
         checkList(bc, new String[] { "client", "clients0" });
         assertEquals(d.getFcInterface("server"), bc.lookupFc("clients0"));
         bc.unbindFc("clients0");

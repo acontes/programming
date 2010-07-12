@@ -82,14 +82,14 @@ public interface SCAIntentController {
         throws IllegalLifeCycleException;
         
      *//**
-         * Add the specified intent handler on the service or reference interface
-         * whose name is specified.
-         * 
-         * @param handler  the intent handler to add
-         * @param name     the interface name
-         * @throws NoSuchInterfaceException  if the interface does not exist
-         * @since 0.4.4
-         */
+             * Add the specified intent handler on the service or reference interface
+             * whose name is specified.
+             * 
+             * @param handler  the intent handler to add
+             * @param name     the interface name
+             * @throws NoSuchInterfaceException  if the interface does not exist
+             * @since 0.4.4
+             */
     /*
         public void addFcIntentHandler( IntentHandler handler, String name )
         throws NoSuchInterfaceException;
@@ -111,13 +111,13 @@ public interface SCAIntentController {
         throws NoSuchInterfaceException, NoSuchMethodException;
 
      *//**
-         * Return the list of all intent handlers associated with the interface
-         * (service or reference) whose name is specified.
-         * 
-         * @param name  the interface name
-         * @throws NoSuchInterfaceException  if the interface does not exist
-         * @since 0.4.4
-         */
+             * Return the list of all intent handlers associated with the interface
+             * (service or reference) whose name is specified.
+             * 
+             * @param name  the interface name
+             * @throws NoSuchInterfaceException  if the interface does not exist
+             * @since 0.4.4
+             */
     public List<IntentHandler> listFcIntentHandler(String name) throws NoSuchInterfaceException;
 
     /**

@@ -12,7 +12,10 @@ public class CIntententHandler implements IntentHandler {
 
     @Override
     public Object invoke(IntentJoinPoint Ijpt) throws Throwable {
-        return Ijpt.proceed();
+        System.err.println("Debugg haha before");
+        Object ret = Ijpt.proceed();
+        System.err.println("Debugg haha after");
+        return ret;
     }
 
 }
