@@ -135,6 +135,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     	Set<String> visited = new HashSet<String>();
     	visited.add(this.getMonitoredComponentName());
     	
+    	String localName = this.getMonitoredComponentName();
     	String destName = cr.getCalledComponent();
     	MonitorController child = null;
     	
@@ -150,13 +151,17 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 		for(String monitorItfName : externalMonitors.keySet()) {
     		RPlogger.debug("["+this.getMonitoredComponentName()+"] Looking external interface ["+monitorItfName+"]");
     		if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    			RPlogger.debug("Selected!");
 				child = externalMonitors.get(monitorItfName);
 			}
 		}
 		RPlogger.debug("-------------------------------------------------------------");
 		RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
     	result = child.getPathForID(id, rootID, visited);
+    	result.add(new PathItem(cr.getParentID(), id, cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime() - cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
+    	
+    	// sort the results according to the order of the calls
+    	result.getSize();
+    	
     	RPlogger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     	return result;
     	
@@ -192,6 +197,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
     	// call each branch that starts here and has the same rootID
     	for(ComponentRequestID crid : branches.keySet()) {
+
     		RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
     		// get the record of the request
     		rr = logHandler.fetchRequestRecord(crid);
@@ -200,7 +206,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
 
 
     		// this path item represents the fact that the call arrived here
-    		pi = new PathItem(rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
+    		pi = new PathItem(crid, rr.getRequestID(), rr.getArrivalTime(), rr.getReplyTime(), rr.getReplyTime()-rr.getArrivalTime(), rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
     		// add this PathItem
     		RPlogger.debug("["+localName+"] Adding pathItem ["+ pi.toString() +"]");
     		result.add(pi);
@@ -212,6 +218,10 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     			// get the name of the component to call
     			destName = cr.getCalledComponent();
     			RPlogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
+    			
+    			// add the item saying that a call was sent. However, while doing the search we won't necessarily call that component now.
+    			result.add(new PathItem(cr.getParentID(), cr.getRequestID(), cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime()-cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
+    			
     			// if it is in the visited list, don't call it
     			if(!visited.contains(destName)) {
     				// select the client interface (can be external or internal) where this component is connected
@@ -244,6 +254,7 @@ public class MonitorControl extends AbstractProActiveComponentController impleme
     			}
     		}
     	}
+    	
 
     	RPlogger.debug("["+localName+"] Returning results with "+ result.getPath().size() +" pathItems");
 
