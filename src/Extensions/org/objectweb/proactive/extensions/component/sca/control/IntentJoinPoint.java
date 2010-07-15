@@ -53,6 +53,7 @@ public class IntentJoinPoint {
      * 
      * @param obj invoke target object
      * @param m method name in string 
+     * @param paramTypes the type of arguments
      * @param args an array of parameter objects
      */
     public IntentJoinPoint(String m, Object obj, Class[] paramTypes, Object[] args) {
@@ -60,7 +61,6 @@ public class IntentJoinPoint {
         this.invokeTarget = obj;
         this.paramTypes = paramTypes;
         this.args = args;
-        //Object [] t = new Object[] {true};
     }
 
     /**

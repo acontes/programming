@@ -59,8 +59,8 @@ import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.CAttributes;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.sca.components.CIntententHandler;
-import functionalTests.component.sca.components.IntentControllerTestComp;
-import functionalTests.component.sca.components.IntentTestInterface;
+import functionalTests.component.sca.components.TestIntentComponent;
+import functionalTests.component.sca.components.TestIntentItf;
 
 
 public class TestSCAIntentServiceItfGen extends Conformtest {
@@ -81,7 +81,7 @@ public class TestSCAIntentServiceItfGen extends Conformtest {
         t = tf.createFcType(new InterfaceType[] {
                 tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER, CAttributes.class.getName(), false, false,
                         false),
-                tf.createFcItfType("server", IntentTestInterface.class.getName(), false, false, false),
+                tf.createFcItfType("server", TestIntentItf.class.getName(), false, false, false),
                 tf.createFcItfType("client", I.class.getName(), true, true, false) });
     }
 
@@ -90,15 +90,14 @@ public class TestSCAIntentServiceItfGen extends Conformtest {
     // -------------------------------------------------------------------------
     @Test
     public void testParametricPrimitive() throws Exception {
-        Component c = gf.newFcInstance(t, parametricPrimitive, IntentControllerTestComp.class.getName());
+        Component c = gf.newFcInstance(t, parametricPrimitive, TestIntentComponent.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
-        IntentTestInterface i = (IntentTestInterface) c.getFcInterface("server");
+        TestIntentItf i = (TestIntentItf) c.getFcInterface("server");
         i.m();
         SCAIntentController scaic = Utils.getSCAIntentController(c);
         scaic.addFcIntentHandler(new CIntententHandler());
         scaic.addFcIntentHandler(new CIntententHandler());
-        IntentTestInterface objIn = (IntentTestInterface) IntentServiceItfGenerator.instance().generateClass(
-                i, c, 2);
+        TestIntentItf objIn = (TestIntentItf) IntentServiceItfGenerator.instance().generateClass(i, c, 2);
         objIn.n();
         objIn.m();
         checkInterface(objIn);

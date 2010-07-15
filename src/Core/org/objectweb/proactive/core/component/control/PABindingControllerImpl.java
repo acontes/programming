@@ -36,11 +36,17 @@
  */
 package org.objectweb.proactive.core.component.control;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.NotFoundException;
 
 import org.etsi.uri.gcm.api.type.GCMInterfaceType;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
@@ -366,6 +372,8 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             try {
                 // replace server itf with an interface of the same type+same proxy, but with interception code
                 sItf = OutputInterceptorClassGenerator.instance().generateInterface(sItf, outputInterceptors);
+                System.err.println("a new interface with interceptor generated , sItf is " +
+                    sItf.getClass().getName());
             } catch (InterfaceGenerationFailedException e) {
                 controllerLogger.error("could not generate output interceptor for client interface " +
                     clientItfName + " : " + e.getMessage());

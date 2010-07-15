@@ -1,9 +1,10 @@
 package functionalTests.component.sca.components;
 
 import functionalTests.component.conform.components.C;
+import functionalTests.component.conform.components.I;
 
 
-public class IntentControllerTestComp extends C implements IntentTestInterface {
+public class TestIntentComponent extends C implements TestIntentItf {
 
     public void m() {
         System.err.println("in method m without param");

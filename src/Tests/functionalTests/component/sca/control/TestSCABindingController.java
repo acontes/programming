@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca;
+package functionalTests.component.sca.control;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
@@ -55,19 +55,17 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 
-import functionalTests.component.conform.Conformtest;
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
-import functionalTests.component.interceptor.FooItf;
 import functionalTests.component.sca.components.CIntententHandler;
 
 
-public class TestBindingController {
+public class TestSCABindingController {
     protected Component boot;
     protected GCMTypeFactory tf;
     protected GenericFactory gf;
@@ -81,7 +79,7 @@ public class TestBindingController {
     // -------------------------------------------------------------------------
     // Constructor and setup
     // -------------------------------------------------------------------------
-    public TestBindingController() {
+    public TestSCABindingController() {
         super();
     }
 

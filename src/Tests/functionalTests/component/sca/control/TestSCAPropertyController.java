@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca;
+package functionalTests.component.sca.control;
 
 import static org.junit.Assert.assertEquals;
 
