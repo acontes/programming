@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
@@ -76,6 +76,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
     protected String proxyClassName;
     protected Class<Adapter<T>> adapterClass;
     protected ProActiveSecurityManager psm;
+    protected RemoteObjectExposer<T> roe;
 
     public RemoteObjectImpl(String className, T target) throws IllegalArgumentException, SecurityException,
             InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
@@ -107,7 +108,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
             Object o;
 
             if (message instanceof RemoteObjectRequest) {
-                o = message.getMethodCall().execute(this);
+                o = ((RemoteObjectRequest) message).execute(this);
             } else {
                 o = message.getMethodCall().execute(this.target);
             }
@@ -223,9 +224,10 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         try {
             T reifiedObjectStub = (T) createStubObject();
             if (adapterClass != null) {
-                Constructor<Adapter<T>> myConstructor = adapterClass.getConstructor(new Class[] { Class
-                        .forName(this.className) });
-                Adapter<T> ad = myConstructor.newInstance(reifiedObjectStub);
+                Constructor<Adapter<T>> myConstructor = adapterClass.getConstructor(new Class[] {});// Class                        .forName(this.className)  });
+                Adapter<T> ad = myConstructor.newInstance();
+                ad.setTargetAndCallConstruct((T) target);
+                ad.setTarget(reifiedObjectStub);
                 return ad.getAs();
             } else {
                 return reifiedObjectStub;
@@ -262,6 +264,7 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         try {
             T reifiedObjectStub = (T) createStubObject();
             ((StubObject) reifiedObjectStub).setProxy(new SynchronousProxy(null, new Object[] { rro }));
+
             if (adapterClass != null) {
 
                 Class<?>[] classArray = new Class[] { Class.forName(this.className) };
@@ -414,4 +417,11 @@ public class RemoteObjectImpl<T> implements RemoteObject<T>, Serializable {
         return null;
     }
 
+    public RemoteObjectExposer<T> getRemoteObjectExposer() {
+        return this.roe;
+    }
+
+    public void setRemoteObjectExposer(RemoteObjectExposer<T> roe) {
+        this.roe = roe;
+    }
 }

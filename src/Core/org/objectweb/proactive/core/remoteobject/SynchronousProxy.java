@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.remoteobject;
 
@@ -157,5 +157,9 @@ public class SynchronousProxy implements Proxy, Serializable {
             return false;
         }
         return true;
+    }
+
+    public RemoteObject getRemoteObject() {
+        return this.remoteObject;
     }
 }

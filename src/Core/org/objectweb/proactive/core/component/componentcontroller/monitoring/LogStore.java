@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
+import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
@@ -25,7 +25,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
  * @author cruz
  *
  */
-public class LogStore extends AbstractProActiveComponentController implements LogHandler {
+public class LogStore extends AbstractPAComponentController implements LogHandler {
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 

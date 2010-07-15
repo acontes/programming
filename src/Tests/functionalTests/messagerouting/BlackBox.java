@@ -36,15 +36,14 @@
  */
 package functionalTests.messagerouting;
 
-import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
 
 import org.junit.After;
 import org.junit.Before;
-import org.objectweb.proactive.extra.messagerouting.client.Tunnel;
-import org.objectweb.proactive.extra.messagerouting.router.Router;
-import org.objectweb.proactive.extra.messagerouting.router.RouterConfig;
+import org.objectweb.proactive.extensions.pamr.client.Tunnel;
+import org.objectweb.proactive.extensions.pamr.router.Router;
+import org.objectweb.proactive.extensions.pamr.router.RouterConfig;
 
 import functionalTests.FunctionalTest;
 
@@ -54,7 +53,7 @@ public class BlackBox extends FunctionalTest {
     protected Tunnel tunnel;
 
     @Before
-    public void beforeBlackbox() throws IOException {
+    public void beforeBlackbox() throws Exception {
         RouterConfig config = new RouterConfig();
         this.router = Router.createAndStart(config);
 

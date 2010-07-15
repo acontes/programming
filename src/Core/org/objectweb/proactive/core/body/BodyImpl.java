@@ -88,11 +88,11 @@ import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.body.tags.tag.DsiTag;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.ComponentParameters;
-import org.objectweb.proactive.core.component.ProActiveInterface;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
-import org.objectweb.proactive.core.component.identity.ProActiveComponent;
-import org.objectweb.proactive.core.component.representative.ProActiveComponentRepresentative;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.debug.debugger.BreakpointType;
@@ -939,7 +939,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             		// (but that's like a "major" thing)
 
             		ComponentMethodCallMetadata cmcmd = methodCall.getComponentMetadata();
-            		ProActiveComponent pac = ((ComponentBodyImpl)BodyImpl.this).getProActiveComponentImpl();
+            		PAComponent pac = ((ComponentBodyImpl)BodyImpl.this).getPAComponentImpl();
             		
             		
             		if(pac != null && cmcmd != null) {
@@ -954,10 +954,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             			try {
             				// more ugliness ... name must not end with -NF 
             				// this is to avoid that the tags be propagated in calls inside the membrane ... I don't want to monitor that, and it generates errors
-							if(!Utils.isControllerInterfaceName(interfaceName) && !interfaceName.endsWith("-nf") ) {
+							if(!Utils.isControllerItfName(interfaceName) && !interfaceName.endsWith("-nf") ) {
 								bc = Fractal.getBindingController(pac);
 								if(bc != null) {
-									componentDestName = ((ProActiveComponentRepresentative)((ProActiveInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
+									componentDestName = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
 								}
 							}
 						} catch (NoSuchInterfaceException e) {

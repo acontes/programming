@@ -40,11 +40,11 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.After;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.adl.Registry;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.OperatingSystem;
@@ -67,7 +67,7 @@ public class TestGather_GCMdep extends ComponentTest {
     public void testRemoteGathercast() throws Exception {
 
         URL descriptorPath = TestGather_GCMdep.class
-                .getResource("/functionalTests/component/descriptor/applicationDescriptor.xml");
+                .getResource("/functionalTests/component/deployment/applicationDescriptor.xml");
 
         vContract.setVariableFromProgram(GCMFunctionalTest.VAR_OS, OperatingSystem.getOperatingSystem()
                 .name(), VariableContractType.DescriptorDefaultVariable);
@@ -100,7 +100,7 @@ public class TestGather_GCMdep extends ComponentTest {
 
         // bind components
         System.out.println("\nBind components...");
-        BindingController bc = Fractal.getBindingController(gatherCmpClient);
+        BindingController bc = GCM.getBindingController(gatherCmpClient);
         // binding
         bc.bindFc("sender", gatherCmpServer.getFcInterface("receiver"));
 
@@ -109,8 +109,8 @@ public class TestGather_GCMdep extends ComponentTest {
         ((Runnable) gatherCmpClient.getFcInterface("main")).run();
 
         System.out.println("\nStart components...");
-        Fractal.getLifeCycleController(gatherCmpClient).startFc();
-        Fractal.getLifeCycleController(gatherCmpServer).startFc();
+        GCM.getGCMLifeCycleController(gatherCmpClient).startFc();
+        GCM.getGCMLifeCycleController(gatherCmpServer).startFc();
     }
 
     @After

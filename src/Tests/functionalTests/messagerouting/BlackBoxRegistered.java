@@ -40,10 +40,12 @@ import java.io.IOException;
 
 import org.junit.Before;
 import org.objectweb.proactive.core.util.ProActiveRandom;
-import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationReplyMessage;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extensions.pamr.protocol.AgentID;
+import org.objectweb.proactive.extensions.pamr.protocol.MagicCookie;
+import org.objectweb.proactive.extensions.pamr.protocol.message.Message;
+import org.objectweb.proactive.extensions.pamr.protocol.message.RegistrationReplyMessage;
+import org.objectweb.proactive.extensions.pamr.protocol.message.RegistrationRequestMessage;
+import org.objectweb.proactive.extensions.pamr.router.RouterImpl;
 
 
 /**
@@ -57,7 +59,8 @@ public class BlackBoxRegistered extends BlackBox {
     @Before
     public void registerAgent() throws IOException {
         // Connect
-        Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextPosLong(), 0);
+        Message message = new RegistrationRequestMessage(null, ProActiveRandom.nextPosLong(),
+            RouterImpl.DEFAULT_ROUTER_ID, new MagicCookie());
         tunnel.write(message.toByteArray());
 
         byte[] resp = tunnel.readMessage();

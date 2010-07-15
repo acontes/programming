@@ -5,8 +5,8 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2010 INRIA/University of
+ *              Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -32,7 +32,7 @@
  *  Contributor(s):
  *
  * ################################################################
- * $$PROACTIVE_INITIAL_DEV$$
+ * $$ACTIVEEON_CONTRIBUTOR$$
  */
 package org.objectweb.proactive.core.runtime;
 
@@ -109,13 +109,14 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
+import org.objectweb.proactive.core.runtime.broadcast.RTBroadcaster;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
 import org.objectweb.proactive.core.security.ProActiveSecurityManager;
+import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.SecurityContext;
 import org.objectweb.proactive.core.security.SecurityEntity;
 import org.objectweb.proactive.core.security.TypedCertificate;
-import org.objectweb.proactive.core.security.SecurityConstants.EntityType;
 import org.objectweb.proactive.core.security.crypto.KeyExchangeException;
 import org.objectweb.proactive.core.security.crypto.SessionException;
 import org.objectweb.proactive.core.security.domain.SecurityDomain;
@@ -160,11 +161,22 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // JMX
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
     private static final Logger clLogger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
+
     static {
         try {
             proActiveRuntime = new ProActiveRuntimeImpl();
             proActiveRuntime.createMBean();
             System.setProperty(PALifeCycle.PA_STARTED_PROP, "true");
+            if (CentralPAPropertyRepository.PA_RUNTIME_PING.isTrue()) {
+                new PARTPinger().start();
+            }
+
+            if (CentralPAPropertyRepository.PA_RUNTIME_BROADCAST.isTrue()) {
+                RTBroadcaster rtBrodcaster = RTBroadcaster.getInstance();
+                // notify our presence on the lan
+                rtBrodcaster.sendDiscover();
+            }
+
         } catch (UnknownProtocolException e) {
             e.printStackTrace();
         } catch (ProActiveException e) {
@@ -492,7 +504,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             Node node = null;
             try {
                 node = new NodeImpl((ProActiveRuntime) PARemoteObject.lookup(URI.create(localNode.getURL())),
-                    localNode.getURL(), URIBuilder.getProtocol(localNode.getURL()), jobId);
+                    localNode.getURL(), jobId);
             } catch (ProActiveException e) {
                 throw new NodeException("Failed to created NodeImpl", e);
             }
@@ -712,6 +724,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             }
             mbean = null;
         }
+
         // END JMX unregistration
         System.exit(0);
 

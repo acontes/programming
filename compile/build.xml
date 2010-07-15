@@ -107,7 +107,8 @@
 		</fileset>
 		<else>
 			<fileset dir="${cl.test.dir}" id="performancesuite">
-				<include name="performanceTests/**/*Test*.class" />
+				<include name="performanceTests/bandwidth/Test*.class" />
+				<include name="performanceTests/throughput/Test*.class" />
 				<exclude name="**/*$*.class" />
 				<exclude name="**/*Ibis*.class" />
 			</fileset>
@@ -195,7 +196,6 @@
 		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/runtime/ProActiveRuntime" />
 		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/body/UniversalBody" />
 		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/component/type/Composite" />
-		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/component/ProActiveInterfaceImpl" />
 		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/jmx/util/JMXNotificationListener" />
 		<generate_stub_for_class srcDir="${cl.proactive.dir}" class="org/objectweb/proactive/core/util/log/remote/ProActiveLogCollector" />
 
@@ -266,7 +266,7 @@
 			<bool>
 				<and>
 					<os family="Unix" />
-					<available file="mpicc" filepath="/bin:/usr/bin:/usr/local/bin" />
+					<available file="mpic++" filepath="/bin:/usr/bin:/usr/local/bin" />
 				</and>
 			</bool>
 			<echo>Compiling native examples</echo>
@@ -278,7 +278,9 @@
 					-I${src.mpi.dir}
 					-I${src.nativeinterface.dir}
 					-L${deploy.lib.native.dir}
-					-lProActiveNativeInterfaceIPC -lProActiveMPIComm
+					-lProActiveNativeInterfaceIPC 
+					-lProActiveNativeComm
+					-lProActiveMPIComm
 					-fPIC -g
 					hello_pampi.c -o hello_pampi " />
 			</exec>
@@ -292,7 +294,7 @@
 			</exec>
 
 			<else>
-				<echo>Native examples are only available for Unix and mpicc must be installed</echo>
+				<echo>Native examples are only available for Unix and mpic++ must be installed</echo>
 			</else>
 		</if>
 
@@ -619,6 +621,8 @@
 				<jvmargs />
 
 				<!--
+
+					<jvmarg value="-agentlib:yjpagent=onexit=snapshot,tracing,alloceach=5" />
 					Remote Debug:
 					<jvmarg value="-Xdebug" />
 					<jvmarg value="-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000" />
@@ -678,6 +682,10 @@
 				<jvmarg value="-Dproactive.net.router.port=0" />
 			</jvmargs>
 		</junitMacro>
+	</target>
+
+	<target name="junit.pnp" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
+		<junitMacro communication.protocol="pnp" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite"/>
 	</target>
 
 	<target name="with.clover">
@@ -1009,7 +1017,8 @@
 				<include name="log4j.jar" />
 				<include name="xercesImpl-2.8.1.jar" />
 				<include name="bouncycastle.jar" />
-				<include name="fractal.jar" />
+				<include name="fractal-api-2.0.3-SNAPSHOT.jar" />
+				<include name="fractal-gcm-api-1.1.1.jar" />
 			</fileset>
 		</jar>
 	</target>

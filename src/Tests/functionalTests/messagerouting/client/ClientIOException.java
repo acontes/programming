@@ -44,15 +44,16 @@ import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.util.Sleeper;
-import org.objectweb.proactive.extra.messagerouting.client.AgentImpl;
-import org.objectweb.proactive.extra.messagerouting.client.MessageHandler;
-import org.objectweb.proactive.extra.messagerouting.exceptions.MessageRoutingException;
-import org.objectweb.proactive.extra.messagerouting.protocol.AgentID;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.DataRequestMessage;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.DebugMessage;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.Message;
-import org.objectweb.proactive.extra.messagerouting.protocol.message.DebugMessage.DebugType;
-import org.objectweb.proactive.extra.messagerouting.remoteobject.util.socketfactory.MessageRoutingPlainSocketFactory;
+import org.objectweb.proactive.extensions.pamr.client.AgentImpl;
+import org.objectweb.proactive.extensions.pamr.client.MessageHandler;
+import org.objectweb.proactive.extensions.pamr.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extensions.pamr.protocol.AgentID;
+import org.objectweb.proactive.extensions.pamr.protocol.MagicCookie;
+import org.objectweb.proactive.extensions.pamr.protocol.message.DataRequestMessage;
+import org.objectweb.proactive.extensions.pamr.protocol.message.DebugMessage;
+import org.objectweb.proactive.extensions.pamr.protocol.message.Message;
+import org.objectweb.proactive.extensions.pamr.protocol.message.DebugMessage.DebugType;
+import org.objectweb.proactive.extensions.pamr.remoteobject.util.socketfactory.MessageRoutingPlainSocketFactory;
 
 import functionalTests.messagerouting.BlackBox;
 
@@ -99,7 +100,8 @@ public class ClientIOException extends BlackBox {
 
         public Agent(InetAddress routerAddr, int routerPort,
                 Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
-            super(routerAddr, routerPort, messageHandlerClass, new MessageRoutingPlainSocketFactory());
+            super(routerAddr, routerPort, null, new MagicCookie(), messageHandlerClass,
+                    new MessageRoutingPlainSocketFactory());
         }
 
         public void sendMsg(Message message) throws MessageRoutingException {

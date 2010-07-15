@@ -41,13 +41,12 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.control.NameController;
-import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PADeployment;
-import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
 import org.objectweb.proactive.core.util.OperatingSystem;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -59,7 +58,7 @@ import org.objectweb.proactive.gcmdeployment.GCMApplication;
 import functionalTests.FunctionalTest;
 import functionalTests.GCMFunctionalTest;
 import functionalTests.GCMFunctionalTestDefaultNodes;
-import functionalTests.component.descriptor.fractaladl.Test;
+import functionalTests.component.deployment.Test;
 
 
 // we need this active object to perform the test, because futures updates are involved (managed by future pool)
@@ -78,40 +77,43 @@ public class DummyAO implements Serializable {
                 .getJvmParameters(), VariableContractType.ProgramVariable);
 
         ProActiveDescriptor deploymentDescriptor = PADeployment.getProactiveDescriptor(Test.class
-                .getResource("/functionalTests/component/descriptor/deploymentDescriptor.xml").getPath(),
+                .getResource("/functionalTests/component/deployment/deploymentDescriptor.xml").getPath(),
                 vContract);
         context.put("deployment-descriptor", deploymentDescriptor);
 
         Component x = (Component) f.newComponent("functionalTests.component.migration.x", context);
         deploymentDescriptor.activateMappings();
-        Fractal.getLifeCycleController(x).startFc();
-        Fractive.getMigrationController(x).migrateTo(deploymentDescriptor.getVirtualNode("VN3").getNode());
+        GCM.getGCMLifeCycleController(x).startFc();
+        GCM.getMigrationController(x).migrateGCMComponentTo(
+                deploymentDescriptor.getVirtualNode("VN3").getNode());
         Assert.assertEquals("hello", ((E) x.getFcInterface("e")).gee(new StringWrapper("hello"))
                 .stringValue());
 
         Component y = (Component) f.newComponent("functionalTests.component.migration.y", context);
-        Fractive.getMigrationController(y).migrateTo(deploymentDescriptor.getVirtualNode("VN1").getNode());
-        Fractal.getLifeCycleController(y).startFc();
+        GCM.getMigrationController(y).migrateGCMComponentTo(
+                deploymentDescriptor.getVirtualNode("VN1").getNode());
+        GCM.getGCMLifeCycleController(y).startFc();
 
         Component toto = (Component) f.newComponent("functionalTests.component.migration.toto", context);
-        Fractive.getMigrationController(toto).migrateTo(deploymentDescriptor.getVirtualNode("VN2").getNode());
-        Fractal.getLifeCycleController(toto).startFc();
+        GCM.getMigrationController(toto).migrateGCMComponentTo(
+                deploymentDescriptor.getVirtualNode("VN2").getNode());
+        GCM.getGCMLifeCycleController(toto).startFc();
         Assert.assertEquals("toto", ((E) toto.getFcInterface("e01")).gee(new StringWrapper("toto"))
                 .stringValue());
         //        
         Component test = (Component) f.newComponent("functionalTests.component.migration.test", context);
 
-        Fractal.getLifeCycleController(test).startFc();
+        GCM.getGCMLifeCycleController(test).startFc();
         StringWrapper result = new StringWrapper("");
         //        for (int i = 0; i < 2; i++) {
         //            result = ((A) test.getFcInterface("a")).foo(new StringWrapper("hello world !"));
         //        }
 
-        Component[] subComponents = Fractal.getContentController(test).getFcSubComponents();
+        Component[] subComponents = GCM.getContentController(test).getFcSubComponents();
         for (int i = 0; i < subComponents.length; i++) {
-            NameController nc = Fractal.getNameController(subComponents[i]);
+            NameController nc = GCM.getNameController(subComponents[i]);
             if (nc.getFcName().equals("y")) {
-                Fractive.getMigrationController(subComponents[i]).migrateTo(
+                GCM.getMigrationController(subComponents[i]).migrateGCMComponentTo(
                         deploymentDescriptor.getVirtualNode("VN3").getNode());
                 break;
             }
@@ -137,7 +139,7 @@ public class DummyAO implements Serializable {
         Map<String, Object> context = new HashMap<String, Object>();
 
         URL descriptorPath = Test.class
-                .getResource("/functionalTests/component/descriptor/applicationDescriptor.xml");
+                .getResource("/functionalTests/component/deployment/applicationDescriptor.xml");
 
         VariableContractImpl vContract = new VariableContractImpl();
         vContract.setVariableFromProgram(GCMFunctionalTest.VAR_OS, OperatingSystem.getOperatingSystem()
@@ -156,38 +158,38 @@ public class DummyAO implements Serializable {
         context.put("deployment-descriptor", newDeploymentDescriptor);
 
         Component x = (Component) f.newComponent("functionalTests.component.migration.x", context);
-        Fractal.getLifeCycleController(x).startFc();
+        GCM.getGCMLifeCycleController(x).startFc();
 
-        Fractive.getMigrationController(x)
-                .migrateTo(newDeploymentDescriptor.getVirtualNode("VN3").getANode());
+        GCM.getMigrationController(x).migrateGCMComponentTo(
+                newDeploymentDescriptor.getVirtualNode("VN3").getANode());
         Assert.assertEquals("hello", ((E) x.getFcInterface("e")).gee(new StringWrapper("hello"))
                 .stringValue());
 
         Component y = (Component) f.newComponent("functionalTests.component.migration.y", context);
-        Fractive.getMigrationController(y)
-                .migrateTo(newDeploymentDescriptor.getVirtualNode("VN1").getANode());
-        Fractal.getLifeCycleController(y).startFc();
+        GCM.getMigrationController(y).migrateGCMComponentTo(
+                newDeploymentDescriptor.getVirtualNode("VN1").getANode());
+        GCM.getGCMLifeCycleController(y).startFc();
 
         Component toto = (Component) f.newComponent("functionalTests.component.migration.toto", context);
-        Fractive.getMigrationController(toto).migrateTo(
+        GCM.getMigrationController(toto).migrateGCMComponentTo(
                 newDeploymentDescriptor.getVirtualNode("VN2").getANode());
-        Fractal.getLifeCycleController(toto).startFc();
+        GCM.getGCMLifeCycleController(toto).startFc();
         Assert.assertEquals("toto", ((E) toto.getFcInterface("e01")).gee(new StringWrapper("toto"))
                 .stringValue());
         //        
         Component test = (Component) f.newComponent("functionalTests.component.migration.test", context);
 
-        Fractal.getLifeCycleController(test).startFc();
+        GCM.getGCMLifeCycleController(test).startFc();
         StringWrapper result = new StringWrapper("");
         //        for (int i = 0; i < 2; i++) {
         //            result = ((A) test.getFcInterface("a")).foo(new StringWrapper("hello world !"));
         //        }
 
-        Component[] subComponents = Fractal.getContentController(test).getFcSubComponents();
+        Component[] subComponents = GCM.getContentController(test).getFcSubComponents();
         for (int i = 0; i < subComponents.length; i++) {
-            NameController nc = Fractal.getNameController(subComponents[i]);
+            NameController nc = GCM.getNameController(subComponents[i]);
             if (nc.getFcName().equals("y")) {
-                Fractive.getMigrationController(subComponents[i]).migrateTo(
+                GCM.getMigrationController(subComponents[i]).migrateGCMComponentTo(
                         newDeploymentDescriptor.getVirtualNode("VN3").getANode());
                 break;
             }

@@ -25,7 +25,7 @@ import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.tags.tag.CMTag;
-import org.objectweb.proactive.core.component.componentcontroller.AbstractProActiveComponentController;
+import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  * @author cruz
  *
  */
-public class EventListener extends AbstractProActiveComponentController implements NotificationListener, BindingController, EventControl {
+public class EventListener extends AbstractPAComponentController implements NotificationListener, BindingController, EventControl {
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 

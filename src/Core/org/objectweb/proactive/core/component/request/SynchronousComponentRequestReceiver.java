@@ -71,9 +71,8 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
         if (r instanceof ComponentRequest) {
             if (!((ComponentRequest) r).isControllerRequest()) {
                 if (CentralPAPropertyRepository.PA_COMPONENT_USE_SHORTCUTS.isTrue()) {
-                    if (!((ComponentBody) bodyReceiver).getProActiveComponentImpl().getInputInterceptors()
-                            .isEmpty() ||
-                        !((ComponentBody) bodyReceiver).getProActiveComponentImpl().getOutputInterceptors()
+                    if (!((ComponentBody) bodyReceiver).getPAComponentImpl().getInputInterceptors().isEmpty() ||
+                        !((ComponentBody) bodyReceiver).getPAComponentImpl().getOutputInterceptors()
                                 .isEmpty()) {
                         if (logger.isDebugEnabled()) {
                             logger
@@ -87,7 +86,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
                     ((ComponentRequest) r).shortcutNotification(r.getSender(), bodyReceiver
                             .getRemoteAdapter());
 
-                    // TODO_M leave a ref of the shortcut
+                    // TODO leave a ref of the shortcut
                     if (logger.isDebugEnabled()) {
                         logger
                                 .debug("directly executing request " +
@@ -99,7 +98,7 @@ public class SynchronousComponentRequestReceiver extends RequestReceiverImpl {
                     }
                 }
                 bodyReceiver.serve(r);
-                // TODO_M check with FT
+                // TODO check with FT
                 return SynchronousComponentRequestReceiver.SHORTCUT;
             }
         }
