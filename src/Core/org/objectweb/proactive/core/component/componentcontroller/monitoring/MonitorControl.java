@@ -5,9 +5,23 @@ import java.util.Map;
 import java.util.Set;
 
 import org.etsi.uri.gcm.api.control.MonitorController;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.control.MethodStatistics;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
 public interface MonitorControl extends MonitorController {
 
+	//-------------------------------------------------------------------------------------------
+	// Adaptation for the GCM Monitoring API
+	
+	void startMonitoring();
+	void stopMonitoring();
+	void resetMonitoring();
+	BooleanWrapper isMonitoringStarted();
+	public Map<String, MethodStatistics> getAllStatistics();
+	public MethodStatistics getStatistics(String itfName, String methodName) throws ProActiveRuntimeException;
+	public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes) throws ProActiveRuntimeException;
+	
     //--------------------------------------------------------------------------------------------
     // Extensions for the Monitoring Framework
     //

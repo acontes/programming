@@ -54,6 +54,41 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	super();
     }
     
+    //--------------------------------------------------------------------------
+    // Old API, kept for wrapping calls to the next
+	@Override
+	public Map<String, MethodStatistics> getAllStatistics() {
+		return null;
+	}
+	@Override
+	public MethodStatistics getStatistics(String itfName, String methodName)
+			throws ProActiveRuntimeException {
+		return null;
+	}
+	@Override
+	public MethodStatistics getStatistics(String itfName, String methodName,
+			Class<?>[] parametersTypes) throws ProActiveRuntimeException {
+		return null;
+	}
+	@Override
+	public BooleanWrapper isMonitoringStarted() {
+		return new BooleanWrapper(isGCMMonitoringStarted());
+	}
+	@Override
+	public void resetMonitoring() {
+		resetGCMMonitoring();
+	}
+	@Override
+	public void startMonitoring() {
+		startGCMMonitoring();
+	}
+	@Override
+	public void stopMonitoring() {
+		stopGCMMonitoring();
+	}
+    
+	//-----------------------------------------------------------------------
+	// GCM Monitoring API
 	@Override
 	public Map<String, Object> getAllGCMStatistics() {
 		return null;
@@ -62,7 +97,6 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	@Override
 	public MethodStatistics getGCMStatistics(String itfName, String methodName,
 			Class<?>[] parametersTypes) throws ProActiveRuntimeException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -363,6 +397,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	public String getMonitoredComponentName() {
 		return hostComponent.getComponentParameters().getName();
 	}
-	
+
+
+
+
+
 
 }
