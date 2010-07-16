@@ -36,26 +36,21 @@
  */
 package functionalTests.component.sca.gen;
 
-import static org.junit.Assert.assertEquals;
-
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
-import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.component.sca.gen.IntentServiceItfGenerator;
 
 import functionalTests.component.conform.Conformtest;
-import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.CAttributes;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.sca.components.CIntententHandler;
@@ -95,71 +90,11 @@ public class TestSCAIntentServiceItfGen extends Conformtest {
         TestIntentItf i = (TestIntentItf) c.getFcInterface("server");
         i.m();
         SCAIntentController scaic = Utils.getSCAIntentController(c);
-        scaic.addFcIntentHandler(new CIntententHandler());
-        scaic.addFcIntentHandler(new CIntententHandler());
+        scaic.addFcIntentHandler(new CIntententHandler(""));
+        scaic.addFcIntentHandler(new CIntententHandler(""));
         TestIntentItf objIn = (TestIntentItf) IntentServiceItfGenerator.instance().generateClass(i, c, 2);
         objIn.n();
         objIn.m();
         checkInterface(objIn);
-        /*
-         CAttributes ca = (CAttributes) GCM.getAttributeController(c);
-         ca.setX1(true);
-         assertEquals(true, ca.getX1());
-         ca.setX2((byte) 1);
-         assertEquals((byte) 1, ca.getX2());
-         ca.setX3((char) 1);
-         assertEquals((char) 1, ca.getX3());
-         ca.setX4((short) 1);
-         assertEquals((short) 1, ca.getX4());
-         ca.setX5(1);
-         assertEquals(1, ca.getX5());
-         ca.setX6(1);
-         assertEquals((long) 1, ca.getX6());
-         ca.setX7(1);
-         assertEquals(1, ca.getX7(), 0);
-         ca.setX8(1);
-         assertEquals(1, ca.getX8(), 0);
-         ca.setX9("1");
-         assertEquals("1", ca.getX9());
-         ca.setWriteOnlyX11(true);
-         assertEquals(true, i.n(false, null));*/
     }
-    /*
-     @Test(expected = InstantiationException.class)
-     public void testParametricPrimitiveWithBadContentClass() throws Exception {
-     Component c = gf.newFcInstance(t, parametricPrimitive, TestSCAInterceptorGen.class.getName());
-     }
-
-     @Test
-     @Ignore
-     public void testParametricPrimitiveTemplate() throws Exception {
-     Component c = gf.newFcInstance(t, parametricPrimitiveTemplate, C.class.getName());
-
-     CAttributes ca = (CAttributes) GCM.getAttributeController(c);
-     ca.setX1(true);
-     ca.setX2((byte) 1);
-     ca.setX3((char) 1);
-     ca.setX4((short) 1);
-     ca.setX5(1);
-     ca.setX6(1);
-     ca.setX7(1);
-     ca.setX8(1);
-     ca.setX9("1");
-     ca.setWriteOnlyX11(true);
-
-     c = GCM.getFactory(c).newFcInstance();
-     GCM.getGCMLifeCycleController(c).startFc();
-     ca = (CAttributes) GCM.getAttributeController(c);
-
-     assertEquals(true, ca.getX1());
-     assertEquals((byte) 1, ca.getX2());
-     assertEquals((char) 1, ca.getX3());
-     assertEquals((short) 1, ca.getX4());
-     assertEquals(1, ca.getX5());
-     assertEquals((long) 1, ca.getX6());
-     assertEquals(1, ca.getX7(), 0);
-     assertEquals(1, ca.getX8(), 0);
-     assertEquals("1", ca.getX9());
-     assertEquals(true, ((I) c.getFcInterface("server")).n(false, null));
-     }*/
 }

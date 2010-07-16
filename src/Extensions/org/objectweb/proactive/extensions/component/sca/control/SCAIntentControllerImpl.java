@@ -80,26 +80,20 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public void addFcIntentHandler(IntentHandler handler) throws IllegalLifeCycleException {
-        // TODO Auto-generated method stub
-        /*try {
-        	String generatedInterceptorName = InterceptorGenerator.instance().generateClass(handler.getClass().getName());
-        } catch (ClassGenerationFailedException e) {
-        	// TODO Auto-generated catch block
-        	e.printStackTrace();
-        }*/
-        intentHandlers.add(handler);
+
+        intentHandlers.add(0, handler);
 
     }
 
     @Override
     public List<IntentHandler> listFcIntentHandler(String name) throws NoSuchInterfaceException {
-        // TODO Auto-generated method stub
+
         return intentHandlers;
     }
 
     @Override
     public void removeFcIntentHandler(IntentHandler handler) {
-        // TODO Auto-generated method stub
+
         intentHandlers.remove(handler);
     }
 

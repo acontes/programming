@@ -1,5 +1,7 @@
 package functionalTests.component.sca.control;
 
+import static org.junit.Assert.assertEquals;
+
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
@@ -24,6 +26,7 @@ import functionalTests.component.sca.components.CIntententHandler;
 import functionalTests.component.sca.components.CServer;
 import functionalTests.component.sca.components.TestIntentComponent;
 import functionalTests.component.sca.components.TestIntentItf;
+import functionalTests.component.sca.components.ThreadIntentHandler;
 
 
 public class TestSCAIntentController extends Conformtest {
@@ -50,7 +53,7 @@ public class TestSCAIntentController extends Conformtest {
                 type_factory.createFcItfType("client", I.class.getName(), TypeFactory.CLIENT,
                         TypeFactory.MANDATORY, TypeFactory.SINGLE) }), new ControllerDescription("A",
             Constants.PRIMITIVE),/*,getClass().getResource(
-        	                        "/functionalTests/component/interceptor/config.xml").getPath()),*/
+                	                        "/functionalTests/component/interceptor/config.xml").getPath()),*/
         new ContentDescription(CClient.class.getName(), new Object[] {}));
 
         componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
@@ -60,14 +63,17 @@ public class TestSCAIntentController extends Conformtest {
 
         SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
                 .getSCAIntentController(componentA);
-        scaic.addFcIntentHandler(new CIntententHandler());
+        scaic.addFcIntentHandler(new CIntententHandler("first"));
+        scaic.addFcIntentHandler(new CIntententHandler("second"));
+        scaic.addFcIntentHandler(new CIntententHandler("third"));
+        scaic.addFcIntentHandler(new ThreadIntentHandler());
         GCM.getBindingController(componentA).bindFc("client", componentB.getFcInterface("server"));
 
         GCM.getGCMLifeCycleController(componentA).startFc();
         GCM.getGCMLifeCycleController(componentB).startFc();
 
-        //((I) componentA.getFcInterface("server")).n('c', 10.0);
-        ((I) componentA.getFcInterface("server")).m(10);
-        Object cItf = GCM.getBindingController(componentA).lookupFc("client");
+        I i = (I) componentA.getFcInterface("server"); // check all functional methods
+        checkInterface(i);
+        Thread.sleep(10000);
     }
 }

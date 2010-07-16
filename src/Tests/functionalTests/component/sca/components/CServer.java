@@ -52,7 +52,6 @@ public class CServer implements I, J {
 
     // FUNCTIONAL INTERFACE
     public void m(boolean v) {
-        //i.m(v);
     }
 
     public void m(byte v) {
@@ -66,6 +65,7 @@ public class CServer implements I, J {
 
     public void m(int v) {
         System.err.println("inside public void m(int v) time is " + System.currentTimeMillis());
+        //while(true);///{System.err.println("cool");}
     }
 
     public void m(long v) {

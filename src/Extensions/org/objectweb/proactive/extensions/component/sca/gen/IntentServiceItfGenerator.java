@@ -36,32 +36,22 @@
  */
 package org.objectweb.proactive.extensions.component.sca.gen;
 
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
-import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.Modifier;
 import javassist.NotFoundException;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.PAInterfaceImpl;
-import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.type.WSComponent;
 import org.objectweb.proactive.core.util.ClassDataCache;
-import org.objectweb.proactive.extensions.component.sca.gen.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 
@@ -157,7 +147,6 @@ public class IntentServiceItfGenerator extends AbstractClassGenerator {
                 for (int i = 0; i < services.length; i++) {
                     // create wrapper : inside contain super.method();
                     CtMethod wrapper = CtNewMethod.delegator(services[i], generatedCtClass);
-                    //System.err.println("Debugg CTMED " + wrapper.toString());
                     wrapper.setName(wrapper.getName() + 0);
                     generatedCtClass.addMethod(wrapper);
                     for (int j = 0; j < numberOfIntents; j++) {
@@ -173,11 +162,11 @@ public class IntentServiceItfGenerator extends AbstractClassGenerator {
                     }
                 }
 
-                generatedCtClass.stopPruning(true);
-                generatedCtClass.writeFile("generated_intent/");
-                superClass.writeFile("generated_intent/");
-                System.out.println("[JAVASSIST] generated class: " + CName);
-                // Generate and add to cache the generated class
+                //	generatedCtClass.stopPruning(true);
+                //	generatedCtClass.writeFile("generated_intent/");
+                //	superClass.writeFile("generated_intent/");
+                //	System.out.println("[JAVASSIST] generated class: " + CName);
+                // 	Generate and add to cache the generated class
                 generatedCtClass.defrost(); // defrost the generated class    
                 byte[] bytecode = generatedCtClass.toBytecode();
                 ClassDataCache.instance().addClassData(CName, bytecode);

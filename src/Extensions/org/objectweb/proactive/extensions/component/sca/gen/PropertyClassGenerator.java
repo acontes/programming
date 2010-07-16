@@ -36,19 +36,15 @@
  */
 package org.objectweb.proactive.extensions.component.sca.gen;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
-import javassist.CannotCompileException;
 import javassist.CtClass;
 import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
-import javassist.NotFoundException;
 
-import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 

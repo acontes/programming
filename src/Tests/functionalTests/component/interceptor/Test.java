@@ -98,8 +98,8 @@ public class Test extends ComponentTest {
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 type_factory.createFcItfType(FooItf.CLIENT_ITF_NAME, FooItf.class.getName(),
                         TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
-                new ControllerDescription("A", Constants.PRIMITIVE),/*,getClass().getResource(
-                                        "/functionalTests/component/interceptor/config.xml").getPath()),*/
+                new ControllerDescription("A", Constants.PRIMITIVE, getClass().getResource(
+                        "/functionalTests/component/interceptor/config.xml").getPath()),
                 new ContentDescription(A.class.getName(), new Object[] {}));
 
         componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
@@ -107,15 +107,12 @@ public class Test extends ComponentTest {
                         TypeFactory.MANDATORY, TypeFactory.SINGLE), }), new ControllerDescription("B",
             Constants.PRIMITIVE), new ContentDescription(B.class.getName(), new Object[] {}));
 
-        SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
-                .getSCAIntentController(componentA);
-        scaic.addFcIntentHandler(new CIntententHandler());
         GCM.getBindingController(componentA).bindFc(FooItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(FooItf.SERVER_ITF_NAME));
 
         //logger.debug("OK, instantiated the component");
-        /*((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
-                .setDummyValue(Test.DUMMY_VALUE);*/
+        ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                .setDummyValue(Test.DUMMY_VALUE);
 
         GCM.getGCMLifeCycleController(componentA).startFc();
         GCM.getGCMLifeCycleController(componentB).startFc();
@@ -124,8 +121,8 @@ public class Test extends ComponentTest {
         ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).foo();
         ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).bar();
         //((FooItf) componentA.getFcInterface("fooItf")).foo();
-        /*result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
-                .getDummyValue();*/
+        result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
+                .getDummyValue();
         GCM.getBindingController(componentA).lookupFc(FooItf.CLIENT_ITF_NAME);
         String expectedResult = DUMMY_VALUE + InputInterceptor1.BEFORE_INTERCEPTION +
             InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION +

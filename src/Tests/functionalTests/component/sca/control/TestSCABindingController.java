@@ -125,7 +125,7 @@ public class TestSCABindingController {
     public void testBindLookupUnbind() throws Exception {
         BindingController bc = GCM.getBindingController(c);
         SCAIntentController scaic = Utils.getSCAIntentController(c);
-        scaic.addFcIntentHandler(new CIntententHandler());
+        scaic.addFcIntentHandler(new CIntententHandler(""));
         bc.bindFc("client", d.getFcInterface("server"));
         checkList(bc, new String[] { "client" });
         assertEquals(d.getFcInterface("server"), bc.lookupFc("client"));
@@ -137,7 +137,6 @@ public class TestSCABindingController {
     public void testCollectionBindLookupUnbind() throws Exception {
         BindingController bc = GCM.getBindingController(c);
         bc.bindFc("clients0", d.getFcInterface("server"));
-        // ((I) c.getFcInterface(I.class.getSimpleName())).m(true);
         checkList(bc, new String[] { "client", "clients0" });
         assertEquals(d.getFcInterface("server"), bc.lookupFc("clients0"));
         bc.unbindFc("clients0");
