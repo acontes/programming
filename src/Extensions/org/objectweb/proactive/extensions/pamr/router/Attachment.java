@@ -38,6 +38,7 @@ package org.objectweb.proactive.extensions.pamr.router;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.Socket;
 import java.net.SocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -88,6 +89,8 @@ public class Attachment {
     final private SocketChannel socketChannel;
 
     final private AtomicBoolean dtored;
+
+    volatile private String agentHostname;
 
     public Attachment(RouterImpl router, SocketChannel socketChannel) {
         this.attachmentId = AttachmentIdGenerator.getId();
@@ -164,10 +167,15 @@ public class Attachment {
 
     public String getRemoteEndpointName() {
         SocketAddress sa = getRemoteEndpoint();
-        if (sa == null)
-            return "unknown";
-        else
+        if (sa == null) {
+            // Troubleshooting: Unknown is sometime returned in production
+            // We are trying to understand why.
+            Socket s = socketChannel.socket();
+            return "unknown (Socket:" + s + " isClosed:" + s.isClosed() + " isConnected: " + s.isConnected() +
+                ")";
+        } else {
             return sa.toString();
+        }
     }
 
     public InetSocketAddress getRemoteEndpoint() {
@@ -221,5 +229,16 @@ public class Attachment {
      */
     public void disconnect() throws IOException {
         this.socketChannel.close();
+    }
+
+    public String getAgentHostname() {
+        return this.agentHostname;
+    }
+
+    public void setAgentHostname(String agentHostname) {
+        if (this.agentHostname != null) {
+            logger.warn("setAgentHostname is already set: " + this);
+        }
+        this.agentHostname = agentHostname;
     }
 }

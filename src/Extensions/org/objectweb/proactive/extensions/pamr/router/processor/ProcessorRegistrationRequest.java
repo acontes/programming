@@ -76,6 +76,7 @@ public class ProcessorRegistrationRequest extends Processor {
         try {
             RegistrationRequestMessage message = (RegistrationRequestMessage) Message.constructMessage(
                     this.rawMessage.array(), 0);
+            this.attachment.setAgentHostname(message.getAgentHostname());
             AgentID agentId = message.getAgentID();
 
             if (agentId == null) {
@@ -256,7 +257,7 @@ public class ProcessorRegistrationRequest extends Processor {
             client.sendMessage(reply.toByteArray());
             return true;
         } catch (IOException e) {
-            logger.info("Failed to send registration reply to " + reply.getAgentID() + ": " + e.getCause());
+            logger.info("Failed to send registration reply to " + reply.getAgentID(), e);
         }
         return false;
     }
