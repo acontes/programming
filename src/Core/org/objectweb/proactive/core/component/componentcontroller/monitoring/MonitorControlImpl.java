@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,6 +15,7 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
+import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.control.MethodStatistics;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -36,16 +38,15 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	
 	private EventControl eventControl = null;
 	private LogHandler logHandler = null;
-	private MonitorControl externalMonitor = null;
-	private MonitorControl internalMonitor = null;
+	
+	// interfaces for monitors of internal and external components
 	private Map<String, MonitorControl> externalMonitors = new HashMap<String, MonitorControl>();
 	private Map<String, MonitorControl> internalMonitors = new HashMap<String, MonitorControl>();
 	
-	private String itfs[] = {"events-control-nf", "log-handler-nf",
-			"external-0-monitoring-api-nf", 
-			"external-1-monitoring-api-nf",
-			"internal-0-monitoring-api-nf",
-			"internal-1-monitoring-api-nf"};
+	private String basicItfs[] = {
+			Remmos.EVENT_CONTROL_ITF,
+			Remmos.LOG_HANDLER_ITF
+			};
 	
 	/** Monitoring status */
     private boolean started = false;
@@ -55,7 +56,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     }
     
     //--------------------------------------------------------------------------
-    // Old API, kept for wrapping calls to the next
+    // Old API, kept for wrapping calls to the new one
 	@Override
 	public Map<String, MethodStatistics> getAllStatistics() {
 		return null;
@@ -304,27 +305,23 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	public void bindFc(String cItf, Object sItf)
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
-		if(cItf.equals("events-control-nf")) {
+		if(cItf.equals(Remmos.EVENT_CONTROL_ITF)) {
 			eventControl = (EventControl) sItf;
 			return;
 		}
-		if(cItf.equals("log-handler-nf")) {
+		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
 			logHandler = (LogHandler) sItf;
 			return;
 		}
-		if(cItf.equals("external-0-monitoring-api-nf")) {
+		// it refers to the monitoring interface of an external component (bound from an external client interface)
+		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
+			// WARN: does not check if the corresponding external client interface exists in the host component
 			externalMonitors.put(cItf, (MonitorControl)sItf);
 			return;
 		}
-		if(cItf.equals("external-1-monitoring-api-nf")) {
-			externalMonitors.put(cItf, (MonitorControl) sItf);
-			return;
-		}
-		if(cItf.equals("internal-0-monitoring-api-nf")) {
-			internalMonitors.put(cItf, (MonitorControl) sItf);
-			return;
-		}
-		if(cItf.equals("internal-1-monitoring-api-nf")) {
+		// it refers to the monitoring interface of an internal component (external server interface bound to an internal server interface)
+		if(cItf.endsWith("-internal-"+Remmos.MONITOR_SERVICE_ITF)) {
+			// WARN: does not check if the corresponding internal server interface exists in the host component
 			internalMonitors.put(cItf, (MonitorControl) sItf);
 			return;
 		}
@@ -333,27 +330,35 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
 	@Override
 	public String[] listFc() {
-		return itfs;
+		int nExternalMonitors = externalMonitors.size();
+		int nInternalMonitors = internalMonitors.size();
+		int nBasicItfs = basicItfs.length;
+		String[] externalMonitorNames = externalMonitors.keySet().toArray(new String[nExternalMonitors]);
+		String[] internalMonitorNames = internalMonitors.keySet().toArray(new String[nInternalMonitors]);
+		
+		ArrayList<String> itfsList = new ArrayList<String>(nExternalMonitors+nInternalMonitors+nBasicItfs);
+		for(int i=0;i<nBasicItfs;i++) {
+			itfsList.add(basicItfs[i]);
+		}
+		itfsList.addAll(externalMonitors.keySet());
+		itfsList.addAll(internalMonitors.keySet());
+		
+		return itfsList.toArray(new String[itfsList.size()]);
+		
 	}
 
 	@Override
 	public Object lookupFc(String cItf) throws NoSuchInterfaceException {
-		if(cItf.equals("events-control-nf")) {
+		if(cItf.equals(Remmos.EVENT_CONTROL_ITF)) {
 			return eventControl;
 		}
-		if(cItf.equals("log-handler-nf")) {
+		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
 			return logHandler;
 		}
-		if(cItf.equals("external-0-monitoring-api-nf")) {
+		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
 			return externalMonitors.get(cItf);
 		}
-		if(cItf.equals("external-1-monitoring-api-nf")) {
-			return externalMonitors.get(cItf);
-		}
-		if(cItf.equals("internal-0-monitoring-api-nf")) {
-			return internalMonitors.get(cItf);
-		}
-		if(cItf.equals("internal-1-monitoring-api-nf")) {
+		if(cItf.endsWith("-internal-"+Remmos.MONITOR_SERVICE_ITF)) {
 			return internalMonitors.get(cItf);
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
@@ -362,22 +367,16 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	@Override
 	public void unbindFc(String cItf) throws NoSuchInterfaceException,
 			IllegalBindingException, IllegalLifeCycleException {
-		if(cItf.equals("events-control-nf")) {
+		if(cItf.equals(Remmos.EVENT_CONTROL_ITF)) {
 			eventControl = null;
 		}
-		if(cItf.equals("log-handler-nf")) {;
+		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
 			logHandler = null;
 		}
-		if(cItf.equals("external-0-monitoring-api-nf")) {
+		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
 			externalMonitors.put(cItf,null);
 		}
-		if(cItf.equals("external-1-monitoring-api-nf")) {
-			externalMonitors.put(cItf,null);
-		}
-		if(cItf.equals("internal-0-monitoring-api-nf")) {
-			internalMonitors.put(cItf,null);
-		}
-		if(cItf.equals("internal-1-monitoring-api-nf")) {
+		if(cItf.endsWith("-internal-"+Remmos.MONITOR_SERVICE_ITF)) {
 			internalMonitors.put(cItf,null);
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		

@@ -728,6 +728,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
 	
 }
 
+/*
 class ConnectionTest implements NotificationListener {
 
 	@Override
@@ -736,4 +737,4 @@ class ConnectionTest implements NotificationListener {
 		
 	}
 	
-}
+}*/
