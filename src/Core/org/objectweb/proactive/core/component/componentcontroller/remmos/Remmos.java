@@ -2,8 +2,13 @@ package org.objectweb.proactive.core.component.componentcontroller.remmos;
 
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
@@ -13,6 +18,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventListener;
@@ -28,10 +34,14 @@ import org.objectweb.proactive.core.component.control.PAGCMLifeCycleController;
 import org.objectweb.proactive.core.component.control.PAMembraneController;
 import org.objectweb.proactive.core.component.control.PASuperController;
 import org.objectweb.proactive.core.component.control.PASuperControllerImpl;
+import org.objectweb.proactive.core.component.exceptions.NoSuchComponentException;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -42,6 +52,9 @@ import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
  */
 public class Remmos {
 
+	// Logger
+	private static final Logger logger = ProActiveLogger.getLogger(Loggers.REMMOS);
+	
 	// Monitor-related Components
 	public static final String EVENT_LISTENER_COMP = "event-listener-NF";
 	public static final String LOG_STORE_COMP = "log-store-NF";
@@ -166,6 +179,12 @@ public class Remmos {
 	/**
 	 * Builds the monitoring components and put them in the membrane.
 	 * The functional assembly must be done before, otherwise the internal assemblies will be incomplete.
+	 * 
+	 * After the execution of this method, the component (composite or primitive) will have all the Monitor-related components
+	 * created and bound to the corresponding (internal and external) interfaces on the membrane.
+	 * 
+	 *  The bindings from the external client and internal client monitoring interfaces are not created here.
+	 *  They must be added later with the "enableMonitoring" method.
 	 * 
 	 * @param component
 	 * @throws Exception 
@@ -381,11 +400,167 @@ public class Remmos {
 	 * Starts monitoring in this component and all its connections.
 	 * Bindings are created if necessary.
 	 * 
+	 * FIXME: This method is recursive, and performs a DFS search in the graph of bindings.
+	 *        It does not consider cyclic paths. For that it would need a parameter of "visited" components (like MonitorControlImpl, when recovering the paths)
+	 *        
+	 * WARN: The method can repeat bindings, in the sense that it can create them twice. This is not inconsistent, but it can be improved by keeping a list
+	 *       of created bindings.
+	 * 
 	 * @param component
 	 */
 	public static void enableMonitoring(Component component) {
 		
+		// if the component is not an instance of PAComponent, it will fail
+		PAComponent pacomponent = (PAComponent) component;
+		String componentName = pacomponent.getComponentParameters().getName();
+		String itfName;
+		String componentDestName = "-";
+		boolean composite = Constants.COMPOSITE.equals(pacomponent.getComponentParameters().getHierarchicalType());
 		
+		BindingController bc = null;
+		PASuperController sc = null;
+		PAMembraneController membrane = null;
+		PAComponent componentDest = null;
+		PAComponent parent = null;
+		MonitorControl externalMonitor = null;
+		MonitorControl internalMonitor = null;
+
+		logger.debug("Enabling monitoring on component "+componentName);
+		
+		// Get the Super Controller
+		try {
+			sc = Utils.getPASuperController(pacomponent);
+		} catch (NoSuchInterfaceException e) {
+			sc = null;
+		}
+		if(sc == null) {
+			return;
+		}
+		Component parents[] = sc.getFcSuperComponents();
+		if(parents.length > 0) {
+			parent = ((PAComponent)parents[0]);
+			logger.debug("   My parent is "+ parent.getComponentParameters().getName() );
+		}
+		else {
+			logger.debug("   No parent");
+		}
+		
+		
+		// Get the Membrane Controller
+		try {
+			membrane = Utils.getPAMembraneController(pacomponent);
+		} catch (NoSuchInterfaceException e) {
+			// if there is no membrane controller, we cannot do anything
+			membrane = null;
+		}
+		if(membrane == null)
+			return;
+		
+		
+		// If it is a composite, first it makes the bindings for the internal components
+		if(composite) {
+			logger.debug("Composite");
+			// Get the Binding Controller of the composite (must have one)
+			try {
+				bc = Utils.getPABindingController(pacomponent);
+			} catch (NoSuchInterfaceException e) {
+				bc = null;
+			}
+			if(bc == null) {
+				logger.debug("A composite without Binding Controller?");
+				return;
+			}
+			
+			InterfaceType[] itfType = pacomponent.getComponentParameters().getComponentType().getFcInterfaceTypes();
+					
+			for(InterfaceType itf : itfType) {
+				// only for single server interfaces
+				if( !itf.isFcClientItf() && ((PAGCMInterfaceType)itf).isGCMSingletonItf() && !((PAGCMInterfaceType)itf).isGCMCollectiveItf() ) {
+					try {
+						itfName = itf.getFcItfName();
+						componentDest = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(itfName)).getFcItfOwner());
+						componentDestName = componentDest.getComponentParameters().getName();
+						logger.debug("   Client interface (internal): "+ itfName + ", bound to "+ componentDestName);
+						internalMonitor = ((MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER));
+						logger.debug("   Binding ["+componentName+"."+itfName+"-internal-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");
+						membrane.stopMembrane();
+						membrane.bindNFc(itfName+"-internal-"+Constants.MONITOR_CONTROLLER, internalMonitor);
+						membrane.startMembrane();
+					} catch (NoSuchInterfaceException e) {
+						e.printStackTrace();
+					} catch (IllegalLifeCycleException e) {
+						e.printStackTrace();
+					} catch (IllegalBindingException e) {
+						e.printStackTrace();
+					} catch (NoSuchComponentException e) {
+						e.printStackTrace();
+					}	
+					
+					// now it should continue with the destination component ...
+					enableMonitoring(componentDest);
+				}
+			}
+		}
+		
+		// Get the Binding Controller, if we have not him already
+		// If it is a composite, we already have the Binding Controller
+		if(bc == null) {
+			try {
+				bc = Utils.getPABindingController(pacomponent);
+			} catch (NoSuchInterfaceException e) {
+				bc = null;
+			}
+		}
+		// if there is no Binding Controller, then we're in a Primitive without client interfaces, so we don't need to continue
+		if(bc == null) {
+			return;
+		}
+		
+		// Takes all the external client interfaces of the component and creates a binding between the corresponding monitoring interfaces
+		// (provided that the client interfaces are bound)
+		
+		InterfaceType[] fItfType = pacomponent.getComponentParameters().getInterfaceTypes();
+		boolean foundParent;
+		for(int i=0; i<fItfType.length; i++) {
+			foundParent = false;
+			// only server-singleton supported ... others ignored
+			if(fItfType[i].isFcClientItf() && ((PAGCMInterfaceType)fItfType[i]).isGCMSingletonItf() && !((PAGCMInterfaceType)fItfType[i]).isGCMCollectiveItf()) {
+				itfName = fItfType[i].getFcItfName();
+				// get the component bound to this interface .... (if there is one) !!!!!!!!!!!!!!
+				try {
+					componentDest = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(itfName)).getFcItfOwner());
+					componentDestName = componentDest.getComponentParameters().getName();
+					logger.debug("   Client interface: "+ itfName + ", bound to "+ componentDestName);
+					// if the component destination is the same as the parent of the current component, 
+					// then I should bind to internal monitoring interface of the parent
+					if(componentDest.equals(parent)) {
+						foundParent = true;
+						externalMonitor = (MonitorControl)componentDest.getFcInterface("internal-server-"+Constants.MONITOR_CONTROLLER);
+						logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+"internal-server-"+Constants.MONITOR_CONTROLLER+"]");
+					}
+					else {
+						externalMonitor = (MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER);
+						logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");						
+					}
+					// do the NF binding
+					membrane.stopMembrane();
+					membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
+					membrane.startMembrane();
+				} catch (NoSuchInterfaceException e) {
+					e.printStackTrace();
+				} catch (IllegalLifeCycleException e) {
+					e.printStackTrace();
+				} catch (IllegalBindingException e) {
+					e.printStackTrace();
+				} catch (NoSuchComponentException e) {
+					e.printStackTrace();
+				}
+				// if I just bound to the internal interface of the parent, then don't continue with him, otherwise I'll get into a cycle
+				if(!foundParent) {
+					enableMonitoring(componentDest);
+				}
+			}
+		}
 		
 	}
 }

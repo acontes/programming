@@ -80,6 +80,7 @@ public interface Loggers {
     static final public String COMPONENTS_ADL = COMPONENTS + ".adl";
     static final public String COMPONENTS_MULTICAST = COMPONENTS + ".multicast";
     static final public String COMPONENTS_GATHERCAST = COMPONENTS + ".gathercast";
+    static final public String REMMOS = COMPONENTS + ".remmos";
     static final public String DEPLOYMENT = CORE + ".deployment";
     static final public String DEPLOYMENT_PROCESS = DEPLOYMENT + ".process";
     static final public String DEPLOYMENT_LOG = DEPLOYMENT + ".log";
