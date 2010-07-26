@@ -957,6 +957,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 							if(!Utils.isControllerItfName(interfaceName) && !interfaceName.endsWith("-nf") ) {
 								bc = Fractal.getBindingController(pac);
 								if(bc != null) {
+									// FIXME This doesn't work properly if the interfaces names differ in the client and the server (awful bug!)
 									componentDestName = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
 								}
 							}
