@@ -37,5 +37,5 @@
 package org.objectweb.proactive.examples.components.sca.currencysms;
 
 public interface Runner {
-    public void execute();
+    public void execute() throws Exception;
 }

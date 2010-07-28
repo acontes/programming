@@ -42,6 +42,7 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
 import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.Utils;
@@ -52,37 +53,35 @@ public class Main {
     private static final String currencyURL = "http://www.webservicex.net/CurrencyConvertor.asmx";
     private static final String orangeURL = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
 
-    public static void main(String[] args) {
-        try {
-            SCAPAPropertyRepository.SCA_PROVIDER
-                    .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
-            Component boot = Utils.getBootstrapComponent();
-            GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
-            GenericFactory gf = GCM.getGenericFactory(boot);
-            ComponentType t = tf.createFcType(new InterfaceType[] {
-                    tf.createFcItfType("Runner", Runner.class.getName(), false, false, false),
-                    tf.createFcItfType(CurrencySMS.CURRENCY_SERVICE_NAME, CurrencyService.class.getName(),
-                            true, false, false),
-                    tf.createFcItfType(CurrencySMS.ORANGE_SERVICE_NAME, OrangeService.class.getName(), true,
-                            false, false) });
+    public static void main(String[] args) throws Exception {
+        SCAPAPropertyRepository.SCA_PROVIDER
+                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+        Component boot = Utils.getBootstrapComponent();
+        GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
+        GenericFactory gf = GCM.getGenericFactory(boot);
+        ComponentType t = tf.createFcType(new InterfaceType[] {
+                tf.createFcItfType("Runner", Runner.class.getName(), false, false, false),
+                tf.createFcItfType(CurrencySMS.CURRENCY_SERVICE_NAME, CurrencyService.class.getName(), true,
+                        false, false),
+                tf.createFcItfType(CurrencySMS.ORANGE_SERVICE_NAME, OrangeService.class.getName(), true,
+                        false, false) });
 
-            Component comp = gf.newFcInstance(t, "primitive", CurrencySMS.class.getName());
-            GCM.getBindingController(comp).bindFc(CurrencySMS.CURRENCY_SERVICE_NAME,
-                    currencyURL + "(" + WSInfo.DYNAMICCXFWSCALLER_ID + ")");
-            GCM.getBindingController(comp).bindFc(CurrencySMS.ORANGE_SERVICE_NAME,
-                    orangeURL + "(" + RestOrangeServiceCaller.class.getName() + ")");
-            SCAPropertyController scap = Utils.getSCAPropertyController(comp);
-            scap.init();
-            scap.setValue("fromCurrency", "USD");
-            scap.setValue("toCurrency", "EUR");
-            scap.setValue("id", "xxxxxxxx"); // Change me
-            scap.setValue("from", "38100");
-            scap.setValue("to", "3360000000"); // Change me
+        Component comp = gf.newFcInstance(t, "primitive", CurrencySMS.class.getName());
+        GCM.getBindingController(comp).bindFc(CurrencySMS.CURRENCY_SERVICE_NAME,
+                currencyURL + "(" + WSInfo.DYNAMICCXFWSCALLER_ID + ")");
+        GCM.getBindingController(comp).bindFc(CurrencySMS.ORANGE_SERVICE_NAME,
+                orangeURL + "(" + RestOrangeServiceCaller.class.getName() + ")");
+        SCAPropertyController scap = Utils.getSCAPropertyController(comp);
+        scap.init();
+        scap.setValue("fromCurrency", "USD");
+        scap.setValue("toCurrency", "EUR");
+        scap.setValue("id", "xxxxxxxx"); // Change me
+        scap.setValue("from", "38100");
+        scap.setValue("to", "3360000000"); // Change me
 
-            GCM.getGCMLifeCycleController(comp).startFc();
-            ((Runner) comp.getFcInterface("Runner")).execute();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        GCM.getGCMLifeCycleController(comp).startFc();
+        ((Runner) comp.getFcInterface("Runner")).execute();
+
+        PALifeCycle.exitSuccess();
     }
 }

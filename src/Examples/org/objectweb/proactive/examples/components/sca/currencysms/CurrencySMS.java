@@ -53,55 +53,15 @@ public class CurrencySMS implements BindingController, Runner {
 
     /* SCA Properties */
     @Property
-    private String fromCurrency;
+    protected String fromCurrency;
     @Property
-    private String toCurrency;
+    protected String toCurrency;
     @Property
-    private String id;
+    protected String id;
     @Property
-    private String from;
+    protected String from;
     @Property
-    private String to;
-
-    public String getFromCurrency() {
-        return fromCurrency;
-    }
-
-    public String getToCurrency() {
-        return toCurrency;
-    }
-
-    public String getFrom() {
-        return from;
-    }
-
-    public String getId() {
-        return id;
-    }
-
-    public String getTo() {
-        return to;
-    }
-
-    public void setFromCurrency(String fromCurrency) {
-        this.fromCurrency = fromCurrency;
-    }
-
-    public void setToCurrency(String toCurrency) {
-        this.toCurrency = toCurrency;
-    }
-
-    public void setFrom(String from) {
-        this.from = from;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public void setTo(String to) {
-        this.to = to;
-    }
+    protected String to;
 
     public void execute() {
         double currency = currencyService.ConversionRate(fromCurrency, toCurrency);
