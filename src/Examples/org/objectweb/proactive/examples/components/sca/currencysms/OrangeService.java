@@ -34,8 +34,8 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.component.sca.currencysms;
+package org.objectweb.proactive.examples.components.sca.currencysms;
 
-public interface CurrencyService {
-    public Double ConversionRate(String fromCurrency, String toCurrency);
+public interface OrangeService {
+    public boolean sendSMS(String id, String from, String to, String content);
 }

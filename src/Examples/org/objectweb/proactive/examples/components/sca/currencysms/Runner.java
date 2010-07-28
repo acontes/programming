@@ -34,8 +34,8 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.orange;
+package org.objectweb.proactive.examples.components.sca.currencysms;
 
 public interface Runner {
-    public boolean execute();
+    public void execute();
 }

@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.component.sca.currencysms;
+package org.objectweb.proactive.examples.components.sca.currencysms;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -75,7 +75,6 @@ public class RestOrangeServiceCaller implements PAWSCaller {
     public void setup(Class<?> serviceClass, String wsUrl) {
         rootUrl = wsUrl;
     }
-
 }
 
 class ResultatParseur extends DefaultHandler {
@@ -103,7 +102,7 @@ class ResultatParseur extends DefaultHandler {
             SAXParser saxParser = factory.newSAXParser();
             XMLReader xmlReader = saxParser.getXMLReader();
             xmlReader.setContentHandler(this);
-            xmlReader.setErrorHandler(null);//(new MyErrorHandler(System.err));
+            xmlReader.setErrorHandler(null);
             xmlReader.parse(url);
         } catch (Throwable t) {
             t.printStackTrace();
@@ -114,26 +113,19 @@ class ResultatParseur extends DefaultHandler {
         System.out.println("Start Document: " + url);
     }
 
-    // debut de l'element
-    public void startElement(String namespaceURI, String localName, // local name
-            String rawName, // qualified name
-            Attributes atts) throws SAXException {
-        // recuperation du nom de l'element
+    public void startElement(String namespaceURI, String localName, String rawName, Attributes atts)
+            throws SAXException {
         String eltName = localName;
         if ("".equals(eltName))
             eltName = rawName;
         if (eltName.equals("status_code")) {
             disp_code = true;
-            //System.out.print("dbt element: "+ eltName+"\n");
         }
         if (eltName.equals("status_msg")) {
             disp_msg = true;
-            //System.out.print("dbt element: "+ eltName+"\n");
         }
     }
 
-    // Pour les noeuds textes
-    @Override
     public void characters(char[] ch, int start, int length) {
         if (disp_code == true) {
             String text = new String(ch, start, length);
@@ -156,18 +148,12 @@ class ResultatParseur extends DefaultHandler {
             eltName = rawName;
         if (eltName.equals("status_code")) {
             disp_code = false;
-            //System.out.print("dbt element: "+ eltName+"\n");
         }
         if (eltName.equals("status_msg")) {
             disp_msg = false;
-            //System.out.print("dbt element: "+ eltName+"\n");
         }
-
     }
 
-    // fin du document
     public void endDocument() throws SAXException {
-        //System.out.print("End Document\n");
     }
-
 }

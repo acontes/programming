@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.component.sca.currencysms;
+package org.objectweb.proactive.examples.components.sca.currencysms;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
@@ -47,6 +47,10 @@ public class CurrencySMS implements BindingController, Runner {
     public static final String CURRENCY_SERVICE_NAME = "CurrencyService";
     public static final String ORANGE_SERVICE_NAME = "OrangeService";
 
+    /* SCA References (client interfaces) */
+    private CurrencyService currencyService;
+    private OrangeService orangeService;
+
     /* SCA Properties */
     @Property
     private String fromCurrency;
@@ -58,10 +62,6 @@ public class CurrencySMS implements BindingController, Runner {
     private String from;
     @Property
     private String to;
-
-    /* SCA References (client interfaces) */
-    private CurrencyService currencyService;
-    private OrangeService orangeService;
 
     public String getFromCurrency() {
         return fromCurrency;
@@ -85,7 +85,6 @@ public class CurrencySMS implements BindingController, Runner {
 
     public void setFromCurrency(String fromCurrency) {
         this.fromCurrency = fromCurrency;
-
     }
 
     public void setToCurrency(String toCurrency) {

@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.component.sca.currencysms;
+package org.objectweb.proactive.examples.components.sca.currencysms;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
@@ -42,17 +42,20 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
-import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
 
 public class Main {
+    private static final String currencyURL = "http://www.webservicex.net/CurrencyConvertor.asmx";
+    private static final String orangeURL = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
+
     public static void main(String[] args) {
         try {
-            SCAConfig.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+            SCAPAPropertyRepository.SCA_PROVIDER
+                    .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
             Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
             GenericFactory gf = GCM.getGenericFactory(boot);
@@ -64,10 +67,8 @@ public class Main {
                             false, false) });
 
             Component comp = gf.newFcInstance(t, "primitive", CurrencySMS.class.getName());
-            String currencyURL = "http://www.webservicex.net/CurrencyConvertor.asmx";
             GCM.getBindingController(comp).bindFc(CurrencySMS.CURRENCY_SERVICE_NAME,
                     currencyURL + "(" + WSInfo.DYNAMICCXFWSCALLER_ID + ")");
-            String orangeURL = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
             GCM.getBindingController(comp).bindFc(CurrencySMS.ORANGE_SERVICE_NAME,
                     orangeURL + "(" + RestOrangeServiceCaller.class.getName() + ")");
             SCAPropertyController scap = Utils.getSCAPropertyController(comp);
