@@ -76,7 +76,6 @@ public class Remmos {
 	public static PAGCMInterfaceType[] createMonitorableNFType(PAGCMTypeFactory pagcmTf, PAGCMInterfaceType[] fItfType, String hierarchy) {
 
 		ArrayList<PAGCMInterfaceType> typeList = new ArrayList<PAGCMInterfaceType>();
-		
 		PAGCMInterfaceType type[] = null;
 		PAGCMInterfaceType pagcmItfType = null;
 		
