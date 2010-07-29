@@ -45,12 +45,22 @@ import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
 
 
-public class CServer implements I, J {
+public class CServer implements TestIntentItf, J {
 
     protected I i;
     protected Map<String, Object> j = new HashMap<String, Object>();
 
     // FUNCTIONAL INTERFACE
+    
+	public void m() {
+		System.err.println("inside public void m() ");
+        while(true);
+	}
+
+	public int n() {
+		return 0;
+	}
+    
     public void m(boolean v) {
     }
 
@@ -62,10 +72,9 @@ public class CServer implements I, J {
 
     public void m(short v) {
     }
-
+    
     public void m(int v) {
-        System.err.println("inside public void m(int v) time is " + System.currentTimeMillis());
-        //while(true);///{System.err.println("cool");}
+        
     }
 
     public void m(long v) {
@@ -130,4 +139,6 @@ public class CServer implements I, J {
     public String[] n(String[] v, boolean w) {
         return v;
     }
+
+	
 }

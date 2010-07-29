@@ -45,9 +45,9 @@ import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
 
 
-public class CClient implements BindingController, I, J {
+public class CClient implements BindingController, TestIntentItf, J {
 
-    protected I i;
+    protected TestIntentItf i;
     protected Map<String, Object> j = new HashMap<String, Object>();
 
     // BINDING CONTROLLER
@@ -69,7 +69,7 @@ public class CClient implements BindingController, I, J {
 
     public void bindFc(String s, Object o) {
         if (s.equals("client")) {
-            i = (I) o;
+            i = (TestIntentItf) o;
         } else if (s.startsWith("clients")) {
             j.put(s, o);
         }
@@ -84,6 +84,17 @@ public class CClient implements BindingController, I, J {
     }
 
     // FUNCTIONAL INTERFACE
+    
+    @Override
+	public void m() throws Exception {
+    	i.m();
+	}
+
+	@Override
+	public int n() {
+		return i.n();
+	}
+    
     public void m(boolean v) {
         i.m(v);
     }
@@ -164,4 +175,5 @@ public class CClient implements BindingController, I, J {
     public String[] n(String[] v, boolean w) {
         return i.n(v, w);
     }
+
 }

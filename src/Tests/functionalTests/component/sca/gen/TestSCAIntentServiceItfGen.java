@@ -53,7 +53,7 @@ import org.objectweb.proactive.extensions.component.sca.gen.IntentServiceItfGene
 import functionalTests.component.conform.Conformtest;
 import functionalTests.component.conform.components.CAttributes;
 import functionalTests.component.conform.components.I;
-import functionalTests.component.sca.components.CIntententHandler;
+import functionalTests.component.sca.components.SecurityIntentHandler;
 import functionalTests.component.sca.components.TestIntentComponent;
 import functionalTests.component.sca.components.TestIntentItf;
 
@@ -90,8 +90,8 @@ public class TestSCAIntentServiceItfGen extends Conformtest {
         TestIntentItf i = (TestIntentItf) c.getFcInterface("server");
         i.m();
         SCAIntentController scaic = Utils.getSCAIntentController(c);
-        scaic.addFcIntentHandler(new CIntententHandler(""));
-        scaic.addFcIntentHandler(new CIntententHandler(""));
+        scaic.addFcIntentHandler(new SecurityIntentHandler(""));
+        scaic.addFcIntentHandler(new SecurityIntentHandler(""));
         TestIntentItf objIn = (TestIntentItf) IntentServiceItfGenerator.instance().generateClass(i, c, 2);
         objIn.n();
         objIn.m();

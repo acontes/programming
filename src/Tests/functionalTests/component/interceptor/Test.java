@@ -52,7 +52,7 @@ import org.objectweb.proactive.extensions.component.sca.control.SCAIntentControl
 
 import functionalTests.ComponentTest;
 import functionalTests.component.controller.DummyController;
-import functionalTests.component.sca.components.CIntententHandler;
+import functionalTests.component.sca.components.SecurityIntentHandler;
 
 
 /**

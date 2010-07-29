@@ -47,16 +47,20 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
+//@snippet-start component_scauserguide_2
+
 import org.objectweb.proactive.extensions.component.sca.SCAConfig;
 import org.objectweb.proactive.extensions.component.sca.Utils;
+//@snippet-end component_scauserguide_2
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.sca.components.PropertyControllerTestComp;
 import functionalTests.component.sca.components.CAttributes;
-import functionalTests.component.sca.components.CIntententHandler;
+import functionalTests.component.sca.components.SecurityIntentHandler;
 
+//@snippet-start component_scauserguide_3
 
 public class TestSCAPropertyController extends ComponentTest {
     protected Component boot;
@@ -74,33 +78,25 @@ public class TestSCAPropertyController extends ComponentTest {
         t = tf.createFcType(new InterfaceType[] { tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER,
                 CAttributes.class.getName(), false, false, false) });
     }
+    
+  //@snippet-end component_scauserguide_3
 
     // -----------------------------------------------------------------------------------
     // Full test
     // -----------------------------------------------------------------------------------
     @Test
+  //@snippet-start component_scauserguide_4
+    
     public void testSCAPropertyController() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", PropertyControllerTestComp.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(c);
-        scac.init();
+        //scac.init();
         scac.setValue("x1", true);
         assertEquals(new Boolean(true), scac.getValue("x1"));
         scac.setValue("x2", (byte) 1);
         assertEquals((byte) 1, scac.getValue("x2"));
         scac.setValue("x3", (char) 1);
-        /*assertEquals((char) 1, scac.getValue("x3"));
-        scac.setValue("x4", (short) 1);
-        assertEquals((short) 1, scac.getValue("x4"));
-        scac.setValue("x5", 1);
-        assertEquals(1, scac.getValue("x5"));
-        scac.setValue("x6", 1);
-        assertEquals((long) 1, scac.getValue("x6"));
-        scac.setValue("x7", 1);
-        assertEquals((float) 1, scac.getValue("x7"));
-        scac.setValue("x8", 1);
-        assertEquals((double) 1, scac.getValue("x8"));
-        scac.setValue("x9", "1");
-        assertEquals("1", scac.getValue("x9"));*/
     }
+  //@snippet-end component_scauserguide_4
 }

@@ -75,6 +75,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * name of all initialized properties
      */
     private List<String> initilizedProperties = new ArrayList<String>();
+    
+    private boolean init=false;
 
     /**
      * initialize all private fields .
@@ -86,10 +88,17 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     }
 
     public void init() {
-        propertyNames = getDeclaredPropertyNamesInList();
-        for (String element : propertyNames) {
-            types.put(element, getDeclaredPropertyType(element));
-        }
+    	if(init==true)
+    	{
+    		return;
+    	}
+    	else{
+	        propertyNames = getDeclaredPropertyNamesInList();
+	        init=true;
+	        for (String element : propertyNames) {
+	            types.put(element, getDeclaredPropertyType(element));
+	        } 
+    	}
     }
 
     @Override
@@ -114,6 +123,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @param value  the property value
      */
     public void setType(String name, Class<?> type) {
+    	init();
         types.put(name, type);
     }
 
@@ -153,6 +163,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @param value  the property value
      */
     public void setValue(String name, Object value) {
+    	init();
         String NameUp = NameUp(name);
         String setterName = "set" + NameUp;
         Class<?> typeAttribute = types.get(name);
@@ -167,10 +178,10 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             } catch (IllegalArgumentException e) {
                 System.err.println("problem on invoking arguments!! " + args);
             } catch (IllegalAccessException iae) {
-                logger.error(iae.getMessage());
+                logger.error(iae.getCause());
             } catch (InvocationTargetException ite) {
                 System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
-                logger.error(ite.getMessage());
+                logger.error(ite.getCause());
             }
         } catch (SecurityException se) {
             logger.error(se.getMessage());
@@ -187,6 +198,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @return      the property value
      */
     public Class<?> getType(String name) {
+    	init();
         return types.get(name);
     }
 
@@ -198,6 +210,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @return      the property value
      */
     public Object getValue(String name) {
+    	init();
         String NameUp = NameUp(name);
         String getterName = "get" + NameUp;
         try {
@@ -229,6 +242,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      *              <code>false</code> otherwise
      */
     public boolean containsPropertyName(String name) {
+    	init();
         return initilizedProperties.contains(name);
     }
 
@@ -237,6 +251,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * {@link #setValue(String, Object)}.
      */
     public String[] getPropertyNames() {
+    	init();
         return (String[]) initilizedProperties.toArray();
     }
 
@@ -249,6 +264,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      *              <code>false</code> otherwise
      */
     public boolean containsDeclaredPropertyName(String name) {
+    	init();
         return propertyNames.contains(name);
     }
 
@@ -279,6 +295,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * class.
      */
     public String[] getDeclaredPropertyNames() {
+    	init();
         String[] names = (String[]) propertyNames.toArray();
         return names;
     }
@@ -291,6 +308,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * @return      the property type
      */
     public Class<?> getDeclaredPropertyType(String name) {
+    	init();
         if (containsDeclaredPropertyName(name)) {
             String setter = "set" + NameUp(name);
             Method med = ListMethodes.get(setter);

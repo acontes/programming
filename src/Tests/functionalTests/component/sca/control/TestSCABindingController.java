@@ -62,7 +62,7 @@ import org.objectweb.proactive.extensions.component.sca.control.SCAIntentControl
 import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
-import functionalTests.component.sca.components.CIntententHandler;
+import functionalTests.component.sca.components.SecurityIntentHandler;
 
 
 public class TestSCABindingController {
@@ -125,7 +125,7 @@ public class TestSCABindingController {
     public void testBindLookupUnbind() throws Exception {
         BindingController bc = GCM.getBindingController(c);
         SCAIntentController scaic = Utils.getSCAIntentController(c);
-        scaic.addFcIntentHandler(new CIntententHandler(""));
+        scaic.addFcIntentHandler(new SecurityIntentHandler(""));
         bc.bindFc("client", d.getFcInterface("server"));
         checkList(bc, new String[] { "client" });
         assertEquals(d.getFcInterface("server"), bc.lookupFc("client"));

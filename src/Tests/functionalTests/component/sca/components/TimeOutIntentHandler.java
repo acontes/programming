@@ -2,9 +2,9 @@ package functionalTests.component.sca.components;
 
 import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.component.sca.control.IntentJoinPoint;
+//@snippet-start component_scauserguide_6
 
-
-public class ThreadIntentHandler implements IntentHandler {
+public class TimeOutIntentHandler implements IntentHandler {
 
     // Default timeout if not set.
     private static final long DEFAULT_TIMEOUT = 5000;
@@ -19,6 +19,7 @@ public class ThreadIntentHandler implements IntentHandler {
 
     @Override
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
+    	System.err.println("inside TimeOutIntentHandler");
         // run the proceed in a separate thread.
         ProceedThread pt = new ProceedThread();
         // set the IntentJoinPoint to proceed.
@@ -33,11 +34,8 @@ public class ThreadIntentHandler implements IntentHandler {
             if (pt.isAlive()) {
 
                 // don't interrupt the proceed thread because we don't know in which state it is.
-                System.err.println("is alive!");
-                throw new Exception("ServiceUnavailable Timeout of " + timeout + " ms exceeded");
-            } else
-                System.err.println("not alive!");
-            //System.err.println(pt.getUncaughtExceptionHandler());
+                throw new Exception("Service Unavailable Timeout of " + timeout + " ms exceeded");
+            }
         } catch (InterruptedException e) {
             System.err.println("call interrupted");
         }
@@ -70,3 +68,4 @@ class ProceedThread extends Thread {
         }
     }
 }
+//@snippet-end component_scauserguide_6

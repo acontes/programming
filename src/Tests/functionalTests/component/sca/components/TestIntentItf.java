@@ -7,7 +7,7 @@ public interface TestIntentItf extends I {
     public static final String CLIENT_ITF_NAME = "client";
     public static final String SERVER_ITF_NAME = "server";
 
-    public void m();
+    public void m() throws Exception;
 
     public int n();
 }
