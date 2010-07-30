@@ -10,8 +10,6 @@ import javax.naming.NamingException;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.IllegalBindingException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
@@ -22,9 +20,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Mon
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.RemmosUtils;
 import org.objectweb.proactive.core.component.control.PABindingController;
-import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.core.component.control.PASuperController;
-import org.objectweb.proactive.core.component.exceptions.NoSuchComponentException;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
@@ -129,8 +125,6 @@ public class MonitorConsole {
 
 	public void run() throws NoSuchInterfaceException, IOException, NamingException {
 
-		PAComponentRepresentative pacr;
-		
 		printBanner();
 		running = true;
 		
@@ -195,6 +189,11 @@ public class MonitorConsole {
 				}
 				// starting from the current component, find all those that are connected to him and add them to the managed components map
 				discoverComponents(current);
+			}
+			else if(command.equals(COM_DESCRIBE)) {
+				for(Component c : managedComponents.values()) {
+					RemmosUtils.describeComponent(c);
+				}
 			}
 			
 			
@@ -309,6 +308,12 @@ public class MonitorConsole {
 		System.out.println("This command is not implemented :(");
 	}
 
+	/**
+	 * Finds components connected from this one, and adds them to the managedComponents map.
+	 * 
+	 * @param c
+	 * @throws NoSuchInterfaceException
+	 */
 	private void discoverComponents(Component c) throws NoSuchInterfaceException {
 		
 		PASuperController pasc;
@@ -326,6 +331,7 @@ public class MonitorConsole {
 			return;
 		}
 		pacr = (PAComponentRepresentative) c;
+		logger.debug("Discovering from component "+ pacr.getComponentParameters().getName());
 		
 		// Get the Super Controller and the name of the parent component (if any)
 		try {
@@ -345,23 +351,26 @@ public class MonitorConsole {
 			logger.debug("   No parent");
 		}
 		
+		// Get the Binding Controller of the component
+		try {
+			pabc = Utils.getPABindingController(pacr);
+		} catch (NoSuchInterfaceException e) {
+			pabc = null;
+		}
+		
 		hierarchicalType = pacr.getComponentParameters().getHierarchicalType();
 
-		// first, it looks at all the subcomponents
+		// first, it checks the internal components
 		if(hierarchicalType.equals(Constants.COMPOSITE)) {
-			// Get the Binding Controller of the composite (must have one)
-			try {
-				pabc = Utils.getPABindingController(pacr);
-			} catch (NoSuchInterfaceException e) {
-				pabc = null;
-			}
+			
+			// a composite should have a Binding Controller
 			if(pabc == null) {
 				logger.debug("A composite without Binding Controller?");
 				return;
 			}
 			
+			// get all the server interfaces, and tries to find the connected internal components.
 			interfaceTypes = pacr.getComponentParameters().getComponentType().getFcInterfaceTypes();
-			// check all the server interfaces and tries to find the connected components
 			
 			for(InterfaceType itf : interfaceTypes) {
 				// only for single server interfaces. Does not consider collective ones (yet)
@@ -389,21 +398,14 @@ public class MonitorConsole {
 		}
 		
 		// then, it looks at the components bound through a client interface
-		// Get the Binding Controller, if we have not him already
-		// If it is a composite, we already have the Binding Controller
-		if(pabc == null) {
-			try {
-				pabc = Utils.getPABindingController(c);
-			} catch (NoSuchInterfaceException e) {
-				pabc = null;
-			}
-		}
+		
 		// if there is no Binding Controller, then we're in a Primitive without client interfaces, so we don't need to continue
 		if(pabc == null) {
 			return;
 		}
 		
-		// Takes all the external client interfaces of the component, which are bound
+		// Takes all the external client interfaces of the component, which are bound, and calls discover on each of the bound components.
+		// If the bound component is the parent, then we don't call it.
 		interfaceTypes = pacr.getComponentParameters().getComponentType().getFcInterfaceTypes();
 		boolean foundParent;
 		for(InterfaceType itf : interfaceTypes) {
@@ -424,11 +426,11 @@ public class MonitorConsole {
 					componentDestName = componentDest.getComponentParameters().getName();
 					logger.debug("   Client interface: "+ interfaceName + ", bound to "+ componentDestName);
 					// if the component destination is the same as the parent of the current component, 
-					// then I should bind to internal monitoring interface of the parent
+					// then I don't need to continue from this interface
 					if(componentDest.equals(parent)) {
 						foundParent = true;
 					}
-					// if I just bound to the internal interface of the parent, then don't continue with him, otherwise I'll get into a cycle
+					// if I find to the internal interface of the parent, then I don't continue with him, otherwise I'll get into a cycle
 					if(!foundParent) {
 						if(componentDest != null) {
 							// if the component is not already added

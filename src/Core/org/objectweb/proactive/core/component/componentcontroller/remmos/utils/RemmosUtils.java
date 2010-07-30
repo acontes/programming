@@ -34,6 +34,7 @@ public class RemmosUtils {
 		PAComponent pacomp = (PAComponent) comp;
 		System.out.println("Component: " + pacomp.getComponentParameters().getName());
 		InterfaceType[] itfTypes = pacomp.getComponentParameters().getInterfaceTypes();
+		itfTypes = pacomp.getComponentParameters().getComponentType().getFcInterfaceTypes();
 		for(int i=0; i<itfTypes.length; i++) {
 			System.out.println("  Interface: " + (((PAGCMInterfaceType)itfTypes[i]).isFcClientItf() ? " client ":" server ")
 					+ (((PAGCMInterfaceType)itfTypes[i]).isFcOptionalItf() ? " optional  ":" mandatory ")
