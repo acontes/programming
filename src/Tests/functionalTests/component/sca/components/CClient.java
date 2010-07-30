@@ -84,17 +84,17 @@ public class CClient implements BindingController, TestIntentItf, J {
     }
 
     // FUNCTIONAL INTERFACE
-    
-    @Override
-	public void m() throws Exception {
-    	i.m();
-	}
 
-	@Override
-	public int n() {
-		return i.n();
-	}
-    
+    @Override
+    public void m() throws Exception {
+        i.m();
+    }
+
+    @Override
+    public int n() {
+        return i.n();
+    }
+
     public void m(boolean v) {
         i.m(v);
     }

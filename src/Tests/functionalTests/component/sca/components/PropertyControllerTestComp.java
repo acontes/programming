@@ -1,6 +1,8 @@
 package functionalTests.component.sca.components;
 
 import org.osoa.sca.annotations.Property;
+
+
 //@snippet-start component_scauserguide_1
 
 public class PropertyControllerTestComp {

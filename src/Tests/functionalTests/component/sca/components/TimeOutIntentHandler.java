@@ -2,6 +2,8 @@ package functionalTests.component.sca.components;
 
 import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.component.sca.control.IntentJoinPoint;
+
+
 //@snippet-start component_scauserguide_6
 
 public class TimeOutIntentHandler implements IntentHandler {
@@ -19,7 +21,7 @@ public class TimeOutIntentHandler implements IntentHandler {
 
     @Override
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-    	System.err.println("inside TimeOutIntentHandler");
+        System.err.println("inside TimeOutIntentHandler");
         // run the proceed in a separate thread.
         ProceedThread pt = new ProceedThread();
         // set the IntentJoinPoint to proceed.

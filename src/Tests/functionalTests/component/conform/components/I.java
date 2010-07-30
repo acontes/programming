@@ -48,7 +48,7 @@ public interface I {
 
     void m(short v);
 
-    void m(int v) ;
+    void m(int v);
 
     void m(long v);
 

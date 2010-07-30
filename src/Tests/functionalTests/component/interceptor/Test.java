@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription; //import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.extensions.component.sca.Utils;
-import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 
 import functionalTests.ComponentTest;
@@ -88,7 +88,8 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        SCAConfig.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+        SCAPAPropertyRepository.SCA_PROVIDER
+                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);

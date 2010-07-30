@@ -55,7 +55,7 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.extensions.component.sca.SCAConfig;
+import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 
@@ -85,7 +85,8 @@ public class TestSCABindingController {
 
     @Before
     public void setUp() throws Exception {
-        SCAConfig.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+        SCAPAPropertyRepository.SCA_PROVIDER
+                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);

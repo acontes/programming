@@ -1286,14 +1286,14 @@
       <info>
         <title>OverView and Basic knowlege</title>
       </info>
-      <para>We see upon &quot;Web Service Binding&quot; chapter, that a SCA Component can communicate with a GCM component by webservice. The features have been mentioned below concern the implementation of SCA specific features in GCM component context, and the potentiel possibility to creat a SCA component&apos;s compatible layer.</para>
-      <para>SCA features&apos; implementation are splitten from core package, they are in Extension package : org.objectweb.proactive.extensions.component.sca.* . It&apos;s important to know that when you configure a SCA featured component you need to use the Utils.java in &quot;org.objectweb.proactive.extensions.component.sca&quot; package instead of &quot;org.objectweb.proactive.core.component.Utils&quot;, the first one is just an extension of the second one. </para>
+      <para>We see upon &quot;Web Service Binding&quot; chapter, that a SCA Component can communicate with a GCM component by web-service. The features have been mentioned below concern the implementation of SCA specific features in GCM component context, and the potential possibility to create a SCA component&apos;s compatibility layer.</para>
+      <para>SCA features&apos; implementation is split from core package, they are in Extension package : <literal>org.objectweb.proactive.extensions.component.sca.* </literal>. It&apos;s important to know that when you configure a SCA featured component you need to use the Utils.java in <literal>org.objectweb.proactive.extensions.component.sca</literal> package instead of <literal>org.objectweb.proactive.core.component.Utils</literal>, the first one is an extension of the second one. </para>
     </section>
     <section>
       <info>
-        <title>SCA Property features</title>
+        <title>SCA Property feature</title>
       </info>
-      <para>A SCA component can have several properties, the Idea of property is identical to &quot;Attribute&quot; in standard GCM component. An easy exemple : A WebService client need to have information such as Login name, password and timeOut, those can be defined as properties in a Component this way : </para>
+      <para>A SCA component can have several properties, the idea of property is identical to &quot;Attribute&quot; in standard GCM component. An easy example : A Web-service client need to have information such as Login name, password and time Out, those can be defined as properties in a Component this way : </para>
       <programlisting language="java">@property</programlisting>
       <programlisting language="java">String loginName</programlisting>
       <programlisting language="java">@property</programlisting>
@@ -1316,7 +1316,7 @@
           <textdata fileref="automatic_snippets/component_scauserguide_2.snip"/>
         </textobject>
       </programlisting>
-      <para>Here you notice that the Utils class is import from &quot;org.objectweb.proactive.extensions.component.sca&quot; .</para>
+      <para>Here you notice that the Utils class is import from <literal>org.objectweb.proactive.extensions.component.sca</literal>.</para>
       <programlisting language="java">
         <textobject>
           <textdata fileref="automatic_snippets/component_scauserguide_3.snip"/>
@@ -1328,26 +1328,26 @@
           <textdata fileref="automatic_snippets/component_scauserguide_4.snip"/>
         </textobject>
       </programlisting>
-      <para>A final remark on SCA featured component, the property fields should be declared as &quot;public&quot; or &quot;protected&quot; , because the internal mecanism generate a child class based on original component class, in case of private property , when setValue() routine be called , &quot; java.lang.IllegalAccessError&quot; exception will be rised.</para>
+      <para>A final remark on SCA featured component: the property fields should be declared as &quot;public&quot; or &quot;protected&quot; , because the internal mechanism generate a child class based on original component class, in case of private property , when setValue() routine be called , &quot; java.lang.IllegalAccessError&quot; exception will be risen.</para>
     </section>
     <section>
       <info>
         <title>SCA Intent feature</title>
       </info>
-      <para>Intents can be applicated on a component&apos;s functional interface, it is similar to Interceptor we have seen before, but their implementation are quite different , and Intent allow the whole controll over the calling method. </para>
-      <para>In a few words , for exemple, user have a crital function &quot;foo()&quot; from now on can only be called by a specific user, you could add a security intent to check user&apos;s authentification, in case of verification success, routine will be proceeded , otherwise after failing several attempts , a security warming can be rised to system administrator.</para>
+      <para>Intents can be applied on a component&apos;s functional interface, it is similar to Interceptor we have seen before, but their implementation are quite different , Intent allows the whole control over the calling method. </para>
+      <para>In a few words , for example, you have a critical function &quot;foo()&quot; , from now on can only be called by a specific user, you could add a security intent to check user&apos;s authentication, if it success, routine will be proceeded , otherwise after failing several attempts , a security warming can be risen to system administrator.</para>
       <section>
         <info>
           <title>Write a custom intent handler</title>
         </info>
-        <para>Intent handler define the behavious before and after functional calls</para>
+        <para>Intent handler define the behaviors before and after a functional call</para>
         <para>When a new implementation is defined for a given Intent handler, it has to conform to the following rules: </para>
         <orderedlist>
           <listitem>
             <para> The IntentHandler&apos;s implementation has to implement the <literal>IntentHandler</literal> interface, which is the base interface for component intent handler in ProActive. </para>
           </listitem>
           <listitem>
-            <para>The IntentHandler&apos;s implementation has to implement <literal>public Object invoke(IntentJoinPoint ijp) throws Throwable;</literal></para>
+            <para>The IntentHandler&apos;s implementation has to implement method <literal>public Object invoke(IntentJoinPoint ijp) throws Throwable;</literal></para>
           </listitem>
         </orderedlist>
         <para>The argument IntentJoinPoint in <literal>public Object invoke(IntentJoinPoint ijp) throws Throwable</literal> method represent the method body which user can call, it contains <literal>public Object proceed()</literal> routine allows the functional method invocation</para>
@@ -1363,24 +1363,29 @@
         <para>
           <emphasis>Component&apos;s adaptation to IntentHandler usage : </emphasis>
         </para>
-        <para>In Proactive/GCM when a client call a method through functional interface, it is asynchrone , except for method&apos;s return value is a java primitive or it throws an exception. A exemple to illustrate the situation : </para>
+        <para>In Proactive/GCM when a client call a method through a functional interface, it is asynchronous , except for method which return value is a primitive or it throws an exception. A exemple to illustrate the situation : </para>
         <programlisting language="java">
           <textobject>
             <textdata fileref="automatic_snippets/component_scauserguide_6.snip"/>
           </textobject>
         </programlisting>
-        <para>This intent handler attempt to run the method in a independ thread, if the method call time out, it catch the exception. Imagine a service <literal>public void m()</literal> , with an infinite loop inside. unfortunately it would not catch the timeout exception, because the method call is asynchrone , it is been executed successfully the infinite loop would terminate silently when the &quot;main&quot; is finished.</para>
-        <para>To avoid this kind of behavious, a method can become synchrone by adding throws exception </para>
-        <para>Here is the fonction implementation in Component: </para>
-        <programlisting language="java"> public void foo() { System.err.println(&quot;inside public void m(int v) time is &quot; + System.currentTimeMillis()); while(true); } </programlisting>
-        <para>To force method call be synchronise, declare the fonction in the fonctional interface this way: </para>
-        <programlisting language="java"> void foo() throws Exception; </programlisting>
+        <para>This intent handler attempt to run the method in a independent thread, if the method call time out, it catch the exception. </para>
+        <para>Imagine a service <literal>public void m()</literal> , with an infinite loop inside. unfortunately it would not catch the timeout exception, because the method call is asynchronous , the methodis been executed successfully. and the infinite loop would terminate silently when the &quot;main&quot; is finished.</para>
+        <para>But this is not what we expective, to avoid this kind of behaviors, a method can become synchronous by adding throws exception at end of the method declaration </para>
+        <para>Here is the method implementation in Component: </para>
+        <programlisting language="java">
+         <textobject>
+            <textdata fileref="automatic_snippets/component_scauserguide_9.snip"/>
+          </textobject>
+         </programlisting>
+        <para>To force method call be synchronous, declare the method in the functional interface this way: </para>
+        <programlisting language="java"> void m() throws Exception; </programlisting>
       </section>
       <section>
         <info>
           <title>Set up Component with Intents</title>
         </info>
-        <para>Folowing codes illustrate how to set up a component with intents that we have defined defore:</para>
+        <para>Following codes illustrate how to set up a component with intents that we have defined before:</para>
         <programlisting language="java">
           <textobject>
             <textdata fileref="automatic_snippets/component_scauserguide_7.snip"/>
@@ -1392,9 +1397,22 @@
             <textdata fileref="automatic_snippets/component_scauserguide_8.snip"/>
           </textobject>
         </programlisting>
-        <para>The result produce by the exemple : </para>
-        <literallayout> 2010-07-29 15:47:41.363::INFO: Logging to STDERR via org.mortbay.log.StdErrLog 2010-07-29 15:47:41.601::INFO: jetty-6.1.x 2010-07-29 15:47:41.735::INFO: Started SelectChannelConnector@0.0.0.0:39610 71950@arch - [INFO oactive.remoteobject] ..... 71950@arch - [INFO oactive.remoteobject] ..... 71950@arch - [INFO oactive.remoteobject] ..... 71950@arch - [INFO communication.rmi] Created a new registry on port 1099 inside TimeOutIntentHandler inside SecurityIntentHandler enter the password: java.lang.Exception: Service Unavailable Timeout of 5000 ms exceeded 71950@arch - [INFO testsuite] functionalTests.FunctionalTest @AfterClass: afterClass </literallayout>
-        <para>upon exemple illustrate how the method call failed, because user haven&apos;t enter the password in a 5 second period.</para>
+        <para>The result produce by the example : </para>
+        <literallayout> 2010-07-29 15:47:41.363::INFO: Logging to STDERR via org.mortbay.log.StdErrLog
+         2010-07-29 15:47:41.601::INFO: jetty-6.1.x 
+         2010-07-29 15:47:41.735::INFO: 
+         Started SelectChannelConnector@0.0.0.0:39610 
+         71950@arch - [INFO oactive.remoteobject] ..... 
+         71950@arch - [INFO oactive.remoteobject] ..... 
+         71950@arch - [INFO oactive.remoteobject] ..... 
+         71950@arch - [INFO communication.rmi] Created a new registry on port 1099 
+         inside TimeOutIntentHandler 
+         inside SecurityIntentHandler 
+         enter the password: 
+         java.lang.Exception: Service Unavailable Timeout of 5000 ms exceeded 
+         71950@arch - [INFO testsuite] functionalTests.FunctionalTest @AfterClass: afterClass 
+         </literallayout>
+        <para>upon example illustrate how the method call failed, because user haven&apos;t enter the password in a 5 second period.</para>
       </section>
     </section>
   </section>

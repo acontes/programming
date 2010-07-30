@@ -72,7 +72,6 @@ public class Main {
         GCM.getBindingController(comp).bindFc(CurrencySMS.ORANGE_SERVICE_NAME,
                 orangeURL + "(" + RestOrangeServiceCaller.class.getName() + ")");
         SCAPropertyController scap = Utils.getSCAPropertyController(comp);
-        scap.init();
         scap.setValue("fromCurrency", "USD");
         scap.setValue("toCurrency", "EUR");
         scap.setValue("id", "xxxxxxxx"); // Change me

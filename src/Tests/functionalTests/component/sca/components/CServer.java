@@ -51,16 +51,20 @@ public class CServer implements TestIntentItf, J {
     protected Map<String, Object> j = new HashMap<String, Object>();
 
     // FUNCTIONAL INTERFACE
-    
-	public void m() {
-		System.err.println("inside public void m() ");
-        while(true);
-	}
+    //@snippet-start component_scauserguide_9
 
-	public int n() {
-		return 0;
-	}
-    
+    public void m() {
+        System.err.println("inside public void m() ");
+        while (true)
+            ;
+    }
+
+    //@snippet-end component_scauserguide_9
+
+    public int n() {
+        return 0;
+    }
+
     public void m(boolean v) {
     }
 
@@ -72,9 +76,9 @@ public class CServer implements TestIntentItf, J {
 
     public void m(short v) {
     }
-    
+
     public void m(int v) {
-        
+
     }
 
     public void m(long v) {
@@ -140,5 +144,4 @@ public class CServer implements TestIntentItf, J {
         return v;
     }
 
-	
 }
