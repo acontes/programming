@@ -91,11 +91,9 @@ public class OutputInterceptor1Impl extends AbstractPAController implements Outp
 
     public void afterOutputMethodInvocation(MethodCall methodCall) {
         setDummyValue(getDummyValue() + OutputInterceptor1.AFTER_INTERCEPTION);
-        //System.err.println("outPut interceptor after");
     }
 
     public void beforeOutputMethodInvocation(MethodCall methodCall) {
         setDummyValue(getDummyValue() + OutputInterceptor1.BEFORE_INTERCEPTION);
-        //System.err.println("outPut interceptor before");
     }
 }

@@ -4,7 +4,7 @@
     <controllers>
         <controller>
             <interface>org.objectweb.proactive.core.component.control.PABindingController</interface>
-            <implementation>org.objectweb.proactive.extensions.component.sca.control.SCAPABindingControllerImpl</implementation>
+            <implementation>org.objectweb.proactive.core.component.control.PABindingControllerImpl</implementation>
         </controller>
         <controller>
             <interface>org.objectweb.proactive.core.component.control.PAContentController</interface>
@@ -38,10 +38,6 @@
         <controller output-interceptor="true">
             <interface>functionalTests.component.interceptor.OutputInterceptor1</interface>
             <implementation>functionalTests.component.interceptor.OutputInterceptor1Impl</implementation>
-        </controller>
-        <controller>
-            <interface>org.objectweb.proactive.extensions.component.sca.control.SCAIntentController</interface>
-            <implementation>org.objectweb.proactive.extensions.component.sca.control.SCAIntentControllerImpl</implementation>
         </controller>
     </controllers>
     

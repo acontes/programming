@@ -36,9 +36,6 @@
  */
 package functionalTests.component.conform.components;
 
-import java.io.Serializable;
-
-
 public interface I {
     void m(boolean v);
 

@@ -53,8 +53,8 @@ public class C implements CAttributes, BindingController, I, J {
     private double x8;
     private String x9;
     private boolean x11;
-    protected I i;
-    protected Map<String, Object> j = new HashMap<String, Object>();
+    private I i;
+    private Map<String, Object> j = new HashMap<String, Object>();
 
     // ATTRIBUTE CONTROLLER
     public boolean getX1() {
@@ -172,7 +172,6 @@ public class C implements CAttributes, BindingController, I, J {
 
     // FUNCTIONAL INTERFACE
     public void m(boolean v) {
-        //i.m(v);
     }
 
     public void m(byte v) {
@@ -185,7 +184,6 @@ public class C implements CAttributes, BindingController, I, J {
     }
 
     public void m(int v) {
-        System.err.println("inside public void m(int v)");
     }
 
     public void m(long v) {

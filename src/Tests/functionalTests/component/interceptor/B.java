@@ -42,11 +42,5 @@ public class B implements FooItf {
 
     public void foo() {
         // nothing
-        System.err.println("jsuis dans foo!!");
-    }
-
-    public void bar() {
-        // nothing
-        System.err.println("jsuis dans bar!!");
     }
 }

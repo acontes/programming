@@ -52,10 +52,6 @@ public class A implements FooItf, BindingController {
         b.foo();
     }
 
-    public void bar() {
-        b.bar();
-    }
-
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
             IllegalBindingException, IllegalLifeCycleException {
         if (clientItfName.equals(FooItf.CLIENT_ITF_NAME)) {

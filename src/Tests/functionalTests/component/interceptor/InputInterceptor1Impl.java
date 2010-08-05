@@ -100,14 +100,12 @@ public class InputInterceptor1Impl extends AbstractPAController implements Input
     public void afterInputMethodInvocation(MethodCall methodCall) {
         //System.out.println("after method invocation");
         setDummyValue(getDummyValue() + InputInterceptor1.AFTER_INTERCEPTION);
-        System.err.println("input interceptor after");
         afterInvocationCounter++;
     }
 
     public void beforeInputMethodInvocation(MethodCall methodCall) {
         //        System.out.println("before method invocation");
         setDummyValue(getDummyValue() + InputInterceptor1.BEFORE_INTERCEPTION);
-        System.err.println("input interceptor before");
         beforeInvocationCounter++;
     }
 }

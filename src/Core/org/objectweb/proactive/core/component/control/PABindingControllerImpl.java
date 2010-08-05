@@ -36,17 +36,11 @@
  */
 package org.objectweb.proactive.core.component.control;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
 
 import org.etsi.uri.gcm.api.type.GCMInterfaceType;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
@@ -83,7 +77,6 @@ import org.objectweb.proactive.core.component.type.PAGCMInterfaceTypeImpl;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.component.type.WSComponent;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
-import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 
 
 /**
@@ -282,10 +275,11 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             IllegalBindingException, IllegalLifeCycleException {
         // get value of (eventual) future before casting
         serverItf = PAFuture.getFutureValue(serverItf);
-        //System.err.println("Bind ");
+
         PAInterface sItf = null;
         if (serverItf instanceof PAInterface) {
             sItf = (PAInterface) serverItf;
+
             //        if (controllerLogger.isDebugEnabled()) {
             //            String serverComponentName;
             //
@@ -372,8 +366,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
             try {
                 // replace server itf with an interface of the same type+same proxy, but with interception code
                 sItf = OutputInterceptorClassGenerator.instance().generateInterface(sItf, outputInterceptors);
-                System.err.println("a new interface with interceptor generated , sItf is " +
-                    sItf.getClass().getName());
             } catch (InterfaceGenerationFailedException e) {
                 controllerLogger.error("could not generate output interceptor for client interface " +
                     clientItfName + " : " + e.getMessage());
@@ -385,8 +377,6 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
                 throw ibe;
             }
         }
-
-        //List<IntentHandler> intentHandlers = 
 
         // Multicast bindings are handled here
         if (Utils.isGCMMulticastItf(clientItfName, owner)) {

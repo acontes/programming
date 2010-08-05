@@ -45,14 +45,11 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.core.component.ControllerDescription; //import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.extensions.component.sca.Utils;
-import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
-import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
+import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Utils;
 
 import functionalTests.ComponentTest;
 import functionalTests.component.controller.DummyController;
-import functionalTests.component.sca.components.SecurityIntentHandler;
 
 
 /**
@@ -88,8 +85,6 @@ public class Test extends ComponentTest {
      */
     @org.junit.Test
     public void action() throws Exception {
-        SCAPAPropertyRepository.SCA_PROVIDER
-                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
@@ -120,11 +115,10 @@ public class Test extends ComponentTest {
         // invoke functional methods on A
         // each invocation actually triggers a modification of the dummy value of the dummy controller
         ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).foo();
-        ((FooItf) componentA.getFcInterface(FooItf.SERVER_ITF_NAME)).bar();
         //((FooItf) componentA.getFcInterface("fooItf")).foo();
         result = ((DummyController) componentA.getFcInterface(DummyController.DUMMY_CONTROLLER_NAME))
                 .getDummyValue();
-        GCM.getBindingController(componentA).lookupFc(FooItf.CLIENT_ITF_NAME);
+
         String expectedResult = DUMMY_VALUE + InputInterceptor1.BEFORE_INTERCEPTION +
             InputOutputInterceptor.BEFORE_INPUT_INTERCEPTION +
             // starting invocation, which performs an output invocation, hence the following
@@ -133,6 +127,6 @@ public class Test extends ComponentTest {
             // invocation now finished
             InputOutputInterceptor.AFTER_INPUT_INTERCEPTION + InputInterceptor1.AFTER_INTERCEPTION;
         ;
-        //Assert.assertEquals(expectedResult, result);
+        Assert.assertEquals(expectedResult, result);
     }
 }
