@@ -61,10 +61,18 @@ public class Remmos {
 	public static final String LOG_STORE_COMP = "log-store-NF";
 	public static final String MONITOR_SERVICE_COMP = "monitor-service-NF";
 	
+	// SLA Management-related Components
+	public static final String SLA_MANAGER_COMP = "sla-manager-NF";
+	
+	// Reconfiguration-related Components
+	public static final String RECONFIGURATION_COMP = "reconfiguration-component-NF";
+	
 	// Interfaces
 	public static final String EVENT_CONTROL_ITF = "event-control-nf";
 	public static final String LOG_HANDLER_ITF = "log-handler-nf";
 	public static final String MONITOR_SERVICE_ITF = "monitor-service-nf";
+	public static final String SLA_MGMT_ITF = "sla-management-nf";
+	public static final String ACTIONS_ITF = "actions-nf";
 	
 	/**
 	 * Creates the NF interfaces that will be used for the Monitoring and Management framework (implemented as components).
@@ -98,13 +106,13 @@ public class Remmos {
 			// TODO the NF interfaces for SLAManagement and Actions
 			
 			// external client Monitoring interfaces
-			// add one client Monitoring interface for each client binding (maybe optional or mandatory)
-			// collective and multicast/gathercast interfaces not supported (yet)
+			// add one client Monitoring interface for each client F interface
+			// TODO collective and multicast/gathercast interfaces not supported (yet)
 			String itfName;
-			for(int i=0; i<fItfType.length; i++) {
+			for(PAGCMInterfaceType itfType : fItfType) {
 				// only client-singleton supported ... others ignored
-				if(fItfType[i].isFcClientItf() && fItfType[i].isGCMSingletonItf() && !fItfType[i].isGCMCollectiveItf()) {
-					itfName = fItfType[i].getFcItfName() + "-external-"+Constants.MONITOR_CONTROLLER;
+				if(itfType.isFcClientItf() && itfType.isGCMSingletonItf() && !itfType.isGCMCollectiveItf()) {
+					itfName = itfType.getFcItfName() + "-external-" + Constants.MONITOR_CONTROLLER;
 					pagcmItfType = (PAGCMInterfaceType) pagcmTf.createGCMItfType(itfName, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY);
 					typeList.add(pagcmItfType);
 				}
@@ -115,10 +123,10 @@ public class Remmos {
 			if(Constants.COMPOSITE.equals(hierarchy)) {
 				// one client internal Monitoring interface for each server binding
 				// collective and multicast/gathercast interfaces not supported (yet)
-				for(int i=0; i<fItfType.length; i++) {
+				for(PAGCMInterfaceType itfType : fItfType) {
 					// only server-singleton supported ... others ignored
-					if(!fItfType[i].isFcClientItf() && fItfType[i].isGCMSingletonItf() && !fItfType[i].isGCMCollectiveItf()) {
-						itfName = fItfType[i].getFcItfName() + "-internal-"+Constants.MONITOR_CONTROLLER;
+					if(!itfType.isFcClientItf() && itfType.isGCMSingletonItf() && !itfType.isGCMCollectiveItf()) {
+						itfName = itfType.getFcItfName() + "-internal-"+Constants.MONITOR_CONTROLLER;
 						pagcmItfType = (PAGCMInterfaceType) pagcmTf.createGCMItfType(itfName, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY, PAGCMTypeFactory.INTERNAL);
 						typeList.add(pagcmItfType);
 					}
@@ -136,6 +144,7 @@ public class Remmos {
 		type = (PAGCMInterfaceType[]) typeList.toArray(new PAGCMInterfaceType[typeList.size()]);
 		return type;
 	}
+	
 	
 	/**
 	 * Adds the controller objects to the NF interfaces that are not part of the M&M Framework.
@@ -175,6 +184,7 @@ public class Remmos {
 		// LIFECYCLE is mandatory and should have been added at component creation time
 		// NAME      is mandatory and should have been added at component creation time
 	}
+
 	
 	/**
 	 * Builds the monitoring components and put them in the membrane.
@@ -227,23 +237,24 @@ public class Remmos {
 		String clientItfName;
 		String serverItfName;
 		InterfaceType[] fItfType = ((PAComponent) component).getComponentParameters().getInterfaceTypes();
-		for(int i=0; i<fItfType.length; i++) {
+		for(InterfaceType itfType : fItfType) {
 			// only client-singleton supported ... others ignored
-			if(fItfType[i].isFcClientItf() && ((PAGCMInterfaceType)fItfType[i]).isGCMSingletonItf() && !((PAGCMInterfaceType)fItfType[i]).isGCMCollectiveItf()) {
-				itfName = fItfType[i].getFcItfName();
+			if(itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMSingletonItf() && !((PAGCMInterfaceType)itfType).isGCMCollectiveItf()) {
+				itfName = itfType.getFcItfName();
 				clientItfName = itfName+"-external-"+MONITOR_SERVICE_ITF;
 				serverItfName = itfName+"-external-"+Constants.MONITOR_CONTROLLER;
 				membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
 			}
 		}
 		// the composites need additional bindings with their internal monitoring interfaces
-		if(Constants.COMPOSITE.equals(((PAComponent) component).getComponentParameters().getHierarchicalType())) {
+		String hierarchicalType = ((PAComponent) component).getComponentParameters().getHierarchicalType();
+		if(Constants.COMPOSITE.equals(hierarchicalType)) {
 			// one client internal Monitoring interface for each server binding
 			// collective and multicast/gathercast interfaces not supported (yet)
-			for(int i=0; i<fItfType.length; i++) {
+			for(InterfaceType itfType : fItfType) {
 				// only server-singleton supported ... others ignored
-				if(!fItfType[i].isFcClientItf() && ((PAGCMInterfaceType)fItfType[i]).isGCMSingletonItf() && !((PAGCMInterfaceType)fItfType[i]).isGCMCollectiveItf()) {
-					itfName = fItfType[i].getFcItfName();
+				if(!itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMSingletonItf() && !((PAGCMInterfaceType)itfType).isGCMCollectiveItf()) {
+					itfName = itfType.getFcItfName();
 					clientItfName = itfName+"-internal-"+MONITOR_SERVICE_ITF;
 					serverItfName = itfName+"-internal-"+Constants.MONITOR_CONTROLLER;
 					membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
@@ -351,10 +362,10 @@ public class Remmos {
 		// collective and multicast/gathercast interfaces not supported (yet)
 		String itfName;
 		InterfaceType[] fItfType = ((PAComponent) component).getComponentParameters().getInterfaceTypes();
-		for(int i=0; i<fItfType.length; i++) {
+		for(InterfaceType itfType : fItfType) {
 			// only client-singleton supported ... others ignored
-			if(fItfType[i].isFcClientItf() && ((PAGCMInterfaceType)fItfType[i]).isGCMSingletonItf() && !((PAGCMInterfaceType)fItfType[i]).isGCMCollectiveItf()) {
-				itfName = fItfType[i].getFcItfName() + "-external-"+MONITOR_SERVICE_ITF;
+			if(itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMSingletonItf() && !((PAGCMInterfaceType)itfType).isGCMCollectiveItf()) {
+				itfName = itfType.getFcItfName() + "-external-"+MONITOR_SERVICE_ITF;
 				try {
 					monitorServiceItfTypeList.add(patf.createGCMItfType(itfName, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 				} catch (InstantiationException e) {
@@ -364,13 +375,14 @@ public class Remmos {
 		}
 		
 		// composites also require client interfaces for internal bindings
-		if(Constants.COMPOSITE.equals(((PAComponent) component).getComponentParameters().getHierarchicalType())) {
+		String hierarchicalType = ((PAComponent) component).getComponentParameters().getHierarchicalType();
+		if(Constants.COMPOSITE.equals(hierarchicalType)) {
 			// one client internal Monitoring interface for each server binding
 			// collective and multicast/gathercast interfaces not supported (yet)
-			for(int i=0; i<fItfType.length; i++) {
+			for(InterfaceType itfType : fItfType) {
 				// only server-singleton supported ... others ignored
-				if(!fItfType[i].isFcClientItf() && ((PAGCMInterfaceType)fItfType[i]).isGCMSingletonItf() && !((PAGCMInterfaceType)fItfType[i]).isGCMCollectiveItf()) {
-					itfName = fItfType[i].getFcItfName() + "-internal-"+MONITOR_SERVICE_ITF;
+				if(!itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMSingletonItf() && !((PAGCMInterfaceType)itfType).isGCMCollectiveItf()) {
+					itfName = itfType.getFcItfName() + "-internal-"+MONITOR_SERVICE_ITF;
 					try {
 						monitorServiceItfTypeList.add(patf.createGCMItfType(itfName, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));					
 					} catch (InstantiationException e) {
@@ -436,6 +448,7 @@ public class Remmos {
 		if(sc == null) {
 			return;
 		}
+		// we should get only one parent here, as GCM does not support shared components
 		Component parents[] = sc.getFcSuperComponents();
 		if(parents.length > 0) {
 			parent = ((PAComponent)parents[0]);
@@ -470,7 +483,8 @@ public class Remmos {
 				logger.debug("A composite without Binding Controller?");
 				return;
 			}
-			
+
+			// get all the functional interfaces
 			InterfaceType[] itfType = pacomponent.getComponentParameters().getComponentType().getFcInterfaceTypes();
 					
 			for(InterfaceType itf : itfType) {
@@ -480,7 +494,7 @@ public class Remmos {
 						itfName = itf.getFcItfName();
 						componentDest = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(itfName)).getFcItfOwner());
 						componentDestName = componentDest.getComponentParameters().getName();
-						logger.debug("   Client interface (internal): "+ itfName + ", bound to "+ componentDestName);
+						logger.debug("   Server interface (internal): "+ itfName + ", bound to "+ componentDestName);
 						internalMonitor = ((MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER));
 						logger.debug("   Binding ["+componentName+"."+itfName+"-internal-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");
 						membrane.stopMembrane();
@@ -502,7 +516,7 @@ public class Remmos {
 			}
 		}
 		
-		// Get the Binding Controller, if we have not him already
+		// Get the Binding Controller, if we have not him already. 
 		// If it is a composite, we already have the Binding Controller
 		if(bc == null) {
 			try {
