@@ -1,8 +1,43 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of 
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package functionalTests.component.sca.control;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
-import org.apache.axis2.databinding.types.xsd.String;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
@@ -11,27 +46,19 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.core.component.ControllerDescription;
-import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 
-import functionalTests.component.conform.Conformtest;
-import functionalTests.component.conform.components.C;
-import functionalTests.component.interceptor.A;
-import functionalTests.component.interceptor.B;
-import functionalTests.component.interceptor.FooItf;
-import functionalTests.component.sca.components.CClient;
-import functionalTests.component.sca.components.SecurityIntentHandler;
-import functionalTests.component.sca.components.CServer;
-import functionalTests.component.sca.components.TestIntentComponent;
-import functionalTests.component.sca.components.TestIntentItf;
-import functionalTests.component.sca.components.TimeOutIntentHandler;
+import functionalTests.component.sca.SCAComponentTest;
+import functionalTests.component.sca.control.components.CClient;
+import functionalTests.component.sca.control.components.CServer;
+import functionalTests.component.sca.control.components.IntentHandlerTest;
+import functionalTests.component.sca.control.components.TestIntentItf;
 
 
 //@snippet-start component_scauserguide_7
 
-public class TestSCAIntentController extends Conformtest {
+public class TestSCAIntentController extends SCAComponentTest {
     Component componentA;
     Component componentB;
 
@@ -39,48 +66,40 @@ public class TestSCAIntentController extends Conformtest {
         super();
     }
 
-    /**
-     * @see testsuite.test.FunctionalTest#action()
-     */
     @org.junit.Test
     public void action() throws Exception {
-        SCAPAPropertyRepository.SCA_PROVIDER
-                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
-                type_factory.createFcItfType("server", TestIntentItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                type_factory.createFcItfType("client", TestIntentItf.class.getName(), TypeFactory.CLIENT,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE) }), new ControllerDescription("A",
-            Constants.PRIMITIVE), new ContentDescription(CClient.class.getName(), new Object[] {}));
+                type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType(TestIntentItf.CLIENT_ITF_NAME, TestIntentItf.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
+                Constants.PRIMITIVE, new ContentDescription(CClient.class.getName(), new Object[] {}));
 
         componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
-                .createFcItfType("server", TestIntentItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE), }), new ControllerDescription("B",
-            Constants.PRIMITIVE), new ContentDescription(CServer.class.getName(), new Object[] {}));
+                .createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
+                Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
         //@snippet-end component_scauserguide_7
         //@snippet-start component_scauserguide_8        
 
         SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
                 .getSCAIntentController(componentA);
-
-        scaic.addFcIntentHandler(new TimeOutIntentHandler());
-        scaic.addFcIntentHandler(new SecurityIntentHandler("first"));
-        GCM.getBindingController(componentA).bindFc("client", componentB.getFcInterface("server"));
+        scaic.addIntentHandler(new IntentHandlerTest());
+        GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
 
         GCM.getGCMLifeCycleController(componentA).startFc();
         GCM.getGCMLifeCycleController(componentB).startFc();
-
-        TestIntentItf i = (TestIntentItf) componentA.getFcInterface("server");
+        TestIntentItf i = (TestIntentItf) componentA.getFcInterface(TestIntentItf.SERVER_ITF_NAME);
         try {
             i.m();
             System.out.println("invocation of method n success");
-
         } catch (Exception e) {
-            System.err.println(e);
+            fail();
         }
     }
 }

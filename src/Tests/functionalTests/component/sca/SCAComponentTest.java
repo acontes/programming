@@ -34,49 +34,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.components;
+package functionalTests.component.sca;
 
-import org.objectweb.fractal.api.control.AttributeController;
+import org.junit.BeforeClass;
+import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
+
+import functionalTests.ComponentTest;
 
 
-public interface CAttributes extends AttributeController {
-    boolean getX1();
+public abstract class SCAComponentTest extends ComponentTest {
+    public SCAComponentTest() {
+        super();
+    }
 
-    void setX1(boolean v);
-
-    byte getX2();
-
-    void setX2(byte v);
-
-    char getX3();
-
-    void setX3(char v);
-
-    short getX4();
-
-    void setX4(short v);
-
-    int getX5();
-
-    void setX5(int v);
-
-    long getX6();
-
-    void setX6(long v);
-
-    float getX7();
-
-    void setX7(float v);
-
-    double getX8();
-
-    void setX8(double v);
-
-    String getX9();
-
-    void setX9(String v);
-
-    boolean getReadOnlyX10();
-
-    void setWriteOnlyX11(boolean v);
+    @BeforeClass
+    public static void componentPreConditions() throws Exception {
+        //-Dsca.provider=org.objectweb.proactive.extensions.component.sca.SCAFractive
+        SCAPAPropertyRepository.SCA_PROVIDER
+                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+    }
 }

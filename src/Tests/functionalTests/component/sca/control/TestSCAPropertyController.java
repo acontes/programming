@@ -46,22 +46,16 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.core.component.Constants; //@snippet-start component_scauserguide_2
-
-import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
-import org.objectweb.proactive.extensions.component.sca.Utils; //@snippet-end component_scauserguide_2
-import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
+import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
-import functionalTests.ComponentTest;
-import functionalTests.component.sca.components.PropertyControllerTestComp;
-import functionalTests.component.sca.components.CAttributes;
-import functionalTests.component.sca.components.SecurityIntentHandler;
+import functionalTests.component.sca.SCAComponentTest;
+import functionalTests.component.sca.control.components.PropertyComponent;
 
 
 //@snippet-start component_scauserguide_3
 
-public class TestSCAPropertyController extends ComponentTest {
+public class TestSCAPropertyController extends SCAComponentTest {
     protected Component boot;
     protected GCMTypeFactory tf;
     protected GenericFactory gf;
@@ -69,14 +63,10 @@ public class TestSCAPropertyController extends ComponentTest {
 
     @Before
     public void setUp() throws Exception {
-        //-Dsca.provider=org.objectweb.proactive.core.component.sca.SCAFractive
-        SCAPAPropertyRepository.SCA_PROVIDER
-                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         boot = Utils.getBootstrapComponent();
         tf = GCM.getGCMTypeFactory(boot);
         gf = GCM.getGenericFactory(boot);
-        t = tf.createFcType(new InterfaceType[] { tf.createFcItfType(Constants.ATTRIBUTE_CONTROLLER,
-                CAttributes.class.getName(), false, false, false) });
+        t = tf.createFcType(new InterfaceType[] {});
     }
 
     //@snippet-end component_scauserguide_3
@@ -87,10 +77,9 @@ public class TestSCAPropertyController extends ComponentTest {
     @Test
     //@snippet-start component_scauserguide_4
     public void testSCAPropertyController() throws Exception {
-        Component c = gf.newFcInstance(t, "primitive", PropertyControllerTestComp.class.getName());
+        Component c = gf.newFcInstance(t, "primitive", PropertyComponent.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(c);
-        //scac.init();
         scac.setValue("x1", true);
         assertEquals(new Boolean(true), scac.getValue("x1"));
         scac.setValue("x2", (byte) 1);
