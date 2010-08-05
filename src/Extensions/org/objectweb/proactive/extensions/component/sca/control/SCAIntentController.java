@@ -39,136 +39,150 @@ package org.objectweb.proactive.extensions.component.sca.control;
 import java.util.List;
 
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Intent control interface for SCA components.
+ * Component interface to control SCA intents of the SCA/GCM component to which it belongs.
+ *
+ * @author The ProActive Team
  */
+@PublicAPI
 public interface SCAIntentController {
     /**
-     * Add the specified intent handler on all service and reference methods of
-     * the current component.
-     * 
-     * @param handler  the intent handler to add
-     * @throw IllegalLifeCycleException  if the component is not stopped
+     * Adds the given intent handler on all service and reference interfaces.
+     *
+     * @param intentHandler The intent handler to add.
+     * @throws IllegalLifeCycleException If the component is not stopped.
+     * @throws IllegalBindingException If a service or reference interface is already bound.
      */
-    public void addFcIntentHandler(IntentHandler handler) throws IllegalLifeCycleException;
+    public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
+            IllegalBindingException;
 
     /**
-     * Add the specified intent handler on all interfaces (business or control)
-     * which match the specified interface filter.
-     * 
-     * @param handler  the intent handler to add
-     * @param filter   the interface filter
-     * @throw IllegalLifeCycleException  if the component is not stopped
+     * Adds the given intent handler on the given service or reference interface.
+     *
+     * @param intentHandler The intent handler to add.
+     * @param itfName The service or reference interface name.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+     * @throws IllegalLifeCycleException If the component is not stopped.
+     * @throws IllegalBindingException If the service or reference interface is already bound.
      */
-    /*public void addFcIntentHandler(
-        IntentHandler handler, InterfaceFilter filter )
-    throws IllegalLifeCycleException;
-     */
-    /**
-     * Add the specified intent handler on all pairs interface (business or
-     * control), method which match the specified filter.
-     * 
-     * @param handler  the intent handler to add
-     * @param filter   the filter for interface, method pairs
-     * @throw IllegalLifeCycleException  if the component is not stopped
-     * @since 1.0
-     */
-    /*
-        public void addFcIntentHandler(
-            IntentHandler handler, InterfaceMethodFilter filter )
-        throws IllegalLifeCycleException;
-        
-     *//**
-                         * Add the specified intent handler on the service or reference interface
-                         * whose name is specified.
-                         * 
-                         * @param handler  the intent handler to add
-                         * @param name     the interface name
-                         * @throws NoSuchInterfaceException  if the interface does not exist
-                         * @since 0.4.4
-                         */
-    /*
-        public void addFcIntentHandler( IntentHandler handler, String name )
-        throws NoSuchInterfaceException;
-     */
-    /**
-     * Add the specified intent handler on the method of the service or
-     * reference interface whose name is specified.
-     * 
-     * @param handler  the intent handler to add
-     * @param name     the interface name
-     * @param method   the method
-     * @throws NoSuchInterfaceException  if the interface does not exist
-     * @throws NoSuchMethodException     if the method does not exist
-     * @since 1.0
-     */
-    /*
-        public void addFcIntentHandler(
-            IntentHandler handler, String name, Method method )
-        throws NoSuchInterfaceException, NoSuchMethodException;
-
-     *//**
-                         * Return the list of all intent handlers associated with the interface
-                         * (service or reference) whose name is specified.
-                         * 
-                         * @param name  the interface name
-                         * @throws NoSuchInterfaceException  if the interface does not exist
-                         * @since 0.4.4
-                         */
-    public List<IntentHandler> listFcIntentHandler(String name) throws NoSuchInterfaceException;
+    public void addIntentHandler(IntentHandler intentHandler, String itfName)
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException;
 
     /**
-     * Return the list of all intent handlers associated with the method of the
-     * interface (service or reference) whose name is specified.
-     * 
-     * @param name    the interface name
-     * @param method  the method
-     * @throws NoSuchInterfaceException  if the interface does not exist
-     * @throws NoSuchMethodException     if the method does not exist
-     * @since 1.0
-     */
-    /*
-        public List<IntentHandler> listFcIntentHandler( String name, Method method )
-        throws NoSuchInterfaceException, NoSuchMethodException;
-     */
-    /**
-     * Remove the specified intent handler on all interfaces (service and
-     * reference) of the current component.
-     * 
-     * @param handler  the intent handler to remove
-     * @since 0.4.4
-     */
-    public void removeFcIntentHandler(IntentHandler handler);
+    * Adds the given intent handler on the given method of the given service or reference interface.
+    *
+    * @param intentHandler The intent handler to add.
+    * @param itfName The service or reference interface name.
+    * @param methodName The method name.
+    * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+    * @throws NoSuchMethodException If the method does not exist.
+    * @throws IllegalLifeCycleException If the component is not stopped.
+    * @throws IllegalBindingException If the service or reference interface is already bound.
+    */
+    public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
+            IllegalBindingException;
 
     /**
-     * Remove the specified intent handler on the interface (service or
-     * reference) whose name is specified.
-     * 
-     * @param handler  the intent handler to remove
-     * @param name     the interface name
-     * @throws NoSuchInterfaceException  if the interface does not exist
-     * @since 0.4.4
+     * Indicates if the component has intent handlers, i.e. if at least one of its service or reference interfaces
+     * has intent handlers.
+     *
+     * @return True if the component has intent handlers, i.e. if at least one of its service or reference interfaces
+     * has intent handlers.
      */
-    /*
-        public void removeFcIntentHandler( IntentHandler handler, String name )
-        throws NoSuchInterfaceException;
-     */
+    public boolean hasIntentHandler();
+
     /**
-     * Remove the specified intent handler on the method of the interface
-     * (service or reference) whose name is specified.
-     * 
-     * @param handler  the intent handler to remove
-     * @param name     the interface name
-     * @param method   the method
-     * @throws NoSuchInterfaceException  if the interface does not exist
-     * @throws NoSuchMethodException     if the method does not exist
-     * @since 1.0
+     * Indicates if the given service or reference interface has intent handlers.
+     *
+     * @param ItfName The service or reference interface name.
+     * @return True if the given service or reference interface has intent handlers, false otherwise.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
      */
-    /*
-        public void removeFcIntentHandler(
-            IntentHandler handler, String name, Method method )
-        throws NoSuchInterfaceException, NoSuchMethodException;*/
+    public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException;
+
+    /**
+     * Indicates if the given method of the given service or reference interface has intent handlers.
+     *
+     * @param itfName The service or reference interface name.
+     * @param methodName The method name.
+     * @return True if the given method of the given service or reference interface has intent handlers, false
+     * otherwise.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+     * @throws NoSuchMethodException If the method does not exist.
+     */
+    public boolean hasIntentHandler(String ItfName, String methodName) throws NoSuchInterfaceException,
+            NoSuchMethodException;
+
+    /**
+     * Returns the list of all intent handlers associated with all service and reference interfaces.
+     *
+     * @return The list of all intent handlers associated with all service and reference interfaces.
+     */
+    public List<IntentHandler> listIntentHandler();
+
+    /**
+     * Returns the list of all intent handlers associated with the given service or reference interface.
+     *
+     * @param ItfName The service or reference interface name.
+     * @return The list of all intent handlers associated with the given service or reference interface.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+     */
+    public List<IntentHandler> listIntentHandler(String ItfName) throws NoSuchInterfaceException;
+
+    /**
+     * Returns the list of all intent handlers associated with the given method of the given service or reference
+     * interface.
+     *
+     * @param itfName The service or reference interface name.
+     * @param methodName The method name.
+     * @return The list of all intent handlers associated with the given method of the given service or reference
+     * interface.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+     * @throws NoSuchMethodException If the method does not exist.
+     */
+    public List<IntentHandler> listIntentHandler(String ItfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException;
+
+    /**
+     * Removes the given intent handler on all service and reference interfaces.
+     *
+     * @param intentHandler The intent handler to remove.
+     * @throws IllegalLifeCycleException If the component is not stopped.
+     * @throws IllegalBindingException If a service or reference interface is already bound.
+     */
+    public void removeIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
+            IllegalBindingException;
+
+    /**
+     * Removes the given intent handler on the given service or reference interface.
+     *
+     * @param intentHandler The intent handler to remove.
+     * @param itfName The service or reference interface name.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+     * @throws IllegalLifeCycleException If the component is not stopped.
+     * @throws IllegalBindingException If the service or reference interface is already bound.
+     */
+    public void removeIntentHandler(IntentHandler intentHandler, String itfName)
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException;
+
+    /**
+    * Removes the given intent handler on the given method of the given service or reference interface.
+    *
+    * @param intentHandler The intent handler to remove.
+    * @param itfName The service or reference interface name.
+    * @param methodName The method name.
+    * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+    * @throws NoSuchMethodException If the method does not exist.
+    * @throws IllegalLifeCycleException If the component is not stopped.
+    * @throws IllegalBindingException If the service or reference interface is already bound.
+    */
+    public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
+            IllegalBindingException;
 }

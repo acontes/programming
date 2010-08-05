@@ -45,15 +45,23 @@ import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 
+import org.objectweb.fractal.api.Component;
+import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
+import org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator;
+import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 
 
 /**
+ * Defines {@link #generateClass(String)} method which generates a subclass based on original one. It takes care of
+ * presence of org.osoa.sca.annotations.Property annotation, the generated subclass contains the getters and setters
+ * corresponding to the properties.
  *
  * @author The ProActive Team
  */
-public class PropertyClassGenerator extends AbstractClassGenerator {
+public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
     private static PropertyClassGenerator instance;
 
     public static PropertyClassGenerator instance() {
@@ -64,13 +72,13 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
         }
     }
 
-    /**
-     * convert a String to another string which the first case become capital
-     * "cool" --> "Cool"
-     * @param name
-     * @return String which first case is capital letter
+    /*
+     * Converts a string to another string which the first letter become capital.
+     *
+     * @param name Name to convert.
+     * @return String which first letter is capitalized.
      */
-    private String NameUp(String name) {
+    private String nameUp(String name) {
         char[] nameUpper = name.toCharArray();
         nameUpper[0] = Character.toUpperCase(nameUpper[0]);
         String nameUp = new String(nameUpper);
@@ -78,53 +86,65 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
     }
 
     /**
-     * generate a subclass from root class, if it contains org.osoa.sca.annotations.Property annotation
-     * @param className Name of the component class.
+     * Generates a subclass from root class, if it contains org.osoa.sca.annotations.Property annotation. It adds to
+     * the subclass the getter/setter corresponding to the properties.
+     *
+     * @param className Name of the component content class.
      * @return The generated class name.
+     * @throws ClassGenerationFailedException If the generation failed.
      */
     public String generateClass(String className) throws ClassGenerationFailedException {
-        String CName = Utils.getPropertyClassName(className);
-        Class<?> generatedClass;
+        String generatedClassName = Utils.getPropertyClassName(className);
         try {
-            generatedClass = loadClass(CName);
+            loadClass(generatedClassName);
         } catch (ClassNotFoundException cnfe) {
             try {
-                CtClass generatedCtClass = pool.makeClass(CName);
+                CtClass generatedCtClass = pool.makeClass(generatedClassName);
                 generatedCtClass.defrost();
-                CtClass sup = pool.get(className); // get super class
-                CtField[] decFields = sup.getDeclaredFields(); // get declared fleids of superclass
-                ArrayList<CtField> proptyFields = new ArrayList<CtField>();
-                // check annotated feilds
-                for (int i = 0; i < decFields.length; i++) {
-                    Object anno = decFields[i].getAnnotation(org.osoa.sca.annotations.Property.class);
-                    if (anno != null) {
-                        proptyFields.add(decFields[i]);
-                    }
 
+                // Set super class
+                CtClass superClass = pool.get(className);
+                generatedCtClass.setSuperclass(superClass);
+
+                // Get property fields of superclass
+                CtField[] fields = superClass.getDeclaredFields();
+                ArrayList<CtField> propertyFields = new ArrayList<CtField>();
+                for (int i = 0; i < fields.length; i++) {
+                    if (fields[i].hasAnnotation(org.osoa.sca.annotations.Property.class)) {
+                        propertyFields.add(fields[i]);
+                    }
                 }
-                generatedCtClass.setSuperclass(sup); // set super class to generated class
+
+                // Add default constructor
                 CtConstructor constructorNoParam = CtNewConstructor.defaultConstructor(generatedCtClass);
                 generatedCtClass.addConstructor(constructorNoParam);
-                // create and  add getter , setter
-                for (int i = 0; i < proptyFields.size(); i++) {
-                    CtField tmp = new CtField(proptyFields.get(i), generatedCtClass);
-                    CtMethod getter = CtNewMethod.getter("get" + NameUp(tmp.getName()), tmp);
-                    CtMethod setter = CtNewMethod.setter("set" + NameUp(tmp.getName()), tmp);
+
+                // Add getter and setter for property fields
+                for (int i = 0; i < propertyFields.size(); i++) {
+                    CtField propertyField = new CtField(propertyFields.get(i), generatedCtClass);
+                    CtMethod getter = CtNewMethod.getter("get" + nameUp(propertyField.getName()),
+                            propertyField);
                     generatedCtClass.addMethod(getter);
+                    CtMethod setter = CtNewMethod.setter("set" + nameUp(propertyField.getName()),
+                            propertyField);
                     generatedCtClass.addMethod(setter);
                 }
-                //          generatedCtClass.stopPruning(true);
-                //        	generatedCtClass.writeFile("generated/");
-                //			System.out.println("[JAVASSIST] generated class: " + CName); 	
+
+                //                generatedCtClass.stopPruning(true);
+                //                generatedCtClass.writeFile("generated/");
+                //                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+
                 // Generate and add to cache the generated class
                 byte[] bytecode = generatedCtClass.toBytecode();
-                ClassDataCache.instance().addClassData(CName, bytecode);
+                ClassDataCache.instance().addClassData(generatedClassName, bytecode);
                 if (logger.isDebugEnabled()) {
-                    logger.debug("added " + CName + " to cache");
+                    logger.debug("added " + generatedClassName + " to cache");
                     logger.debug("generated classes cache is: " + ClassDataCache.instance().toString());
                 }
-                generatedClass = Utils.defineClass(CName, bytecode);
-                generatedCtClass.defrost(); // defrost the generated class
+                Utils.defineClass(generatedClassName, bytecode);
+
+                // Defrost the generated class
+                generatedCtClass.defrost();
             } catch (Exception e) {
                 logger.error("Cannot generate subClass of [" + className + "] with javassist: " +
                     e.getMessage());
@@ -132,6 +152,17 @@ public class PropertyClassGenerator extends AbstractClassGenerator {
                     "] with javassist", e);
             }
         }
-        return CName;
+        return generatedClassName;
+    }
+
+    /*
+     * Non used.
+     * (non-Javadoc)
+     * @see org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator#generateInterface(java.lang.String, org.objectweb.fractal.api.Component, org.objectweb.proactive.core.component.type.PAGCMInterfaceType, boolean, boolean)
+     */
+    public PAInterface generateInterface(String interfaceName, Component owner,
+            PAGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            throws InterfaceGenerationFailedException {
+        return null;
     }
 }

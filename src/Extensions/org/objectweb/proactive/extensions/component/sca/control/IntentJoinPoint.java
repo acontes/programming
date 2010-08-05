@@ -39,51 +39,48 @@ package org.objectweb.proactive.extensions.component.sca.control;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
- * IntentJoinPoint class definition, the class initialize with all necessary informations for a standAlone method invocation
+ * IntentJoinPoint class definition. The class is initialized with all necessary informations for a stand alone
+ * method invocation.
+ *
+ * @author The ProActive Team
+ * @see IntentHandler
  */
+@PublicAPI
 public class IntentJoinPoint {
-    private String medName;
     private Object invokeTarget;
-    private Class paramTypes[];
+    private Method method;
     private Object args[];
 
     /**
-     * 
-     * @param obj invoke target object
-     * @param m method name in string 
-     * @param paramTypes the type of arguments
-     * @param args an array of parameter objects
+     * Default constructor.
+     *
+     * @param invokeTarget Invoke target object.
+     * @param methodName Method name.
+     * @param paramTypes The type of arguments.
+     * @param args An array of parameter objects.
      */
-    public IntentJoinPoint(String m, Object obj, Class[] paramTypes, Object[] args) {
-        this.medName = m;
-        this.invokeTarget = obj;
-        this.paramTypes = paramTypes;
+    public IntentJoinPoint(Object invokeTarget, String methodName, Class<?>[] paramTypes, Object[] args)
+            throws SecurityException, NoSuchMethodException {
+        this.invokeTarget = invokeTarget;
+        this.method = invokeTarget.getClass().getMethod(methodName, paramTypes);
         this.args = args;
     }
 
     /**
-     * 
-     * @return get the method object by name
-     * @throws SecurityException
-     * @throws NoSuchMethodException
+     * Invokes the method.
+     *
+     * @return The return object of the invoked method.
+     * @throws IllegalAccessException If the underlying method is inaccessible.
+     * @throws IllegalArgumentException If the invocation cannot be done (e.g. the specified object argument is not
+     * an instance of the class or interface declaring the underlying method, wrong number of parameters, ...).
+     * @throws InvocationTargetException If the invocation throws an exception.
      */
-    private Method getMethodByName() throws SecurityException, NoSuchMethodException {
-        return invokeTarget.getClass().getMethod(medName, paramTypes);
-    }
-
-    /**
-     * invoke the method
-     * @return the return object of invoked method
-     * @throws IllegalArgumentException
-     * @throws IllegalAccessException
-     * @throws InvocationTargetException
-     * @throws SecurityException
-     * @throws NoSuchMethodException
-     */
-    public Object proceed() throws IllegalArgumentException, IllegalAccessException,
-            InvocationTargetException, SecurityException, NoSuchMethodException {
-        return getMethodByName().invoke(invokeTarget, args);
+    public Object proceed() throws IllegalAccessException, IllegalArgumentException,
+            InvocationTargetException {
+        return method.invoke(invokeTarget, args);
     }
 }

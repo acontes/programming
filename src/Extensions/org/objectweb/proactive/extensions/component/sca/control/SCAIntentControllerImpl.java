@@ -42,6 +42,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -54,11 +55,12 @@ import org.objectweb.proactive.extensions.component.sca.Constants;
 
 
 /**
- * 
- * @author mug
+ * Implementation of the {@link SCAIntentController} interface. 
+ *
+ * @author The ProActive Team
+ * @see SCAIntentController
  */
 public class SCAIntentControllerImpl extends AbstractPAController implements SCAIntentController {
-
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
     private List<IntentHandler> intentHandlers;
@@ -74,27 +76,62 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.SCA_INTENT_CONTROLLER,
                     SCAIntentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
-        } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), e);
+        } catch (InstantiationException ie) {
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), ie);
         }
     }
 
-    public void addFcIntentHandler(IntentHandler handler) throws IllegalLifeCycleException {
-
-        intentHandlers.add(0, handler);
-
+    public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
+            IllegalBindingException {
+        intentHandlers.add(intentHandler);
     }
 
-    @Override
-    public List<IntentHandler> listFcIntentHandler(String name) throws NoSuchInterfaceException {
+    public void addIntentHandler(IntentHandler intentHandler, String itfName)
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException {
+    }
 
+    public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
+            IllegalBindingException {
+    }
+
+    public boolean hasIntentHandler() {
+        return intentHandlers.size() != 0;
+    }
+
+    public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException {
+        return intentHandlers.size() != 0;
+    }
+
+    public boolean hasIntentHandler(String ItfName, String methodName) throws NoSuchInterfaceException,
+            NoSuchMethodException {
+        return intentHandlers.size() != 0;
+    }
+
+    public List<IntentHandler> listIntentHandler() {
         return intentHandlers;
     }
 
-    @Override
-    public void removeFcIntentHandler(IntentHandler handler) {
-
-        intentHandlers.remove(handler);
+    public List<IntentHandler> listIntentHandler(String ItfName) throws NoSuchInterfaceException {
+        return null;
     }
 
+    public List<IntentHandler> listIntentHandler(String ItfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException {
+        return null;
+    }
+
+    public void removeIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
+            IllegalBindingException {
+        intentHandlers.remove(intentHandler);
+    }
+
+    public void removeIntentHandler(IntentHandler intentHandler, String itfName)
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException {
+    }
+
+    public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
+            IllegalBindingException {
+    }
 }

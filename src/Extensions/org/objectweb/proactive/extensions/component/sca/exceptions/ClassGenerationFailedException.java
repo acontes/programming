@@ -36,11 +36,15 @@
  */
 package org.objectweb.proactive.extensions.component.sca.exceptions;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
 /**
  * This exception occurs when the generation of component classes fails.
  *
  * @author The ProActive Team
  */
+@PublicAPI
 public class ClassGenerationFailedException extends Exception {
     public ClassGenerationFailedException() {
         super();

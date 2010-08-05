@@ -47,7 +47,7 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesLoaderSPI;
  */
 public class SCAPAPropertyRepository implements PAPropertiesLoaderSPI {
     /**
-     * Indicate the SCA provider class, to the ProActive implementation of
+     * Indicates the SCA provider class, to the ProActive implementation of
      * SCA/GCM set it to org.objectweb.proactive.core.component.sca.SCAFractive
      */
     static public PAPropertyString SCA_PROVIDER = new PAPropertyString("sca.provider", true);

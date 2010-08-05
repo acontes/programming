@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.extensions.component.sca.control;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -45,7 +46,6 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -54,49 +54,66 @@ import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.component.sca.Constants;
+import org.objectweb.proactive.extensions.component.sca.exceptions.IncompatiblePropertyTypeException;
+import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchPropertyException;
+import org.osoa.sca.annotations.Property;
 
 
+/**
+ * Implementation of the {@link SCAPropertyController} interface. 
+ *
+ * @author The ProActive Team
+ * @see SCAPropertyController
+ */
 public class SCAPropertyControllerImpl extends AbstractPAController implements SCAPropertyController {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
-    /**
-     * declared properties' types
-     */
-    private Map<String, Class<?>> types = new HashMap<String, Class<?>>();
-    /**
-     * name of all declared properties
-     */
-    private List<String> propertyNames = new ArrayList<String>();
-    /**
-     * all getter and setter methodes from user build propertyController
-     */
-    private Map<String, Method> ListMethodes = new HashMap<String, Method>();
-    /**
-     * name of all initialized properties
-     */
-    private List<String> initilizedProperties = new ArrayList<String>();
+    /** A mapping of known wrapper classes. */
+    private static final Map<Class<?>, Class<?>> wrapperClasses;
 
-    private boolean init = false;
+    static {
+        wrapperClasses = new HashMap<Class<?>, Class<?>>();
+        wrapperClasses.put(boolean.class, Boolean.class);
+        wrapperClasses.put(byte.class, Byte.class);
+        wrapperClasses.put(char.class, Character.class);
+        wrapperClasses.put(double.class, Double.class);
+        wrapperClasses.put(float.class, Float.class);
+        wrapperClasses.put(int.class, Integer.class);
+        wrapperClasses.put(long.class, Long.class);
+        wrapperClasses.put(short.class, Short.class);
+    }
+
+    /** Boolean to indicate if private members have been initialized. */
+    private boolean init;
+
+    /** Name of all declared properties. */
+    private List<String> declaredPropertyNames;
+
+    /** Type of all declared properties. */
+    private Map<String, Class<?>> declaredPropertyTypes;
+
+    /** Getter and setter methods for all declared properties. */
+    private Map<String, Method> propertyMethods;
+
+    /** Name of all initialized properties. */
+    private List<String> initilizedProperties;
+
+    /** Current type of properties. */
+    private Map<String, Class<?>> propertyTypes;
 
     /**
-     * initialize all private fields .
-     * @param owner owner component
-     * @throws NoSuchInterfaceException
+     * Default constructor.
+     *
+     * @param owner Owner component.
      */
     public SCAPropertyControllerImpl(Component owner) {
         super(owner);
-    }
-
-    public void init() {
-        if (init == true) {
-            return;
-        } else {
-            propertyNames = getDeclaredPropertyNamesInList();
-            init = true;
-            for (String element : propertyNames) {
-                types.put(element, getDeclaredPropertyType(element));
-            }
-        }
+        init = false;
+        declaredPropertyNames = new ArrayList<String>();
+        declaredPropertyTypes = new HashMap<String, Class<?>>();
+        propertyMethods = new HashMap<String, Method>();
+        initilizedProperties = new ArrayList<String>();
+        propertyTypes = new HashMap<String, Class<?>>();
     }
 
     @Override
@@ -105,251 +122,200 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             setItfType(PAGCMTypeFactoryImpl.instance().createFcItfType(Constants.SCA_PROPERTY_CONTROLLER,
                     SCAPropertyController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
                     TypeFactory.SINGLE));
-        } catch (InstantiationException e) {
-            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), e);
+        } catch (InstantiationException ie) {
+            throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), ie);
         }
     }
 
-    // -------------------------------------------------------------------------
-    // Implementation of the SCAPropertyController interface
-    // -------------------------------------------------------------------------
-
-    /**
-     * Set the type of the specified property. is not proper implemented yet
-     * 
-     * @param type   the property type
-     * @param value  the property value
+    /*
+     * Initializes private members. Done only one time.
      */
-    public void setType(String name, Class<?> type) {
-        init();
-        types.put(name, type);
-    }
-
-    /**
-     * convert a String to another string which the first case become capital
-     * "cool" --> "Cool"
-     * @param name
-     * @return String which first case is capital letter
-     */
-    private String NameUp(String name) {
-        char[] nameUpper = name.toCharArray();
-        nameUpper[0] = Character.toUpperCase(nameUpper[0]);
-        String nameUp = new String(nameUpper);
-        //System.out.println("Debug Nameup : "+nameUp);
-        return nameUp;
-    }
-
-    /**
-     * convert a String to another string which the first case become lower-case letter
-     * "Cool" --> "cool"
-     * @param name
-     * @return String with lower-case letter on first case
-     */
-    private String NameLow(String name) {
-        char[] nameLower = name.toCharArray();
-        nameLower[0] = Character.toLowerCase(nameLower[0]);
-        String nameLow = new String(nameLower);
-        //System.out.println("Debug nameLow: "+nameLow);
-        return nameLow;
-    }
-
-    /**
-     * Set the value of the specified property. If the property has already been
-     * set, the old value is lost, and the new value is recorded.
-     * 
-     * @param name   the property name
-     * @param value  the property value
-     */
-    public void setValue(String name, Object value) {
-        init();
-        String NameUp = NameUp(name);
-        String setterName = "set" + NameUp;
-        Class<?> typeAttribute = types.get(name);
-        try {
-            Object args[] = new Object[1];
-            args[0] = value;
-            Object ObjToInvoke = owner.getReferenceOnBaseObject();
-            Method setter = ObjToInvoke.getClass().getMethod(setterName, typeAttribute);
-            initilizedProperties.add(name);
+    private void init() {
+        if (!init) {
             try {
-                setter.invoke(ObjToInvoke, args);
-            } catch (IllegalArgumentException e) {
-                System.err.println("problem on invoking arguments!! " + args);
-            } catch (IllegalAccessException iae) {
-                logger.error(iae.getCause());
-            } catch (InvocationTargetException ite) {
-                System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
-                logger.error(ite.getCause());
+                Class<?> baseClass = owner.getReferenceOnBaseObject().getClass();
+                Class<?> currentClass = baseClass;
+                while (!currentClass.equals(Object.class)) {
+                    Field[] fields = currentClass.getDeclaredFields();
+                    for (int i = 0; i < fields.length; i++) {
+                        if (fields[i].isAnnotationPresent(Property.class)) {
+                            declaredPropertyNames.add(fields[i].getName());
+                            Class<?> type = fields[i].getType();
+                            if (type.isPrimitive()) {
+                                type = wrapperClasses.get(type);
+                            }
+                            declaredPropertyTypes.put(fields[i].getName(), type);
+                            String getterName = getGetterName(fields[i].getName());
+                            propertyMethods.put(getterName, baseClass
+                                    .getMethod(getterName, new Class<?>[] {}));
+                            String setterName = getSetterName(fields[i].getName());
+                            propertyMethods.put(setterName, baseClass.getMethod(setterName,
+                                    new Class<?>[] { fields[i].getType() }));
+                        }
+                    }
+                    currentClass = currentClass.getSuperclass();
+                }
+                init = true;
+            } catch (SecurityException se) {
+                logger.error("Cannot initialize SCAPropertyController: " + se.getMessage());
+                ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                    "Cannot initialize SCAPropertyController: " + se.getMessage());
+                pare.initCause(se);
+                throw pare;
+            } catch (NoSuchMethodException nsme) {
+                logger.error("Cannot initialize SCAPropertyController: " + nsme.getMessage());
+                ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                    "Cannot initialize SCAPropertyController: " + nsme.getMessage());
+                pare.initCause(nsme);
+                throw pare;
             }
-        } catch (SecurityException se) {
-            logger.error(se.getMessage());
-        } catch (NoSuchMethodException nsme) {
-            logger.error(nsme.getMessage());
         }
     }
 
-    /**
-     * Return the type of the specified property. Return <code>null</code> if
-     * the property type has not been set.
-     * 
-     * @param name  the property name
-     * @return      the property value
-     */
-    public Class<?> getType(String name) {
+    public boolean containsDeclaredPropertyName(String name) {
         init();
-        return types.get(name);
+        return declaredPropertyNames.contains(name);
     }
 
-    /**
-     * Return the value of the specified property. Return <code>null</code> if
-     * the property value has not been set.
-     * 
-     * @param name  the property name
-     * @return      the property value
-     */
-    public Object getValue(String name) {
+    public String[] getDeclaredPropertyNames() {
         init();
-        String NameUp = NameUp(name);
-        String getterName = "get" + NameUp;
-        try {
-            Object ObjToInvoke = owner.getReferenceOnBaseObject();
-            Method getter = ObjToInvoke.getClass().getMethod(getterName);
-            initilizedProperties.add(name);
-            try {
-                Object res = getter.invoke(ObjToInvoke);
-                return res;
-            } catch (IllegalAccessException iae) {
-                logger.error(iae.getMessage());
-            } catch (InvocationTargetException ite) {
-                System.err.println("problem on invoking object !!" + ObjToInvoke.getClass().getName());
-                logger.error(ite.getMessage());
-            }
-        } catch (SecurityException se) {
-            logger.error(se.getMessage());
-        } catch (NoSuchMethodException nsme) {
-            logger.error(nsme.getMessage());
-        }
-        return null;
+        return declaredPropertyNames.toArray(new String[] {});
     }
 
-    /**
-     * Return <code>true</code> if the specified property has been set.
-     * 
-     * @param name  the property name
-     * @return      <code>true</code> if the property has been set,
-     *              <code>false</code> otherwise
-     */
+    public Class<?> getDeclaredPropertyType(String name) throws NoSuchPropertyException {
+        assertPropertyExist(name);
+        return declaredPropertyTypes.get(name);
+    }
+
     public boolean containsPropertyName(String name) {
-        init();
         return initilizedProperties.contains(name);
     }
 
-    /**
-     * Return the names of the properties whose values have been set by invoking
-     * {@link #setValue(String, Object)}.
-     */
     public String[] getPropertyNames() {
-        init();
-        return (String[]) initilizedProperties.toArray();
+        return initilizedProperties.toArray(new String[] {});
     }
 
-    /**
-     * Return <code>true</code> if the specified property can be injected in the
-     * content class.
-     * 
-     * @param name  the property name
-     * @return      <code>true</code> if the property can be injected,
-     *              <code>false</code> otherwise
-     */
-    public boolean containsDeclaredPropertyName(String name) {
-        init();
-        return propertyNames.contains(name);
+    public Class<?> getType(String name) throws NoSuchPropertyException {
+        assertPropertyExist(name);
+        return propertyTypes.get(name);
     }
 
-    /**
-     * Return the names of the properties which can be injected in the content
-     * class.
-     */
-    private List<String> getDeclaredPropertyNamesInList() {
-        Object ObjToInvoke = owner.getReferenceOnBaseObject();
-        Method methods[] = ObjToInvoke.getClass().getMethods();
-        List<String> namesList = new ArrayList<String>();
-        for (int i = 0; i < methods.length; i++) {
-            String tmp = methods[i].getName();
-            if (tmp.startsWith("set")) {
-                ListMethodes.put(tmp, methods[i]);
-                namesList.add(NameLow(tmp.substring(3)));
-            }
-            if (tmp.startsWith("get")) {
-                ListMethodes.put(tmp, methods[i]);
-            }
+    public void setType(String name, Class<?> type) throws NoSuchPropertyException,
+            IncompatiblePropertyTypeException {
+        assertPropertyExist(name);
+        if (!declaredPropertyTypes.get(name).isAssignableFrom(type)) {
+            logger.error("The given type is not assignable to the declared type of the property \"" + name +
+                "\"");
+            throw new IncompatiblePropertyTypeException(
+                "The given type is not assignable to the declared type of the property \"" + name + "\"");
         }
-
-        return namesList;
+        propertyTypes.put(name, type);
     }
 
-    /**
-     * Return the names of the properties which can be injected in the content
-     * class.
-     */
-    public String[] getDeclaredPropertyNames() {
-        init();
-        String[] names = (String[]) propertyNames.toArray();
-        return names;
-    }
-
-    /**
-     * Return the type of the specified property, provided that this property
-     * can be injected in the content class.
-     * 
-     * @param name  the property name
-     * @return      the property type
-     */
-    public Class<?> getDeclaredPropertyType(String name) {
-        init();
-        if (containsDeclaredPropertyName(name)) {
-            String setter = "set" + NameUp(name);
-            Method med = ListMethodes.get(setter);
-            return med.getParameterTypes()[0];
+    public Object getValue(String name) throws NoSuchPropertyException {
+        assertPropertyExist(name);
+        if (containsPropertyName(name)) {
+            Object contentClass = owner.getReferenceOnBaseObject();
+            Method getter = propertyMethods.get(getGetterName(name));
+            try {
+                return getter.invoke(contentClass, new Object[] {});
+            } catch (IllegalArgumentException iae) {
+                throw propertyValueError(name, true, iae);
+            } catch (IllegalAccessException iae) {
+                throw propertyValueError(name, true, iae);
+            } catch (InvocationTargetException ite) {
+                throw propertyValueError(name, true, ite);
+            }
+        } else {
+            return null;
         }
-        return null;
     }
 
-    /**
-     * Set the reference of the property controller which promotes the specified
-     * property to the current property controller.
-     * 
-     * @param name      the promoter property name
-     * @param promoter  the promoter component or
-     *                  <code>null</code> to unregister the promoter
-     * @throws IllegalPromoterException
-     *      thrown when attempting to set a cycle between property promoters
-     */
     /*
-        public void setPromoter( String name, SCAPropertyController promoter )
-        throws IllegalPromoterException {
-            
-            promoters.put(name,promoter);
-
-            if( promoter != null ) {
-                SCAPropertyController peer = promoter.getPromoter(name);
-                if( peer == this ) {
-                    String compname = _this_weaveableOptNC.getFcName();
-                    throw new IllegalPromoterException(compname);
-                }
-            }
-        }*/
-
-    /**
-     * Return the reference of the property controller which promotes the
-     * specified property. Return <code>null</code> if the property is managed
-     * locally by the current property controller.
-     * 
-     * @param name  the promoter property name
-     * @return      the promoter component or <code>null</code>
+     * Gets the getter method name for the given property.
+     *
+     * @param name Name of the property.
+     * @return The getter method name.
      */
-    /*public SCAPropertyController getPromoter( String name ) {
-        return promoters.get(name);
-    }*/
+    private String getGetterName(String name) {
+        return "get" + nameUp(name);
+    }
 
+    public void setValue(String name, Object value) throws NoSuchPropertyException,
+            IncompatiblePropertyTypeException {
+        assertPropertyExist(name);
+        Class<?> currentType = propertyTypes.containsKey(name) ? propertyTypes.get(name)
+                : declaredPropertyTypes.get(name);
+        if (!currentType.isInstance(value)) {
+            logger.error("Cannot set value of property \"" + name +
+                "\" because the given value is not assignable to the type of the property");
+            throw new IncompatiblePropertyTypeException("Cannot set value of property \"" + name +
+                "\" because the given value is not assignable to the type of the property");
+        }
+        Object contentClass = owner.getReferenceOnBaseObject();
+        Method setter = propertyMethods.get(getSetterName(name));
+        try {
+            setter.invoke(contentClass, new Object[] { value });
+        } catch (IllegalArgumentException iae) {
+            throw propertyValueError(name, false, iae);
+        } catch (IllegalAccessException iae) {
+            throw propertyValueError(name, false, iae);
+        } catch (InvocationTargetException ite) {
+            throw propertyValueError(name, false, ite);
+        }
+        initilizedProperties.add(name);
+    }
+
+    /*
+     * Gets the setter method name for the given property.
+     *
+     * @param name Name of the property.
+     * @return The setter method name.
+     */
+    private String getSetterName(String name) {
+        return "set" + nameUp(name);
+    }
+
+    /*
+     * Converts a string to another string which the first letter become capital.
+     *
+     * @param name Name to convert.
+     * @return String which first letter is capitalized.
+     */
+    private String nameUp(String name) {
+        char[] nameUpper = name.toCharArray();
+        nameUpper[0] = Character.toUpperCase(nameUpper[0]);
+        String nameUp = new String(nameUpper);
+        return nameUp;
+    }
+
+    /*
+     * Writes an error message on logger and returns an exception for errors occurring when trying
+     * to get or set the value of a property.
+     *
+     * @param name Name of the property.
+     * @param onGet Boolean indicating if error occurred when trying to get the value of a property.
+     * @return ProActiveRuntimeException for errors occurring when trying to get or set the value of
+     * a property.
+     */
+    private ProActiveRuntimeException propertyValueError(String name, boolean onGet, Exception e) {
+        String message = "Cannot " + (onGet ? "get" : "set") + " value of property \"" + name + "\": " +
+            e.getMessage();
+        logger.error(message);
+        ProActiveRuntimeException pare = new ProActiveRuntimeException(message);
+        pare.initCause(e);
+        return pare;
+    }
+
+    /*
+     * Asserts that a property exists.
+     *
+     * @param name Name of the property.
+     * @throws NoSuchPropertyException If the property does not exist.
+     */
+    private void assertPropertyExist(String name) throws NoSuchPropertyException {
+        if (!containsDeclaredPropertyName(name)) {
+            throw new NoSuchPropertyException("The property \"" + name + "\" does not exist");
+        }
+    }
 }

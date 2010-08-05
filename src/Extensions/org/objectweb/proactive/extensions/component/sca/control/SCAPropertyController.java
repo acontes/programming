@@ -36,104 +36,98 @@
  */
 package org.objectweb.proactive.extensions.component.sca.control;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.component.sca.exceptions.IncompatiblePropertyTypeException;
+import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchPropertyException;
+
+
+/**
+ * Component interface to control SCA properties of the SCA/GCM component to which it belongs.
+ *
+ * @author The ProActive Team
+ */
+@PublicAPI
 public interface SCAPropertyController {
-    public void init();
-
     /**
-     * Set the type of the specified property. If the property has already been
-     * set, the old value is lost, and the new value is recorded.
-     * 
-     * @param type   the property type
-     * @param value  the property value
-     */
-    public void setType(String name, Class<?> type);
-
-    /**
-     * Set the value of the specified property. If the property has already been
-     * set, the old value is lost, and the new value is recorded.
-     * 
-     * @param name   the property name
-     * @param value  the property value
-     */
-    public void setValue(String name, Object value);
-
-    /**
-     * Return the type of the specified property. Return <code>null</code> if
-     * the property type has not been set.
-     * 
-     * @param name  the property name
-     * @return      the property value
-     */
-    public Class<?> getType(String name);
-
-    /**
-     * Return the value of the specified property. Return <code>null</code> if
-     * the property value has not been set.
-     * 
-     * @param name  the property name
-     * @return      the property value
-     */
-    public Object getValue(String name) throws Exception;
-
-    /**
-     * Return <code>true</code> if the specified property has been set.
-     * 
-     * @param name  the property name
-     * @return      <code>true</code> if the property has been set,
-     *              <code>false</code> otherwise
-     */
-    public boolean containsPropertyName(String name);
-
-    /**
-     * Return the names of the properties whose values have been set by invoking
-     * {@link #setValue(String, Object)}.
-     */
-    public String[] getPropertyNames();
-
-    /**
-     * Return <code>true</code> if the specified property can be injected in the
-     * content class.
-     * 
-     * @param name  the property name
-     * @return      <code>true</code> if the property can be injected,
-     *              <code>false</code> otherwise
+     * Indicates if the given property is declared as property in the content class.
+     *
+     * @param name The property name.
+     * @return True, if the given property is declared as property in the content class, false otherwise.
      */
     public boolean containsDeclaredPropertyName(String name);
 
     /**
-     * Return the names of the properties which can be injected in the content
-     * class.
+     * Returns the names of the properties declared in the content class.
+     *
+     * @return The names of the properties declared in the content class.
      */
     public String[] getDeclaredPropertyNames();
 
     /**
-     * Return the type of the specified property, provided that this property
-     * can be injected in the content class.
-     * 
-     * @param name  the property name
-     * @return      the property type
+     * Returns the type of the given property as declared in the content class.
+     *
+     * @param name The property name.
+     * @return The type of the given property as declared in the content class.
+     * @throws NoSuchPropertyException If the property does not exist.
      */
-    public Class<?> getDeclaredPropertyType(String name);
+    public Class<?> getDeclaredPropertyType(String name) throws NoSuchPropertyException;
 
     /**
-     * Set the reference of the property controller which promotes the specified
-     * property to the current property controller.
-     * 
-     * @param name      the promoter property name
-     * @param promoter  the promoter component or
-     *                  <code>null</code> to unregister the promoter
-     * @throws IllegalPromoterException
-     *      thrown when attempting to set a cycle between property promoters
+     * Indicates if the given property has been set.
+     *
+     * @param name The property name.
+     * @return True, if the property has been set, false otherwise.
      */
-    //public void setPromoter( String name, SCAPropertyController promoter )
-    //throws Exception;
+    public boolean containsPropertyName(String name);
+
     /**
-     * Return the reference of the property controller which promotes the
-     * specified property. Return <code>null</code> if the property is managed
-     * locally by the current property controller.
-     * 
-     * @param name  the promoter property name
-     * @return      the promoter component or <code>null</code>
+     * Returns the names of the properties whose values have been set by invoking {@link #setValue(String, Object)}.
+     *
+     * @return The names of the properties whose values have been set by invoking {@link #setValue(String, Object)}.
      */
-    //public SCAPropertyController getPromoter( String name );
+    public String[] getPropertyNames();
+
+    /**
+     * Returns the current type of the given property or null if the type has not been set by invoking
+     * {@link #setType(String, Class)}.
+     *
+     * @param name The property name.
+     * @return The current type of the given property or null if the type has not been set by invoking
+     * {@link #setType(String, Class)}.
+     * @throws NoSuchPropertyException If the property does not exist.
+     */
+    public Class<?> getType(String name) throws NoSuchPropertyException;
+
+    /**
+     * Sets the type of the given property to the given type which must be a sub type (or same) of the declared type.
+     *
+     * @param name The property name.
+     * @param type The property type.
+     * @throws NoSuchPropertyException If the property does not exist.
+     * @throws IncompatiblePropertyTypeException If the given type is not a sub type (or same) of the declared type.
+     */
+    public void setType(String name, Class<?> type) throws NoSuchPropertyException,
+            IncompatiblePropertyTypeException;
+
+    /**
+     * Returns the value of the given property or null if the value has not been set by invoking
+     * {@link #setValue(String, Object)}.
+     *
+     * @param name The property name.
+     * @return The property value.
+     * @throws NoSuchPropertyException If the property does not exist.
+     */
+    public Object getValue(String name) throws NoSuchPropertyException;
+
+    /**
+     * Sets the value of the given property to the given value which must be a sub type (or same) of the declared
+     * type.
+     *
+     * @param name The property name.
+     * @param value The property value.
+     * @throws NoSuchPropertyException If the property does not exist.
+     * @throws IncompatiblePropertyTypeException If the given value is not a sub type (or same) of the current type.
+     */
+    public void setValue(String name, Object value) throws NoSuchPropertyException,
+            IncompatiblePropertyTypeException;
 }

@@ -44,7 +44,6 @@ import org.objectweb.fractal.api.factory.Factory;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
@@ -117,18 +116,6 @@ public class Utils extends org.objectweb.proactive.core.component.Utils {
     }
 
     /**
-     * Returns the {@link SCAPropertyController} interface of the given SCA component.
-     *
-     * @param component Reference on a SCA component.
-     * @return {@link SCAPropertyController} interface of the given SCA component.
-     * @throws NoSuchInterfaceException If there is no such interface.
-     */
-    public static SCAPropertyController getSCAPropertyController(final Component component)
-            throws NoSuchInterfaceException {
-        return (SCAPropertyController) component.getFcInterface(Constants.SCA_PROPERTY_CONTROLLER);
-    }
-
-    /**
      * Returns the {@link SCAIntentController} interface of the given SCA component.
      *
      * @param component Reference on a SCA component.
@@ -141,14 +128,14 @@ public class Utils extends org.objectweb.proactive.core.component.Utils {
     }
 
     /**
-     * Returns the {@link PABindingController} interface of the given component.
+     * Returns the {@link SCAPropertyController} interface of the given SCA component.
      *
-     * @param component Reference on a component.
-     * @return {@link PABindingController} interface of the given component.
+     * @param component Reference on a SCA component.
+     * @return {@link SCAPropertyController} interface of the given SCA component.
      * @throws NoSuchInterfaceException If there is no such interface.
      */
-    public static PABindingController getPABindingController(final Component component)
+    public static SCAPropertyController getSCAPropertyController(final Component component)
             throws NoSuchInterfaceException {
-        return (PABindingController) component.getFcInterface(Constants.SCA_PABINDING_CONTROLLER);
+        return (SCAPropertyController) component.getFcInterface(Constants.SCA_PROPERTY_CONTROLLER);
     }
 }

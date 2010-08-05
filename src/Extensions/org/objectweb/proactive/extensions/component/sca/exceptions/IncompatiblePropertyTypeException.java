@@ -34,30 +34,31 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.gen;
+package org.objectweb.proactive.extensions.component.sca.exceptions;
 
-import javassist.ClassPool;
-
-import org.apache.log4j.Logger;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * This class is the parent of classes for generating SCA component classes. It provides utility methods that are
- * used in subclasses.
+ * This exception occurs when trying to set the type or the value of a property with an incompatible type or value.
  *
  * @author The ProActive Team
  */
-public abstract class AbstractClassGenerator {
-    protected static final transient Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_GEN_ITFS);
-    protected static final ClassPool pool = ClassPool.getDefault();
-
-    protected Class<?> loadClass(final String className) throws ClassNotFoundException {
-        // try to fetch the class from the default class loader
-        return Thread.currentThread().getContextClassLoader().loadClass(className);
+@PublicAPI
+public class IncompatiblePropertyTypeException extends Exception {
+    public IncompatiblePropertyTypeException() {
+        super();
     }
 
-    //public abstract String generateClass(final String className) throws ClassGenerationFailedException;
+    public IncompatiblePropertyTypeException(String message) {
+        super(message);
+    }
+
+    public IncompatiblePropertyTypeException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public IncompatiblePropertyTypeException(Throwable cause) {
+        super(cause);
+    }
 }

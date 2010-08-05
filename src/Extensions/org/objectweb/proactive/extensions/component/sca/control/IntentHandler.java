@@ -38,38 +38,30 @@ package org.objectweb.proactive.extensions.component.sca.control;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
- * <p>
  * Interface implemented by intent handlers.
- * </p>
- * 
- * <p>
- * An intent handler is a regular SCA component (primitive or composite) which
- * implements an intent policy. Intent policies are usually non functional
- * features (e.g. transaction, security, logging) which must be applied on
- * SCA business components.
- * </p>
- * <ul>
- * <li>introspecting the intercepted method (so called join point in AOP terms)
- * by retrieving the component reference, the method and the arguments,</li>
- * <li>invoking the intercepted method (method {@link
- * IntentJoinPoint#proceed()}).</li>
- * </ul>
- * 
- * <p>
- * Several intent handlers may be added on the same method. In this case, they
- * are executed in the order in which they were added.
- * </p>
+ * <br>
+ * Intent handlers are useful for non functional features (e.g. security, logging, ...) which must be applied on
+ * SCA/GCM components. Intent handlers intercepts calls on service methods or from reference methods. When the method
+ * is invoked, the invocation is intercepted and the {@link #invoke(IntentJoinPoint)} method of the intent handler is
+ * called. The given {@link IntentJoinPoint} instance allows to introspect the intercepted method (e.g. which
+ * interface, which method, ...) and allows to resume the intercepted invocation method by calling the method
+ * {@link IntentJoinPoint#proceed()}. If several intent handlers are added on the same method, they are executed in
+ * the order in which they were added.
+ *
+ * @author The ProActive Team
+ * @see IntentJoinPoint
  */
+@PublicAPI
 public interface IntentHandler extends Serializable {
-
     /**
-     * This method defines the actions performed by this intent handler.
-     * 
-     * @param ijp  the join point where the interception occured
-     * @return     the value returned by the intercepted method
+     * Defines the actions performed by the intent handler.
+     *
+     * @param ijp The join point where the interception occurred.
+     * @return The value returned by the intercepted method.
      */
     public Object invoke(IntentJoinPoint ijp) throws Throwable;
-
 }

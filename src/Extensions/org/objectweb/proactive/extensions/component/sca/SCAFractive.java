@@ -50,16 +50,17 @@ import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
+import org.osoa.sca.annotations.Property;
 
 
 /**
- * This class is used for creating SCA components. It acts as :
+ * This class is used for creating SCA/GCM components. It acts as :
  * <ol>
  * <li> a bootstrap component</li>
- * <li> a specialized GenericFactory for instantiating new SCA components on remote nodes ({@link PAGenericFactory})</li>
- * <li> a utility class providing static methods to create collective interfaces</li>
+ * <li> a specialized GenericFactory for instantiating new SCA/GCM components on remote nodes ({@link PAGenericFactory})</li>
  * </ol>
  *
  * @author The ProActive Team
@@ -67,48 +68,27 @@ import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerat
 @PublicAPI
 public class SCAFractive extends Fractive {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    private static SCAFractive instance = null;
     public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/extensions/component/sca/config/default-component-config.xml";
 
     /**
-     * no-arg constructor (used by Fractal to get a bootstrap component)
+     * no-arg constructor (used by ProActive to get a bootstrap component)
      */
     public SCAFractive() {
     }
 
-    /**
-     * Returns singleton
-     *
-     * @return SCAFractive a singleton
-     */
-    private static SCAFractive instance() {
-        if (instance == null) {
-            instance = new SCAFractive();
-        }
-        return instance;
-    }
-
     /*
-     * Determine if a class contain org.osoa.sca.annotations.Property annotation
+     * @see
+     * org.objectweb.fractal.api.factory.GenericFactory#newFcInstance(org.objectweb.fractal.api.
+     * Type, java.lang.Object, java.lang.Object)
      */
-    private boolean hasPropertyAnnotation(String className) throws InstantiationException {
-        try {
-            Class<?> clazz = Class.forName(className);
-            Field[] fields = clazz.getFields();
-            for (int i = 0; i < fields.length; i++) {
-                if (fields[i].isAnnotationPresent(org.osoa.sca.annotations.Property.class)) {
-                    return true;
-                }
-            }
-        } catch (ClassNotFoundException cnfe) {
-            logger.error(cnfe.getMessage());
-            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
-                cnfe.getMessage());
-            ie.initCause(cnfe);
-            throw ie;
+    public Component newFcInstance(Type type, Object controllerDesc, Object contentDesc)
+            throws InstantiationException {
+        if (controllerDesc.equals(Constants.COMPOSITE) || controllerDesc.equals(Constants.PRIMITIVE)) {
+            return newFcInstance(type, new ControllerDescription(null, (String) controllerDesc,
+                DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION), contentDesc);
+        } else {
+            return super.newFcInstance(type, controllerDesc, contentDesc);
         }
-
-        return false;
     }
 
     /*
@@ -120,18 +100,17 @@ public class SCAFractive extends Fractive {
      */
     public Component newFcInstance(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, Node node) throws InstantiationException {
-        ControllerDescription newControllerDesc = new ControllerDescription(controllerDesc.getName(),
-            controllerDesc.getHierarchicalType(), DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION);
-        if (newControllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)) {
+        if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
+            controllerDesc.getControllersSignatures().containsKey(SCAPropertyController.class.getName())) {
             String className = contentDesc.getClassName();
             // Test whether the component class has a property annotation
-            boolean hasSCAProperty = hasPropertyAnnotation(className);
-            if (hasSCAProperty) {
+            if (hasPropertyAnnotation(className)) {
                 try {
                     String generatedClassName = PropertyClassGenerator.instance().generateClass(className);
                     contentDesc.setClassName(generatedClassName);
                 } catch (ClassGenerationFailedException cgfe) {
-                    logger.error(cgfe.getMessage());
+                    logger.error("Cannot generate SCA Property class for " + className + " : " +
+                        cgfe.getMessage());
                     InstantiationException ie = new InstantiationException(
                         "Cannot generate SCA Property class for " + className + " : " + cgfe.getMessage());
                     ie.initCause(cgfe);
@@ -139,6 +118,33 @@ public class SCAFractive extends Fractive {
                 }
             }
         }
-        return super.newFcInstance(type, newControllerDesc, contentDesc, node);
+        return super.newFcInstance(type, controllerDesc, contentDesc, node);
+    }
+
+    /*
+     * Determines if a class contains org.osoa.sca.annotations.Property annotation.
+     *
+     * @param className Class to introspect.
+     * @return True if the given class contains org.osoa.sca.annotations.Property annotation.
+     * @throws InstantiationException If the class cannot be found.
+     */
+    private boolean hasPropertyAnnotation(String className) throws InstantiationException {
+        try {
+            Class<?> clazz = Class.forName(className);
+            Field[] fields = clazz.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                if (fields[i].isAnnotationPresent(Property.class)) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            logger.error("Cannot find classe " + className + " : " + cnfe.getMessage());
+            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
+                cnfe.getMessage());
+            ie.initCause(cnfe);
+            throw ie;
+        }
+
+        return false;
     }
 }
