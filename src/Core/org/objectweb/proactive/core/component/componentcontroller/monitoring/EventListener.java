@@ -103,6 +103,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
             }
             started = true;
             logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);
+            System.out.println("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);            
 //            System.out.println("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL+" @ " +FactoryName.getJMXServerName(runtimeURL) + " ... " + FactoryName.getJMXServerName(runtimeURL));
             
             // trying to find lost JMX Notifications (but it's not so important now)

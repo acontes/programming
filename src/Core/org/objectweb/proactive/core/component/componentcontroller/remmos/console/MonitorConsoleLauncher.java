@@ -15,7 +15,7 @@ public class MonitorConsoleLauncher {
 	 * @throws IOException 
 	 * @throws NoSuchInterfaceException 
 	 */
-	public static void main(String[] args) throws NoSuchInterfaceException, IOException, NamingException {
+	public static void main(String[] args) throws Exception {
 
 		MonitorConsole mc = new MonitorConsole();
 		mc.run();

@@ -91,6 +91,8 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
+import org.objectweb.proactive.core.component.control.PABindingController;
+import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
@@ -930,8 +932,9 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             	if(currentreq instanceof ComponentRequestImpl) {
             		String componentSourceName = "-";
             		String componentDestName = "-";
-            		String interfaceName = "-";
+            		String interfaceDestName = "-";
             		String methodName = "-";
+            		String interfaceSourceName = "-";
             		// ugly!
             		// This behaviour should be part of the Tag t.apply(), but how can the Tag have access to the BodyImpl ?
             		// Moreover, Component specific behaviour shouldn't be in ComponentBodyImpl, instead of here? 
@@ -941,11 +944,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             		ComponentMethodCallMetadata cmcmd = methodCall.getComponentMetadata();
             		PAComponent pac = ((ComponentBodyImpl)BodyImpl.this).getPAComponentImpl();
             		
-            		
             		if(pac != null && cmcmd != null) {
             			ComponentParameters cp = pac.getComponentParameters();
             			componentSourceName = pac.getComponentParameters().getName();
-            			interfaceName = cmcmd.getComponentInterfaceName();
+            			interfaceDestName = cmcmd.getComponentInterfaceName();
+            			if(cmcmd.getSenderItfID() != null) {
+            				interfaceSourceName = cmcmd.getSenderItfID().getItfName();
+            			}
+            			
             			// why does this return false????
             			// System.out.println("::::::::::"+cmcmd.isComponentMethodCall());
             			// if this component is generating a request, it should have a bound client interface,
@@ -954,24 +960,24 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             			try {
             				// more ugliness ... name must not end with -NF 
             				// this is to avoid that the tags be propagated in calls inside the membrane ... I don't want to monitor that, and it generates errors
-							if(!Utils.isControllerItfName(interfaceName) && !interfaceName.endsWith("-nf") ) {
-								bc = Fractal.getBindingController(pac);
-								if(bc != null) {
-									// FIXME This doesn't work properly if the interfaces names differ in the client and the server (awful bug!)
-									componentDestName = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(interfaceName)).getFcItfOwner()).getComponentParameters().getName();
-								}
+            				if(!Utils.isControllerItfName(interfaceDestName) && !interfaceDestName.endsWith("-nf") ) {
+            					bc = Fractal.getBindingController(pac);
+            					// Binding Controller shouldn't be null if I'm in a component making a component request
+            					//if(bc != null) {
+            					componentDestName = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(interfaceSourceName)).getFcItfOwner()).getComponentParameters().getName();
+            					//System.out.println("Calling from ["+ componentSourceName +"."+interfaceSourceName+"] to ["+ componentDestName +"."+ interfaceDestName+"]");
+            					//}
 							}
 						} catch (NoSuchInterfaceException e) {
 							// FIXME I shouldn't add tags if the component is NF, I don't want to monitor them
 							// For now I will ignore them, but it should be solved in clean way (detecting before the fact that the component is NF)
-							System.out.println("Couldn't find interface [" + interfaceName + "] on component ["+ componentSourceName + "]");
+							System.out.println("Couldn't find interface [" + interfaceDestName + "] on component ["+ componentSourceName + "]");
 							//e.printStackTrace();
 						}
 						
             			
             		}
         			methodName = methodCall.getName();
-            		//System.out.println("Call from " + componentSourceName + " to " + interfaceName + "." + methodName);
 
             		// Remove the current CMTag (if exists), and keep the ID of the previous, as it will be used for the new CMTag attached to this request
         			// Also keep the root ID
@@ -993,7 +999,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             		if(!componentDestName.equals("-")) {
                 		// sequenceID is the new one, just generated (in sendRequest).
                 		// needed to find the request that was being served, to be able to associate it in the callLog
-                		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceName, methodName, rootID));            			
+                		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceDestName, methodName, rootID));            			
             		}
             		
 

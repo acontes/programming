@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.component.representative.PAComponentRepresen
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
 import org.objectweb.proactive.core.component.type.WSComponent;
+import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
@@ -208,6 +209,11 @@ public class Remmos {
 		patf = (PAGCMTypeFactory) Fractal.getTypeFactory(boot);
 		pagf = (PAGenericFactory) Fractal.getGenericFactory(boot);
 
+		logger.debug("Currently on runtime: "+ ProActiveRuntimeImpl.getProActiveRuntime().getURL() );
+		PAComponent pac = (PAComponent) component;
+		logger.debug("Component(AO) ID: "+ pac.getID());
+		
+		
 		// creates the components used for monitoring
 		Component eventListener = createBasicEventListener(patf, pagf, EventListener.class.getName());
 		Component logStore = createBasicLogStore(patf, pagf, LogStore.class.getName());
@@ -215,9 +221,13 @@ public class Remmos {
 
 		// performs the NF assembly
 		PAMembraneController membrane = Utils.getPAMembraneController(component);
+		PAGCMLifeCycleController lifeCycle = Utils.getPAGCMLifeCycleController(component);
 		// stop the membrane before making changes
 		String membraneOldState = membrane.getMembraneState();
+		String componentOldState = lifeCycle.getFcState();
 		membrane.stopMembrane();
+		lifeCycle.stopFc();
+		
 		
 		
 		// add components to the membrane
@@ -270,8 +280,10 @@ public class Remmos {
 		// restore membrane state after having made changes
 		if(membraneOldState.equals(PAMembraneController.MEMBRANE_STARTED)) {
 			membrane.startMembrane();
-		}		
-		
+		}
+		if(componentOldState.equals(PAGCMLifeCycleController.STARTED)) {
+			lifeCycle.startFc();
+		}
 		
 	}
 	
@@ -423,6 +435,9 @@ public class Remmos {
 	public static void enableMonitoring(Component component) {
 		
 		// if the component is not an instance of PAComponent, it will fail
+		if(!(component instanceof PAComponent)) {
+			return;
+		}
 		PAComponent pacomponent = (PAComponent) component;
 		String componentName = pacomponent.getComponentParameters().getName();
 		String itfName;

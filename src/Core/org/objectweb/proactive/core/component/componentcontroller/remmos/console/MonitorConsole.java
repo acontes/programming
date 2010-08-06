@@ -18,6 +18,7 @@ import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
+import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.RemmosUtils;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PASuperController;
@@ -49,7 +50,7 @@ public class MonitorConsole {
 	final String COM_CLEAR = "c";
 	
 	final String COM_ADD_COM = "a";
-	final String COM_LIST = "list";
+	final String COM_LIST = "ls";
 	final String COM_DESCRIBE = "desc";
 	final String COM_DISC = "disc";
 	final String COM_CURRENT = "cur";
@@ -123,7 +124,7 @@ public class MonitorConsole {
 		}
 	}
 
-	public void run() throws NoSuchInterfaceException, IOException, NamingException {
+	public void run() throws Exception {
 
 		printBanner();
 		running = true;
@@ -182,6 +183,7 @@ public class MonitorConsole {
 					System.out.println("Current: "+ currentRep.getComponentParameters().getName());
 				}
 			}
+			// Discovers all components connected to this one, and add them to the managed map.
 			else if(command.equals(COM_DISC)) {
 				if(current == null) {
 					System.out.println("No component seleted.");
@@ -195,7 +197,52 @@ public class MonitorConsole {
 					RemmosUtils.describeComponent(c);
 				}
 			}
-			
+			// Add monitoring capabilities to all the managed components or, if specified, only to one
+			else if(command.equals(COM_ADD_MON)) {
+				// args supplied --> add monitoring to specificed component
+				if(args != null) {
+					String name = args.split("[ ]+", 2)[0];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+					}
+					else {
+						System.out.println("Adding monitoring components to "+ name +" ...");
+						Remmos.addMonitoring(found);
+					}
+				}
+				// no args ... add mo
+				else {
+					for(String name : managedComponents.keySet()) {
+						System.out.println("Adding monitoring components to "+ name +" ...");
+						Remmos.addMonitoring(managedComponents.get(name));
+					}
+				}
+			}
+			// Enables monitoring to all the components connected to this one.
+			else if(command.equals(COM_ENABLE_MON)) {
+				System.out.println("Enabling monitoring from component "+ currentRep.getComponentParameters().getName());
+				Remmos.enableMonitoring(current);
+			}
+			// Starts the monitoring activity in all managed components
+			else if(command.equals("m")) {
+				if(!monitoring) {
+					System.out.println("Starting monitoring");
+					for(Component comp : managedComponents.values()) {
+						((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).startMonitoring();
+					}
+					System.out.println("Monitoring Framework started.");
+					monitoring = true;
+				}
+				else {
+					System.out.println("Stopping monitoring");
+					for(Component comp : managedComponents.values()) {
+						((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).stopMonitoring();
+					}
+					System.out.println("Monitoring Framework stopped.");
+					monitoring = false;
+				}
+			}
 			
 			
 			
@@ -379,7 +426,7 @@ public class MonitorConsole {
 						interfaceName = itf.getFcItfName();
 						componentDest = (PAComponentRepresentative)((PAInterface) pabc.lookupFc(interfaceName)).getFcItfOwner();
 						componentDestName = componentDest.getComponentParameters().getName();
-						logger.debug("   Client interface (internal): "+ interfaceName + ", bound to "+ componentDestName);
+						logger.debug("   Server interface (internal): "+ interfaceName + ", bound to "+ componentDestName);
 					} catch (NoSuchInterfaceException e) {
 						e.printStackTrace();
 					}
