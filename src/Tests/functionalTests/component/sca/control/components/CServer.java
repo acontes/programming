@@ -39,14 +39,11 @@ package functionalTests.component.sca.control.components;
 public class CServer implements TestIntentItf {
     protected TestIntentItf testIntentItf;
 
-    //@snippet-start component_scauserguide_9
     public void m() {
         System.err.println("inside public void m() ");
         //        while (true)
         //            ;
     }
-
-    //@snippet-end component_scauserguide_9
 
     public int n() {
         return 0;

@@ -53,8 +53,6 @@ import functionalTests.component.sca.SCAComponentTest;
 import functionalTests.component.sca.control.components.PropertyComponent;
 
 
-//@snippet-start component_scauserguide_3
-
 public class TestSCAPropertyController extends SCAComponentTest {
     protected Component boot;
     protected GCMTypeFactory tf;
@@ -69,13 +67,11 @@ public class TestSCAPropertyController extends SCAComponentTest {
         t = tf.createFcType(new InterfaceType[] {});
     }
 
-    //@snippet-end component_scauserguide_3
-
     // -----------------------------------------------------------------------------------
     // Full test
     // -----------------------------------------------------------------------------------
     @Test
-    //@snippet-start component_scauserguide_4
+    //@snippet-start component_scauserguide_2
     public void testSCAPropertyController() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", PropertyComponent.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
@@ -86,5 +82,5 @@ public class TestSCAPropertyController extends SCAComponentTest {
         assertEquals((byte) 1, scac.getValue("x2"));
         scac.setValue("x3", (char) 1);
     }
-    //@snippet-end component_scauserguide_4
+    //@snippet-end component_scauserguide_2
 }

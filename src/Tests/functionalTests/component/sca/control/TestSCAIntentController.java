@@ -56,8 +56,6 @@ import functionalTests.component.sca.control.components.IntentHandlerTest;
 import functionalTests.component.sca.control.components.TestIntentItf;
 
 
-//@snippet-start component_scauserguide_7
-
 public class TestSCAIntentController extends SCAComponentTest {
     Component componentA;
     Component componentB;
@@ -83,12 +81,11 @@ public class TestSCAIntentController extends SCAComponentTest {
                 .createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
                 Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
-        //@snippet-end component_scauserguide_7
-        //@snippet-start component_scauserguide_8        
-
+        //@snippet-start component_scauserguide_5        
         SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
                 .getSCAIntentController(componentA);
         scaic.addIntentHandler(new IntentHandlerTest());
+        //@snippet-end component_scauserguide_5
         GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
 
@@ -103,4 +100,3 @@ public class TestSCAIntentController extends SCAComponentTest {
         }
     }
 }
-//@snippet-end component_scauserguide_8

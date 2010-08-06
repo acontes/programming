@@ -42,7 +42,7 @@ import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.component.sca.control.IntentJoinPoint;
 
 
-//@snippet-start component_scauserguide_5
+//@snippet-start component_scauserguide_3
 public class SecurityIntentHandler implements IntentHandler {
     String password;
 
@@ -63,4 +63,4 @@ public class SecurityIntentHandler implements IntentHandler {
         }
     }
 }
-//@snippet-end component_scauserguide_5
+//@snippet-end component_scauserguide_3
