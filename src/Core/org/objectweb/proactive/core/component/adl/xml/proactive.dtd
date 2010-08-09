@@ -9,7 +9,7 @@
 <?add ast="definition" itf="org.objectweb.fractal.adl.Definition" ?>
 
 <!-- components module -->
-<?add ast="component"  itf="org.objectweb.fractal.adl.components.Component" ?>
+<?add ast="component"  itf="org.objectweb.proactive.core.component.adl.components.PAComponent" ?>
 <?add ast="definition" itf="org.objectweb.fractal.adl.components.ComponentDefinition" ?>
 
 <!-- interfaces module -->
@@ -114,6 +114,7 @@
 <!ATTLIST component
   name CDATA #REQUIRED
   definition CDATA #IMPLIED
+  domain CDATA #IMPLIED
 >
 
 <!ELEMENT interface (comment*) >

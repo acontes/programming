@@ -3,6 +3,13 @@
 
 <definition name="org.objectweb.proactive.core.component.adl.PACompiler" extends="org.objectweb.fractal.adl.BasicCompiler">
 	<!-- Compiler definitions -->
+	<component name="component-compiler"
+		definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
+		<interface name="builder" role="client"
+			signature="org.objectweb.fractal.adl.components.ComponentBuilder" />
+		<content
+			class="org.objectweb.proactive.core.component.adl.components.PAPrimitiveComponentCompiler" />
+	</component>
 	<component name="implementation-compiler" definition="org.objectweb.fractal.adl.components.PrimitiveCompilerType">
 		<interface role="client" name="builder" signature="org.objectweb.fractal.adl.implementations.ImplementationBuilder"/>
 		<content class="org.objectweb.proactive.core.component.adl.implementations.PAImplementationCompiler"/>
