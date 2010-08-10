@@ -15,6 +15,8 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.fractal.util.Fractal;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -41,6 +43,9 @@ import org.objectweb.proactive.core.component.representative.PAComponentRepresen
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
 import org.objectweb.proactive.core.component.type.WSComponent;
+import org.objectweb.proactive.core.node.Node;
+import org.objectweb.proactive.core.node.NodeFactory;
+import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -189,7 +194,7 @@ public class Remmos {
 	
 	/**
 	 * Builds the monitoring components and put them in the membrane.
-	 * The functional assembly must be done before, otherwise the internal assemblies will be incomplete.
+	 * The functional assembly, in the case of composites, must be done before, otherwise the internal assemblies will be incomplete.
 	 * 
 	 * After the execution of this method, the component (composite or primitive) will have all the Monitor-related components
 	 * created and bound to the corresponding (internal and external) interfaces on the membrane.
@@ -211,13 +216,21 @@ public class Remmos {
 
 		logger.debug("Currently on runtime: "+ ProActiveRuntimeImpl.getProActiveRuntime().getURL() );
 		PAComponent pac = (PAComponent) component;
-		logger.debug("Component(AO) ID: "+ pac.getID());
+		PAComponentRepresentative pacr = (PAComponentRepresentative) component;
+		logger.debug("Adding monitoring components for component ["+ pac.getComponentParameters().getName()+"], with ID ["+ pac.getID() +"]");
+		UniversalBodyProxy ubp = (UniversalBodyProxy) pacr.getProxy();
+		UniversalBody ub = ubp.getBody();
+		String bodyUrl = ub.getNodeURL();
+		logger.debug("   Which is in node ["+ bodyUrl + "]");
+		Node parentNode = NodeFactory.getNode(bodyUrl);
+		ProActiveRuntime part = parentNode.getProActiveRuntime();
+		logger.debug("   and in runtime ["+ part.getURL() + "]");
 		
 		
 		// creates the components used for monitoring
-		Component eventListener = createBasicEventListener(patf, pagf, EventListener.class.getName());
-		Component logStore = createBasicLogStore(patf, pagf, LogStore.class.getName());
-		Component monitorService = createMonitorService(patf, pagf, MonitorControlImpl.class.getName(), component);
+		Component eventListener = createBasicEventListener(patf, pagf, EventListener.class.getName(), parentNode);
+		Component logStore = createBasicLogStore(patf, pagf, LogStore.class.getName(), parentNode);
+		Component monitorService = createMonitorService(patf, pagf, MonitorControlImpl.class.getName(), component, parentNode);
 
 		// performs the NF assembly
 		PAMembraneController membrane = Utils.getPAMembraneController(component);
@@ -293,7 +306,7 @@ public class Remmos {
 	 * @param pagf
 	 * @return
 	 */
-	private static Component createBasicEventListener(PAGCMTypeFactory patf, PAGenericFactory pagf, String eventListenerClass) {
+	private static Component createBasicEventListener(PAGCMTypeFactory patf, PAGenericFactory pagf, String eventListenerClass, Node node) {
 		
 		Component eventListener = null;
 		InterfaceType[] eventListenerItfType = null;
@@ -307,7 +320,8 @@ public class Remmos {
 			eventListenerType = patf.createFcType(eventListenerItfType);
 			eventListener = pagf.newNFcInstance(eventListenerType,
 					new ControllerDescription(EVENT_LISTENER_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"),
-					new ContentDescription(eventListenerClass)
+					new ContentDescription(eventListenerClass),
+					node
 			);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -323,7 +337,7 @@ public class Remmos {
 	 * @param logStoreClass
 	 * @return
 	 */
-	private static Component createBasicLogStore(PAGCMTypeFactory patf, PAGenericFactory pagf, String logStoreClass) {
+	private static Component createBasicLogStore(PAGCMTypeFactory patf, PAGenericFactory pagf, String logStoreClass, Node node) {
 		
 		Component logStore = null;
 		InterfaceType[] logStoreItfType = null;
@@ -336,7 +350,8 @@ public class Remmos {
 		logStoreType = patf.createFcType(logStoreItfType);
 		logStore = pagf.newNFcInstance(logStoreType, 
 				new ControllerDescription(LOG_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
-				new ContentDescription(logStoreClass)
+				new ContentDescription(logStoreClass),
+				node
 		);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -353,14 +368,14 @@ public class Remmos {
 	 * @param component
 	 * @return
 	 */
-	private static Component createMonitorService(PAGCMTypeFactory patf, PAGenericFactory pagf, String monitorServiceClass, Component component) {
+	private static Component createMonitorService(PAGCMTypeFactory patf, PAGenericFactory pagf, String monitorServiceClass, Component component, Node node) {
 
 		Component monitorService = null;
 		InterfaceType[] monitorServiceItfType = null;
 		ComponentType monitorServiceType = null;
 		ArrayList<InterfaceType> monitorServiceItfTypeList = new ArrayList<InterfaceType>();
 		
-		// TODO create the interface type, according to the client/server functional interfaces on the component
+		// Create the interface type, according to the client/server functional interfaces on the component
 		try {
 			monitorServiceItfTypeList.add(patf.createGCMItfType(LOG_HANDLER_ITF, LogHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			monitorServiceItfTypeList.add(patf.createGCMItfType(EVENT_CONTROL_ITF, EventControl.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
@@ -409,7 +424,8 @@ public class Remmos {
 			monitorServiceType = patf.createFcType(monitorServiceItfType);
 			monitorService = pagf.newNFcInstance(monitorServiceType,
 					new ControllerDescription(MONITOR_SERVICE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"),
-					new ContentDescription(monitorServiceClass)
+					new ContentDescription(monitorServiceClass),
+					node
 			);
 		} catch (InstantiationException e) {
 			e.printStackTrace();

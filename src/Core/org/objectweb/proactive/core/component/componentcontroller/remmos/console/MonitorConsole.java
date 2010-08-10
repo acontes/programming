@@ -11,6 +11,9 @@ import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
@@ -23,8 +26,10 @@ import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.R
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PASuperController;
 import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
+import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -155,6 +160,7 @@ public class MonitorConsole {
 				String url = args.split("[ ]+", 2)[0];
 				Component c = Fractive.lookup(url);
 				String name = ((PAComponent)c).getComponentParameters().getName();
+				System.out.println("Looked-up ["+name+"] @ ["+url+"]");
 				managedComponents.put(name, c);
 			}
 			else if(command.equals(COM_LIST)) {
@@ -211,7 +217,7 @@ public class MonitorConsole {
 						Remmos.addMonitoring(found);
 					}
 				}
-				// no args ... add mo
+				// no args ... add monitoring to all components
 				else {
 					for(String name : managedComponents.keySet()) {
 						System.out.println("Adding monitoring components to "+ name +" ...");
@@ -298,12 +304,11 @@ public class MonitorConsole {
 				}
 			}
 			else if(command.equals("p")) {
-				Component compZ = managedComponents.get(0);
-				RemmosUtils.displayCalls(compZ);
+				RemmosUtils.displayCalls(current);
 				System.out.println("ID: ");
 				long id = Long.parseLong(sc.nextLine());
-				System.out.println("Path from Z, for request "+ id);
-				RequestPath rp = ((MonitorControl)compZ.getFcInterface(Constants.MONITOR_CONTROLLER)).getPathForID(new ComponentRequestID(id));
+				System.out.println("Path from "+ currentRep.getComponentParameters().getName()+ ", for request "+ id);
+				RequestPath rp = ((MonitorControl)current.getFcInterface(Constants.MONITOR_CONTROLLER)).getPathForID(new ComponentRequestID(id));
 				RemmosUtils.displayPath(rp);
 			}
 		}
