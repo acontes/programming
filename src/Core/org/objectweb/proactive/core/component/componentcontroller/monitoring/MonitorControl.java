@@ -30,8 +30,8 @@ public interface MonitorControl extends MonitorController {
      * Get the list of all requests that have been entered this component
      * 
      */
-    List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfRequestIDs();
-    List<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID> getListOfCallIDs();
+    List<ComponentRequestID> getListOfIncomingRequestIDs();
+    List<ComponentRequestID> getListOfOutgoingRequestIDs();
     
     /** 
      * Get the path followed by an specific request
@@ -54,13 +54,13 @@ public interface MonitorControl extends MonitorController {
      * Get the list of entries in the Request Log
      * @return
      */
-    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, RequestRecord> getRequestLog();
+    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, IncomingRequestRecord> getRequestLog();
     
     /**
      * Get the list of entries in the Call Log
      * @return
      */
-    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, CallRecord> getCallLog();
+    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, OutgoingRequestRecord> getCallLog();
     
     List<String> getNotificationsReceived(); 
     

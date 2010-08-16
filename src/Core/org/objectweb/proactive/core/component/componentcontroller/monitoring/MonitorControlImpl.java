@@ -37,7 +37,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	private static final Logger RPlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST_PATH);
 	
 	private EventControl eventControl = null;
-	private LogHandler logHandler = null;
+	private RecordHandler logHandler = null;
 	
 	// interfaces for monitors of internal and external components
 	private Map<String, MonitorControl> externalMonitors = new HashMap<String, MonitorControl>();
@@ -143,12 +143,12 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 	
 	// TODO
-	public List<ComponentRequestID> getListOfRequestIDs() {
+	public List<ComponentRequestID> getListOfIncomingRequestIDs() {
 		return logHandler.getListOfRequestIDs();
 	}
 	
 	// TODO
-	public List<ComponentRequestID> getListOfCallIDs() {
+	public List<ComponentRequestID> getListOfOutgoingRequestIDs() {
 		return logHandler.getListOfCallIDs();
 	}
 
@@ -157,10 +157,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
      */
     public RequestPath getPathForID(ComponentRequestID id) {
     	RequestPath result;
-    	CallRecord cr;
+    	OutgoingRequestRecord cr;
     	
     	RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+")");
-    	cr = logHandler.fetchCallRecord(id);
+    	cr = logHandler.fetchOutgoingRequestRecord(id);
     	
     	ComponentRequestID rootID = cr.getRootID();
     	Set<String> visited = new HashSet<String>();
@@ -211,10 +211,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	visited.add(localName);
     	
  
-    	Map<ComponentRequestID, RequestRecord> branches = null; //logHandler.getCallRecordsFromParent(rootID);
-    	Map<ComponentRequestID, CallRecord> children = null; 
-    	RequestRecord rr;
-    	CallRecord cr;
+    	Map<ComponentRequestID, IncomingRequestRecord> branches = null; //logHandler.getCallRecordsFromParent(rootID);
+    	Map<ComponentRequestID, OutgoingRequestRecord> children = null; 
+    	IncomingRequestRecord rr;
+    	OutgoingRequestRecord cr;
     	PathItem pi;
     	MonitorControl child = null;
 
@@ -231,7 +231,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
     		RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
     		// get the record of the request
-    		rr = logHandler.fetchRequestRecord(crid);
+    		rr = logHandler.fetchIncomingRequestRecord(crid);
     		// get all the calls that were sent while serving this request
     		children = logHandler.getCallRecordsFromParent(crid);
 
@@ -245,7 +245,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
     		// call each component to which a request was sent
     		for(ComponentRequestID childID : children.keySet()) {
-    			cr = logHandler.fetchCallRecord(childID);
+    			cr = logHandler.fetchOutgoingRequestRecord(childID);
     			// get the name of the component to call
     			destName = cr.getCalledComponent();
     			RPlogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
@@ -314,7 +314,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 			return;
 		}
 		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
-			logHandler = (LogHandler) sItf;
+			logHandler = (RecordHandler) sItf;
 			return;
 		}
 		// it refers to the monitoring interface of an external component (bound from an external client interface)
@@ -387,12 +387,12 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 
 	@Override
-	public Map<ComponentRequestID, CallRecord> getCallLog() {
+	public Map<ComponentRequestID, OutgoingRequestRecord> getCallLog() {
 		return logHandler.getCallLog();
 	}
 
 	@Override
-	public Map<ComponentRequestID, RequestRecord> getRequestLog() {
+	public Map<ComponentRequestID, IncomingRequestRecord> getRequestLog() {
 		return logHandler.getRequestLog();
 	}
 

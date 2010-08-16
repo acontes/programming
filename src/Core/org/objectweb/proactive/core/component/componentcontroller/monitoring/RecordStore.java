@@ -1,0 +1,235 @@
+package org.objectweb.proactive.core.component.componentcontroller.monitoring;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
+
+/**
+ * Log Storage component for the Monitoring Framework.
+ * Contains a collections of AbstractRecord objects.
+ * 
+ * Another implementation could introduce another kind of Log.
+ * 
+ * @author cruz
+ *
+ */
+public class RecordStore extends AbstractPAComponentController implements RecordHandler {
+
+	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
+
+	/** Log for incoming requests */
+    private Map<ComponentRequestID, IncomingRequestRecord> incomingRequestLog;
+    
+    /** Log for outgoing request */
+    private Map<ComponentRequestID, OutgoingRequestRecord> outgoingRequestLog;
+
+	
+	public RecordStore() {
+		super();
+	}
+	
+	public void init() {
+		logger.debug("[Log Store] Initializing logs ...");
+		// should some of these two HashMap's be synchronized?		
+		incomingRequestLog = new HashMap<ComponentRequestID, IncomingRequestRecord>();
+    	outgoingRequestLog = new HashMap<ComponentRequestID, OutgoingRequestRecord>();
+	}
+
+	@Override
+	public BooleanWrapper exists(Object key, RecordType rt) {
+		if(rt == RecordType.IncomingRequestRecord) {
+			if(incomingRequestLog.containsKey(key)) {
+				return new BooleanWrapper(true);
+			}
+		}
+		if(rt == RecordType.OutgoingRequestRecord) {
+			if(outgoingRequestLog.containsKey(key)) {
+				return new BooleanWrapper(true);
+			}
+		}
+		return new BooleanWrapper(false);
+	}
+
+	@Override
+	public AbstractRecord fetch(Object key, RecordType rt) {
+		if(rt == RecordType.IncomingRequestRecord) {
+			return incomingRequestLog.get(key);	
+		}
+		else if(rt == RecordType.OutgoingRequestRecord) {
+			return outgoingRequestLog.get(key);
+		}
+		else {
+			logger.debug("ERROR. Fetch: Unrecognized RecordType");
+		}
+		return null;
+	}
+	
+	// FIXME Should use the general fetch (from above), but that gives a ClassCastException when passing it as a parameter, won't fix it now...
+	// Maybe it's because the return type (for the Future) is extended from AbstractRecord and so the result can't be cast Incoming/OutgoingRequestRecord? 
+	public IncomingRequestRecord fetchIncomingRequestRecord(Object key) {
+		return incomingRequestLog.get(key);
+	}
+	public OutgoingRequestRecord fetchOutgoingRequestRecord(Object key) {
+		return outgoingRequestLog.get(key);
+	}
+
+	@Override
+	public void insert(AbstractRecord record) {
+		if(record.getRecordType() == RecordType.IncomingRequestRecord) {
+			//logger.debug("INSERTING IN REQ LOG: ID: "+ record.getRequestID() + " -- " + ((RequestRecord)record).getCalledComponent() + "." + ((RequestRecord)record).getInterfaceName() + "." + ((RequestRecord)record).getMethodName() + " -- " + ((RequestRecord)record).getArrivalTime() + ", "+ ((RequestRecord)record).getServingStartTime() + ", "+ ((RequestRecord)record).getReplyTime());
+			incomingRequestLog.put(record.getRequestID(), (IncomingRequestRecord) record);
+		}
+		else if(record.getRecordType() == RecordType.OutgoingRequestRecord) {
+			//logger.debug("INSERTING IN CALL LOG: ID: "+ record.getRequestID() + " -- " + ((CallRecord)record).getCalledComponent() + "." + ((CallRecord)record).getInterfaceName() + "." + ((CallRecord)record).getMethodName() + " -- " + ((CallRecord)record).getSentTime() + ", "+ ((CallRecord)record).getReplyReceptionTime() );
+			outgoingRequestLog.put(record.getRequestID(), (OutgoingRequestRecord) record);
+		}
+		else {
+			logger.debug("ERROR. Insert: Unrecognized RecordType, ID:"+ record.getRequestID() + ", ");
+		}
+	}
+	
+	// the same from above... because HashMap.put() replaces old value!!
+	@Override
+	public void update(Object key, AbstractRecord record) {
+		if(record.recordType == RecordType.IncomingRequestRecord) {
+			incomingRequestLog.put(record.getRequestID(), (IncomingRequestRecord) record);
+		}
+		else if(record.recordType == RecordType.OutgoingRequestRecord) {
+			outgoingRequestLog.put(record.getRequestID(), (OutgoingRequestRecord) record);
+		}
+		else {
+			logger.debug("ERROR. Update: Unrecognized RecordType");
+		}
+	} 
+
+	@Override
+	public Map<ComponentRequestID, OutgoingRequestRecord> getCallLog() {
+		
+		Map<ComponentRequestID, OutgoingRequestRecord> callRecords = new HashMap<ComponentRequestID, OutgoingRequestRecord>(outgoingRequestLog.size());
+		// copy all entries of the log
+		callRecords.putAll(outgoingRequestLog);
+		return callRecords;
+	}
+
+	@Override
+	public Map<ComponentRequestID, IncomingRequestRecord> getRequestLog() {
+		
+		Map<ComponentRequestID, IncomingRequestRecord> requestRecords = new HashMap<ComponentRequestID, IncomingRequestRecord>(outgoingRequestLog.size());
+		// copy all entries of the log
+		requestRecords.putAll(incomingRequestLog);
+		return requestRecords;
+	}
+
+	/**
+	 * Returns a subset of all the entries in the Call Log with an specific parent ID
+	 */
+	@Override
+	public Map<ComponentRequestID, OutgoingRequestRecord> getCallRecordsFromParent(
+			ComponentRequestID id) {
+
+		Map<ComponentRequestID, OutgoingRequestRecord> selectedRecords = new HashMap<ComponentRequestID, OutgoingRequestRecord>();
+		OutgoingRequestRecord cr;
+		
+		// TODO Perform the query in a more efficient way
+		for(ComponentRequestID crid: outgoingRequestLog.keySet()) {
+			cr = outgoingRequestLog.get(crid);
+			// put all the records that have 'id' as parent
+			if(cr.getParentID().equals(id)) {
+				selectedRecords.put(crid, cr);
+			}
+		}
+		return selectedRecords;
+	}
+	
+	/**
+	 * Returns a subset of all the entries in the Request Log with the same root ID
+	 */
+	@Override
+	public Map<ComponentRequestID, IncomingRequestRecord> getRequestRecordsFromRoot(
+			ComponentRequestID rootID) {
+
+		Map<ComponentRequestID, IncomingRequestRecord> selectedRecords = new HashMap<ComponentRequestID, IncomingRequestRecord>();
+		IncomingRequestRecord rr;
+		
+		// TODO Perform the query in a more efficient way
+		for(ComponentRequestID crid: incomingRequestLog.keySet()) {
+			rr = incomingRequestLog.get(crid);
+			// put all the records that have 'rootID' as root
+			if(rr.getRootID().equals(rootID)) {
+				selectedRecords.put(crid, rr);
+			}
+		}
+		return selectedRecords;
+	}
+
+	@Override
+	public void reset() {
+		incomingRequestLog.clear();
+		outgoingRequestLog.clear();
+	}
+	
+	
+	public List<ComponentRequestID> getListOfRequestIDs() {
+		Set<ComponentRequestID> keyset = incomingRequestLog.keySet();
+		List<ComponentRequestID> keylist = new ArrayList<ComponentRequestID>(keyset.size());
+		keylist.addAll(keyset);
+		//Collections.sort(keylist);
+		return keylist;
+	}
+    
+	public List<ComponentRequestID> getListOfCallIDs() {
+		Set<ComponentRequestID> keyset = outgoingRequestLog.keySet();
+		List<ComponentRequestID> keylist = new ArrayList<ComponentRequestID>(keyset.size());
+		keylist.addAll(keyset);
+		//Collections.sort(keylist);
+		return keylist;
+	}
+
+	@Override
+	public List<OutgoingRequestRecord> geOutogoingRequestRecords(
+			Condition<OutgoingRequestRecord> condition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<?> geOutogoingRequestRecords(
+			Condition<OutgoingRequestRecord> condition,
+			Transformation<OutgoingRequestRecord, ?> transformation) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<IncomingRequestRecord> getIncomingRequestRecords(
+			Condition<IncomingRequestRecord> condition) {
+		
+		List<IncomingRequestRecord> result = new ArrayList<IncomingRequestRecord>();
+		// applies condition to all IncomingRequestRecords stored
+		for(IncomingRequestRecord irr : incomingRequestLog.values()) {
+			if(condition.evaluate(irr)) {
+				result.add(irr);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public List<?> getIncomingRequestRecords(
+			Condition<IncomingRequestRecord> condition,
+			Transformation<IncomingRequestRecord, ?> transformation) {
+
+		return null;
+	}
+
+
+	
+}

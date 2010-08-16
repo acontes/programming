@@ -3,12 +3,12 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 import java.io.Serializable;
 
 /**
- * Stores the data and timestamps for a request.
+ * Stores the data and timestamps related to an incoming request (a call from another component).
  * 
  * @author cruz
  *
  */
-public class RequestRecord extends AbstractRecord implements Serializable {
+public class IncomingRequestRecord extends AbstractRecord implements Serializable {
 
 	private String callerComponent;
 	private String calledComponent;
@@ -23,11 +23,11 @@ public class RequestRecord extends AbstractRecord implements Serializable {
 	
 	private boolean finished;
 	
-	public RequestRecord() {
+	public IncomingRequestRecord() {
 	}
 	
-	public RequestRecord(ComponentRequestID requestID, String callerComponent, String calledComponent, String interfaceName, String methodName, long arrivalTime, ComponentRequestID rootID) {
-		super(RecordType.RequestRecord, requestID);
+	public IncomingRequestRecord(ComponentRequestID requestID, String callerComponent, String calledComponent, String interfaceName, String methodName, long arrivalTime, ComponentRequestID rootID) {
+		super(RecordType.IncomingRequestRecord, requestID);
 		this.callerComponent = callerComponent;
 		this.calledComponent = calledComponent;
 		this.interfaceName = interfaceName;

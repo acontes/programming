@@ -24,8 +24,8 @@ import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventListener;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.LogHandler;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.LogStore;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordHandler;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordStore;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlImpl;
 import org.objectweb.proactive.core.component.control.PABindingController;
@@ -229,7 +229,7 @@ public class Remmos {
 		
 		// creates the components used for monitoring
 		Component eventListener = createBasicEventListener(patf, pagf, EventListener.class.getName(), parentNode);
-		Component logStore = createBasicLogStore(patf, pagf, LogStore.class.getName(), parentNode);
+		Component logStore = createBasicLogStore(patf, pagf, RecordStore.class.getName(), parentNode);
 		Component monitorService = createMonitorService(patf, pagf, MonitorControlImpl.class.getName(), component, parentNode);
 
 		// performs the NF assembly
@@ -315,7 +315,7 @@ public class Remmos {
 		try {
 			eventListenerItfType = new InterfaceType[] {
 					patf.createGCMItfType(EVENT_CONTROL_ITF, EventControl.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
-					patf.createGCMItfType(LOG_HANDLER_ITF, LogHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+					patf.createGCMItfType(LOG_HANDLER_ITF, RecordHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			eventListenerType = patf.createFcType(eventListenerItfType);
 			eventListener = pagf.newNFcInstance(eventListenerType,
@@ -345,7 +345,7 @@ public class Remmos {
 		
 		try {
 			logStoreItfType = new InterfaceType[] {
-				patf.createGCMItfType(LOG_HANDLER_ITF, LogHandler.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+				patf.createGCMItfType(LOG_HANDLER_ITF, RecordHandler.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 		logStoreType = patf.createFcType(logStoreItfType);
 		logStore = pagf.newNFcInstance(logStoreType, 
@@ -377,7 +377,7 @@ public class Remmos {
 		
 		// Create the interface type, according to the client/server functional interfaces on the component
 		try {
-			monitorServiceItfTypeList.add(patf.createGCMItfType(LOG_HANDLER_ITF, LogHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+			monitorServiceItfTypeList.add(patf.createGCMItfType(LOG_HANDLER_ITF, RecordHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			monitorServiceItfTypeList.add(patf.createGCMItfType(EVENT_CONTROL_ITF, EventControl.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			monitorServiceItfTypeList.add(patf.createGCMItfType(MONITOR_SERVICE_ITF, MonitorControl.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 		} catch (InstantiationException e) {

@@ -9,12 +9,12 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.core.component.Constants;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.CallRecord;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.OutgoingRequestRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.PathItem;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestRecord;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.IncomingRequestRecord;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 
@@ -71,8 +71,8 @@ public class RemmosUtils {
 			e.printStackTrace();
 		}
 		
-		Map<ComponentRequestID, RequestRecord> requestLog = null;
-		Map<ComponentRequestID, CallRecord> callLog = null;
+		Map<ComponentRequestID, IncomingRequestRecord> requestLog = null;
+		Map<ComponentRequestID, OutgoingRequestRecord> callLog = null;
 		
 		try {
 			requestLog = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getRequestLog();
@@ -90,12 +90,12 @@ public class RemmosUtils {
 		System.out.println();
 	}
 
-    public static void displayRequestLog(Map<ComponentRequestID, RequestRecord> requestLog) {
+    public static void displayRequestLog(Map<ComponentRequestID, IncomingRequestRecord> requestLog) {
     	if(requestLog == null)
     		return;    	
     	Iterator<ComponentRequestID> i = requestLog.keySet().iterator();
     	ComponentRequestID crID;
-    	RequestRecord rs;
+    	IncomingRequestRecord rs;
     	while(i.hasNext()) {
     		crID = i.next();
     		rs = requestLog.get(crID);
@@ -108,12 +108,12 @@ public class RemmosUtils {
     	}
     }
 
-	public static void displayCallLog(Map<ComponentRequestID, CallRecord> callLog) {
+	public static void displayCallLog(Map<ComponentRequestID, OutgoingRequestRecord> callLog) {
 		if(callLog == null)
 			return;
     	Iterator<ComponentRequestID> i = callLog.keySet().iterator();
     	ComponentRequestID crID;
-    	CallRecord cs;
+    	OutgoingRequestRecord cs;
     	long wbnTime = 0;
     	Long start, stop;
     	Map<Long,Long> wbnStart;
@@ -181,7 +181,7 @@ public class RemmosUtils {
 		}
 		List<ComponentRequestID> requests = null;
 		try {
-			requests = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getListOfRequestIDs();
+			requests = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getListOfIncomingRequestIDs();
 		} catch (NoSuchInterfaceException e) {
 			e.printStackTrace();
 		}
@@ -204,7 +204,7 @@ public class RemmosUtils {
 		}
 		List<ComponentRequestID> calls = null;
 		try {
-			calls = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getListOfCallIDs();
+			calls = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getListOfOutgoingRequestIDs();
 		} catch (NoSuchInterfaceException e) {
 			e.printStackTrace();
 		}

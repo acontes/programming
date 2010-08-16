@@ -1,6 +1,5 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
-public enum RecordType {
-	OutgoingRequestRecord,
-	IncomingRequestRecord
+public interface Transformation<S,T> {
+	T execute(S target);
 }

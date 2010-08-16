@@ -67,7 +67,8 @@ public class MonitorConsole {
 	final String COM_ADD_RECONF = "ar";
 	
 	final String COM_NOTIF = "n";
-	final String COM_REQ_LIST = "req";
+	final String COM_INC_REQ_LIST = "incr";
+	final String COM_OUT_REQ_LIST = "outr";
 	final String COM_PATH = "p";
 	
 	final String COM_QUIT = "q";
@@ -80,7 +81,8 @@ public class MonitorConsole {
 			{"palog", "enable/disable ProActive logging messages"},
 			{COM_CLEAR, "clear (reset) the logs"},
 			{COM_NOTIF, "show notifications received (DEBUG)"},
-			{COM_REQ_LIST, "show list of Request IDs served by this component"},
+			{COM_INC_REQ_LIST, "list IDs of Request that have been received by the specified component"},
+			{COM_OUT_REQ_LIST, "list IDs of Request that have been sent by the specified component"},
 			{COM_ADD_COM, "add component url to the list of managed components"},
 			{COM_LIST, "list the names of all managed components"},
 			{COM_DESCRIBE, "describe all managed components"},
@@ -225,7 +227,7 @@ public class MonitorConsole {
 					}
 				}
 			}
-			// Enables monitoring to all the components connected to this one.
+			// Enables monitoring to all the components connected from the current.
 			else if(command.equals(COM_ENABLE_MON)) {
 				System.out.println("Enabling monitoring from component "+ currentRep.getComponentParameters().getName());
 				Remmos.enableMonitoring(current);
@@ -249,25 +251,26 @@ public class MonitorConsole {
 					monitoring = false;
 				}
 			}
-			
-			
-			
-			
+			// Display the logs in all managed components, or in the component specified
 			else if(command.equals("l")) {
-				System.out.println("Resulting logs: ");
-				for(Component comp : managedComponents.values()) {
-					RemmosUtils.displayLogs(comp);
-				}	
-			}
-			else if(command.equals("e")) {
-				if(!palogging) {
-					System.out.println("ProActive logging ON");
-					palogging = true;
+				// args supplied --> logs of specified component
+				if(args != null) {
+					String name = args.split("[ ]+", 2)[0];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+					}
+					else {
+						RemmosUtils.displayLogs(found);
+					}
 				}
+				// no args ... logs of all components
 				else {
-					System.out.println("ProActive logging OFF");
-					palogging = false;
+					for(Component comp : managedComponents.values()) {
+						RemmosUtils.displayLogs(comp);
+					}
 				}
+					
 			}
 			else if(command.equals("m")) {
 				if(!monitoring) {
@@ -293,24 +296,73 @@ public class MonitorConsole {
 				}
 				System.out.println("Logs cleared");
 			}
+			else if(command.equals(COM_INC_REQ_LIST)) {
+				// args supplied --> reqs of specified component
+				if(args != null) {
+					String name = args.split("[ ]+", 2)[0];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+					}
+					else {
+						RemmosUtils.displayReqs(found);
+					}
+				}
+				// no args ... request on all components
+				else {
+					for(Component comp : managedComponents.values()) {
+						RemmosUtils.displayReqs(comp);
+					}
+				}	
+			}
+			else if(command.equals(COM_OUT_REQ_LIST)) {
+				// args supplied --> calls on specified component
+				if(args != null) {
+					String name = args.split("[ ]+", 2)[0];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+					}
+					else {
+						RemmosUtils.displayCalls(found);
+					}
+				}
+				// no args ... calls on all components
+				else {
+					for(Component comp : managedComponents.values()) {
+						RemmosUtils.displayCalls(comp);
+					}
+				}
+			}
+			else if(command.equals("p")) {
+				if(args != null) {
+					String name = args.split("[ ]+", 2)[0];
+					long id = Long.parseLong(name);
+					System.out.println("Path from "+ currentRep.getComponentParameters().getName()+ ", for request "+ id);
+					RequestPath rp = ((MonitorControl)current.getFcInterface(Constants.MONITOR_CONTROLLER)).getPathForID(new ComponentRequestID(id));
+					RemmosUtils.displayPath(rp);
+				}
+				else {
+					System.out.println("Usage: p <reqID>. Use commands '"+ COM_OUT_REQ_LIST +"' to see a list of calls on a component");
+				}
+			}
+			
+			else if(command.equals("e")) {
+				if(!palogging) {
+					System.out.println("ProActive logging ON");
+					palogging = true;
+				}
+				else {
+					System.out.println("ProActive logging OFF");
+					palogging = false;
+				}
+			}
 			else if(command.equals("n")) {
 				for(Component comp : managedComponents.values()) {
 					RemmosUtils.displayNotifs(comp);
 				}
 			}
-			else if(command.equals("req")) {
-				for(Component comp : managedComponents.values()) {
-					RemmosUtils.displayReqs(comp);
-				}
-			}
-			else if(command.equals("p")) {
-				RemmosUtils.displayCalls(current);
-				System.out.println("ID: ");
-				long id = Long.parseLong(sc.nextLine());
-				System.out.println("Path from "+ currentRep.getComponentParameters().getName()+ ", for request "+ id);
-				RequestPath rp = ((MonitorControl)current.getFcInterface(Constants.MONITOR_CONTROLLER)).getPathForID(new ComponentRequestID(id));
-				RemmosUtils.displayPath(rp);
-			}
+			
 		}
 
 		// Finish

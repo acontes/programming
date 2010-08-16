@@ -55,7 +55,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 
-	private LogHandler logHandler;
+	private RecordHandler logHandler;
 	private String[] itfs = {"log-handler-nf"};
 
 	/** Connection to a ProActive BodyWrapperMBean 
@@ -352,19 +352,19 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	RequestRecord rs;
+    	IncomingRequestRecord rs;
     	// checks if the request data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		// if the key was already there, it has to modify it to add the arrival time
     		//logger.debug("Updating RequestRecord on LogStore, component "+ this.monitoredComponentName);
     		//rs = (RequestRecord) logHandler.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchRequestRecord(current);
+    		rs = logHandler.fetchIncomingRequestRecord(current);
     		rs.setArrivalTime(notification.getTimeStamp());
     	}
     	else {
     		// if there was no key, then it has to insert a new one
     		//logger.debug("Creating new RequestRecord on LogStore, component "+ this.monitoredComponentName);
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp(), root);
+    		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp(), root);
     	}
     	logHandler.insert(rs);
     }
@@ -394,17 +394,17 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	RequestRecord rs;
+    	IncomingRequestRecord rs;
     	// checks if the request data has already been entered in the map (should exist already)
-    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchRequestRecord(current);	
+    		rs = logHandler.fetchIncomingRequestRecord(current);	
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and be updated later,
     	// when the corresponding requestReceived notification be processed
     	else {
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
+    		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
@@ -433,17 +433,17 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	RequestRecord rs;
+    	IncomingRequestRecord rs;
     	// checks if the request data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchRequestRecord(current);
+    		rs = logHandler.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed
     	else {
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
+    		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
@@ -476,18 +476,18 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	CallRecord cs;
+    	OutgoingRequestRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchCallRecord(current);
+    		cs = logHandler.fetchOutgoingRequestRecord(current);
     		cs.setSentTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		//logger.debug("Creating new CallRecord on LogStore, component "+ this.monitoredComponentName + ", ID: "+ current);
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false, root);
+    		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false, root);
     		//cs.setReplyReceptionTime(notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
@@ -520,17 +520,17 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	CallRecord cs;
+    	OutgoingRequestRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchCallRecord(current);
+    		cs = logHandler.fetchOutgoingRequestRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
+    		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
     	}
@@ -561,16 +561,16 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	CallRecord cs;
+    	OutgoingRequestRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchCallRecord(current);
+    		cs = logHandler.fetchOutgoingRequestRecord(current);
     		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
+    		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
@@ -601,17 +601,17 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
-    	RequestRecord rs;
+    	IncomingRequestRecord rs;
     	// checks if the request data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.RequestRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchRequestRecord(current);
+    		rs = logHandler.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed
     	else {
-    		rs = new RequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
+    		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	logHandler.insert(rs);
@@ -643,16 +643,16 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	if(interfaceName.equals("-")) {
     		return;
     	}
-    	CallRecord cs;
+    	OutgoingRequestRecord cs;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.CallRecord).booleanValue()) {
+    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchCallRecord(current);
+    		cs = logHandler.fetchOutgoingRequestRecord(current);
     		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		cs = new CallRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
+    		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	logHandler.insert(cs);
@@ -698,7 +698,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
 		if(cItf.equals("log-handler-nf")) {
-			logHandler = (LogHandler) sItf;
+			logHandler = (RecordHandler) sItf;
 			return;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
