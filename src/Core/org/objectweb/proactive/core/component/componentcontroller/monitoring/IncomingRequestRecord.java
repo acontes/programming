@@ -81,6 +81,10 @@ public class IncomingRequestRecord extends AbstractRecord implements Serializabl
 		return finished;
 	}
 	
+	public void setFinished(boolean finished) {
+		this.finished = finished;
+	}
+	
 	public ComponentRequestID getRootID() {
 		return rootID;
 	}

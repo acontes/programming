@@ -51,20 +51,23 @@ public interface MonitorControl extends MonitorController {
     RequestPath getPathStatisticsForId(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
     
     /**
-     * Get the list of entries in the Request Log
+     * Get the list of entries in the Incoming Request Log
      * @return
      */
-    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, IncomingRequestRecord> getRequestLog();
+    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, IncomingRequestRecord> getIncomingRequestLog();
     
     /**
-     * Get the list of entries in the Call Log
+     * Get the list of entries in the Outgoing Request Log
      * @return
      */
-    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, OutgoingRequestRecord> getCallLog();
+    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, OutgoingRequestRecord> getOutgoingRequestLog();
     
     List<String> getNotificationsReceived(); 
     
     String getMonitoredComponentName();
+    
+    void addMetric(String name, Metric metric);
+    Object getMetricValue(String name, Object[] params);
 	
 	
 	

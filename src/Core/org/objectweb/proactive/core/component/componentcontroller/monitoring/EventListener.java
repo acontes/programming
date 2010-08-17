@@ -55,8 +55,8 @@ public class EventListener extends AbstractPAComponentController implements Noti
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 
-	private RecordHandler logHandler;
-	private String[] itfs = {"log-handler-nf"};
+	private RecordStore logHandler;
+	private String[] itfs = {"record-store-nf"};
 
 	/** Connection to a ProActive BodyWrapperMBean 
 	 *  In real terms, this connection should be to a (still inexistent) ComponentWrapperMBean. */
@@ -104,33 +104,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
             started = true;
             logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);
             System.out.println("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);            
-//            System.out.println("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL+" @ " +FactoryName.getJMXServerName(runtimeURL) + " ... " + FactoryName.getJMXServerName(runtimeURL));
-            
-            // trying to find lost JMX Notifications (but it's not so important now)
-//            ConnectionTest ct = new ConnectionTest();
-//            JMXServiceURL jmxUrl = null;
-//            String url = URIBuilder.buildURI(URIBuilder.getHostNameFromUrl(FactoryName.getCompleteUrl(runtimeURL)),
-//                    ProActiveJMXConstants.SERVER_REGISTERED_NAME+"_"+FactoryName.getJMXServerName(runtimeURL), "service:jmx:proactive",
-//                    URIBuilder.getPortNumber(FactoryName.getCompleteUrl(runtimeURL))).toString();
-//            System.out.println("URL: "+ url);
-//            try {
-//				jmxUrl = new JMXServiceURL(url);
-//			} catch (MalformedURLException e1) {
-//				// TODO Auto-generated catch block
-//				e1.printStackTrace();
-//			}
-//			System.out.println("JMXServiceURL = "+ jmxUrl);
-//
-//            JMXConnector connector = null;
-//            try {
-//				connector = JMXConnectorFactory.connect(jmxUrl, ProActiveJMXConstants.PROACTIVE_JMX_ENV);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//            if(connector != null) {
-//            	connector.addConnectionNotificationListener(ct, null, null);
-//            }
-//            System.out.println("-----------------------------------------------------------------------------------");
+
 		}
 	}
 	
@@ -526,6 +500,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = logHandler.fetchOutgoingRequestRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
+    		cs.setFinished(true);
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
@@ -607,6 +582,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
     		rs = logHandler.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
+    		rs.setFinished(true);
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed
@@ -697,8 +673,8 @@ public class EventListener extends AbstractPAComponentController implements Noti
 	public void bindFc(String cItf, Object sItf)
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
-		if(cItf.equals("log-handler-nf")) {
-			logHandler = (RecordHandler) sItf;
+		if(cItf.equals("record-store-nf")) {
+			logHandler = (RecordStore) sItf;
 			return;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
@@ -711,7 +687,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
 
 	@Override
 	public Object lookupFc(String cItf) throws NoSuchInterfaceException {
-		if(cItf.equals("log-handler-nf")) {
+		if(cItf.equals("record-store-nf")) {
 			return logHandler;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
@@ -720,7 +696,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
 	@Override
 	public void unbindFc(String cItf) throws NoSuchInterfaceException,
 			IllegalBindingException, IllegalLifeCycleException {
-		if(cItf.equals("log-handler-nf")) {
+		if(cItf.equals("record-store-nf")) {
 			logHandler = null;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
@@ -729,13 +705,4 @@ public class EventListener extends AbstractPAComponentController implements Noti
 	
 }
 
-/*
-class ConnectionTest implements NotificationListener {
 
-	@Override
-	public void handleNotification(Notification notification, Object handback) {
-		System.out.println("+++++++++++++++++++++++++++++++++++++++ Notification: "+ notification);
-		
-	}
-	
-}*/

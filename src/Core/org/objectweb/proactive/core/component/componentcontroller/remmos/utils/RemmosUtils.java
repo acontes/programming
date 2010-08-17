@@ -75,8 +75,8 @@ public class RemmosUtils {
 		Map<ComponentRequestID, OutgoingRequestRecord> callLog = null;
 		
 		try {
-			requestLog = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getRequestLog();
-			callLog = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getCallLog();
+			requestLog = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getIncomingRequestLog();
+			callLog = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getOutgoingRequestLog();
 		} catch (NoSuchInterfaceException e) {
 			e.printStackTrace();
 		}

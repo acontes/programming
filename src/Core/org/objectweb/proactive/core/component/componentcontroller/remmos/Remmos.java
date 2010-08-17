@@ -24,8 +24,10 @@ import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventListener;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordHandler;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.MetricsStore;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.MetricsStoreImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordStore;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordStoreImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlImpl;
 import org.objectweb.proactive.core.component.control.PABindingController;
@@ -64,8 +66,9 @@ public class Remmos {
 	
 	// Monitor-related Components
 	public static final String EVENT_LISTENER_COMP = "event-listener-NF";
-	public static final String LOG_STORE_COMP = "log-store-NF";
+	public static final String RECORD_STORE_COMP = "record-store-NF";
 	public static final String MONITOR_SERVICE_COMP = "monitor-service-NF";
+	public static final String METRICS_STORE_COMP = "metrics-store-NF";
 	
 	// SLA Management-related Components
 	public static final String SLA_MANAGER_COMP = "sla-manager-NF";
@@ -75,8 +78,9 @@ public class Remmos {
 	
 	// Interfaces
 	public static final String EVENT_CONTROL_ITF = "event-control-nf";
-	public static final String LOG_HANDLER_ITF = "log-handler-nf";
+	public static final String RECORD_STORE_ITF = "record-store-nf";
 	public static final String MONITOR_SERVICE_ITF = "monitor-service-nf";
+	public static final String METRICS_STORE_ITF = "metrics-store-nf";
 	public static final String SLA_MGMT_ITF = "sla-management-nf";
 	public static final String ACTIONS_ITF = "actions-nf";
 	
@@ -229,13 +233,14 @@ public class Remmos {
 		
 		// creates the components used for monitoring
 		Component eventListener = createBasicEventListener(patf, pagf, EventListener.class.getName(), parentNode);
-		Component logStore = createBasicLogStore(patf, pagf, RecordStore.class.getName(), parentNode);
+		Component recordStore = createBasicRecordStore(patf, pagf, RecordStoreImpl.class.getName(), parentNode);
 		Component monitorService = createMonitorService(patf, pagf, MonitorControlImpl.class.getName(), component, parentNode);
+		Component metricsStore = createBasicMetricsStore(patf, pagf, MetricsStoreImpl.class.getName(), parentNode);
 
 		// performs the NF assembly
 		PAMembraneController membrane = Utils.getPAMembraneController(component);
 		PAGCMLifeCycleController lifeCycle = Utils.getPAGCMLifeCycleController(component);
-		// stop the membrane before making changes
+		// stop the membrane and component lifecycle before making changes
 		String membraneOldState = membrane.getMembraneState();
 		String componentOldState = lifeCycle.getFcState();
 		membrane.stopMembrane();
@@ -245,12 +250,15 @@ public class Remmos {
 		
 		// add components to the membrane
 		membrane.addNFSubComponent(eventListener);
-		membrane.addNFSubComponent(logStore);
+		membrane.addNFSubComponent(recordStore);
 		membrane.addNFSubComponent(monitorService);
+		membrane.addNFSubComponent(metricsStore);
 		// bindings between NF components
 		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+EVENT_CONTROL_ITF, EVENT_LISTENER_COMP+"."+EVENT_CONTROL_ITF);
-		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+LOG_HANDLER_ITF, LOG_STORE_COMP+"."+LOG_HANDLER_ITF);
-		membrane.bindNFc(EVENT_LISTENER_COMP+"."+LOG_HANDLER_ITF, LOG_STORE_COMP+"."+LOG_HANDLER_ITF);
+		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
+		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+METRICS_STORE_ITF, METRICS_STORE_COMP+"."+METRICS_STORE_ITF);
+		membrane.bindNFc(EVENT_LISTENER_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
+		membrane.bindNFc(METRICS_STORE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
 		// binding between the NF Monitoring Interface of the host component, and the Monitor Component
 		membrane.bindNFc(Constants.MONITOR_CONTROLLER, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
 		// bindings between the Monitor Component and the external client NF monitoring interfaces
@@ -290,7 +298,7 @@ public class Remmos {
 		}
 		
 		
-		// restore membrane state after having made changes
+		// restore membrane and component lifecycle after having made changes
 		if(membraneOldState.equals(PAMembraneController.MEMBRANE_STARTED)) {
 			membrane.startMembrane();
 		}
@@ -298,6 +306,7 @@ public class Remmos {
 			lifeCycle.startFc();
 		}
 		
+		logger.debug("   Done for component ["+pac.getComponentParameters().getName()+"] !");
 	}
 	
 	/**
@@ -315,7 +324,7 @@ public class Remmos {
 		try {
 			eventListenerItfType = new InterfaceType[] {
 					patf.createGCMItfType(EVENT_CONTROL_ITF, EventControl.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
-					patf.createGCMItfType(LOG_HANDLER_ITF, RecordHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			eventListenerType = patf.createFcType(eventListenerItfType);
 			eventListener = pagf.newNFcInstance(eventListenerType,
@@ -331,35 +340,66 @@ public class Remmos {
 	}
 
 	/**
-	 * Creates the NF Log Store component
+	 * Creates the NF Record Store component
 	 * @param patf
 	 * @param pagf
 	 * @param logStoreClass
 	 * @return
 	 */
-	private static Component createBasicLogStore(PAGCMTypeFactory patf, PAGenericFactory pagf, String logStoreClass, Node node) {
+	private static Component createBasicRecordStore(PAGCMTypeFactory patf, PAGenericFactory pagf, String recordStoreClass, Node node) {
 		
-		Component logStore = null;
-		InterfaceType[] logStoreItfType = null;
-		ComponentType logStoreType = null;
+		Component recordStore = null;
+		InterfaceType[] recordStoreItfType = null;
+		ComponentType recordStoreType = null;
 		
 		try {
-			logStoreItfType = new InterfaceType[] {
-				patf.createGCMItfType(LOG_HANDLER_ITF, RecordHandler.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+			recordStoreItfType = new InterfaceType[] {
+					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
-		logStoreType = patf.createFcType(logStoreItfType);
-		logStore = pagf.newNFcInstance(logStoreType, 
-				new ControllerDescription(LOG_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
-				new ContentDescription(logStoreClass),
-				node
-		);
+			recordStoreType = patf.createFcType(recordStoreItfType);
+			recordStore = pagf.newNFcInstance(recordStoreType, 
+					new ControllerDescription(RECORD_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
+					new ContentDescription(recordStoreClass),
+					node
+			);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		}
+
+		return recordStore;
+	}
+
+	/**
+	 * Creates the NF Metrics Store component
+	 * @param patf
+	 * @param pagf
+	 * @param metricsStoreClass
+	 * @param node
+	 * @return
+	 */
+	private static Component createBasicMetricsStore(PAGCMTypeFactory patf, PAGenericFactory pagf, String metricsStoreClass, Node node) {
+		
+		Component metricsStore = null;
+		InterfaceType[] metricsStoreItfType = null;
+		ComponentType metricsStoreType = null;
+		
+		try {
+			metricsStoreItfType = new InterfaceType[] {
+					patf.createGCMItfType(METRICS_STORE_ITF, MetricsStore.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+			};
+			metricsStoreType = patf.createFcType(metricsStoreItfType);
+			metricsStore = pagf.newNFcInstance(metricsStoreType, 
+					new ControllerDescription(METRICS_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
+					new ContentDescription(metricsStoreClass),
+					node
+			);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		}
 		
-		return logStore;
+		return metricsStore;
 	}
-	
 	/**
 	 * Creates the NF Monitor Service component
 	 * @param patf
@@ -377,8 +417,9 @@ public class Remmos {
 		
 		// Create the interface type, according to the client/server functional interfaces on the component
 		try {
-			monitorServiceItfTypeList.add(patf.createGCMItfType(LOG_HANDLER_ITF, RecordHandler.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			monitorServiceItfTypeList.add(patf.createGCMItfType(EVENT_CONTROL_ITF, EventControl.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+			monitorServiceItfTypeList.add(patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+			monitorServiceItfTypeList.add(patf.createGCMItfType(METRICS_STORE_ITF, MetricsStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));			
 			monitorServiceItfTypeList.add(patf.createGCMItfType(MONITOR_SERVICE_ITF, MonitorControl.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 		} catch (InstantiationException e) {
 			e.printStackTrace();

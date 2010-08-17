@@ -19,8 +19,10 @@ import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.metrics.MetricsLibrary;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.RemmosUtils;
 import org.objectweb.proactive.core.component.control.PABindingController;
@@ -54,7 +56,7 @@ public class MonitorConsole {
 	final String COM_MON = "m";
 	final String COM_CLEAR = "c";
 	
-	final String COM_ADD_COM = "a";
+	final String COM_ADD_COMP = "a";
 	final String COM_LIST = "ls";
 	final String COM_DESCRIBE = "desc";
 	final String COM_DISC = "disc";
@@ -71,25 +73,29 @@ public class MonitorConsole {
 	final String COM_OUT_REQ_LIST = "outr";
 	final String COM_PATH = "p";
 	
+	final String COM_ADD_METRIC = "addMetric";
+	final String COM_EXEC_METRIC = "getMetric";
+	final String COM_RM_METRIC = "rmMetric";
+	
 	final String COM_QUIT = "q";
 	
 	final String commandDescriptions[][] = {
 			{COM_HELP, "help"}, 
 			{COM_LOGS, "display logs"},
-			{"r", "execute (send a message)"},
 			{COM_MON, "start/stop monitoring in all reachable components"},
-			{"palog", "enable/disable ProActive logging messages"},
 			{COM_CLEAR, "clear (reset) the logs"},
 			{COM_NOTIF, "show notifications received (DEBUG)"},
 			{COM_INC_REQ_LIST, "list IDs of Request that have been received by the specified component"},
 			{COM_OUT_REQ_LIST, "list IDs of Request that have been sent by the specified component"},
-			{COM_ADD_COM, "add component url to the list of managed components"},
+			{COM_ADD_COMP, "add component url to the list of managed components"},
 			{COM_LIST, "list the names of all managed components"},
 			{COM_DESCRIBE, "describe all managed components"},
 			{COM_DISC, "discover more components starting from the current"},
 			{COM_CURRENT, "show current component / set current component"},
 			{COM_ADD_MON, "add monitoring capabilities (NF components) to a component"},
 			{COM_ENABLE_MON, "enable monitoring by connecting monitoring interfaces of related components"},
+			{COM_ADD_METRIC, "add metric to specified component"},
+			{COM_RM_METRIC, "remove metric from specified component"},
 			{COM_ADD_SLA, "add SLA monitoring capabilities (NF components) to a component"},
 			{COM_ADD_RECONF, "add reconfiguration capabilities (NF components) to a component"},
 			{COM_PATH, "get path for a request"},
@@ -154,9 +160,9 @@ public class MonitorConsole {
 			else if(command.equals(COM_HELP)) {
 				displayHelp();
 			}
-			else if(command.equals(COM_ADD_COM)) {
+			else if(command.equals(COM_ADD_COMP)) {
 				if(args == null) {
-					System.out.println("Usage: "+ COM_ADD_COM + " <url>");
+					System.out.println("Usage: "+ COM_ADD_COMP + " <url>");
 					continue;
 				}
 				String url = args.split("[ ]+", 2)[0];
@@ -334,7 +340,7 @@ public class MonitorConsole {
 					}
 				}
 			}
-			else if(command.equals("p")) {
+			else if(command.equals(COM_PATH)) {
 				if(args != null) {
 					String name = args.split("[ ]+", 2)[0];
 					long id = Long.parseLong(name);
@@ -343,20 +349,71 @@ public class MonitorConsole {
 					RemmosUtils.displayPath(rp);
 				}
 				else {
-					System.out.println("Usage: p <reqID>. Use commands '"+ COM_OUT_REQ_LIST +"' to see a list of calls on a component");
+					System.out.println("Usage: "+ COM_PATH +" <reqID>. Use commands '"+ COM_OUT_REQ_LIST +"' to see a list of calls on a component");
 				}
 			}
 			
-			else if(command.equals("e")) {
-				if(!palogging) {
-					System.out.println("ProActive logging ON");
-					palogging = true;
+			else if(command.equals(COM_ADD_METRIC)) {
+				if(args != null) {
+					String[] argsList = args.split("[ ]+", 2);
+					String name = argsList[0];
+					Component found = managedComponents.get(name);
+					if(found != null) {
+						if(argsList.length > 1) {
+							String metricName = argsList[1];
+							Metric metric = MetricsLibrary.getInstance().getMetric(metricName);
+							if(metric != null) {
+								((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).addMetric(metricName, metric);
+							}
+							else {
+								System.out.println("Metric "+name+" not found.");	
+							}
+						}
+						else {
+							System.out.println("No metric specified.");
+						}
+					}
+					else {
+						System.out.println("Component "+name+" not found.");
+					}
 				}
 				else {
-					System.out.println("ProActive logging OFF");
-					palogging = false;
+					System.out.println("Usage: "+ COM_ADD_METRIC +" <component> <metric_name>");
 				}
 			}
+			
+			else if(command.equals(COM_EXEC_METRIC)) {
+				if(args != null) {
+					String[] argsList = args.split("[ ]+", 2);
+					String name = argsList[0];
+					Component found = managedComponents.get(name);
+					if(found != null) {
+						if(argsList.length > 1) {
+							String metricName = argsList[1];
+							Metric metric = MetricsLibrary.getInstance().getMetric(metricName);
+							if(metric != null) {
+								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricValue(metricName, null);
+								System.out.println("Result = "+ result + "(class: "+result.getClass().getName()+")");
+							}
+							else {
+								System.out.println("Metric "+name+" not found.");	
+							}
+						}
+						else {
+							// here, instead, it could execute all the metrics
+							System.out.println("No metric specified.");
+						}
+					}
+					else {
+						System.out.println("Component "+name+" not found.");
+					}
+				}
+				else {
+					System.out.println("Usage: "+ COM_EXEC_METRIC +" <component> <metric_name>");
+				}
+			}
+
+			
 			else if(command.equals("n")) {
 				for(Component comp : managedComponents.values()) {
 					RemmosUtils.displayNotifs(comp);

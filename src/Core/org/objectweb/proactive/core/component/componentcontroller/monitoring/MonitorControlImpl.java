@@ -37,7 +37,8 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	private static final Logger RPlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST_PATH);
 	
 	private EventControl eventControl = null;
-	private RecordHandler logHandler = null;
+	private RecordStore recordStore = null;
+	private MetricsStore metricsStore = null;
 	
 	// interfaces for monitors of internal and external components
 	private Map<String, MonitorControl> externalMonitors = new HashMap<String, MonitorControl>();
@@ -45,7 +46,8 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	
 	private String basicItfs[] = {
 			Remmos.EVENT_CONTROL_ITF,
-			Remmos.LOG_HANDLER_ITF
+			Remmos.RECORD_STORE_ITF,
+			Remmos.METRICS_STORE_ITF
 			};
 	
 	/** Monitoring status */
@@ -108,7 +110,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
 	@Override
 	public void resetGCMMonitoring() {
-		this.logHandler.reset();
+		this.recordStore.reset();
 		this.eventControl.reset();
 	}
 
@@ -132,7 +134,8 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		
 		// start the other components of the framework
 		this.eventControl.start();
-		this.logHandler.init();
+		this.recordStore.init();
+		this.metricsStore.init();
 	}
 
 	@Override
@@ -144,12 +147,12 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	
 	// TODO
 	public List<ComponentRequestID> getListOfIncomingRequestIDs() {
-		return logHandler.getListOfRequestIDs();
+		return recordStore.getListOfRequestIDs();
 	}
 	
 	// TODO
 	public List<ComponentRequestID> getListOfOutgoingRequestIDs() {
-		return logHandler.getListOfCallIDs();
+		return recordStore.getListOfCallIDs();
 	}
 
 	/** 
@@ -160,7 +163,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	OutgoingRequestRecord cr;
     	
     	RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+")");
-    	cr = logHandler.fetchOutgoingRequestRecord(id);
+    	cr = recordStore.fetchOutgoingRequestRecord(id);
     	
     	ComponentRequestID rootID = cr.getRootID();
     	Set<String> visited = new HashSet<String>();
@@ -220,7 +223,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
 
     	// find, in the call log, the list of all calls that were made here, related to the same rootID
-    	branches = logHandler.getRequestRecordsFromRoot(rootID);
+    	branches = recordStore.getIncomingRequestRecordsFromRoot(rootID);
 
     	RPlogger.debug("["+localName+"] Branches: "+ branches.size());
 
@@ -231,9 +234,9 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
     		RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
     		// get the record of the request
-    		rr = logHandler.fetchIncomingRequestRecord(crid);
+    		rr = recordStore.fetchIncomingRequestRecord(crid);
     		// get all the calls that were sent while serving this request
-    		children = logHandler.getCallRecordsFromParent(crid);
+    		children = recordStore.getOutgoingRequestRecordsFromParent(crid);
 
 
     		// this path item represents the fact that the call arrived here
@@ -245,7 +248,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
     		// call each component to which a request was sent
     		for(ComponentRequestID childID : children.keySet()) {
-    			cr = logHandler.fetchOutgoingRequestRecord(childID);
+    			cr = recordStore.fetchOutgoingRequestRecord(childID);
     			// get the name of the component to call
     			destName = cr.getCalledComponent();
     			RPlogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
@@ -313,8 +316,12 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 			eventControl = (EventControl) sItf;
 			return;
 		}
-		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
-			logHandler = (RecordHandler) sItf;
+		if(cItf.equals(Remmos.RECORD_STORE_ITF)) {
+			recordStore = (RecordStore) sItf;
+			return;
+		}
+		if(cItf.equals(Remmos.METRICS_STORE_ITF)) {
+			metricsStore = (MetricsStore) sItf;
 			return;
 		}
 		// it refers to the monitoring interface of an external component (bound from an external client interface)
@@ -356,8 +363,11 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		if(cItf.equals(Remmos.EVENT_CONTROL_ITF)) {
 			return eventControl;
 		}
-		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
-			return logHandler;
+		if(cItf.equals(Remmos.RECORD_STORE_ITF)) {
+			return recordStore;
+		}
+		if(cItf.equals(Remmos.METRICS_STORE_ITF)) {
+			return metricsStore;
 		}
 		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
 			return externalMonitors.get(cItf);
@@ -374,8 +384,11 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		if(cItf.equals(Remmos.EVENT_CONTROL_ITF)) {
 			eventControl = null;
 		}
-		if(cItf.equals(Remmos.LOG_HANDLER_ITF)) {
-			logHandler = null;
+		if(cItf.equals(Remmos.RECORD_STORE_ITF)) {
+			recordStore = null;
+		}
+		if(cItf.equals(Remmos.METRICS_STORE_ITF)) {
+			metricsStore = null;
 		}
 		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
 			externalMonitors.put(cItf,null);
@@ -387,13 +400,13 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 
 	@Override
-	public Map<ComponentRequestID, OutgoingRequestRecord> getCallLog() {
-		return logHandler.getCallLog();
+	public Map<ComponentRequestID, IncomingRequestRecord> getIncomingRequestLog() {
+		return recordStore.getIncomingRequestRecords();
 	}
-
+	
 	@Override
-	public Map<ComponentRequestID, IncomingRequestRecord> getRequestLog() {
-		return logHandler.getRequestLog();
+	public Map<ComponentRequestID, OutgoingRequestRecord> getOutgoingRequestLog() {
+		return recordStore.getOutgoingRequestRecords();
 	}
 
 	@Override
@@ -401,7 +414,15 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		return hostComponent.getComponentParameters().getName();
 	}
 
+	@Override
+	public void addMetric(String name, Metric metric) {
+		metricsStore.addMetric(name, metric);		
+	}
 
+	@Override
+	public Object getMetricValue(String name, Object[] params) {
+		return metricsStore.calculate(name, params);
+	}
 
 
 

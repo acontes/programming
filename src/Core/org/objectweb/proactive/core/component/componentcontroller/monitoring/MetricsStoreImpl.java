@@ -8,18 +8,20 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
+import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class MetricsStoreImpl implements MetricsStore, BindingController {
+public class MetricsStoreImpl extends AbstractPAComponentController implements MetricsStore, BindingController {
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 	
 	Map<String, Metric> metrics;
 	
-	RecordHandler records;
+	RecordStore records;
 	
-	String[] itfList = {"records-nf"};
+	String[] itfList = {Remmos.RECORD_STORE_ITF};
 	
 	@Override
 	public void init() {
@@ -28,6 +30,7 @@ public class MetricsStoreImpl implements MetricsStore, BindingController {
 	
 	@Override
 	public void addMetric(String name, Metric metric) {
+		metric.setRecordSource(records);
 		metrics.put(name, metric);
 	}
 
@@ -81,30 +84,39 @@ public class MetricsStoreImpl implements MetricsStore, BindingController {
 	}
 
 	@Override
-	public void bindFc(String arg0, Object arg1)
+	public void bindFc(String itfName, Object obj)
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
-		// TODO Auto-generated method stub
-		
+		if(itfName.equals(Remmos.RECORD_STORE_ITF)) {
+			records = (RecordStore) obj;
+		}
+		else {
+			throw new NoSuchInterfaceException("Interface "+ itfName + " not found.");
+		}
 	}
 
 	@Override
 	public String[] listFc() {
-		// TODO Auto-generated method stub
-		return null;
+		return itfList;
 	}
 
 	@Override
-	public Object lookupFc(String arg0) throws NoSuchInterfaceException {
-		// TODO Auto-generated method stub
-		return null;
+	public Object lookupFc(String itfName) throws NoSuchInterfaceException {
+		if(itfName.equals(Remmos.RECORD_STORE_ITF)) {
+			return records;
+		}
+		throw new NoSuchInterfaceException("Interface "+ itfName + " not found.");
 	}
 
 	@Override
-	public void unbindFc(String arg0) throws NoSuchInterfaceException,
+	public void unbindFc(String itfName) throws NoSuchInterfaceException,
 			IllegalBindingException, IllegalLifeCycleException {
-		// TODO Auto-generated method stub
-		
+		if(itfName.equals(Remmos.RECORD_STORE_ITF)) {
+			records = null;
+		}
+		else {
+			throw new NoSuchInterfaceException("Interface "+ itfName + " not found.");
+		}
 	}
 
 

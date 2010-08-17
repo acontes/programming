@@ -1,6 +1,8 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
-public interface Condition<P> {
+import java.io.Serializable;
+
+public interface Condition<P> extends Serializable {
 	
 	boolean evaluate(P object);
 

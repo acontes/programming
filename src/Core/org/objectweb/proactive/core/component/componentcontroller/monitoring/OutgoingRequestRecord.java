@@ -102,6 +102,10 @@ public class OutgoingRequestRecord extends AbstractRecord implements Serializabl
 	public boolean isFinished() {
 		return finished;
 	}
+	
+	public void setFinished(boolean finished) {
+		this.finished = finished;
+	}
 
 	public boolean isVoidRequest() {
 		return voidRequest;

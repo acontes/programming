@@ -4,18 +4,21 @@ import java.io.Serializable;
 
 public abstract class Metric implements Serializable {
 
+	/** The record source */
+	protected RecordStore records = null;
+	
 	/** The value hold by the Metric */
-	Object value = null;
+	protected Object value = null;
 	
 	/** Metric must be updated or not */
-	boolean enabled = true;
+	protected boolean enabled = true;
 	
 	/**
 	 * Calculates the value of the metric, using the parameters provided
 	 * @param params
 	 * @return
 	 */
-	Object calculate(Object[] params) {
+	public Object calculate(Object[] params) {
 		return null;
 	}
 	
@@ -23,7 +26,7 @@ public abstract class Metric implements Serializable {
 	 * Returns the current value of the metric, without any recalculating
 	 * @return
 	 */
-	Object getValue() {
+	public Object getValue() {
 		return null;
 	}
 	
@@ -31,18 +34,22 @@ public abstract class Metric implements Serializable {
 	 * Sets arbitrarily the value of the metric
 	 * @param v
 	 */
-	void setValue(Object v) {
+	public void setValue(Object v) {
 		value = v;
 	}
 
 	/**
 	 * Enable/disable the metric. Default is enabled.
 	 */
-	void enable() {
+	public void enable() {
 		enabled = true;
 	}
-	void disable() {
+	public void disable() {
 		enabled = false;
+	}
+	
+	public void setRecordSource(RecordStore rs) {
+		records = rs;
 	}
 	
 }
