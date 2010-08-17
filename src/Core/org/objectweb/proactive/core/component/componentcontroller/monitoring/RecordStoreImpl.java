@@ -196,8 +196,15 @@ public class RecordStoreImpl extends AbstractPAComponentController implements Re
 	@Override
 	public List<OutgoingRequestRecord> getOutgoingRequestRecords(
 			Condition<OutgoingRequestRecord> condition) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		List<OutgoingRequestRecord> result = new ArrayList<OutgoingRequestRecord>();
+		// applies condition to all IncomingRequestRecords stored
+		for(OutgoingRequestRecord orr : outgoingRequestLog.values()) {
+			if(condition.evaluate(orr)) {
+				result.add(orr);
+			}
+		}
+		return result;
 	}
 
 	@Override

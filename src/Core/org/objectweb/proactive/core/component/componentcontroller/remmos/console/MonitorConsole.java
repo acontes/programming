@@ -366,7 +366,7 @@ public class MonitorConsole {
 								((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).addMetric(metricName, metric);
 							}
 							else {
-								System.out.println("Metric "+name+" not found.");	
+								System.out.println("Metric "+metricName+" not found.");	
 							}
 						}
 						else {
@@ -393,10 +393,10 @@ public class MonitorConsole {
 							Metric metric = MetricsLibrary.getInstance().getMetric(metricName);
 							if(metric != null) {
 								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricValue(metricName, null);
-								System.out.println("Result = "+ result + "(class: "+result.getClass().getName()+")");
+								System.out.println("Result = "+ result);
 							}
 							else {
-								System.out.println("Metric "+name+" not found.");	
+								System.out.println("Metric "+metricName+" not found.");	
 							}
 						}
 						else {
