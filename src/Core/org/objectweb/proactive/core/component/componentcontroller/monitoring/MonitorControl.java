@@ -67,7 +67,10 @@ public interface MonitorControl extends MonitorController {
     String getMonitoredComponentName();
     
     void addMetric(String name, Metric metric);
-    Object getMetricValue(String name, Object[] params);
+    Object runMetric(String name, Object[] params);
+    Object getMetricValue();
+    
+    Set<String> getMetricList();
 	
 	
 	

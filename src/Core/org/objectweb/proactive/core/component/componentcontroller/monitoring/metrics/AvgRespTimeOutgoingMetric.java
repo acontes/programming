@@ -3,7 +3,6 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring.me
 import java.util.List;
 
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Condition;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.IncomingRequestRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.OutgoingRequestRecord;
 
@@ -14,9 +13,9 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Out
  *
  */
 
-public class AvgRespTimeOutgoingMetric extends Metric {
+public class AvgRespTimeOutgoingMetric extends Metric<Double> {
 
-	public Object calculate(Object[] params) {
+	public Double calculate(final Object[] params) {
 
 		List<OutgoingRequestRecord> recordList = null;
 		recordList = records.getOutgoingRequestRecords(new Condition<OutgoingRequestRecord>(){
@@ -27,6 +26,7 @@ public class AvgRespTimeOutgoingMetric extends Metric {
 			}
 		}
 		);
+		
 		// and calculates the average
 		double sum = 0.0;
 		double nRecords = recordList.size();
@@ -36,10 +36,6 @@ public class AvgRespTimeOutgoingMetric extends Metric {
 			}
 		}
 		value = sum/nRecords;
-		return value;
-	}
-	
-	public Object getValue() {
 		return value;
 	}
 	

@@ -2,13 +2,19 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 import java.io.Serializable;
 
-public abstract class Metric implements Serializable {
+/**
+ * Parent class for all metrics, which produce a value of type T.
+ * @author cruz
+ *
+ * @param <T>
+ */
+public abstract class Metric<T> implements Serializable {
 
 	/** The record source */
 	protected RecordStore records = null;
 	
 	/** The value hold by the Metric */
-	protected Object value = null;
+	protected T value = null;
 	
 	/** Metric must be updated or not */
 	protected boolean enabled = true;
@@ -18,23 +24,23 @@ public abstract class Metric implements Serializable {
 	 * @param params
 	 * @return
 	 */
-	public Object calculate(Object[] params) {
+	public T calculate(final Object[] params) {
 		return null;
 	}
 	
 	/**
-	 * Returns the current value of the metric, without any recalculating
+	 * Returns the current value of the metric, without any recalculation
 	 * @return
 	 */
-	public Object getValue() {
-		return null;
+	public T getValue() {
+		return value;
 	}
 	
 	/**
 	 * Sets arbitrarily the value of the metric
 	 * @param v
 	 */
-	public void setValue(Object v) {
+	public void setValue(T v) {
 		value = v;
 	}
 

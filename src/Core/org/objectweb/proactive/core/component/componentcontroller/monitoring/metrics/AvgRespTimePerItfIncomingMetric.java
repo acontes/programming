@@ -13,20 +13,23 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Met
  *
  */
 
-public class AvgRespTimeIncomingMetric extends Metric<Double> {
+public class AvgRespTimePerItfIncomingMetric extends Metric<Double> {
 
 	public Double calculate(final Object[] params) {
 
 		List<IncomingRequestRecord> recordList = null;
 		recordList = records.getIncomingRequestRecords(new Condition<IncomingRequestRecord>(){
-			// condition that returns true for every record
+			// condition that returns true for every record that belongs to a given interface
 			@Override
 			public boolean evaluate(IncomingRequestRecord irr) {
-				return true;
+				String name = (String) params[0];
+				if(irr.getInterfaceName().equals(name)) {
+					return true;
+				}
+				return false;
 			}
 		}
 		);
-		
 		// and calculates the average
 		double sum = 0.0;
 		double nRecords = recordList.size();
@@ -38,7 +41,7 @@ public class AvgRespTimeIncomingMetric extends Metric<Double> {
 		value = sum/nRecords;
 		return value;
 	}
-	
+		
 }
 
 

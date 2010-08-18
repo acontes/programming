@@ -3,7 +3,6 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring.me
 import java.util.List;
 
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Condition;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.IncomingRequestRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.OutgoingRequestRecord;
 
@@ -14,16 +13,20 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Out
  *
  */
 
-public class AvgRespTimePerItfOutgoingMetric<T> extends Metric {
+public class AvgRespTimePerItfOutgoingMetric extends Metric<Double> {
 
-	public Object calculate(Object[] params) {
+	public Double calculate(final Object[] params) {
 
 		List<OutgoingRequestRecord> recordList = null;
 		recordList = records.getOutgoingRequestRecords(new Condition<OutgoingRequestRecord>(){
-			// condition that returns true for every record
+			// condition that returns true for every record that belongs to a given interface
 			@Override
 			public boolean evaluate(OutgoingRequestRecord orr) {
-				return true;
+				String name = (String) params[0];
+				if(orr.getInterfaceName().equals(name)) {
+					return true;
+				}
+				return false;
 			}
 		}
 		);
@@ -36,15 +39,9 @@ public class AvgRespTimePerItfOutgoingMetric<T> extends Metric {
 			}
 		}
 		value = sum/nRecords;
-		Double s = new Double(3.0);
-	
 		return value;
 	}
-	
-	public Object getValue() {
-		return value;
-	}
-	
+		
 }
 
 

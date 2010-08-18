@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -17,7 +18,7 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 	
-	Map<String, Metric> metrics;
+	Map<String, Metric<?>> metrics;
 	
 	RecordStore records;
 	
@@ -25,11 +26,11 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 	
 	@Override
 	public void init() {
-		metrics = new HashMap<String, Metric>();
+		metrics = new HashMap<String, Metric<?>>();
 	}
 	
 	@Override
-	public void addMetric(String name, Metric metric) {
+	public void addMetric(String name, Metric<?> metric) {
 		metric.setRecordSource(records);
 		metrics.put(name, metric);
 	}
@@ -82,6 +83,12 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 			metric.setValue(v);
 		}
 	}
+	
+	@Override
+	public Set<String> getMetricList() {
+		return metrics.keySet();
+	}
+
 
 	@Override
 	public void bindFc(String itfName, Object obj)
@@ -118,6 +125,7 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 			throw new NoSuchInterfaceException("Interface "+ itfName + " not found.");
 		}
 	}
+
 
 
 }

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -60,7 +61,7 @@ public class MonitorConsole {
 	final String COM_LIST = "ls";
 	final String COM_DESCRIBE = "desc";
 	final String COM_DISC = "disc";
-	final String COM_CURRENT = "cur";
+	final String COM_CURRENT = "use";
 	
 	
 	final String COM_ADD_MON = "am";
@@ -74,7 +75,10 @@ public class MonitorConsole {
 	final String COM_PATH = "p";
 	
 	final String COM_ADD_METRIC = "addMetric";
-	final String COM_EXEC_METRIC = "getMetric";
+	final String COM_GET_METRIC = "getMetric";
+	final String COM_RUN_METRIC = "runMetric";
+	final String COM_LS_METRIC = "lsMetric";
+	final String COM_LS_LIB_METRIC = "metrics";
 	final String COM_RM_METRIC = "rmMetric";
 	
 	final String COM_QUIT = "q";
@@ -145,13 +149,13 @@ public class MonitorConsole {
 		while (running) {
 			
 			displayPrompt();
-			input = readCommand();
+			input = readCommand(); // would like to have a way to execute an script here
 			command = input[0];
-			if(input.length > 1) {
-				args = input[1];
+			if(input.length < 2) {
+				args = null;
 			}
 			else {
-				args = null;
+				args = input[1];
 			}
 			
 			if(command.equals(COM_QUIT)) {
@@ -160,44 +164,45 @@ public class MonitorConsole {
 			else if(command.equals(COM_HELP)) {
 				displayHelp();
 			}
+			// add a component
 			else if(command.equals(COM_ADD_COMP)) {
 				if(args == null) {
 					System.out.println("Usage: "+ COM_ADD_COMP + " <url>");
 					continue;
 				}
-				String url = args.split("[ ]+", 2)[0];
+				String url = input[1];
 				Component c = Fractive.lookup(url);
 				String name = ((PAComponent)c).getComponentParameters().getName();
 				System.out.println("Looked-up ["+name+"] @ ["+url+"]");
 				managedComponents.put(name, c);
 			}
+			// list comopnents
 			else if(command.equals(COM_LIST)) {
 				for(String name : managedComponents.keySet()) {
 					System.out.println("   "+ name);
 				}
 			}
+			// set current component
 			else if(command.equals(COM_CURRENT)) {
 				// args supplied --> set current component
 				if(args != null) {
-					String name = args.split("[ ]+", 2)[0];
+					String name = input[1];
 					Component found = managedComponents.get(name);
 					if(found == null) {
 						System.out.println("Component "+name+" not found.");
+						continue;
 					}
-					else {
-						current = found;
-					}
+					current = found;
 				}
 				// show current component
 				if(current == null) {
 					System.out.println("No component selected.");
+					continue;
 				}
-				else {
-					currentRep = (PAComponentRepresentative) current;
-					System.out.println("Current: "+ currentRep.getComponentParameters().getName());
-				}
+				currentRep = (PAComponentRepresentative) current;
+				System.out.println("Current: "+ currentRep.getComponentParameters().getName());
 			}
-			// Discovers all components connected to this one, and add them to the managed map.
+			// Discovers all components connected to the current one, and add them to the managed map.
 			else if(command.equals(COM_DISC)) {
 				if(current == null) {
 					System.out.println("No component seleted.");
@@ -213,17 +218,16 @@ public class MonitorConsole {
 			}
 			// Add monitoring capabilities to all the managed components or, if specified, only to one
 			else if(command.equals(COM_ADD_MON)) {
-				// args supplied --> add monitoring to specificed component
+				// args supplied --> add monitoring to specified component
 				if(args != null) {
-					String name = args.split("[ ]+", 2)[0];
+					String name = input[1];
 					Component found = managedComponents.get(name);
 					if(found == null) {
 						System.out.println("Component "+name+" not found.");
+						continue;
 					}
-					else {
-						System.out.println("Adding monitoring components to "+ name +" ...");
-						Remmos.addMonitoring(found);
-					}
+					System.out.println("Adding monitoring components to "+ name +" ...");
+					Remmos.addMonitoring(found);
 				}
 				// no args ... add monitoring to all components
 				else {
@@ -238,7 +242,7 @@ public class MonitorConsole {
 				System.out.println("Enabling monitoring from component "+ currentRep.getComponentParameters().getName());
 				Remmos.enableMonitoring(current);
 			}
-			// Starts the monitoring activity in all managed components
+			// Starts/stop the monitoring activity in all managed components
 			else if(command.equals("m")) {
 				if(!monitoring) {
 					System.out.println("Starting monitoring");
@@ -261,13 +265,11 @@ public class MonitorConsole {
 			else if(command.equals("l")) {
 				// args supplied --> logs of specified component
 				if(args != null) {
-					String name = args.split("[ ]+", 2)[0];
+					String name = input[1];
 					Component found = managedComponents.get(name);
 					if(found == null) {
 						System.out.println("Component "+name+" not found.");
-					}
-					else {
-						RemmosUtils.displayLogs(found);
+						continue;
 					}
 				}
 				// no args ... logs of all components
@@ -278,41 +280,37 @@ public class MonitorConsole {
 				}
 					
 			}
-			else if(command.equals("m")) {
-				if(!monitoring) {
-					System.out.println("Starting monitoring");
-					for(Component comp : managedComponents.values()) {
-						((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).startMonitoring();
+			// Clear the logs in all managed components, or in the component specified
+			else if(command.equals("c")) {
+				// args supplied --> clear specified component
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Cmponent "+name+" not found.");
+						continue;
 					}
-					System.out.println("Monitoring Framework started.");
-					monitoring = true;
+					((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).resetMonitoring();
+					System.out.println("Logs cleared on "+ name);
 				}
 				else {
-					System.out.println("Stopping monitoring");
 					for(Component comp : managedComponents.values()) {
-						((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).stopMonitoring();
+						((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).resetMonitoring();
 					}
-					System.out.println("Monitoring Framework stopped.");
-					monitoring = false;
-				}
-			}
-			else if(command.equals("c")) {
-				for(Component comp : managedComponents.values()) {
-					((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).resetMonitoring();
 				}
 				System.out.println("Logs cleared");
 			}
+			// List IDs of incoming requests from all components, or in the component specified
 			else if(command.equals(COM_INC_REQ_LIST)) {
 				// args supplied --> reqs of specified component
 				if(args != null) {
-					String name = args.split("[ ]+", 2)[0];
+					String name = input[1];
 					Component found = managedComponents.get(name);
 					if(found == null) {
 						System.out.println("Component "+name+" not found.");
+						continue;
 					}
-					else {
-						RemmosUtils.displayReqs(found);
-					}
+					RemmosUtils.displayReqs(found);
 				}
 				// no args ... request on all components
 				else {
@@ -321,6 +319,7 @@ public class MonitorConsole {
 					}
 				}	
 			}
+			// List IDs of outgoing requests from all components, or in the component specified
 			else if(command.equals(COM_OUT_REQ_LIST)) {
 				// args supplied --> calls on specified component
 				if(args != null) {
@@ -328,10 +327,9 @@ public class MonitorConsole {
 					Component found = managedComponents.get(name);
 					if(found == null) {
 						System.out.println("Component "+name+" not found.");
+						continue;
 					}
-					else {
-						RemmosUtils.displayCalls(found);
-					}
+					RemmosUtils.displayCalls(found);
 				}
 				// no args ... calls on all components
 				else {
@@ -340,6 +338,7 @@ public class MonitorConsole {
 					}
 				}
 			}
+			// Get the request path followed by an outgoing request from the current component
 			else if(command.equals(COM_PATH)) {
 				if(args != null) {
 					String name = args.split("[ ]+", 2)[0];
@@ -349,24 +348,26 @@ public class MonitorConsole {
 					RemmosUtils.displayPath(rp);
 				}
 				else {
-					System.out.println("Usage: "+ COM_PATH +" <reqID>. Use commands '"+ COM_OUT_REQ_LIST +"' to see a list of calls on a component");
+					System.out.println("Usage: "+ COM_PATH +" <reqID>. Use command '"+ COM_OUT_REQ_LIST +"' to see a list of IDs.");
 				}
 			}
-			
+			// Add metrics from the metric library
 			else if(command.equals(COM_ADD_METRIC)) {
 				if(args != null) {
-					String[] argsList = args.split("[ ]+", 2);
-					String name = argsList[0];
+					String name = input[1];
 					Component found = managedComponents.get(name);
 					if(found != null) {
-						if(argsList.length > 1) {
-							String metricName = argsList[1];
-							Metric metric = MetricsLibrary.getInstance().getMetric(metricName);
-							if(metric != null) {
-								((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).addMetric(metricName, metric);
-							}
-							else {
-								System.out.println("Metric "+metricName+" not found.");	
+						if(input.length > 2) {
+							for(int i=2; i<input.length; i++) {
+								String metricName = input[i];
+								Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricName);
+								if(metric != null) {
+									((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).addMetric(metricName, metric);
+									System.out.println("Metric "+metricName+" added to "+ found +".");
+								}
+								else {
+									System.out.println("Metric "+metricName+" not found on Metrics Library.");	
+								}
 							}
 						}
 						else {
@@ -378,29 +379,35 @@ public class MonitorConsole {
 					}
 				}
 				else {
-					System.out.println("Usage: "+ COM_ADD_METRIC +" <component> <metric_name>");
+					System.out.println("Usage: "+ COM_ADD_METRIC +" <component> <list_of_metric_names>");
 				}
 			}
-			
-			else if(command.equals(COM_EXEC_METRIC)) {
+			// Calculate a metric on the specified component
+			else if(command.equals(COM_RUN_METRIC)) {
 				if(args != null) {
-					String[] argsList = args.split("[ ]+", 2);
-					String name = argsList[0];
+					String name = input[1];
 					Component found = managedComponents.get(name);
 					if(found != null) {
-						if(argsList.length > 1) {
-							String metricName = argsList[1];
-							Metric metric = MetricsLibrary.getInstance().getMetric(metricName);
-							if(metric != null) {
-								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricValue(metricName, null);
-								System.out.println("Result = "+ result);
+						if(input.length > 2) {
+							String metricName = input[2];
+							// arguments are supplied for the metric
+							if(input.length > 3) {
+								String args[] = new String[input.length-3];
+								for(int i=3; i<input.length; i++) {
+									args[i-3] = input[i];
+								}
+								//Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricName);
+								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, args);
+								System.out.println(found+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
 							}
+							// no args supplied for the metric
 							else {
-								System.out.println("Metric "+metricName+" not found.");	
+								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, null);
+								System.out.println(found+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
 							}
 						}
 						else {
-							// here, instead, it could execute all the metrics
+							// here, instead, it could execute all the metrics ... but what about the params?
 							System.out.println("No metric specified.");
 						}
 					}
@@ -409,17 +416,37 @@ public class MonitorConsole {
 					}
 				}
 				else {
-					System.out.println("Usage: "+ COM_EXEC_METRIC +" <component> <metric_name>");
+					System.out.println("Usage: "+ COM_RUN_METRIC +" <component> <metric_name>");
 				}
 			}
+			// List metrics available from the metrics library			
+			else if(command.equals(COM_LS_LIB_METRIC)) {
+				System.out.println("Available metrics:");
+				Set<String> list = MetricsLibrary.getInstance().getMetricList();
+				for(String s : list) {
+					System.out.println("   "+ s);
+				}
 
-			
-			else if(command.equals("n")) {
-				for(Component comp : managedComponents.values()) {
-					RemmosUtils.displayNotifs(comp);
+			}
+			// List metrics available in all components, or in the specified component
+			else if(command.equals(COM_LS_METRIC)) {
+				// args supplied --> calls on specified component
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+						continue;
+					}
+					RemmosUtils.displayMetrics(found);
+				}
+				// no args ... calls on all components
+				else {
+					for(Component comp : managedComponents.values()) {
+						RemmosUtils.displayMetrics(comp);
+					}
 				}
 			}
-			
 		}
 
 		// Finish
@@ -443,7 +470,7 @@ public class MonitorConsole {
 	
 	private String[] readCommand() {
 		String line = sc.nextLine();
-		String[] result = line.split("[ ]+", 2);
+		String[] result = line.split("[ ]+");
 		return result;
 	}
 	
@@ -608,4 +635,6 @@ public class MonitorConsole {
 		}
 
 	}
+
+	
 }

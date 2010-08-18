@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.Set;
+
 /**
  * Interface for a component that stores and updates Metrics.
  * @author cruz
@@ -10,7 +12,7 @@ public interface MetricsStore {
 
 	void init();
 	
-	void addMetric(String name, Metric metric);
+	void addMetric(String name, Metric<?> metric);
 	
 	void removeMetric(String name);
 	
@@ -23,5 +25,7 @@ public interface MetricsStore {
 	Object getValue(String name);
 	
 	void setValue(String name, Object v);
+	
+	Set<String> getMetricList();
 	
 }

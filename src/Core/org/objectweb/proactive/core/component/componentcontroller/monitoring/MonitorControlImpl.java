@@ -420,9 +420,21 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 
 	@Override
-	public Object getMetricValue(String name, Object[] params) {
+	public Object runMetric(String name, Object[] params) {
 		return metricsStore.calculate(name, params);
 	}
+
+	@Override
+	public Set<String> getMetricList() {
+		return metricsStore.getMetricList();
+	}
+
+	@Override
+	public Object getMetricValue() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 

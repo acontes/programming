@@ -2,7 +2,9 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring.me
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
 
@@ -14,8 +16,10 @@ public class MetricsLibrary {
 	
 	private MetricsLibrary() {
 		library = new HashMap<String,Class<?>>();
-		library.put("avgIncoming", AvgRespTimeIncomingMetric.class);
-		library.put("avgOutgoing", AvgRespTimeOutgoingMetric.class);
+		library.put("avgInc", AvgRespTimeIncomingMetric.class);
+		library.put("avgOut", AvgRespTimeOutgoingMetric.class);
+		library.put("avgIncItf", AvgRespTimePerItfIncomingMetric.class);
+		library.put("avgOutItf", AvgRespTimePerItfOutgoingMetric.class);
 	}
 	
 	/** Singleton
@@ -34,22 +38,13 @@ public class MetricsLibrary {
 	 * @param name
 	 * @return
 	 */
-	public Metric getMetric(String name) {
-		Metric metric = null;
+	public Metric<?> getMetric(String name) {
+		Metric<?> metric = null;
 		if(library.containsKey(name)) {
 			Class<?> metricClass = library.get(name);
-			/*try {
-				metric = (Metric) metricClass.newInstance();
-			} catch (InstantiationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IllegalAccessException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}*/
-			
+
 			try {
-				metric = (Metric) metricClass.getConstructor().newInstance();
+				metric = (Metric<?>) metricClass.getConstructor().newInstance();
 			} catch (IllegalArgumentException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -72,6 +67,14 @@ public class MetricsLibrary {
 			
 		}
 		return metric;
+	}
+	
+	/**
+	 * Gets the list of available metrics from the library
+	 * @return
+	 */
+	public Set<String> getMetricList() {
+		return library.keySet();
 	}
 	
 	

@@ -3,6 +3,7 @@ package org.objectweb.proactive.core.component.componentcontroller.remmos.utils;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -224,6 +225,27 @@ public class RemmosUtils {
 		for(PathItem path:paths) {
 			System.out.println("*" + path.toString());
 		}
+	}
+	
+	public static void displayMetrics(Component comp) throws NoSuchInterfaceException {
+		String hostComponentName = null;
+		try {
+			hostComponentName = Fractal.getNameController(comp).getFcName();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		}
+		Set<String> metricSet = null;
+		try {
+			metricSet = ((MonitorControl)comp.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricList();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		}
+		System.out.println("Metrics in component ["+ hostComponentName +"]");
+		System.out.print("   ");
+		for(String s : metricSet) {
+			System.out.print(s+" ");
+		}
+		System.out.println();
 	}
 	
 	public static String toSeg(long nseg) {
