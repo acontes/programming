@@ -425,7 +425,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 
 	@Override
-	public Set<String> getMetricList() {
+	public List<String> getMetricList() {
 		return metricsStore.getMetricList();
 	}
 

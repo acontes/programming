@@ -1,20 +1,14 @@
 package org.objectweb.proactive.core.component.componentcontroller.remmos.console;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
-import javax.naming.NamingException;
-
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.Body;
-import org.objectweb.proactive.core.body.UniversalBody;
-import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.PAInterface;
@@ -29,10 +23,8 @@ import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.R
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PASuperController;
 import org.objectweb.proactive.core.component.identity.PAComponent;
-import org.objectweb.proactive.core.component.identity.PAComponentImpl;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
-import org.objectweb.proactive.core.node.NodeFactory;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
@@ -363,7 +355,7 @@ public class MonitorConsole {
 								Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricName);
 								if(metric != null) {
 									((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).addMetric(metricName, metric);
-									System.out.println("Metric "+metricName+" added to "+ found +".");
+									System.out.println("Metric "+metricName+" added to "+ name +".");
 								}
 								else {
 									System.out.println("Metric "+metricName+" not found on Metrics Library.");	
@@ -403,7 +395,7 @@ public class MonitorConsole {
 							// no args supplied for the metric
 							else {
 								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, null);
-								System.out.println(found+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
+								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
 							}
 						}
 						else {

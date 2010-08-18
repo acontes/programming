@@ -70,7 +70,7 @@ public interface MonitorControl extends MonitorController {
     Object runMetric(String name, Object[] params);
     Object getMetricValue();
     
-    Set<String> getMetricList();
+    List<String> getMetricList();
 	
 	
 	

@@ -1,6 +1,8 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -85,8 +87,11 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 	}
 	
 	@Override
-	public Set<String> getMetricList() {
-		return metrics.keySet();
+	public List<String> getMetricList() {
+		Set<String> keys = metrics.keySet();
+		List<String> res = new ArrayList<String>(keys.size());
+		res.addAll(keys);
+		return res;
 	}
 
 

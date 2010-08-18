@@ -1,5 +1,6 @@
 package org.objectweb.proactive.core.component.componentcontroller.monitoring;
 
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -26,6 +27,6 @@ public interface MetricsStore {
 	
 	void setValue(String name, Object v);
 	
-	Set<String> getMetricList();
+	List<String> getMetricList();
 	
 }
