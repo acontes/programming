@@ -254,7 +254,7 @@ public class MonitorConsole {
 				}
 			}
 			// Display the logs in all managed components, or in the component specified
-			else if(command.equals("l")) {
+			else if(command.equals(COM_LOGS)) {
 				// args supplied --> logs of specified component
 				if(args != null) {
 					String name = input[1];
@@ -263,6 +263,7 @@ public class MonitorConsole {
 						System.out.println("Component "+name+" not found.");
 						continue;
 					}
+					RemmosUtils.displayLogs(found);
 				}
 				// no args ... logs of all components
 				else {
@@ -273,7 +274,7 @@ public class MonitorConsole {
 					
 			}
 			// Clear the logs in all managed components, or in the component specified
-			else if(command.equals("c")) {
+			else if(command.equals(COM_CLEAR)) {
 				// args supplied --> clear specified component
 				if(args != null) {
 					String name = input[1];
@@ -390,7 +391,7 @@ public class MonitorConsole {
 								}
 								//Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricName);
 								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, args);
-								System.out.println(found+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
+								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
 							}
 							// no args supplied for the metric
 							else {

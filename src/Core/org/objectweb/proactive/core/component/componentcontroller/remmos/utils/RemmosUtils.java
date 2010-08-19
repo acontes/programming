@@ -83,9 +83,9 @@ public class RemmosUtils {
 		}
 		
 		System.out.println("===================== Component ["+ hostComponentName +"] =====================");
-		System.out.println("===================== Request Log ================================");
+		System.out.println("===================== Incoming Log ===============================");
 		displayRequestLog(requestLog);
-		System.out.println("======================= Call Log =================================");
+		System.out.println("======================Outgoing Log ================================");
 		displayCallLog(callLog);
 		System.out.println("==================================================================");
 		System.out.println();

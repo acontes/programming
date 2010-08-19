@@ -123,12 +123,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 			hostComponentName = hostComponent.getComponentParameters().getControllerDescription().getName();
 		}
 		logger.debug("[Monitor Control] My Host component is "+ hostComponentName + "[ID: "+ hostComponent.getID()+"]");
-		System.out.println("[Monitor Control] My Host component is "+ hostComponentName + "[ID: "+ hostComponent.getID()+"]");
 		// configure the event listener
 		UniqueID aoID = hostComponent.getID();
 		String runtimeURL = ProActiveRuntimeImpl.getProActiveRuntime().getURL();
 		logger.debug("[Monitor Control] RuntimeURL = "+ runtimeURL);
-		System.out.println("[Monitor Control] RuntimeURL = "+ runtimeURL);
 		this.eventControl.setBodyToMonitor(aoID, runtimeURL, hostComponentName);
 		
 		

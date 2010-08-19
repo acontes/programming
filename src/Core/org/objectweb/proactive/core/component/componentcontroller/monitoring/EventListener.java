@@ -500,7 +500,6 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = logHandler.fetchOutgoingRequestRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
-    		cs.setFinished(true);
     		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
@@ -582,7 +581,6 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
     		rs = logHandler.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
-    		rs.setFinished(true);
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
     	// when the corresponding requestReceived notification be processed

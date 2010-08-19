@@ -78,6 +78,8 @@ public class IncomingRequestRecord extends AbstractRecord implements Serializabl
 	}
 
 	public boolean isFinished() {
+		if(finished) return true;
+		finished = (arrivalTime != 0 && servingStartTime != 0 && replyTime != 0);
 		return finished;
 	}
 	

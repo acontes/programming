@@ -100,6 +100,8 @@ public class OutgoingRequestRecord extends AbstractRecord implements Serializabl
 	}
 
 	public boolean isFinished() {
+		if(finished) return true;
+		finished = (sentTime != 0 && replyReceptionTime != 0);
 		return finished;
 	}
 	

@@ -2,7 +2,6 @@ package org.objectweb.proactive.core.component.componentcontroller.monitoring.me
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +19,14 @@ public class MetricsLibrary {
 		library.put("avgOut", AvgRespTimeOutgoingMetric.class);
 		library.put("avgIncItf", AvgRespTimePerItfIncomingMetric.class);
 		library.put("avgOutItf", AvgRespTimePerItfOutgoingMetric.class);
+		library.put("maxInc", MaxRespTimeIncomingMetric.class);
+		library.put("maxOut", MaxRespTimeOutgoingMetric.class);
+		library.put("minInc", MinRespTimeIncomingMetric.class);
+		library.put("minOut", MinRespTimeOutgoingMetric.class);
+		library.put("maxIncItf", MaxRespTimePerItfIncomingMetric.class);
+		library.put("maxOutItf", MaxRespTimePerItfOutgoingMetric.class);
+		library.put("minIncItf", MinRespTimePerItfIncomingMetric.class);
+		library.put("minOutItf", MinRespTimePerItfOutgoingMetric.class);
 	}
 	
 	/** Singleton
