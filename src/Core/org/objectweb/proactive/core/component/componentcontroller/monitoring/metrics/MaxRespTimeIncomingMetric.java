@@ -5,6 +5,7 @@ import java.util.List;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Condition;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.IncomingRequestRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventType;
 
 /**
  * Calculates the Average Response Time of all the requests that have been served by the component.
@@ -15,6 +16,10 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Met
 
 public class MaxRespTimeIncomingMetric extends Metric<Long> {
 
+	public MaxRespTimeIncomingMetric() {
+		subscribedEvents.add(RemmosEventType.INCOMING_REQUEST_EVENT);
+	}
+	
 	public Long calculate(final Object[] params) {
 
 		List<IncomingRequestRecord> recordList = null;

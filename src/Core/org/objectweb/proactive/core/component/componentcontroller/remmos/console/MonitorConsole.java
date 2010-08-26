@@ -1,6 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.remmos.console;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
@@ -68,7 +69,9 @@ public class MonitorConsole {
 	
 	final String COM_ADD_METRIC = "addMetric";
 	final String COM_GET_METRIC = "getMetric";
+	final String COM_GET_METRICS = "getMetrics";
 	final String COM_RUN_METRIC = "runMetric";
+	final String COM_RUN_METRICS = "runMetrics";
 	final String COM_LS_METRIC = "lsMetric";
 	final String COM_LS_LIB_METRIC = "metrics";
 	final String COM_RM_METRIC = "rmMetric";
@@ -91,7 +94,11 @@ public class MonitorConsole {
 			{COM_ADD_MON, "add monitoring capabilities (NF components) to a component"},
 			{COM_ENABLE_MON, "enable monitoring by connecting monitoring interfaces of related components"},
 			{COM_ADD_METRIC, "add metric to specified component"},
-			{COM_RM_METRIC, "remove metric from specified component"},
+			{COM_GET_METRIC, "get current value of the metric (does not recalculate it)"},
+			{COM_GET_METRICS, "get current value of all metrics (does not recalculate them)"},
+			{COM_RUN_METRIC, "run the specified metric on the specified component"},
+			{COM_RUN_METRICS, "run all the metrics added to the specified component"},
+			{COM_RM_METRIC, "remove metric from the specified component"},
 			{COM_ADD_SLA, "add SLA monitoring capabilities (NF components) to a component"},
 			{COM_ADD_RECONF, "add reconfiguration capabilities (NF components) to a component"},
 			{COM_PATH, "get path for a request"},
@@ -235,7 +242,7 @@ public class MonitorConsole {
 				Remmos.enableMonitoring(current);
 			}
 			// Starts/stop the monitoring activity in all managed components
-			else if(command.equals("m")) {
+			else if(command.equals(COM_MON)) {
 				if(!monitoring) {
 					System.out.println("Starting monitoring");
 					for(Component comp : managedComponents.values()) {
@@ -351,17 +358,58 @@ public class MonitorConsole {
 					Component found = managedComponents.get(name);
 					if(found != null) {
 						if(input.length > 2) {
-							for(int i=2; i<input.length; i++) {
-								String metricName = input[i];
-								Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricName);
-								if(metric != null) {
+							String metricLibraryName = input[2];
+							Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricLibraryName);
+							if(metric != null) {
+								if(input.length > 3) {
+									String metricName = input[3];
+									String[] args;
+									if(input.length > 4) {
+										args = new String[input.length-4];
+										for(int i=0; i<args.length; i++) {
+											args[i] = input[i+4];
+										}
+									}
+									else {
+										args = null;
+									}
+									metric.setArgs(args);
 									((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).addMetric(metricName, metric);
-									System.out.println("Metric "+metricName+" added to "+ name +".");
+									System.out.println("Metric "+metricName+" (type: "+metricLibraryName+") added to "+ name +".");
 								}
 								else {
-									System.out.println("Metric "+metricName+" not found on Metrics Library.");	
+									System.out.println("No name specified for the metric");	
+									System.out.println("Usage: "+ COM_ADD_METRIC +" <component_name> <metric_library_name> <instanced_metric_name> <arguments>");
 								}
 							}
+							else {
+								System.out.println("Metric "+metricLibraryName+" not found on Metrics Library.");	
+							}
+
+						}
+						else {
+							System.out.println("No metric type specified.");
+							System.out.println("Usage: "+ COM_ADD_METRIC +" <component_name> <metric_library_name> <instanced_metric_name> <arguments>");
+						}
+					}
+					else {
+						System.out.println("Component "+name+" not found.");
+					}
+				}
+				else {
+					System.out.println("Usage: "+ COM_ADD_METRIC +" <component> <metric_library_name> <instanced_metric_name> <arguments>");
+				}
+			}
+			// Get the value of a metric on the specified component, without recalculate it
+			else if(command.equals(COM_GET_METRIC)) {
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found != null) {
+						if(input.length > 2) {
+							String metricName = input[2];
+							Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricValue(metricName);
+							System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass()+")");
 						}
 						else {
 							System.out.println("No metric specified.");
@@ -372,7 +420,26 @@ public class MonitorConsole {
 					}
 				}
 				else {
-					System.out.println("Usage: "+ COM_ADD_METRIC +" <component> <list_of_metric_names>");
+					System.out.println("Usage: "+ COM_RUN_METRIC +" <component> <metric_name>");
+				}
+			}
+			// Get value of all metrics on the specified component
+			else if(command.equals(COM_GET_METRICS)) {
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+						continue;
+					}
+					List<String> metrics = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricList();
+					for(String metricName : metrics) {
+						Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricValue(metricName);
+						System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass()+")");
+					}
+				}
+				else {
+					System.out.println("Usage: "+ COM_RUN_METRICS +" <component>");
 				}
 			}
 			// Calculate a metric on the specified component
@@ -383,24 +450,24 @@ public class MonitorConsole {
 					if(found != null) {
 						if(input.length > 2) {
 							String metricName = input[2];
-							// arguments are supplied for the metric
+							String args[] = null;
+							// optional arguments are supplied for the metric (if there are arguments, the metric will be called with them)
 							if(input.length > 3) {
-								String args[] = new String[input.length-3];
+								args = new String[input.length-3];
 								for(int i=3; i<input.length; i++) {
 									args[i-3] = input[i];
 								}
-								//Metric<?> metric = MetricsLibrary.getInstance().getMetric(metricName);
 								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, args);
-								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
+								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass()+")");
 							}
 							// no args supplied for the metric
 							else {
-								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, null);
-								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass().getInterfaces()[0]+")");
+								args = null;
+								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName);
+								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass()+")");
 							}
 						}
 						else {
-							// here, instead, it could execute all the metrics ... but what about the params?
 							System.out.println("No metric specified.");
 						}
 					}
@@ -410,6 +477,25 @@ public class MonitorConsole {
 				}
 				else {
 					System.out.println("Usage: "+ COM_RUN_METRIC +" <component> <metric_name>");
+				}
+			}
+			// Calculate all metrics on the specified component
+			else if(command.equals(COM_RUN_METRICS)) {
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+						continue;
+					}
+					List<String> metrics = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).getMetricList();
+					for(String metricName : metrics) {
+						Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName);
+						System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass()+")");
+					}
+				}
+				else {
+					System.out.println("Usage: "+ COM_RUN_METRICS +" <component>");
 				}
 			}
 			// List metrics available from the metrics library			

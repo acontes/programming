@@ -5,36 +5,30 @@ import java.util.List;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Condition;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.IncomingRequestRecord;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
-import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventType;
 
 /**
- * Calculates the Average Response Time of all the requests that have been served by the component.
+ * Obtains Infrastructure-Deployment information: Host, Node, VN
  * 
  * @author cruz
  *
  */
 
-public class AvgRespTimePerItfIncomingMetric extends Metric<Double> {
+public class DeploymentSensor extends Metric<String> {
 
-	public AvgRespTimePerItfIncomingMetric() {
-		subscribedEvents.add(RemmosEventType.INCOMING_REQUEST_EVENT);
-	}
-	
-	public Double calculate(final Object[] params) {
+	public String calculate(final Object[] params) {
 
+		String response;
+		
 		List<IncomingRequestRecord> recordList = null;
 		recordList = records.getIncomingRequestRecords(new Condition<IncomingRequestRecord>(){
-			// condition that returns true for every record that belongs to a given interface
+			// condition that returns true for every record
 			@Override
 			public boolean evaluate(IncomingRequestRecord irr) {
-				String name = (String) params[0];
-				if(irr.getInterfaceName().equals(name)) {
-					return true;
-				}
-				return false;
+				return true;
 			}
 		}
 		);
+		
 		// and calculates the average
 		double sum = 0.0;
 		double nRecords = recordList.size();
@@ -43,10 +37,10 @@ public class AvgRespTimePerItfIncomingMetric extends Metric<Double> {
 				sum += (double)(irr.getReplyTime() - irr.getArrivalTime());
 			}
 		}
-		value = sum/nRecords;
-		return value;
+		//value = sum/nRecords;
+		return value.toString();
 	}
-		
+	
 }
 
 

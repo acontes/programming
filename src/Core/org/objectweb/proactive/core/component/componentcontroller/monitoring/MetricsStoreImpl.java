@@ -12,19 +12,22 @@ import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEvent;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventListener;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
-public class MetricsStoreImpl extends AbstractPAComponentController implements MetricsStore, BindingController {
+public class MetricsStoreImpl extends AbstractPAComponentController implements MetricsStore, RemmosEventListener, BindingController {
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 	
-	Map<String, Metric<?>> metrics;
+	/** Metrics stored in this component */
+	private Map<String, Metric<?>> metrics;
 	
-	RecordStore records;
+	private RecordStore records;
 	
-	String[] itfList = {Remmos.RECORD_STORE_ITF};
+	private String[] itfList = {Remmos.RECORD_STORE_ITF};
 	
 	@Override
 	public void init() {
@@ -38,8 +41,18 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 	}
 
 	@Override
+	public Object calculate(String name) {
+		Metric<?> metric = metrics.get(name);
+		Object result = null;
+		if(metric != null) {
+			result = metric.calculate();
+		}
+		return result;
+	}
+	
+	@Override
 	public Object calculate(String name, Object[] params) {
-		Metric metric = metrics.get(name);
+		Metric<?> metric = metrics.get(name);
 		Object result = null;
 		if(metric != null) {
 			result = metric.calculate(params);
@@ -49,7 +62,7 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 
 	@Override
 	public void disableMetric(String name) {
-		Metric metric = metrics.get(name);
+		Metric<?> metric = metrics.get(name);
 		if(metric != null) {
 			metric.disable();
 		}
@@ -57,7 +70,7 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 
 	@Override
 	public void enableMetric(String name) {
-		Metric metric = metrics.get(name);
+		Metric<?> metric = metrics.get(name);
 		if(metric != null) {
 			metric.enable();
 		}
@@ -65,7 +78,7 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 
 	@Override
 	public Object getValue(String name) {
-		Metric metric = metrics.get(name);
+		Metric<?> metric = metrics.get(name);
 		Object result = null;
 		if(metric != null) {
 			result = metric.getValue();
@@ -129,6 +142,18 @@ public class MetricsStoreImpl extends AbstractPAComponentController implements M
 		else {
 			throw new NoSuchInterfaceException("Interface "+ itfName + " not found.");
 		}
+	}
+
+	@Override
+	public void onEvent(RemmosEvent re) {
+		// check all the metrics stored. If the metric is subscribed for the event, recalculate it.
+		
+		for(Metric<?> metric : metrics.values()) {
+			if(metric.isSubscribedTo(re.getType())) {
+				metric.calculate();
+			}
+		}
+		
 	}
 
 

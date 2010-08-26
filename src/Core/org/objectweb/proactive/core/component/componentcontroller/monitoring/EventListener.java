@@ -26,6 +26,10 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
 import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEvent;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventListener;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventType;
+import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.jmx.ProActiveJMXConstants;
 import org.objectweb.proactive.core.jmx.client.ClientConnector;
 import org.objectweb.proactive.core.jmx.naming.FactoryName;
@@ -55,8 +59,9 @@ public class EventListener extends AbstractPAComponentController implements Noti
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
 
-	private RecordStore logHandler;
-	private String[] itfs = {"record-store-nf"};
+	private RecordStore recordStore;
+	private RemmosEventListener metricsStore;
+	private String[] itfs = {Remmos.RECORD_STORE_ITF, Remmos.METRICS_NOTIF_ITF};
 
 	/** Connection to a ProActive BodyWrapperMBean 
 	 *  In real terms, this connection should be to a (still inexistent) ComponentWrapperMBean. */
@@ -326,21 +331,29 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	IncomingRequestRecord rs;
+    	boolean newRecord = false;
     	// checks if the request data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		// if the key was already there, it has to modify it to add the arrival time
-    		//logger.debug("Updating RequestRecord on LogStore, component "+ this.monitoredComponentName);
     		//rs = (RequestRecord) logHandler.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchIncomingRequestRecord(current);
+    		rs = recordStore.fetchIncomingRequestRecord(current);
     		rs.setArrivalTime(notification.getTimeStamp());
     	}
     	else {
     		// if there was no key, then it has to insert a new one
-    		//logger.debug("Creating new RequestRecord on LogStore, component "+ this.monitoredComponentName);
     		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, notification.getTimeStamp(), root);
+    		newRecord = true;
     	}
-    	logHandler.insert(rs);
+    	
+    	recordStore.insert(rs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_INCOMING_REQUEST_EVENT, null));
+    	}
+    	if(rs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.INCOMING_REQUEST_EVENT, null));
+    	}
     }
     
 	/**
@@ -368,11 +381,13 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	IncomingRequestRecord rs;
+    	boolean newRecord = false;
     	// checks if the request data has already been entered in the map (should exist already)
-    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchIncomingRequestRecord(current);	
+    		rs = recordStore.fetchIncomingRequestRecord(current);	
     		rs.setServingStartTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and be updated later,
@@ -380,8 +395,16 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	else {
     		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setServingStartTime(notification.getTimeStamp());
+    		newRecord = true;
     	}
-    	logHandler.insert(rs);
+    	
+    	recordStore.insert(rs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_INCOMING_REQUEST_EVENT, null));
+    	}
+    	if(rs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.INCOMING_REQUEST_EVENT, null));
+    	}
     }
     
     /**
@@ -407,11 +430,13 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	IncomingRequestRecord rs;
+    	boolean newRecord = false;
     	// checks if the request data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchIncomingRequestRecord(current);
+    		rs = recordStore.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
@@ -419,8 +444,17 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	else {
     		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setReplyTime(notification.getTimeStamp());
+    		newRecord = true;
     	}
-    	logHandler.insert(rs);
+    	
+    	recordStore.insert(rs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_INCOMING_REQUEST_EVENT, null));
+    	}
+    	if(rs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.INCOMING_REQUEST_EVENT, null));
+    	}
+    	
     }
     
     /**
@@ -450,21 +484,28 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	OutgoingRequestRecord cs;
+    	boolean newRecord = true;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchOutgoingRequestRecord(current);
+    		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.setSentTime(notification.getTimeStamp());
-    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
-    		//logger.debug("Creating new CallRecord on LogStore, component "+ this.monitoredComponentName + ", ID: "+ current);
     		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, notification.getTimeStamp(), false, root);
-    		//cs.setReplyReceptionTime(notification.getTimeStamp());
+    		newRecord = true;
     	}
-    	logHandler.insert(cs);
+    	
+    	recordStore.insert(cs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_OUTGOING_REQUEST_EVENT, null));
+    	}
+    	if(cs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.OUTGOING_REQUEST_EVENT, null));
+    	}
     }
     
     /**
@@ -494,21 +535,29 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	OutgoingRequestRecord cs;
+    	boolean newRecord = false;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchOutgoingRequestRecord(current);
+    		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
-    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] sent: "+ cs.getSentTime());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
-    		//logger.debug("ReplyReceptionTime set to "+ cs.getReplyReceptionTime() +" for call ["+ destComponentName +"."+ interfaceName +"."+ methodName+"] NEW");
+    		newRecord = true;
     	}
-    	logHandler.insert(cs);
+    	
+    	recordStore.insert(cs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_OUTGOING_REQUEST_EVENT, null));
+    	}
+    	if(cs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.OUTGOING_REQUEST_EVENT, null));
+    	}
     }
     
     /**
@@ -535,19 +584,29 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		return;
     	}
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	OutgoingRequestRecord cs;
+    	boolean newRecord = false;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchOutgoingRequestRecord(current);
+    		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	else {
     		// the data should be added without the sentTime, which should be added when the notification for RequestSent arrives (later)
     		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
+    		newRecord = true;
     	}
-    	logHandler.insert(cs);
+    	
+    	recordStore.insert(cs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_OUTGOING_REQUEST_EVENT, null));
+    	}
+    	if(cs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.OUTGOING_REQUEST_EVENT, null));
+    	}
     }
     
     /**
@@ -575,11 +634,13 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	String interfaceName = cmTagFields[4];
     	String methodName = cmTagFields[5];
     	ComponentRequestID root = new ComponentRequestID(Long.parseLong(cmTagFields[6]));
+    	
     	IncomingRequestRecord rs;
+    	boolean newRecord = false;
     	// checks if the request data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
-    		rs = logHandler.fetchIncomingRequestRecord(current);
+    		rs = recordStore.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
     	}
     	// else, the data should be added (without the arrival time), and the arrival time added later,
@@ -587,8 +648,15 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	else {
     		rs = new IncomingRequestRecord(current, sourceName, destName, interfaceName, methodName, 0, root);
     		rs.setReplyTime(notification.getTimeStamp());
+    		newRecord = true;
     	}
-    	logHandler.insert(rs);
+    	recordStore.insert(rs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_INCOMING_REQUEST_EVENT, null));
+    	}
+    	if(rs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.INCOMING_REQUEST_EVENT, null));
+    	}
     }
     
     /**
@@ -617,11 +685,13 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	if(interfaceName.equals("-")) {
     		return;
     	}
+    	
     	OutgoingRequestRecord cs;
+    	boolean newRecord = false;
     	// checks if the call data has already been entered in the map
-    	if(logHandler.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
-    		cs = logHandler.fetchOutgoingRequestRecord(current);
+    		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
     	else {
@@ -629,7 +699,14 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		cs = new OutgoingRequestRecord(current, parent, destComponentName, interfaceName, methodName, 0, false, root);
     		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
     	}
-    	logHandler.insert(cs);
+    	
+    	recordStore.insert(cs);
+    	if(newRecord) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.NEW_OUTGOING_REQUEST_EVENT, null));
+    	}
+    	if(cs.isFinished()) {
+    		notifyMetrics(new RemmosEvent(RemmosEventType.OUTGOING_REQUEST_EVENT, null));
+    	}
     }
     
     /**
@@ -651,12 +728,14 @@ public class EventListener extends AbstractPAComponentController implements Noti
     		if(currentFields[1].equals(CMTag.IDENTIFIER)) {
     			// This is the CMTag. Process it
     			return currentFields[2];
-    			// And this shouldn't be necessary!!!... the CMTag should have a constructor that receives a string
-    			//return new CMTag(null, Long.parseLong(tagFields[0]), Long.parseLong(tagFields[1]), tagFields[2], tagFields[3], tagFields[4], tagFields[5]);
     		}
     	}
     	
     	return null;
+    }
+    
+    private void notifyMetrics(RemmosEvent re) {
+    	metricsStore.onEvent(re);
     }
     
     public List<String> getNotifications() {
@@ -671,8 +750,12 @@ public class EventListener extends AbstractPAComponentController implements Noti
 	public void bindFc(String cItf, Object sItf)
 			throws NoSuchInterfaceException, IllegalBindingException,
 			IllegalLifeCycleException {
-		if(cItf.equals("record-store-nf")) {
-			logHandler = (RecordStore) sItf;
+		if(cItf.equals(Remmos.RECORD_STORE_ITF)) {
+			recordStore = (RecordStore) sItf;
+			return;
+		}
+		if(cItf.equals(Remmos.METRICS_NOTIF_ITF)) {
+			metricsStore = (RemmosEventListener) sItf;
 			return;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");		
@@ -685,8 +768,11 @@ public class EventListener extends AbstractPAComponentController implements Noti
 
 	@Override
 	public Object lookupFc(String cItf) throws NoSuchInterfaceException {
-		if(cItf.equals("record-store-nf")) {
-			return logHandler;
+		if(cItf.equals(Remmos.RECORD_STORE_ITF)) {
+			return recordStore;
+		}
+		if(cItf.endsWith(Remmos.METRICS_NOTIF_ITF)) {
+			return metricsStore;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}
@@ -694,8 +780,11 @@ public class EventListener extends AbstractPAComponentController implements Noti
 	@Override
 	public void unbindFc(String cItf) throws NoSuchInterfaceException,
 			IllegalBindingException, IllegalLifeCycleException {
-		if(cItf.equals("record-store-nf")) {
-			logHandler = null;
+		if(cItf.equals(Remmos.RECORD_STORE_ITF)) {
+			recordStore = null;
+		}
+		if(cItf.equals(Remmos.METRICS_STORE_ITF)) {
+			metricsStore = null;
 		}
 		throw new NoSuchInterfaceException("Interface "+ cItf +" non existent");
 	}

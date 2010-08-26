@@ -39,8 +39,8 @@ public interface MonitorControl extends MonitorController {
      * @param id
      * @return
      */
-    RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
-    RequestPath getPathForID(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id, org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID rootID, Set<String> visited);
+    RequestPath getPathForID(ComponentRequestID id);
+    RequestPath getPathForID(ComponentRequestID id, ComponentRequestID rootID, Set<String> visited);
     
     /**
      * Same from above, but with statistical information attached
@@ -48,27 +48,28 @@ public interface MonitorControl extends MonitorController {
      * @param id
      * @return
      */
-    RequestPath getPathStatisticsForId(org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID id);
+    RequestPath getPathStatisticsForId(ComponentRequestID id);
     
     /**
      * Get the list of entries in the Incoming Request Log
      * @return
      */
-    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, IncomingRequestRecord> getIncomingRequestLog();
+    Map<ComponentRequestID, IncomingRequestRecord> getIncomingRequestLog();
     
     /**
      * Get the list of entries in the Outgoing Request Log
      * @return
      */
-    Map<org.objectweb.proactive.core.component.componentcontroller.monitoring.ComponentRequestID, OutgoingRequestRecord> getOutgoingRequestLog();
+    Map<ComponentRequestID, OutgoingRequestRecord> getOutgoingRequestLog();
     
     List<String> getNotificationsReceived(); 
     
     String getMonitoredComponentName();
     
-    void addMetric(String name, Metric metric);
+    void addMetric(String name, Metric<?> metric);
+    Object runMetric(String name);
     Object runMetric(String name, Object[] params);
-    Object getMetricValue();
+    Object getMetricValue(String name);
     
     List<String> getMetricList();
 	

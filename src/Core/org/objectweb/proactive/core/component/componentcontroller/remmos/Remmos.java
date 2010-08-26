@@ -30,6 +30,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Rec
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordStoreImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlImpl;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventListener;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.core.component.control.PAContentController;
@@ -81,6 +82,7 @@ public class Remmos {
 	public static final String RECORD_STORE_ITF = "record-store-nf";
 	public static final String MONITOR_SERVICE_ITF = "monitor-service-nf";
 	public static final String METRICS_STORE_ITF = "metrics-store-nf";
+	public static final String METRICS_NOTIF_ITF = "metrics-notifications-nf";
 	public static final String SLA_MGMT_ITF = "sla-management-nf";
 	public static final String ACTIONS_ITF = "actions-nf";
 	
@@ -258,6 +260,7 @@ public class Remmos {
 		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
 		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+METRICS_STORE_ITF, METRICS_STORE_COMP+"."+METRICS_STORE_ITF);
 		membrane.bindNFc(EVENT_LISTENER_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
+		membrane.bindNFc(EVENT_LISTENER_COMP+"."+METRICS_NOTIF_ITF, METRICS_STORE_COMP+"."+METRICS_NOTIF_ITF);
 		membrane.bindNFc(METRICS_STORE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
 		// binding between the NF Monitoring Interface of the host component, and the Monitor Component
 		membrane.bindNFc(Constants.MONITOR_CONTROLLER, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
@@ -324,7 +327,8 @@ public class Remmos {
 		try {
 			eventListenerItfType = new InterfaceType[] {
 					patf.createGCMItfType(EVENT_CONTROL_ITF, EventControl.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
-					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(METRICS_NOTIF_ITF, RemmosEventListener.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			eventListenerType = patf.createFcType(eventListenerItfType);
 			eventListener = pagf.newNFcInstance(eventListenerType,
@@ -386,6 +390,7 @@ public class Remmos {
 		try {
 			metricsStoreItfType = new InterfaceType[] {
 					patf.createGCMItfType(METRICS_STORE_ITF, MetricsStore.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(METRICS_NOTIF_ITF, RemmosEventListener.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
 					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			metricsStoreType = patf.createFcType(metricsStoreItfType);

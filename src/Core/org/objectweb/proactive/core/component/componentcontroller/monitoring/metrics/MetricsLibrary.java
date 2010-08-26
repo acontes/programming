@@ -40,7 +40,8 @@ public class MetricsLibrary {
 		return instance;
 	}
 	
-	/** Gets the class from the library, and returns and instance of that class
+	/** 
+	 * Gets the class from the library, and returns an instance of that class
 	 * 
 	 * @param name
 	 * @return

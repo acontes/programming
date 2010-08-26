@@ -34,7 +34,7 @@ import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 public class MonitorControlImpl extends AbstractPAComponentController implements MonitorControl, BindingController {
 
 	private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_MONITORING);
-	private static final Logger RPlogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST_PATH);
+	private static final Logger rpLogger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUEST_PATH);
 	
 	private EventControl eventControl = null;
 	private RecordStore recordStore = null;
@@ -160,7 +160,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	RequestPath result;
     	OutgoingRequestRecord cr;
     	
-    	RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+")");
+    	rpLogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+")");
     	cr = recordStore.fetchOutgoingRequestRecord(id);
     	
     	ComponentRequestID rootID = cr.getRootID();
@@ -171,30 +171,30 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	String destName = cr.getCalledComponent();
     	MonitorControl child = null;
     	
-    	RPlogger.debug("["+this.getMonitoredComponentName()+"] Record ["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
+    	rpLogger.debug("["+this.getMonitoredComponentName()+"] Record ["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
     	
     	for(String monitorItfName : internalMonitors.keySet()) {
-    		RPlogger.debug("["+this.getMonitoredComponentName()+"] Looking internal interface ["+monitorItfName+"]");
+    		rpLogger.debug("["+this.getMonitoredComponentName()+"] Looking internal interface ["+monitorItfName+"]");
 			if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
 				child = internalMonitors.get(monitorItfName);
 			}
 		}
 		// try the external monitor controllers
 		for(String monitorItfName : externalMonitors.keySet()) {
-    		RPlogger.debug("["+this.getMonitoredComponentName()+"] Looking external interface ["+monitorItfName+"]");
+    		rpLogger.debug("["+this.getMonitoredComponentName()+"] Looking external interface ["+monitorItfName+"]");
     		if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
 				child = externalMonitors.get(monitorItfName);
 			}
 		}
-		RPlogger.debug("-------------------------------------------------------------");
-		RPlogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
+		rpLogger.debug("-------------------------------------------------------------");
+		rpLogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
     	result = child.getPathForID(id, rootID, visited);
     	result.add(new PathItem(cr.getParentID(), id, cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime() - cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
     	
     	// sort the results according to the order of the calls
     	result.getSize();
     	
-    	RPlogger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    	rpLogger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     	return result;
     	
     }
@@ -223,14 +223,14 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	// find, in the call log, the list of all calls that were made here, related to the same rootID
     	branches = recordStore.getIncomingRequestRecordsFromRoot(rootID);
 
-    	RPlogger.debug("["+localName+"] Branches: "+ branches.size());
+    	rpLogger.debug("["+localName+"] Branches: "+ branches.size());
 
 
 
     	// call each branch that starts here and has the same rootID
     	for(ComponentRequestID crid : branches.keySet()) {
 
-    		RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
+    		rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
     		// get the record of the request
     		rr = recordStore.fetchIncomingRequestRecord(crid);
     		// get all the calls that were sent while serving this request
@@ -240,7 +240,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     		// this path item represents the fact that the call arrived here
     		pi = new PathItem(crid, rr.getRequestID(), rr.getArrivalTime(), rr.getReplyTime(), rr.getReplyTime()-rr.getArrivalTime(), rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
     		// add this PathItem
-    		RPlogger.debug("["+localName+"] Adding pathItem ["+ pi.toString() +"]");
+    		rpLogger.debug("["+localName+"] Adding pathItem ["+ pi.toString() +"]");
     		result.add(pi);
 
 
@@ -249,7 +249,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     			cr = recordStore.fetchOutgoingRequestRecord(childID);
     			// get the name of the component to call
     			destName = cr.getCalledComponent();
-    			RPlogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
+    			rpLogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
     			
     			// add the item saying that a call was sent. However, while doing the search we won't necessarily call that component now.
     			result.add(new PathItem(cr.getParentID(), cr.getRequestID(), cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime()-cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
@@ -259,36 +259,36 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     				// select the client interface (can be external or internal) where this component is connected
     				// try the internal monitor controllers
     				for(String monitorItfName : internalMonitors.keySet()) {
-    					RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying internal interface ["+monitorItfName+"]");
+    					rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying internal interface ["+monitorItfName+"]");
     					if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    						RPlogger.debug("Found!");
+    						rpLogger.debug("Found!");
     						child = internalMonitors.get(monitorItfName);
     					}
     				}
     				// try the external monitor controllers
     				for(String monitorItfName : externalMonitors.keySet()) {
-    					RPlogger.debug("["+this.getMonitoredComponentName()+"] Trying external interface ["+monitorItfName+"]");
+    					rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying external interface ["+monitorItfName+"]");
     					if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    						RPlogger.debug("Found!");
+    						rpLogger.debug("Found!");
     						child = externalMonitors.get(monitorItfName);
     					}
     				}
 
     				// and call it
-    				RPlogger.debug("["+this.getMonitoredComponentName()+"] calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
+    				rpLogger.debug("["+this.getMonitoredComponentName()+"] calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
     				branch = child.getPathForID(childID, rootID, visited);
 
     				// add the result to the current RequestPath
     				result.add(branch);	
     			}  
     			else {
-    				RPlogger.debug("["+this.getMonitoredComponentName()+"] Component ["+destName+"] already visited.");
+    				rpLogger.debug("["+this.getMonitoredComponentName()+"] Component ["+destName+"] already visited.");
     			}
     		}
     	}
     	
 
-    	RPlogger.debug("["+localName+"] Returning results with "+ result.getPath().size() +" pathItems");
+    	rpLogger.debug("["+localName+"] Returning results with "+ result.getPath().size() +" pathItems");
 
     	return result;    	
     }
@@ -342,8 +342,8 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		int nExternalMonitors = externalMonitors.size();
 		int nInternalMonitors = internalMonitors.size();
 		int nBasicItfs = basicItfs.length;
-		String[] externalMonitorNames = externalMonitors.keySet().toArray(new String[nExternalMonitors]);
-		String[] internalMonitorNames = internalMonitors.keySet().toArray(new String[nInternalMonitors]);
+		//String[] externalMonitorNames = externalMonitors.keySet().toArray(new String[nExternalMonitors]);
+		//String[] internalMonitorNames = internalMonitors.keySet().toArray(new String[nInternalMonitors]);
 		
 		ArrayList<String> itfsList = new ArrayList<String>(nExternalMonitors+nInternalMonitors+nBasicItfs);
 		for(int i=0;i<nBasicItfs;i++) {
@@ -413,10 +413,15 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 
 	@Override
-	public void addMetric(String name, Metric metric) {
+	public void addMetric(String name, Metric<?> metric) {
 		metricsStore.addMetric(name, metric);		
 	}
 
+	@Override
+	public Object runMetric(String name) {
+		return metricsStore.calculate(name);
+	}
+	
 	@Override
 	public Object runMetric(String name, Object[] params) {
 		return metricsStore.calculate(name, params);
@@ -428,12 +433,9 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	}
 
 	@Override
-	public Object getMetricValue() {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getMetricValue(String name) {
+		return metricsStore.getValue(name);
 	}
-
-
 
 
 
