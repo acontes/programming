@@ -31,6 +31,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Rec
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventListener;
+import org.objectweb.proactive.core.component.componentcontroller.sla.SLAService;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.core.component.control.PAContentController;
@@ -83,6 +84,7 @@ public class Remmos {
 	public static final String MONITOR_SERVICE_ITF = "monitor-service-nf";
 	public static final String METRICS_STORE_ITF = "metrics-store-nf";
 	public static final String METRICS_NOTIF_ITF = "metrics-notifications-nf";
+	public static final String SLA_ALARM_ITF = "sla-alarms-nf";
 	public static final String SLA_MGMT_ITF = "sla-management-nf";
 	public static final String ACTIONS_ITF = "actions-nf";
 	
@@ -115,7 +117,8 @@ public class Remmos {
 			
 			// server Monitoring interface
 			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.MONITOR_CONTROLLER, MonitorControl.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
-			// TODO the NF interfaces for SLAManagement and Actions
+			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.SLA_CONTROLLER, SLAService.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+			// TODO the NF interfaces for Actions
 			
 			// external client Monitoring interfaces
 			// add one client Monitoring interface for each client F interface
