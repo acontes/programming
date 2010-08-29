@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.componentcontroller.sla;
 
 import java.io.Serializable;
 
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.Metric;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 
 /**
@@ -18,9 +19,11 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Mon
 public class SLORule<T> implements Serializable {
 
 	/** The name of the monitored metric */
-	String metricName;
+	private String metricName;
 	
 	T metricValue;
+
+	Metric<T> metric;
 	
 	Condition<T> condition;
 	
@@ -31,6 +34,7 @@ public class SLORule<T> implements Serializable {
 	private MonitorControl monitor; 
 	
 	boolean enabled = true;
+	
 	/** 
 	 * Checks the condition and determines if an alarm must be raised
 	 * 
@@ -52,6 +56,18 @@ public class SLORule<T> implements Serializable {
 	
 	public void setEnabled(boolean e) {
 		enabled = e;
+	}
+	
+	public String getMetricName() {
+		return metricName;
+	}
+	
+	public void setMonitor(MonitorControl ref) {
+		monitor = ref;
+	}
+	
+	public Metric<?> getMetric() {
+		return metric;
 	}
 	
 	

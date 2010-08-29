@@ -21,6 +21,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Req
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.metrics.MetricsLibrary;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.RemmosUtils;
+import org.objectweb.proactive.core.component.componentcontroller.sla.SLAService;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PASuperController;
 import org.objectweb.proactive.core.component.identity.PAComponent;
@@ -76,6 +77,8 @@ public class MonitorConsole {
 	final String COM_LS_LIB_METRIC = "metrics";
 	final String COM_RM_METRIC = "rmMetric";
 	
+	final String COM_ADD_SLO = "addSLO";
+	
 	final String COM_QUIT = "q";
 	
 	final String commandDescriptions[][] = {
@@ -100,6 +103,7 @@ public class MonitorConsole {
 			{COM_RUN_METRICS, "run all the metrics added to the specified component"},
 			{COM_RM_METRIC, "remove metric from the specified component"},
 			{COM_ADD_SLA, "add SLA monitoring capabilities (NF components) to a component"},
+			{COM_ADD_SLO, "add an SLO to the SLA Monitor, that will be checked"},
 			{COM_ADD_RECONF, "add reconfiguration capabilities (NF components) to a component"},
 			{COM_PATH, "get path for a request"},
 			{COM_QUIT, "quit"}
@@ -524,6 +528,52 @@ public class MonitorConsole {
 					for(Component comp : managedComponents.values()) {
 						RemmosUtils.displayMetrics(comp);
 					}
+				}
+			}
+			// Add SLA Monitoring components 
+			else if(command.equals(COM_ADD_SLA)) {
+				// args supplied --> add monitoring to specified component
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+						continue;
+					}
+					System.out.println("Adding SLA monitoring components to "+ name +" ...");
+					Remmos.addSLAMonitoring(found);
+				}
+				// no args ... add monitoring to all components
+				else {
+					for(String name : managedComponents.keySet()) {
+						System.out.println("Adding SLA monitoring components to "+ name +" ...");
+						Remmos.addSLAMonitoring(managedComponents.get(name));
+					}
+				}
+			}
+			// Add an SLO to the SLA Monitor
+			else if(command.equals(COM_ADD_SLO)) {
+				if(args != null) {
+					if(input.length >= 6) {
+						String name = input[1];
+						Component found = managedComponents.get(name);
+						if(found == null) {
+							System.out.println("Component "+name+" not found.");
+							continue;
+						}
+						String sloName = input[2];
+						String[] sloArgs = new String[input.length-3];
+						for(int i=3; i<input.length; i++) {
+							sloArgs[i-3] = input[i];
+						}
+						((SLAService)found.getFcInterface(Constants.SLA_CONTROLLER)).addSLO(sloName, sloArgs);
+					}
+					else {
+						System.out.println("Usage: "+ COM_ADD_SLO + " <componentName> <sloName> <metricType> [args]* <conditionName> <threshold>");
+					}
+				}
+				else {
+					System.out.println("Usage: "+ COM_ADD_SLO + " <componentName> <sloName> <metricType> [args]* <conditionName> <threshold>");
 				}
 			}
 		}

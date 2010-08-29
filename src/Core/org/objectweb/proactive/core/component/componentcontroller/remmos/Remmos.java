@@ -31,7 +31,12 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Rec
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventListener;
+import org.objectweb.proactive.core.component.componentcontroller.sla.MetricsListener;
+import org.objectweb.proactive.core.component.componentcontroller.sla.SLANotifier;
 import org.objectweb.proactive.core.component.componentcontroller.sla.SLAService;
+import org.objectweb.proactive.core.component.componentcontroller.sla.SLAServiceImpl;
+import org.objectweb.proactive.core.component.componentcontroller.sla.SLOStore;
+import org.objectweb.proactive.core.component.componentcontroller.sla.SLOStoreImpl;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.core.component.control.PAContentController;
@@ -73,10 +78,11 @@ public class Remmos {
 	public static final String METRICS_STORE_COMP = "metrics-store-NF";
 	
 	// SLA Management-related Components
-	public static final String SLA_MANAGER_COMP = "sla-manager-NF";
+	public static final String SLA_SERVICE_COMP = "sla-service-NF";
+	public static final String SLO_STORE_COMP = "slo-store-NF";
 	
 	// Reconfiguration-related Components
-	public static final String RECONFIGURATION_COMP = "reconfiguration-component-NF";
+	public static final String RECONFIGURATION_SERVICE_COMP = "reconfiguration-component-NF";
 	
 	// Interfaces
 	public static final String EVENT_CONTROL_ITF = "event-control-nf";
@@ -85,7 +91,8 @@ public class Remmos {
 	public static final String METRICS_STORE_ITF = "metrics-store-nf";
 	public static final String METRICS_NOTIF_ITF = "metrics-notifications-nf";
 	public static final String SLA_ALARM_ITF = "sla-alarms-nf";
-	public static final String SLA_MGMT_ITF = "sla-management-nf";
+	public static final String SLO_STORE_ITF = "slo-store-nf";
+	public static final String SLA_SERVICE_ITF = "sla-service-nf";
 	public static final String ACTIONS_ITF = "actions-nf";
 	
 	/**
@@ -316,6 +323,71 @@ public class Remmos {
 	}
 	
 	/**
+	 * Builds the SLA monitoring components and put them in the membrane.
+	 * The Monitoring components must have been added before, otherwise this method will fail.
+	 * 
+	 * After the execution of this method, the component (composite or primitive) will have all the SLA Monitor-related components
+	 * created and bound to the the Monitor Service components.
+	 * 
+	 * @param component
+	 * @throws Exception
+	 */
+	public static void addSLAMonitoring(Component component) throws Exception {
+		// bootstrapping component and factories
+		Component boot = Fractal.getBootstrapComponent();
+		PAGCMTypeFactory patf = null;
+		PAGenericFactory pagf = null;
+		patf = (PAGCMTypeFactory) Fractal.getTypeFactory(boot);
+		pagf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+
+		PAComponent pac = (PAComponent) component;
+		PAComponentRepresentative pacr = (PAComponentRepresentative) component;
+		logger.debug("Adding SLA Monitoring components for component ["+ pac.getComponentParameters().getName()+"], with ID ["+ pac.getID() +"]");
+		UniversalBodyProxy ubp = (UniversalBodyProxy) pacr.getProxy();
+		UniversalBody ub = ubp.getBody();
+		String bodyUrl = ub.getNodeURL();
+		//logger.debug("   Which is in node ["+ bodyUrl + "]");
+		Node parentNode = NodeFactory.getNode(bodyUrl);
+		//ProActiveRuntime part = parentNode.getProActiveRuntime();
+		//logger.debug("   and in runtime ["+ part.getURL() + "]");
+		
+		// creates the components used for monitoring
+		Component slaService = createBasicSLAService(patf, pagf, SLAServiceImpl.class.getName(), parentNode);
+		Component sloStore = createBasicSLOStore(patf, pagf, SLOStoreImpl.class.getName(), parentNode);
+		
+		// performs the NF assembly
+		PAMembraneController membrane = Utils.getPAMembraneController(component);
+		PAGCMLifeCycleController lifeCycle = Utils.getPAGCMLifeCycleController(component);
+		// stop the membrane and component lifecycle before making changes
+		String membraneOldState = membrane.getMembraneState();
+		String componentOldState = lifeCycle.getFcState();
+		membrane.stopMembrane();
+		lifeCycle.stopFc();
+		
+		// add components to the membrane
+		membrane.addNFSubComponent(slaService);
+		membrane.addNFSubComponent(sloStore);
+		// bindings between NF components
+		membrane.bindNFc(SLA_SERVICE_COMP+"."+SLO_STORE_ITF, SLO_STORE_COMP+"."+SLO_STORE_ITF);
+		membrane.bindNFc(SLO_STORE_COMP+"."+MONITOR_SERVICE_ITF, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
+		// binding between the NF Monitoring Interface of the host component, and the Monitor Component
+		membrane.bindNFc(Constants.SLA_CONTROLLER, SLA_SERVICE_COMP+"."+SLA_SERVICE_ITF);
+		
+		// restore membrane and component lifecycle after having made changes
+		if(membraneOldState.equals(PAMembraneController.MEMBRANE_STARTED)) {
+			membrane.startMembrane();
+		}
+		if(componentOldState.equals(PAGCMLifeCycleController.STARTED)) {
+			lifeCycle.startFc();
+		}
+		
+		logger.debug("   Done for component ["+pac.getComponentParameters().getName()+"] !");
+
+		
+		
+	}
+	
+	/**
 	 * Creates the NF Event Listener component.
 	 * @param patf
 	 * @param pagf
@@ -482,6 +554,56 @@ public class Remmos {
 		
 		
 		return monitorService;
+	}
+	
+	private static Component createBasicSLAService(PAGCMTypeFactory patf, PAGenericFactory pagf, String slaServiceClass, Node node) {
+
+		Component slaService = null;
+		InterfaceType[] slaServiceItfType = null;
+		ComponentType slaServiceType = null;
+		
+		try {
+			slaServiceItfType = new InterfaceType[] {
+					patf.createGCMItfType(SLO_STORE_ITF, SLOStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(SLA_SERVICE_ITF, SLAService.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+			};
+			slaServiceType = patf.createFcType(slaServiceItfType);
+			slaService = pagf.newNFcInstance(slaServiceType, 
+					new ControllerDescription(SLA_SERVICE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
+					new ContentDescription(slaServiceClass),
+					node
+			);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		}
+		
+		return slaService;
+	}
+	
+	private static Component createBasicSLOStore(PAGCMTypeFactory patf, PAGenericFactory pagf, String sloStoreClass, Node node) {
+		
+		Component sloStore = null;
+		InterfaceType[] sloStoreItfType = null;
+		ComponentType sloStoreType = null;
+		
+		try {
+			sloStoreItfType = new InterfaceType[] {
+					patf.createGCMItfType(SLO_STORE_ITF, SLOStore.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(METRICS_NOTIF_ITF, MetricsListener.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(MONITOR_SERVICE_ITF, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+					patf.createGCMItfType(SLA_ALARM_ITF, SLANotifier.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY)
+			};
+			sloStoreType = patf.createFcType(sloStoreItfType);
+			sloStore = pagf.newNFcInstance(sloStoreType, 
+					new ControllerDescription(SLO_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
+					new ContentDescription(sloStoreClass),
+					node
+			);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		}
+		
+		return sloStore;
 	}
 	
 	
