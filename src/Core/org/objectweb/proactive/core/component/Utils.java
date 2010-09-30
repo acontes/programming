@@ -71,32 +71,37 @@ import org.objectweb.proactive.core.component.type.PAGCMTypeFactory;
  */
 @PublicAPI
 public class Utils {
-    /**
+	private static Component bootstrapComponent = null;
+
+	
+	/**
      * Returns a bootstrap component to create other components.
      *
      * @return Bootstrap component to create other components.
      * @throws InstantiationException If the bootstrap component cannot be created.
      */
     public static Component getBootstrapComponent() throws InstantiationException {
-        Component bootstrapComponent;
-        try {
-            bootstrapComponent = GCM.getBootstrapComponent();
-        } catch (InstantiationException ie) {
-            if (System.getProperty("gcm.provider") == null) {
-                try {
-                    bootstrapComponent = Fractal.getBootstrapComponent();
-                } catch (InstantiationException ie2) {
-                    if (System.getProperty("fractal.provider") == null) {
-                        throw new InstantiationException(
-                            "Neither the gcm.provider or the fractal.provider system properties are defined");
-                    } else {
-                        throw ie2;
+    	if (bootstrapComponent == null)
+    	{
+            try {
+                bootstrapComponent = GCM.getBootstrapComponent();
+            } catch (InstantiationException ie) {
+                if (System.getProperty("gcm.provider") == null) {
+                    try {
+                        bootstrapComponent = Fractal.getBootstrapComponent();
+                    } catch (InstantiationException ie2) {
+                        if (System.getProperty("fractal.provider") == null) {
+                            throw new InstantiationException(
+                                "Neither the gcm.provider or the fractal.provider system properties are defined");
+                        } else {
+                            throw ie2;
+                        }
                     }
+                } else {
+                    throw ie;
                 }
-            } else {
-                throw ie;
             }
-        }
+    	}
         return bootstrapComponent;
     }
 
