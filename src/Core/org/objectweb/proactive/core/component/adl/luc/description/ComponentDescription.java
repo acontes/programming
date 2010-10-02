@@ -22,6 +22,12 @@ public class ComponentDescription extends Description
 	private final List<ComponentDescription> subcomponentDescriptions = new ArrayList<ComponentDescription>();
 	private final List<InterfaceDescription> interfaceDescriptions = new ArrayList<InterfaceDescription>();
 	private final List<BindingDescription> bindingDescriptions = new ArrayList<BindingDescription>();
+	private final List<AttributeDescription> attributesDescriptions = new ArrayList<AttributeDescription>();
+
+	public List<AttributeDescription> getAttributesDescriptions()
+	{
+		return attributesDescriptions;
+	}
 
 	public List<BindingDescription> getBindingDescriptions()
 	{
@@ -128,11 +134,16 @@ public class ComponentDescription extends Description
 			bd.check();
 		}
 
-		getMembraneDescription().check();
+		if (getMembraneDescription() != null)
+		{
+			getMembraneDescription().check();
+		}
 	}
 
 	public static ComponentDescription createComponentDescription(XMLNode node) throws ADLException
 	{
+		Assertions.ensure(node.getName().matches("component|definition"), "component description tag must be named 'comopnent' or 'definition''");
+
 		ComponentDescription description = new ComponentDescription();
 
 		description.setName(node.getAttributes().remove("name"));
@@ -143,7 +154,7 @@ public class ComponentDescription extends Description
 			if (!contentNodes.isEmpty())
 			{
 				String contentClassname = contentNodes.get(0).getAttributes().remove("class");
-				Class<?> contentClass = Clazz.forName(contentClassname);
+				Class<?> contentClass = Clazz.findClass(contentClassname);
 
 				if (contentClass == null) throw new ADLException("cannot find content class " + contentClassname);
 
@@ -173,6 +184,11 @@ public class ComponentDescription extends Description
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "binding"))
 		{
 			description.getBindingDescriptions().add(BindingDescription.createBindingDescription(n));
+		}
+
+		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "attributes"))
+		{
+			description.getAttributesDescriptions().add(AttributeDescription.createAttributeDescription(n));
 		}
 
 		return description;
@@ -213,7 +229,15 @@ public class ComponentDescription extends Description
 
 			String childName = name.substring(0, pos);
 			String interfaceName = name.substring(pos + 1);
-			return findSubcomponentDescriptionByName(childName).findInterfaceDescription(interfaceName);
+			
+			if (childName.equals("this"))
+			{
+				return findInterfaceDescription(interfaceName);
+			}
+			else
+			{
+				return findSubcomponentDescriptionByName(childName).findInterfaceDescription(interfaceName);
+			}
 		}
 	}
 

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 
 
-<definition name="org.objectweb.proactive.core.component.adl.luc.ExampleComponent">
-  <interface name="r" role="server" signature="org.objectweb.proactive.core.component.adl.luc.ExampleComponent"/>
+<definition name="org.objectweb.proactive.core.component.adl.luc.demo.ExampleComponent">
+  <interface name="r" role="server" signature="org.objectweb.proactive.core.component.adl.luc.demo.ExampleComponent"/>
   <component name="impl">
-    <interface name="s" role="server" signature="org.objectweb.proactive.core.component.adl.luc.ExampleComponent"/>
-    <content class="org.objectweb.proactive.core.component.adl.luc.BasicExampleComponent"/>
+    <interface name="s" role="server" signature="org.objectweb.proactive.core.component.adl.luc.demo.ExampleComponent"/>
+    <content class="org.objectweb.proactive.core.component.adl.luc.demo.BasicExampleComponent"/>
   </component>
   <binding client="this.r" server="impl.s" />
 </definition>

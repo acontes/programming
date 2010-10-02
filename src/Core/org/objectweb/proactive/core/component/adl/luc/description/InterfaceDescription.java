@@ -2,6 +2,7 @@ package org.objectweb.proactive.core.component.adl.luc.description;
 
 import lucci.Clazz;
 import lucci.text.xml.XMLNode;
+import lucci.util.assertion.Assertions;
 
 import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
@@ -14,7 +15,10 @@ public class InterfaceDescription extends Description
 	private String name;
 	private Role role;
 	private Class<?> signature;
-	private Contingency contingency;
+	private Contingency contingency = Contingency.MANDATORY;
+	private Cardinality cardinality = Cardinality.SINGLETON;
+
+	
 	public Contingency getContingency()
 	{
 		return contingency;
@@ -31,7 +35,6 @@ public class InterfaceDescription extends Description
 	{
 		this.cardinality = cardinality;
 	}
-	private Cardinality cardinality;
 	
 	public String getName()
 	{
@@ -64,10 +67,23 @@ public class InterfaceDescription extends Description
 	
 	public  static InterfaceDescription createInterfaceDescription(XMLNode n)
 	{
+		Assertions.ensure(n.getName().equals("interface"), "interface description tag must be named 'interface''");
+
 		InterfaceDescription id = new InterfaceDescription();
 		id.setName(n.getAttributes().get("name"));
-		id.setRole(n.getAttributes().get("role").equals("client") ? InterfaceDescription.Role.CLIENT : InterfaceDescription.Role.SERVER);
-		id.setSignature(Clazz.forName(n.getAttributes().get("signature")));
+		id.setRole(n.getAttributes().get("role").equals("client") ? Role.CLIENT : Role.SERVER);
+		id.setSignature(Clazz.findClassOrFail(n.getAttributes().get("signature")));
+		
+		if (n.getAttributes().get("contigency") != null)
+		{
+			id.setContingency(n.getAttributes().get("contigency").equals("mandatory") ? Contingency.MANDATORY : Contingency.OPTIONAL);
+		}
+
+		if (n.getAttributes().get("cardinality") != null)
+		{
+			id.setCardinality(n.getAttributes().get("cardinality").equals("singleton") ? Cardinality.SINGLETON : Cardinality.COLLECTION);
+		}
+
 		return id;
 	}
 
@@ -79,6 +95,8 @@ public class InterfaceDescription extends Description
 		n.getAttributes().put("name", getName());
 		n.getAttributes().put("role", getRole().name());
 		n.getAttributes().put("signature", getSignature().getName());
+		n.getAttributes().put("contingency", getContingency().name());
+		n.getAttributes().put("cardinality", getCardinality().name());
 		return n;
 	}
 	@Override

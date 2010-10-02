@@ -28,8 +28,8 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
+import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.adl.luc.demo.ExampleComponent;
 import org.objectweb.proactive.core.component.adl.luc.description.BindingDescription;
 import org.objectweb.proactive.core.component.adl.luc.description.ComponentDescription;
 import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription;
@@ -39,14 +39,14 @@ import org.xml.sax.SAXException;
 
 public class SimplestGCMFactory
 {
-	public static void main(String... args) throws IOException, ParserConfigurationException, SAXException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public SimplestGCMFactory()
 	{
-		SimplestGCMFactory f = new SimplestGCMFactory();
-		String xml = new String(new JavaResource(SimplestGCMFactory.class, "ExampleComponent.fractal").getByteArray());
-		ExampleComponent component = (ExampleComponent) f.createComponent(xml);
-		component.printOk();
+		if (System.getProperty("gcm.provider") == null)
+		{
+			System.setProperty("gcm.provider", Fractive.class.getName());
+		}
 	}
-
+	
 	public Component createComponent(JavaResource resource) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
 	{
 		return createComponent(new String(resource.getByteArray()));
@@ -73,9 +73,9 @@ public class SimplestGCMFactory
 		ComponentType type = createType(componentDescription);
 		Component component = instantiateComponent(componentDescription, type);
 		GCM.getNameController(component).setFcName(componentDescription.getName());
-		Map<String, Component> comp_child = setSubComponents(componentDescription, component);
-		comp_child.put("this", component);
-		bindAllInterfaces(componentDescription, comp_child);
+		Map<String, Component> name_comp = setSubComponents(componentDescription, component);
+		name_comp.put("this", component);
+		bindAllInterfaces(componentDescription, name_comp);
 		return component;
 	}
 
@@ -114,7 +114,7 @@ public class SimplestGCMFactory
 		{
 			// if the component is primitive
 			String s = componentDescription.getSubcomponentDescriptions().isEmpty() ? Constants.PRIMITIVE : Constants.COMPOSITE;
-			return gf.newFcInstance(type, s, componentDescription.getContent().getName());
+			return gf.newFcInstance(type, s, componentDescription.getContent() == null ? null : componentDescription.getContent().getName());
 		}
 		else
 		{
@@ -135,11 +135,13 @@ public class SimplestGCMFactory
 
 	private ComponentType createType(ComponentDescription componentDescription) throws InstantiationException, NoSuchInterfaceException
 	{
+		
 		GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(Utils.getBootstrapComponent());
 		List<InterfaceType> interfaceTypes = new ArrayList<InterfaceType>();
 
 		for (InterfaceDescription id : componentDescription.getInterfaceDescriptions())
 		{
+			System.out.println(id);
 			interfaceTypes.add(typeFactory.createGCMItfType(id.getName(), id.getSignature().getName(), id.getRole() == Role.CLIENT, id.getContingency() == Contingency.OPTIONAL, id.getCardinality().name()));
 		}
 

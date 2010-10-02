@@ -37,6 +37,8 @@ public class BindingDescription extends Description
 	
 	public static BindingDescription createBindingDescription(XMLNode n)
 	{
+		Assertions.ensure(n.getName().equals("binding"), "binding description tag must be named 'binding''");
+
 		BindingDescription bd = new BindingDescription();
 		bd.setClient(n.getAttributes().get("client"));
 		bd.setServer(n.getAttributes().get("server"));

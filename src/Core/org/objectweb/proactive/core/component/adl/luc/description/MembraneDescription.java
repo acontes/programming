@@ -3,9 +3,10 @@ package org.objectweb.proactive.core.component.adl.luc.description;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.objectweb.proactive.core.component.adl.luc.ADLException;
-
 import lucci.text.xml.XMLNode;
+import lucci.util.assertion.Assertions;
+
+import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
 public class MembraneDescription extends Description
 {
@@ -48,5 +49,13 @@ public class MembraneDescription extends Description
 			cd.check();
 		}
 		
+	}
+	
+	
+	public  static MembraneDescription createMembraneDescription(XMLNode n)
+	{
+		Assertions.ensure(n.getName().equals("controller"), "membrane description tag must be named 'controller'");
+		MembraneDescription id = new MembraneDescription();
+		return id;
 	}
 }
