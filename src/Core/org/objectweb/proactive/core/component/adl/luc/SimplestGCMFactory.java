@@ -1,14 +1,12 @@
 package org.objectweb.proactive.core.component.adl.luc;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -49,21 +47,13 @@ public class SimplestGCMFactory
 		}
 	}
 
-	public File getArgumentsFile(File adlFile) throws IOException
-	{
-		return new File(adlFile.getAbsolutePath() + ".args");
-	}
 
-	public Map<String, String> getArguments(File adlFile) throws IOException
-	{
-		return Utilities.loadPropertiesToMap(new String(FileUtilities.getFileContent(getArgumentsFile(adlFile))));
-	}
 
-	public Component createComponent(File adlFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public Component createComponent(File adlFile, File argumentFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
 	{
 		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
 		XMLNode node = XMLUtilities.xml2node(adlDescription, false);
-		applyArguments(getArguments(adlFile), node);
+		Arguments.apply(Arguments.parseArguments(argumentFile), node);
 		ComponentDescription componentDescription = ComponentDescription.createComponentDescription(node);
 		componentDescription.setFile(adlFile);
 		return createComponent(componentDescription);
@@ -83,7 +73,7 @@ public class SimplestGCMFactory
 
 	private void bindAllInterfaces(ComponentDescription componentDescription, Map<String, Component> comp_child) throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException
 	{
-		for (BindingDescription bd : componentDescription.getBindingDescriptions())
+		for (BindingDescription bd : componentDescription.getAllBindingDescriptions())
 		{
 			InterfaceDescription clientInterfaceDescription = componentDescription.findInterfaceDescription(bd.getClient());
 			InterfaceDescription serverInterfaceDescription = componentDescription.findInterfaceDescription(bd.getServer());
@@ -98,7 +88,7 @@ public class SimplestGCMFactory
 	{
 		Map<String, Component> comp_child = new HashMap<String, Component>();
 
-		for (ComponentDescription subD : componentDescription.getSubcomponentDescriptions())
+		for (ComponentDescription subD : componentDescription.getAllSubcomponentDescriptions())
 		{
 			Component child = createComponent(subD);
 			GCM.getContentController(component).addFcSubComponent(child);
@@ -115,7 +105,7 @@ public class SimplestGCMFactory
 		if (componentDescription.getMembraneDescription() == null)
 		{
 			// if the component is primitive
-			String s = componentDescription.getSubcomponentDescriptions().isEmpty() ? Constants.PRIMITIVE : Constants.COMPOSITE;
+			String s = componentDescription.getAllSubcomponentDescriptions().isEmpty() ? Constants.PRIMITIVE : Constants.COMPOSITE;
 			return gf.newFcInstance(type, s, componentDescription.getContent() == null ? null : componentDescription.getContent().getName());
 		}
 		else
@@ -129,7 +119,7 @@ public class SimplestGCMFactory
 			else
 			{
 				// this refers to an external controller config
-				ControllerDescription cd = new ControllerDescription("parametricPrimitive", componentDescription.getSubcomponentDescriptions().isEmpty() ? Constants.PRIMITIVE : Constants.COMPOSITE, desc, false);
+				ControllerDescription cd = new ControllerDescription("parametricPrimitive", componentDescription.getAllSubcomponentDescriptions().isEmpty() ? Constants.PRIMITIVE : Constants.COMPOSITE, desc, false);
 				return gf.newFcInstance(type, cd, componentDescription.getContent().getName());
 			}
 		}
@@ -141,7 +131,7 @@ public class SimplestGCMFactory
 		GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(Utils.getBootstrapComponent());
 		List<InterfaceType> interfaceTypes = new ArrayList<InterfaceType>();
 
-		for (InterfaceDescription id : componentDescription.getInterfaceDescriptions())
+		for (InterfaceDescription id : componentDescription.getAllInterfaceDescriptions())
 		{
 			System.out.println(id);
 			interfaceTypes.add(typeFactory.createGCMItfType(id.getName(), id.getSignature().getName(), id.getRole() == Role.CLIENT, id.getContingency() == Contingency.OPTIONAL, id.getCardinality().name()));
@@ -150,36 +140,5 @@ public class SimplestGCMFactory
 		return typeFactory.createFcType(interfaceTypes.toArray(new InterfaceType[0]));
 	}
 
-	private static void applyArguments(Map<String, String> argumentValues, XMLNode node) throws ADLException
-	{
-		for (String n : argumentValues.keySet())
-		{
-			String v = node.getAttributes().get(n);
-
-			if (v == null)
-			{
-				throw new ADLException("no value was found for argument " + n);
-			}
-			else
-			{
-				replaceArgument(v, argumentValues);
-			}
-		}
-
-		for (XMLNode c : node.getChildren())
-		{
-			applyArguments(argumentValues, c);
-		}
-	}
-
-	private static String replaceArgument(String v, Map<String, String> argumentValues)
-	{
-		for (String a : argumentValues.keySet())
-		{
-			v = v.replace("${" + a + "}", argumentValues.get(a));
-		}
-
-		return v;
-	}
 
 }

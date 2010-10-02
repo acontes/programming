@@ -1,8 +1,6 @@
 package org.objectweb.proactive.core.component.adl.luc.description;
 
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,8 +13,18 @@ import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
 public class ComponentDescription extends Description
 {
-	private File file;
 	private String name;
+	private ComponentDescription superDescription;
+
+	public ComponentDescription getSuperDescription()
+	{
+		return superDescription;
+	}
+
+	public void setSuperDescription(ComponentDescription superDescription)
+	{
+		this.superDescription = superDescription;
+	}
 
 	// the content may be null
 	private Class<?> content;
@@ -28,50 +36,56 @@ public class ComponentDescription extends Description
 	private final List<InterfaceDescription> interfaceDescriptions = new ArrayList<InterfaceDescription>();
 	private final List<BindingDescription> bindingDescriptions = new ArrayList<BindingDescription>();
 	private final List<AttributeDescription> attributesDescriptions = new ArrayList<AttributeDescription>();
-	private final List<String> arguments = new ArrayList<String>();
-	
-	private ComponentDescription superDefinition;
-
-	public ComponentDescription getSuperDefinition()
-	{
-		return superDefinition;
-	}
-
-	public List<String> getArguments()
-	{
-		return arguments;
-	}
 
 	public List<AttributeDescription> getDeclaredAttributesDescriptions()
 	{
 		return attributesDescriptions;
 	}
-	
-	public List<AttributeDescription> geAttributeDescriptions()
-	{
-		return Collections.unmodifiableList(Lists.concatene(superDefinition.geAttributeDescriptions(), getDeclaredAttributesDescriptions()));
-	}
 
+	public List<AttributeDescription> getAllAttributeDescriptions()
+	{
+		if (getSuperDescription() == null)
+		{
+			return getDeclaredAttributesDescriptions();
+		}
+		else
+		{
+			return Collections.unmodifiableList(Lists.concatene(getSuperDescription().getAllAttributeDescriptions(), getDeclaredAttributesDescriptions()));
+		}
+	}
 
 	public List<BindingDescription> getDeclaredBindingDescriptions()
 	{
 		return bindingDescriptions;
 	}
-	
-	public List<BindingDescription> getBindingDescriptions()
-	{
-		return Collections.unmodifiableList(Lists.concatene(superDefinition.getBindingDescriptions(), getDeclaredBindingDescriptions()));
-	}
 
+	public List<BindingDescription> getAllBindingDescriptions()
+	{
+		if (getSuperDescription() == null)
+		{
+			return getDeclaredBindingDescriptions();
+		}
+		else
+		{
+			return Collections.unmodifiableList(Lists.concatene(getSuperDescription().getAllBindingDescriptions(), getDeclaredBindingDescriptions()));
+		}
+	}
 
 	public List<InterfaceDescription> getDeclaredInterfaceDescriptions()
 	{
 		return interfaceDescriptions;
 	}
 
-	public List<InterfaceDescription> getInterfaceDescriptions()
+	public List<InterfaceDescription> getAllInterfaceDescriptions()
 	{
-		return Collections.unmodifiableList(Lists.concatene(superDefinition.getInterfaceDescriptions(), getDeclaredInterfaceDescriptions()));
+		if (getSuperDescription() == null)
+		{
+			return getDeclaredInterfaceDescriptions();
+		}
+		else
+		{
+			return Collections.unmodifiableList(Lists.concatene(getSuperDescription().getAllInterfaceDescriptions(), getDeclaredInterfaceDescriptions()));
+		}
 	}
 
 	public String getName()
@@ -86,13 +100,13 @@ public class ComponentDescription extends Description
 
 	public Class<?> getContent()
 	{
-		if (this.content == null)
+		if (this.content == null && getSuperDescription() != null)
 		{
-			return getSuperDefinition().getContent();
+			return getSuperDescription().getContent();
 		}
 		else
 		{
-			return content;
+			return this.content;
 		}
 	}
 
@@ -103,13 +117,13 @@ public class ComponentDescription extends Description
 
 	public MembraneDescription getMembraneDescription()
 	{
-		if (this.membraneDescription == null)
+		if (this.membraneDescription == null && getSuperDescription() != null)
 		{
-			return getSuperDefinition().getMembraneDescription();
+			return getSuperDescription().getMembraneDescription();
 		}
 		else
 		{
-			return membraneDescription;
+			return this.membraneDescription;
 		}
 	}
 
@@ -122,10 +136,17 @@ public class ComponentDescription extends Description
 	{
 		return subcomponentDescriptions;
 	}
-	
-	public List<ComponentDescription> getSubcomponentDescriptions()
+
+	public List<ComponentDescription> getAllSubcomponentDescriptions()
 	{
-		return Lists.concatene(superDefinition.getSubcomponentDescriptions(), getDeclaredSubcomponentDescriptions());
+		if (getSuperDescription() == null)
+		{
+			return getDeclaredSubcomponentDescriptions();
+		}
+		else
+		{
+			return Lists.concatene(getSuperDescription().getAllSubcomponentDescriptions(), getDeclaredSubcomponentDescriptions());
+		}
 	}
 
 	@Override
@@ -135,17 +156,17 @@ public class ComponentDescription extends Description
 		n.setName("component");
 		n.getAttributes().put("name", getName());
 
-		for (Description id : getInterfaceDescriptions())
+		for (Description id : getAllInterfaceDescriptions())
 		{
 			n.getChildren().add(id.toXMLNode());
 		}
 
-		for (Description id : getBindingDescriptions())
+		for (Description id : getAllBindingDescriptions())
 		{
 			n.getChildren().add(id.toXMLNode());
 		}
 
-		for (Description id : getSubcomponentDescriptions())
+		for (Description id : getAllSubcomponentDescriptions())
 		{
 			n.getChildren().add(id.toXMLNode());
 		}
@@ -171,7 +192,7 @@ public class ComponentDescription extends Description
 	{
 		Assertions.ensure(!getName().trim().isEmpty(), "name can't be empty");
 		Assertions.ensure(!getName().equals("this"), "name can't be 'this'");
-		Assertions.ensure(!getInterfaceDescriptions().isEmpty(), "no interface defined");
+		Assertions.ensure(!getAllInterfaceDescriptions().isEmpty(), "no interface defined");
 
 		for (Description d : getDeclaredInterfaceDescriptions())
 		{
@@ -193,10 +214,14 @@ public class ComponentDescription extends Description
 			d.check();
 		}
 
-		
 		if (this.membraneDescription != null)
 		{
 			this.membraneDescription.check();
+		}
+		
+		if (getSuperDescription() != null)
+		{
+			getSuperDescription().check();
 		}
 	}
 
@@ -204,10 +229,6 @@ public class ComponentDescription extends Description
 	{
 		Assertions.ensure(node.getName().matches("component|definition"), "component description tag must be named 'comopnent' or 'definition''");
 		ComponentDescription description = new ComponentDescription();
-
-		// this as to be done first
-		description.getArguments().addAll(Arrays.asList(node.getAttributes().get("arguments").split(" *, *")));
-		
 		description.setName(node.getAttributes().remove("name"));
 
 		{
@@ -256,47 +277,45 @@ public class ComponentDescription extends Description
 		{
 			description.getDeclaredAttributesDescriptions().add(AttributeDescription.createAttributeDescription(n));
 		}
-		
+
 		return description;
 	}
 
-
-
 	public ComponentDescription findSubcomponentDescriptionByName(String name)
 	{
-		for (ComponentDescription d : getSubcomponentDescriptions())
+		for (ComponentDescription d : getAllSubcomponentDescriptions())
 		{
 			if (d.getName().equals(name))
 			{
 				return d;
 			}
 		}
-		
+
 		return null;
 	}
 
 	public InterfaceDescription findInterfaceDescription(String name)
 	{
 		int pos = name.indexOf('.');
-		
+
 		// no dot found so the interface belongs to the current component
 		if (pos < 0)
 		{
-			for (InterfaceDescription id : getInterfaceDescriptions())
+			for (InterfaceDescription id : getAllInterfaceDescriptions())
 			{
 				if (id.getName().equals(name))
 				{
 					return id;
 				}
 			}
-			
+
 			return null;
 		}
 		else
 		{
 			String childName = name.substring(0, pos);
 			String interfaceName = name.substring(pos + 1);
-			
+
 			if (childName.equals("this"))
 			{
 				return findInterfaceDescription(interfaceName);
@@ -308,15 +327,4 @@ public class ComponentDescription extends Description
 		}
 	}
 
-	public void setFile(File file)
-	{
-		this.file = file;
-	}
-
-	public File getFile()
-	{
-		return file;
-	}
-
-	
 }
