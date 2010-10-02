@@ -1,17 +1,19 @@
 package org.objectweb.proactive.core.component.adl.luc;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import lucci.io.FileUtilities;
-import lucci.io.JavaResource;
+import lucci.io.Utilities;
 import lucci.text.xml.XMLNode;
 import lucci.text.xml.XMLUtilities;
 
@@ -46,25 +48,25 @@ public class SimplestGCMFactory
 			System.setProperty("gcm.provider", Fractive.class.getName());
 		}
 	}
-	
-	public Component createComponent(JavaResource resource) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+
+	public File getArgumentsFile(File adlFile) throws IOException
 	{
-		return createComponent(new String(resource.getByteArray()));
+		return new File(adlFile.getAbsolutePath() + ".args");
 	}
 
-	public Component createComponent(File xmlFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public Map<String, String> getArguments(File adlFile) throws IOException
 	{
-		return createComponent(new String(FileUtilities.getFileContent(xmlFile)));
+		return Utilities.loadPropertiesToMap(new String(FileUtilities.getFileContent(getArgumentsFile(adlFile))));
 	}
 
-	public Component createComponent(String xml) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public Component createComponent(File adlFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
 	{
-		return createComponent(XMLUtilities.xml2node(xml, false));
-	}
-
-	public Component createComponent(XMLNode node) throws ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
-	{
-		return createComponent(ComponentDescription.createComponentDescription(node));
+		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
+		XMLNode node = XMLUtilities.xml2node(adlDescription, false);
+		applyArguments(getArguments(adlFile), node);
+		ComponentDescription componentDescription = ComponentDescription.createComponentDescription(node);
+		componentDescription.setFile(adlFile);
+		return createComponent(componentDescription);
 	}
 
 	public Component createComponent(ComponentDescription componentDescription) throws ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
@@ -135,7 +137,7 @@ public class SimplestGCMFactory
 
 	private ComponentType createType(ComponentDescription componentDescription) throws InstantiationException, NoSuchInterfaceException
 	{
-		
+
 		GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(Utils.getBootstrapComponent());
 		List<InterfaceType> interfaceTypes = new ArrayList<InterfaceType>();
 
@@ -147,5 +149,37 @@ public class SimplestGCMFactory
 
 		return typeFactory.createFcType(interfaceTypes.toArray(new InterfaceType[0]));
 	}
-	
+
+	private static void applyArguments(Map<String, String> argumentValues, XMLNode node) throws ADLException
+	{
+		for (String n : argumentValues.keySet())
+		{
+			String v = node.getAttributes().get(n);
+
+			if (v == null)
+			{
+				throw new ADLException("no value was found for argument " + n);
+			}
+			else
+			{
+				replaceArgument(v, argumentValues);
+			}
+		}
+
+		for (XMLNode c : node.getChildren())
+		{
+			applyArguments(argumentValues, c);
+		}
+	}
+
+	private static String replaceArgument(String v, Map<String, String> argumentValues)
+	{
+		for (String a : argumentValues.keySet())
+		{
+			v = v.replace("${" + a + "}", argumentValues.get(a));
+		}
+
+		return v;
+	}
+
 }

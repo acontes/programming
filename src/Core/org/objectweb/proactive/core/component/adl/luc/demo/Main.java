@@ -1,12 +1,11 @@
 package org.objectweb.proactive.core.component.adl.luc.demo;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
-
-import lucci.io.JavaResource;
 
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.ADLException;
@@ -26,8 +25,8 @@ public class Main
 	
 	public static void main(String... args) throws IOException, ParserConfigurationException, SAXException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, org.objectweb.proactive.core.component.adl.luc.ADLException
 	{
-		String xml = new String(new JavaResource(Main.class, "ExampleComponent.fractal").getByteArray());
-		Component component = new SimplestGCMFactory().createComponent(xml);
+		File adlFile = new File("org/objectweb/proactive/core/component/adl/luc/demo/ExampleComponent.fractal");
+		Component component = new SimplestGCMFactory().createComponent(adlFile);
 		GCM.getLifeCycleController(component).startFc();
 		((ExampleComponent) component.getFcInterface("r")).printOk();
 	}

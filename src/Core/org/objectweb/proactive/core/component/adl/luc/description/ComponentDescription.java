@@ -1,9 +1,13 @@
 package org.objectweb.proactive.core.component.adl.luc.description;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import lucci.Clazz;
+import lucci.collections.Lists;
 import lucci.text.xml.XMLNode;
 import lucci.util.assertion.Assertions;
 
@@ -11,6 +15,7 @@ import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
 public class ComponentDescription extends Description
 {
+	private File file;
 	private String name;
 
 	// the content may be null
@@ -23,20 +28,50 @@ public class ComponentDescription extends Description
 	private final List<InterfaceDescription> interfaceDescriptions = new ArrayList<InterfaceDescription>();
 	private final List<BindingDescription> bindingDescriptions = new ArrayList<BindingDescription>();
 	private final List<AttributeDescription> attributesDescriptions = new ArrayList<AttributeDescription>();
+	private final List<String> arguments = new ArrayList<String>();
+	
+	private ComponentDescription superDefinition;
 
-	public List<AttributeDescription> getAttributesDescriptions()
+	public ComponentDescription getSuperDefinition()
+	{
+		return superDefinition;
+	}
+
+	public List<String> getArguments()
+	{
+		return arguments;
+	}
+
+	public List<AttributeDescription> getDeclaredAttributesDescriptions()
 	{
 		return attributesDescriptions;
 	}
+	
+	public List<AttributeDescription> geAttributeDescriptions()
+	{
+		return Collections.unmodifiableList(Lists.concatene(superDefinition.geAttributeDescriptions(), getDeclaredAttributesDescriptions()));
+	}
 
-	public List<BindingDescription> getBindingDescriptions()
+
+	public List<BindingDescription> getDeclaredBindingDescriptions()
 	{
 		return bindingDescriptions;
+	}
+	
+	public List<BindingDescription> getBindingDescriptions()
+	{
+		return Collections.unmodifiableList(Lists.concatene(superDefinition.getBindingDescriptions(), getDeclaredBindingDescriptions()));
+	}
+
+
+	public List<InterfaceDescription> getDeclaredInterfaceDescriptions()
+	{
+		return interfaceDescriptions;
 	}
 
 	public List<InterfaceDescription> getInterfaceDescriptions()
 	{
-		return interfaceDescriptions;
+		return Collections.unmodifiableList(Lists.concatene(superDefinition.getInterfaceDescriptions(), getDeclaredInterfaceDescriptions()));
 	}
 
 	public String getName()
@@ -51,7 +86,14 @@ public class ComponentDescription extends Description
 
 	public Class<?> getContent()
 	{
-		return content;
+		if (this.content == null)
+		{
+			return getSuperDefinition().getContent();
+		}
+		else
+		{
+			return content;
+		}
 	}
 
 	public void setContent(Class<?> content)
@@ -61,7 +103,14 @@ public class ComponentDescription extends Description
 
 	public MembraneDescription getMembraneDescription()
 	{
-		return membraneDescription;
+		if (this.membraneDescription == null)
+		{
+			return getSuperDefinition().getMembraneDescription();
+		}
+		else
+		{
+			return membraneDescription;
+		}
 	}
 
 	public void setMembraneDescription(MembraneDescription membraneDescription)
@@ -69,9 +118,14 @@ public class ComponentDescription extends Description
 		this.membraneDescription = membraneDescription;
 	}
 
-	public List<ComponentDescription> getSubcomponentDescriptions()
+	public List<ComponentDescription> getDeclaredSubcomponentDescriptions()
 	{
 		return subcomponentDescriptions;
+	}
+	
+	public List<ComponentDescription> getSubcomponentDescriptions()
+	{
+		return Lists.concatene(superDefinition.getSubcomponentDescriptions(), getDeclaredSubcomponentDescriptions());
 	}
 
 	@Override
@@ -119,33 +173,41 @@ public class ComponentDescription extends Description
 		Assertions.ensure(!getName().equals("this"), "name can't be 'this'");
 		Assertions.ensure(!getInterfaceDescriptions().isEmpty(), "no interface defined");
 
-		for (Description id : getInterfaceDescriptions())
+		for (Description d : getDeclaredInterfaceDescriptions())
 		{
-			id.check();
+			d.check();
 		}
 
-		for (Description cd : getSubcomponentDescriptions())
+		for (Description d : getDeclaredSubcomponentDescriptions())
 		{
-			cd.check();
+			d.check();
 		}
 
-		for (Description bd : getBindingDescriptions())
+		for (Description d : getDeclaredBindingDescriptions())
 		{
-			bd.check();
+			d.check();
 		}
 
-		if (getMembraneDescription() != null)
+		for (Description d : getDeclaredAttributesDescriptions())
 		{
-			getMembraneDescription().check();
+			d.check();
+		}
+
+		
+		if (this.membraneDescription != null)
+		{
+			this.membraneDescription.check();
 		}
 	}
 
 	public static ComponentDescription createComponentDescription(XMLNode node) throws ADLException
 	{
 		Assertions.ensure(node.getName().matches("component|definition"), "component description tag must be named 'comopnent' or 'definition''");
-
 		ComponentDescription description = new ComponentDescription();
 
+		// this as to be done first
+		description.getArguments().addAll(Arrays.asList(node.getAttributes().get("arguments").split(" *, *")));
+		
 		description.setName(node.getAttributes().remove("name"));
 
 		{
@@ -165,34 +227,40 @@ public class ComponentDescription extends Description
 		{
 			List<XMLNode> membraneNodes = XMLNode.findChildrenWhoseNameMatch(node, "controller");
 
-			if (!membraneNodes.isEmpty())
+			if (membraneNodes.size() == 1)
 			{
-				description.setMembraneDescription(new MembraneDescription());
+				description.setMembraneDescription(MembraneDescription.createMembraneDescription(membraneNodes.get(0)));
+			}
+			else if ((membraneNodes.size() > 1))
+			{
+				throw new ADLException("only one membrane description is allowed");
 			}
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "interface"))
 		{
-			description.getInterfaceDescriptions().add(InterfaceDescription.createInterfaceDescription(n));
+			description.getDeclaredInterfaceDescriptions().add(InterfaceDescription.createInterfaceDescription(n));
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "component"))
 		{
-			description.getSubcomponentDescriptions().add(createComponentDescription(n));
+			description.getDeclaredSubcomponentDescriptions().add(createComponentDescription(n));
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "binding"))
 		{
-			description.getBindingDescriptions().add(BindingDescription.createBindingDescription(n));
+			description.getDeclaredBindingDescriptions().add(BindingDescription.createBindingDescription(n));
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "attributes"))
 		{
-			description.getAttributesDescriptions().add(AttributeDescription.createAttributeDescription(n));
+			description.getDeclaredAttributesDescriptions().add(AttributeDescription.createAttributeDescription(n));
 		}
-
+		
 		return description;
 	}
+
+
 
 	public ComponentDescription findSubcomponentDescriptionByName(String name)
 	{
@@ -226,7 +294,6 @@ public class ComponentDescription extends Description
 		}
 		else
 		{
-
 			String childName = name.substring(0, pos);
 			String interfaceName = name.substring(pos + 1);
 			
@@ -239,6 +306,16 @@ public class ComponentDescription extends Description
 				return findSubcomponentDescriptionByName(childName).findInterfaceDescription(interfaceName);
 			}
 		}
+	}
+
+	public void setFile(File file)
+	{
+		this.file = file;
+	}
+
+	public File getFile()
+	{
+		return file;
 	}
 
 	
