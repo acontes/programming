@@ -1,0 +1,230 @@
+%%This is a very basic article template.
+%%There is just one section and two subsections.
+\documentclass{article}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\xml}[1]{\textsl{#1}}
+
+
+\usepackage{listings}
+\lstset{numbers=left}
+\lstset{numberstyle=\footnotesize}
+
+\usepackage{url}
+
+\title{A factory for GCM}
+\author{Luc Hogie}
+\begin{document}
+\maketitle
+\tableofcontents
+\newpage
+
+
+The aim of the document is to provide a documentation for the new GCM factory.
+
+\section{Introduction}
+
+\subsection{Context}
+
+
+\subsubsection{Fractal}
+
+According to its authors, Fractal is a modular, extensible and programming language agnostic component model  that can be used to design, implement, deploy and reconfigure systems and applications, from operating systems to middleware platforms and to graphical user interfaces.
+
+\subsubsection{ADL}
+
+The ADL used by Fractal allows the description of a hierarchy of  components.
+
+A basic tutorial for ADL syntax can be found at the following web URL:
+\url{http://fractal.ow2.org/tutorials/adl/index.html}
+
+This description is written in a dialect of XML.
+Even though the authors of Fractal claim
+the independance of Fractal from XML, no parser for other syntax is available.
+
+Fractal incorrectly refers to ADL descriptions as ADL files. In fact, the ADL description
+is not stored in a file: it is stored as a Java resource. A Java resource can be either a plain file
+or an entry within a ZIP or JAR container.
+
+
+\subsubsection{ProActive}
+
+\subsubsection{GCM}
+
+\subsubsection{The component factory}
+The component factory of Fractal is a piece of code within Fractal whose the role  is to build a component out of its XML description. This description
+is called an ADL (Architecture Description Language).
+
+
+GCM comes with its own factory which is an extension of Fractal's one.
+
+Althought the objectives of the factory are to merely perform a number of verifications
+on the description and instantiate a set of components out of it, its implementation is cumbersome: it consists of nothing
+less than about 150 Java classes and configuration files.
+In order to implement is extensions, GCM adds about 40 classes and description files.
+
+
+\subsection{Description of the problem}
+The complex design of Fractal factory turned out to be 
+
+The objective of the new factory is then to make a factory that is \em{much} shorter, cleaner,
+easier to understand, faster than the original Fractal/GCM factory.
+
+\section{Design of the factory}
+The new factory is object-oriented.
+
+\subsection{Definitions}
+
+
+\subsection{Input format}
+\subsubsection{ADL}
+The architecture of the component system must be written in a dialect of XML.
+
+\subsubsection{Argument values}
+The arguments values are described in a file as a set of $key=value$ pairs. The format
+of the argument file is then:
+
+\begin{center}
+$k_1 = v_1$ \\
+$k_2 = v_2$ \\
+...  \\
+$k_n = v_n$
+\end{center}
+
+Java programmers will notice that the syntax is the one used for \textit{properties} files.
+
+The name of the argument files is passed to the factory \code{newComponent()} method.
+\subsubsection{Deployment descriptor}
+
+
+\subsection{The new factory}
+
+
+\subsubsection{Lexical analysis: from XML to DOM}
+
+
+
+\subsubsection{Semantic analysis: from DOM to AD}
+
+Each XML element type into the ADL description is represented by a  \code{description} class.
+Then at runtime, each XML element is represented at an instance of this class: a  \code{description} object.
+The description models which attributes and sub-elements (sub-descriptions) the element allows.
+
+In pratise, Fractal ADL  defines the following elements:
+\begin{description}
+\item[\xml{definition}] describes the root component of the component tree;
+\item[\xml{component}] describes a sub-component of a given component;
+\item[\xml{interface}] describes an interface of a given component;
+\item[\xml{binding}] describes an interface binding involving two interfaces of two parent/child components;
+\item[\xml{attributes}] describes attributes in a given components.
+\item[\xml{content}] describes the content class for the implementation code of a given component.
+\end{description}
+The Factory  defines the following classes, all sub-classes of the \code{Description} class:
+\begin{description}
+\item[componentDescription] represents both definition and component elements;
+\item[interface] describes the interface elements;
+\item[binding] the binding elements;
+\item[attributes] describes the attribute elements;
+\end{description}
+
+Note that the \xml{content} XML element is not represented as a specific sub-class of class \code{description}.
+Instead it is represented as a field into the 
+
+The description is build 
+
+\subsubsection{Component creation: from AD to components}
+
+
+
+\section{Enhancement of the ADL}
+
+\subsection{The DTD is no longer required}
+
+All the verifications are done in the semantic analyser.
+
+This simplifies the writing of the XML file.
+
+The DTD can still be useful for documentation purposes.
+
+
+\subsection{Storing the ADL in files rather than in Java resources}
+
+
+
+
+\subsection{the \xml{definition} XML element}
+
+A component is described by the use of the \xml{component} element, except at the root-level
+where the component is to be referred as a  \xml{definition}. This choice probably comes
+from the fact, reinforced by the use of a DTD, that the \xml{definition} element allows
+extra attributes that the \xml{component} element does not. The \xml{arguments}  
+attribute might be of these.
+
+
+\subsection{the \xml{arguments} attribute}
+
+Suppressing the \xml{arguments} attribute into component description element.
+
+\subsection{the \xml{content} XML element}
+
+In the description of a component, only one \xml{content} element is allowed, and this element accepts
+only one attribute, the \xml{class} attribute. 
+
+\begin{lstlisting}
+<component name="boh">
+	...
+	<content class="java.util.ArrayList" />
+	...
+</component>
+\end{lstlisting}
+
+
+Instead, the content information for a component should be expressed as
+an attribute in the \texttt{component} description.
+
+\begin{lstlisting}
+<component name="boh" content="java.util.ArrayList">
+	...
+</component>
+\end{lstlisting}
+
+\section{How to}
+
+\subsection{Perform a new verification}
+
+Verifications are all performed in the \code{check()} method of the \code{Description}
+class. Depending on the description you want to perform the verification (component, interface, etc),
+you will have to look into the corresponding description class (respectively \code{ComponentDescription},
+\code{IntefaceDescription}, etc).
+
+Adding a new verification consists in adding a line to the \code{check()} method. Typically, such line
+is in the form:
+
+\begin{lstlisting}
+if (!condition)
+	throw new ADLException("condition failed");
+\end{lstlisting}
+
+For convenience purpose, the use of the following construct is encouraged:
+
+\begin{lstlisting}
+Assertions.ensure(condition, "condition failed");
+\end{lstlisting}
+
+
+
+\subsection{Add a new attribute to an existing XML element}
+
+As described in Section \ref{}, each element type is represented by a \code{description} class.
+In turn, each attribute of the element is represented as a field into its corresponding \code{description} class.
+Adding a new attribute consists then in adding a new field in this class.
+
+\subsection{Add a new XML element}
+
+\subsection{Modify the way attributes values are processed}
+
+
+\section{Conclusion}
+
+
+\end{document}
