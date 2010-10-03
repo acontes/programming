@@ -15,7 +15,7 @@
 \newcommand{\urll}[1]{\begin{center}\url{#1}\end{center}}
 
 
-\title{A factory for GCM}
+\title{A new factory for Fractal/GCM}
 \author{Luc Hogie}
 \begin{document}
 \maketitle
@@ -105,6 +105,9 @@ leads to large architectures) and {\em simplicity} (which often leads to a lack 
 
 
 \subsection{Input format}
+
+The input of the factory comes in the form of files on the disk.
+
 \subsubsection{ADL}
 The architecture of the component system must be written in a dialect of XML.
 
@@ -159,7 +162,8 @@ and a sub-component of a given component; they are both represented by the class
 \item[\xml{binding}] describes an interface binding involving two interfaces of two parent/child components;
 it is represented by the class \code{BindingDescription};
 \item[\xml{attributes}] describes attributes in a given components; it is represented by the class \code{AttributesDescription};
-\item[\xml{content}] describes the content class for the implementation code of a given component. Instead it is represented as a field into the class \code{ComponentDescription}.
+\item[\xml{content}] describes the content class for the implementation code of a given component. It is
+{\em not} represented by any description. Instead it is represented as a field into the class \code{ComponentDescription}.
 \end{description}
 
 
@@ -264,12 +268,78 @@ As described in Section \ref{}, each element type is represented by a \code{desc
 In turn, each attribute of the element is represented as a field into its corresponding \code{description} class.
 Adding a new attribute consists then in adding a new field in this class.
 
+In order to make the new attribute need to be considered by the semantic analyser, you need
+to add a line of code into the corresponding method.
+
+
+
 \subsection{Add a new XML element}
+
+XML elements have a semantic corresponding description. To add a new XML element, you need to define such a description.
+
+\begin{itemize}
+  \item Mandatory attributes have no default value. They must be assigned at construction time.
+  \item Optional attributes have a default value. They are reassigned only if they are explicity given by the user.
+\end{itemize}
+
+\subsubsection{Example: the interface element}
+
+Mandatory attributes must be provided at construction time:
+\begin{tiny}
+\begin{lstlisting}
+String name  = n.getAttributes().get("name");
+Role role = n.getAttributes().get("role").equals("client") ? Role.CLIENT : Role.SERVER;
+Class<?> signature = Clazz.findClassOrFail(n.getAttributes().get("signature"));
+InterfaceDescription id = new InterfaceDescription(name, role, signature);
+\end{lstlisting}
+\end{tiny}
+
+
+Optional elements are set right after construction, if the user provided a value of them:
+\begin{tiny}
+\begin{lstlisting}
+if (n.getAttributes().get("contigency") != null)
+{
+	id.setContingency(n.getAttributes().get("contigency").equals("mandatory")
+		? Contingency.MANDATORY : Contingency.OPTIONAL);
+}
+\end{lstlisting}
+\end{tiny}
+
 
 \subsection{Modify the way attributes values are processed}
 
+XML attribute values are parsed by the method:
 
-\section{Conclusion}
+\code{String replaceArgument(String v, Map<String, String> argumentValues)}
 
+method in the \code{Attributes} class.
+Its default behavior is to replace the pattern \code{\$\{name\}} by the value of the $name$ argument by its value
+found in the associative map \code{argumentValues}.
+
+Override it to get the behavior you want.
+
+
+
+\section{Features supported}
+The following features are already supported by the new factory:
+\begin{itemize}
+  \item component interfaces (singleton);
+  \item component attributes;
+  \item interface bindings;
+  \item sub-components;
+  \item ADL inheritance;
+  \item arguments and variables (plus extra features);
+\end{itemize}
+
+
+\section{Future works}
+\begin{itemize}
+  \item support for shared components;
+  \item support for collection interfaces;
+  \item support for bindings to web-services;
+  \item support for collection components (Amine Rouini's topic);
+  \item support for componentized membranes (Paul Naoumenko's topic);
+\end{itemize}
 
 \end{document}

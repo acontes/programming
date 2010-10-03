@@ -31,6 +31,10 @@ public class InterfaceDescription extends Description
 	}
 	public void setContingency(Contingency contingency)
 	{
+		if (contingency == null)
+			throw new NullPointerException();
+
+
 		this.contingency = contingency;
 	}
 	public Cardinality getCardinality()
@@ -39,6 +43,10 @@ public class InterfaceDescription extends Description
 	}
 	public void setCardinality(Cardinality cardinality)
 	{
+		if (cardinality == null)
+			throw new NullPointerException();
+
+
 		this.cardinality = cardinality;
 	}
 	

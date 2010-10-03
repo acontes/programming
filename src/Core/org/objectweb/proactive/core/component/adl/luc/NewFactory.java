@@ -37,9 +37,9 @@ import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescr
 import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription.Role;
 import org.xml.sax.SAXException;
 
-public class SimplestGCMFactory
+public class NewFactory
 {
-	public SimplestGCMFactory()
+	public NewFactory()
 	{
 		if (System.getProperty("gcm.provider") == null)
 		{
@@ -47,13 +47,11 @@ public class SimplestGCMFactory
 		}
 	}
 
-
-
 	public Component createComponent(File adlFile, File argumentFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
 	{
 		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
 		XMLNode node = XMLUtilities.xml2node(adlDescription, false);
-		Arguments.apply(Arguments.parseArguments(argumentFile), node);
+		resolveVariables(parseArgumentsValueFile(argumentFile), node);
 		ComponentDescription componentDescription = ComponentDescription.createComponentDescription(node);
 		componentDescription.setFile(adlFile);
 		return createComponent(componentDescription);
@@ -140,5 +138,50 @@ public class SimplestGCMFactory
 		return typeFactory.createFcType(interfaceTypes.toArray(new InterfaceType[0]));
 	}
 
+	public void resolveVariables(Map<String, String> argumentValues, XMLNode node) throws ADLException
+	{
+		// for every variable name
+		for (String n : argumentValues.keySet())
+		{
+			// get the raw value for the attribute
+			String v = node.getAttributes().get(n);
 
+			if (v == null)
+			{
+				throw new ADLException("no value was found for argument " + n);
+			}
+			else
+			{
+				// replace the raw value by the evaluated one
+				node.getAttributes().put(n, replaceVariableValues(v, argumentValues));
+			}
+		}
+
+		for (XMLNode c : node.getChildren())
+		{
+			resolveVariables(argumentValues, c);
+		}
+	}
+
+	public String replaceVariableValues(String v, Map<String, String> argumentValues)
+	{
+		for (String a : argumentValues.keySet())
+		{
+			v = v.replace("${" + a + "}", argumentValues.get(a));
+		}
+
+		return v;
+	}
+
+	public Map<String, String> parseArgumentsValueFile(File argFile) throws IOException
+	{
+		if (argFile == null || !argFile.exists())
+		{
+			return new HashMap<String, String>();
+		}
+		else
+		{
+			return Utilities.loadPropertiesToMap(new String(FileUtilities.getFileContent(argFile)));
+		}
+	}
 }
