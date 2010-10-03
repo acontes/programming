@@ -14,6 +14,11 @@ public class AttributeDescription extends Description
 	private Class<?> signature;
 	private final Map<String, Object> name_value = new HashMap<String, Object>();
 	
+	public AttributeDescription(Class<?> signature)
+	{
+		setSignature(signature);
+	}
+	
 	
 	public Map<String, Object> getName_value()
 	{
@@ -45,6 +50,9 @@ public class AttributeDescription extends Description
 
 	public void setSignature(Class<?> signature)
 	{
+		if (signature == null)
+			throw new NullPointerException();
+
 		this.signature = signature;
 	}
 
@@ -62,8 +70,7 @@ public class AttributeDescription extends Description
 	public  static AttributeDescription createAttributeDescription(XMLNode n) throws ADLException
 	{
 		Assertions.ensure(n.getName().equals("attributes"), "attributes description tag must be named 'attributes''");
-		AttributeDescription attrDesc = new AttributeDescription();
-		attrDesc.setSignature(Clazz.findClassOrFail(n.getAttributes().get("signature")));
+		AttributeDescription attrDesc = new AttributeDescription(Clazz.findClassOrFail(n.getAttributes().get("signature")));
 
 		for (XMLNode c : n.getChildren())
 		{

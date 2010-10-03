@@ -18,6 +18,12 @@ public class InterfaceDescription extends Description
 	private Contingency contingency = Contingency.MANDATORY;
 	private Cardinality cardinality = Cardinality.SINGLETON;
 
+	public InterfaceDescription(String name, Role role, Class<?> signature)
+	{
+		setName(name);
+		setRole(role);
+		setSignature(signature);
+	}
 	
 	public Contingency getContingency()
 	{
@@ -42,6 +48,9 @@ public class InterfaceDescription extends Description
 	}
 	public void setName(String name)
 	{
+		if (name == null)
+			throw new NullPointerException();
+
 		this.name = name;
 	}
 	public Role getRole()
@@ -50,6 +59,9 @@ public class InterfaceDescription extends Description
 	}
 	public void setRole(Role role)
 	{
+		if (role == null)
+			throw new NullPointerException();
+
 		this.role = role;
 	}
 	public Class<?> getSignature()
@@ -68,11 +80,10 @@ public class InterfaceDescription extends Description
 	public  static InterfaceDescription createInterfaceDescription(XMLNode n)
 	{
 		Assertions.ensure(n.getName().equals("interface"), "interface description tag must be named 'interface''");
-
-		InterfaceDescription id = new InterfaceDescription();
-		id.setName(n.getAttributes().get("name"));
-		id.setRole(n.getAttributes().get("role").equals("client") ? Role.CLIENT : Role.SERVER);
-		id.setSignature(Clazz.findClassOrFail(n.getAttributes().get("signature")));
+		String name  = n.getAttributes().get("name");
+		Role role = n.getAttributes().get("role").equals("client") ? Role.CLIENT : Role.SERVER;
+		Class<?> signature = Clazz.findClassOrFail(n.getAttributes().get("signature"));
+		InterfaceDescription id = new InterfaceDescription(name, role, signature);
 		
 		if (n.getAttributes().get("contigency") != null)
 		{

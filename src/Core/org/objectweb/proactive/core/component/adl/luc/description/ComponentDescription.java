@@ -15,17 +15,6 @@ public class ComponentDescription extends Description
 {
 	private String name;
 	private ComponentDescription superDescription;
-
-	public ComponentDescription getSuperDescription()
-	{
-		return superDescription;
-	}
-
-	public void setSuperDescription(ComponentDescription superDescription)
-	{
-		this.superDescription = superDescription;
-	}
-
 	// the content may be null
 	private Class<?> content;
 
@@ -36,6 +25,24 @@ public class ComponentDescription extends Description
 	private final List<InterfaceDescription> interfaceDescriptions = new ArrayList<InterfaceDescription>();
 	private final List<BindingDescription> bindingDescriptions = new ArrayList<BindingDescription>();
 	private final List<AttributeDescription> attributesDescriptions = new ArrayList<AttributeDescription>();
+	
+	
+	public ComponentDescription(String name)
+	{
+		setName(name);
+	}
+	
+	public ComponentDescription getSuperDescription()
+	{
+		return superDescription;
+	}
+
+	public void setSuperDescription(ComponentDescription superDescription)
+	{
+		this.superDescription = superDescription;
+	}
+
+
 
 	public List<AttributeDescription> getDeclaredAttributesDescriptions()
 	{
@@ -95,6 +102,9 @@ public class ComponentDescription extends Description
 
 	public void setName(String name)
 	{
+		if (name == null)
+			throw new NullPointerException();
+
 		this.name = name;
 	}
 
@@ -228,8 +238,7 @@ public class ComponentDescription extends Description
 	public static ComponentDescription createComponentDescription(XMLNode node) throws ADLException
 	{
 		Assertions.ensure(node.getName().matches("component|definition"), "component description tag must be named 'comopnent' or 'definition''");
-		ComponentDescription description = new ComponentDescription();
-		description.setName(node.getAttributes().remove("name"));
+		ComponentDescription description = new ComponentDescription(node.getAttributes().get("name"));
 
 		{
 			List<XMLNode> contentNodes = XMLNode.findChildrenWhoseNameMatch(node, "content");

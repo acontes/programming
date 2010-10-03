@@ -1,16 +1,20 @@
 package org.objectweb.proactive.core.component.adl.luc.description;
 
-import org.objectweb.proactive.core.component.adl.luc.ADLException;
-
-import com.sun.org.apache.xml.internal.utils.IntVector;
-
 import lucci.text.xml.XMLNode;
 import lucci.util.assertion.Assertions;
+
+import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
 public class BindingDescription extends Description
 {
 	private String client, server;
 
+	public BindingDescription(String client, String server)
+	{
+		setClient(client);
+		setServer(server);
+	}
+	
 	public String getClient()
 	{
 		return client;
@@ -18,6 +22,9 @@ public class BindingDescription extends Description
 
 	public void setClient(String client)
 	{
+		if (client == null)
+			throw new NullPointerException();
+
 		this.client = client;
 	}
 
@@ -28,6 +35,9 @@ public class BindingDescription extends Description
 
 	public void setServer(String server)
 	{
+		if (server == null)
+			throw new NullPointerException();
+
 		this.server = server;
 	}
 	
@@ -38,11 +48,7 @@ public class BindingDescription extends Description
 	public static BindingDescription createBindingDescription(XMLNode n)
 	{
 		Assertions.ensure(n.getName().equals("binding"), "binding description tag must be named 'binding''");
-
-		BindingDescription bd = new BindingDescription();
-		bd.setClient(n.getAttributes().get("client"));
-		bd.setServer(n.getAttributes().get("server"));
-		return bd;
+		return new BindingDescription(n.getAttributes().get("client"), n.getAttributes().get("server"));
 	}
 
 	@Override

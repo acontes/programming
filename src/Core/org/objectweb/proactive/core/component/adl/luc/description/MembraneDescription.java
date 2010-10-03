@@ -12,7 +12,7 @@ public class MembraneDescription extends Description
 {
 	private final List<ComponentDescription> componentDescriptions = new ArrayList<ComponentDescription>();
 	private String desc;
-	
+
 
 	public String getDesc()
 	{

@@ -2,8 +2,6 @@
 %%There is just one section and two subsections.
 \documentclass{article}
 
-\newcommand{\code}[1]{\texttt{#1}}
-\newcommand{\xml}[1]{\textsl{#1}}
 
 
 \usepackage{listings}
@@ -12,11 +10,19 @@
 
 \usepackage{url}
 
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\xml}[1]{\textsl{#1}}
+\newcommand{\urll}[1]{\begin{center}\url{#1}\end{center}}
+
+
 \title{A factory for GCM}
 \author{Luc Hogie}
 \begin{document}
 \maketitle
+
+{\footnotesize
 \tableofcontents
+}
 \newpage
 
 
@@ -26,17 +32,24 @@ The aim of the document is to provide a documentation for the new GCM factory.
 
 \subsection{Context}
 
+In a few words, this work consists in the design and implementation of a new component factory for
+the GCM component-based grid architecture, which is a extension of the Fractal specification, and whose
+ProActive constitutes the only implementation available today.
+
 
 \subsubsection{Fractal}
 
 According to its authors, Fractal is a modular, extensible and programming language agnostic component model  that can be used to design, implement, deploy and reconfigure systems and applications, from operating systems to middleware platforms and to graphical user interfaces.
+\urll{http://fractal.ow2.org/}
+Fractal is mostly a Research system which gather a large community of Researcher
+
 
 \subsubsection{ADL}
 
 The ADL used by Fractal allows the description of a hierarchy of  components.
 
 A basic tutorial for ADL syntax can be found at the following web URL:
-\url{http://fractal.ow2.org/tutorials/adl/index.html}
+\urll{http://fractal.ow2.org/tutorials/adl/index.html}
 
 This description is written in a dialect of XML.
 Even though the authors of Fractal claim
@@ -48,6 +61,11 @@ or an entry within a ZIP or JAR container.
 
 
 \subsubsection{ProActive}
+
+According to its authors (OASIS Research team)
+ProActive is a GRID Java library for parallel, distributed, and concurrent computing, also featuring mobility and security in a uniform framework.
+ProActive runs on Local Area Network (LAN), on clusters of workstations, or on Internet Grids.
+\urll{http://proactive.inria.fr/}
 
 \subsubsection{GCM}
 
@@ -65,13 +83,23 @@ In order to implement is extensions, GCM adds about 40 classes and description f
 
 
 \subsection{Description of the problem}
-The complex design of Fractal factory turned out to be 
+The Fractal factory (and its derivative, in a worse manner) suffer from a number of problems:
+\begin{itemize}
+  \item its design involves way more concepts than necessary;
+  \item its design presents many imprecisions in the concepts it introduces;
+  \item its design is made of numerous anti-intuitive constructs;
+  \item its implementation code is full of tricks;
+  \item its comes with absolutely zero documentation, be it at the level of the code or at the level of the conception.
+\end{itemize} 
 
-The objective of the new factory is then to make a factory that is \em{much} shorter, cleaner,
-easier to understand, faster than the original Fractal/GCM factory.
+The objective of the new factory is then to make a factory that is {\em much} shorter, cleaner,
+easier to understand, faster than the original Fractal/GCM factory. It particular, we intend to
+use as many concept as they are stricly necessary, in order to avoid confusion. Also, we plan to
+document it so as a new user involved in its development/extension will have a minimal amount of stress getting into the code.
 
 \section{Design of the factory}
-The new factory is object-oriented.
+The new factory is object-oriented. Its design objective is to use an adequate tradeoff between {\em modularity} (which
+leads to large architectures) and {\em simplicity} (which often leads to a lack of modularity)
 
 \subsection{Definitions}
 
@@ -102,41 +130,53 @@ The name of the argument files is passed to the factory \code{newComponent()} me
 
 \subsubsection{Lexical analysis: from XML to DOM}
 
+XML parsing to DOM is done by the parser built-in into the Java Development Kit.
+Because DOM structures are not handy to manipulate, the parsing process goes a little
+further: it converts the DOM structure into a lighweight tree structure whose the
+basic signature is:
 
+\begin{lstlisting}
+class XMLNode
+{
+	String getName();
+	Map<String, String> getAttributes();
+	List<XMLNode> getChildrenNodes();
+}
+\end{lstlisting}
+which is much simpler to understand and you use than the general purpose DOM data structure.
 
-\subsubsection{Semantic analysis: from DOM to AD}
+\subsubsection{Semantic analysis: from DOM to semantic description}
 
-Each XML element type into the ADL description is represented by a  \code{description} class.
-Then at runtime, each XML element is represented at an instance of this class: a  \code{description} object.
+Each XML element type into the ADL description is represented by a  \code{Description} class.
+Then at runtime, each XML element is represented at an instance of this class: a  \code{Description} object.
 The description models which attributes and sub-elements (sub-descriptions) the element allows.
 
 In pratise, Fractal ADL  defines the following elements:
 \begin{description}
-\item[\xml{definition}] describes the root component of the component tree;
-\item[\xml{component}] describes a sub-component of a given component;
-\item[\xml{interface}] describes an interface of a given component;
+\item[\xml{definition} and \xml{component}] respectively describe  the root component of the component tree;
+and a sub-component of a given component; they are both represented by the class \code{ComponentDescription};
+\item[\xml{interface}] describes an interface of a given component, it is represented by the class \code{InterfaceDescription};
 \item[\xml{binding}] describes an interface binding involving two interfaces of two parent/child components;
-\item[\xml{attributes}] describes attributes in a given components.
-\item[\xml{content}] describes the content class for the implementation code of a given component.
-\end{description}
-The Factory  defines the following classes, all sub-classes of the \code{Description} class:
-\begin{description}
-\item[componentDescription] represents both definition and component elements;
-\item[interface] describes the interface elements;
-\item[binding] the binding elements;
-\item[attributes] describes the attribute elements;
+it is represented by the class \code{BindingDescription};
+\item[\xml{attributes}] describes attributes in a given components; it is represented by the class \code{AttributesDescription};
+\item[\xml{content}] describes the content class for the implementation code of a given component. Instead it is represented as a field into the class \code{ComponentDescription}.
 \end{description}
 
-Note that the \xml{content} XML element is not represented as a specific sub-class of class \code{description}.
-Instead it is represented as a field into the 
 
-The description is build 
+\subsubsection{Component creation: from semantic description to components}
 
-\subsubsection{Component creation: from AD to components}
-
+The creation of the component out of the semantic description of the component system is done
+using Fractal and GCM APIs. Because of this, components created by the new factory are of the very same
+nature than those created by the original factory. They can perfectly interoperate.
 
 
 \section{Enhancement of the ADL}
+
+The ADL as it comes from the Fractal specifications presents a number of weaknesses and imprecisions.
+For example, it is not clear that the \xml{definition} element is intrinsiquely different from the \xml{component} one.
+Also, the usefulness of the \xml{arguments} attribute within a \xml{definition} element is to be discussed.
+This section addresses these imprecisions and proposes a number of enhancements of the ADL.
+
 
 \subsection{The DTD is no longer required}
 
@@ -149,7 +189,12 @@ The DTD can still be useful for documentation purposes.
 
 \subsection{Storing the ADL in files rather than in Java resources}
 
+CGM is implemented in Java. This said, the implementation language of a given software
+should remain a detail to the user. In Fractal, the input data (the ADL file) is expected
+to be a Java resource, making Fractal applications Java system themselves, which break the rule
+that Fractal is a specification intended to be implemented in any language.
 
+Instead, the input data should be expected to be a file.
 
 
 \subsection{the \xml{definition} XML element}
