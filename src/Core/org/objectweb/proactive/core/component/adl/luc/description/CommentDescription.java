@@ -56,25 +56,6 @@ public class CommentDescription extends Description
 		return n;
 	}
 
-	public  static CommentDescription createCommentDescription(XMLNode n)
-	{
-		Assertions.ensure(n.getName().equals("comment"), "comment description tag must be named 'comment''");
-		CommentDescription cd = new CommentDescription();
-		String language  = n.getAttributes().get("language");
-		
-		if (language != null)
-		{
-			cd.setLanguage(language);
-		}
-		String text  = n.getAttributes().get("text");
-		
-		if (text != null)
-		{
-			cd.setText(text);
-		}
 	
-		return cd;
-	}
-
 	
 }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import lucci.Clazz;
 import lucci.collections.Lists;
 import lucci.text.xml.XMLNode;
 import lucci.util.assertion.Assertions;
@@ -274,72 +273,6 @@ public class ComponentDescription extends Description
 		{
 			sd.check();
 		}
-	}
-
-	public static ComponentDescription createComponentDescription(XMLNode node) throws ADLException
-	{
-		Assertions.ensure(node.getName().matches("component|definition"), "component description tag must be named 'comopnent' or 'definition''");
-		ComponentDescription description = new ComponentDescription(node.getAttributes().get("name"));
-
-		{
-			List<XMLNode> contentNodes = XMLNode.findChildrenWhoseNameMatch(node, "content");
-
-			if (!contentNodes.isEmpty())
-			{
-				String contentClassname = contentNodes.get(0).getAttributes().get("class");
-				Class<?> contentClass = Clazz.findClass(contentClassname);
-
-				if (contentClass == null) throw new ADLException("cannot find content class " + contentClassname);
-
-				description.setContent(contentClass);
-			}
-		}
-
-		{
-			List<XMLNode> membraneNodes = XMLNode.findChildrenWhoseNameMatch(node, "controller");
-
-			if (membraneNodes.size() == 1)
-			{
-				description.setMembraneDescription(MembraneDescription.createMembraneDescription(membraneNodes.get(0)));
-			}
-		}
-
-		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "interface"))
-		{
-			InterfaceDescription id = InterfaceDescription.createInterfaceDescription(n);
-			id.setParentDescription(description);
-			description.getDeclaredInterfaceDescriptions().add(id);
-		}
-
-		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "component"))
-		{
-			ComponentDescription cd = createComponentDescription(n);
-			cd.setParentDescription(description);
-			description.getDeclaredSubcomponentDescriptions().add(cd);
-		}
-
-		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "binding"))
-		{
-			BindingDescription bd = BindingDescription.createBindingDescription(n);
-			bd.setParentDescription(description);
-			description.getDeclaredBindingDescriptions().add(bd);
-		}
-
-		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "attributes"))
-		{
-			AttributeDescription ad = AttributeDescription.createAttributeDescription(n);
-			ad.setParentDescription(description);
-			description.getDeclaredAttributesDescriptions().add(ad);
-		}
-
-		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "comments"))
-		{
-			CommentDescription ad = CommentDescription.createCommentDescription(n);
-			ad.setParentDescription(description);
-			description.getDeclaredCommentDescriptions().add(ad);
-		}
-
-		return description;
 	}
 
 	public ComponentDescription findSubcomponentDescriptionByName(String name)

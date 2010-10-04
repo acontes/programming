@@ -11,11 +11,9 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import lucci.io.FileUtilities;
-import lucci.io.JavaResource;
 import lucci.io.Utilities;
 import lucci.text.TextUtilities;
 import lucci.text.xml.XMLNode;
-import lucci.text.xml.XMLUtilities;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
@@ -49,6 +47,10 @@ public class NewFactory
 		GCM.getLifeCycleController(component).startFc();
 		System.out.println(((List<?>) component.getFcInterface("r")).size());
 	}
+	
+	private SemanticAnalyzer semanticAnalyzer = new SemanticAnalyzer();
+	private LexicalAnalyzer lexicalAnalyzer = new LexicalAnalyzer();
+
 
 	public NewFactory()
 	{
@@ -58,22 +60,45 @@ public class NewFactory
 		}
 	}
 
+	
+	public LexicalAnalyzer getLexicalAnalyzer()
+	{
+		return lexicalAnalyzer;
+	}
+
+	public void setLexicalAnalyzer(LexicalAnalyzer lexicalAnalyzer)
+	{
+		if (lexicalAnalyzer == null) throw new NullPointerException();
+
+		this.lexicalAnalyzer = lexicalAnalyzer;
+	}
+
+	public SemanticAnalyzer getSemanticAnalyzer()
+	{
+		return semanticAnalyzer;
+	}
+
+	public void setSemanticAnalyzer(SemanticAnalyzer semanticAnalyzer)
+	{
+		if (semanticAnalyzer == null) throw new NullPointerException();
+
+		this.semanticAnalyzer = semanticAnalyzer;
+	}
+
+
+
 	public Component createComponent(File adlFile, File argumentFile, File deploymentFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, ADLException
 	{
 		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
-
-		// inserts the DTD declaration at the top of the XML text
-		 adlDescription = new String(new JavaResource(NewFactory.class,
-		 "xmlheader.txt").getByteArray()) + "\n\n" + adlDescription;
-
+		
 		// parse XML
-		XMLNode node = XMLUtilities.xml2node(adlDescription, false);
+		XMLNode node = getLexicalAnalyzer().parse(adlDescription, false);
 
 		// resolve variables ${variable_name} -> value
 		resolveVariablesInNode(node, parseArgumentsValueFile(argumentFile));
 		System.out.println(node);
 		// semantic analysis
-		ComponentDescription componentDescription = ComponentDescription.createComponentDescription(node);
+		ComponentDescription componentDescription = getSemanticAnalyzer().createComponentDescription(node);
 		componentDescription.setFile(adlFile);
 
 		// intantiation and initializion out of the description
@@ -182,8 +207,6 @@ public class NewFactory
 			resolveVariablesInNode(c, argumentValues);
 		}
 	}
-
-
 
 	public Map<String, String> parseArgumentsValueFile(File argFile) throws IOException
 	{

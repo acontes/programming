@@ -1,8 +1,6 @@
 package org.objectweb.proactive.core.component.adl.luc.description;
 
-import lucci.Clazz;
 import lucci.text.xml.XMLNode;
-import lucci.util.assertion.Assertions;
 
 import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
@@ -85,26 +83,6 @@ public class InterfaceDescription extends Description
 	}
 	
 	
-	public  static InterfaceDescription createInterfaceDescription(XMLNode n)
-	{
-		Assertions.ensure(n.getName().equals("interface"), "interface description tag must be named 'interface''");
-		String name  = n.getAttributes().get("name");
-		Role role = n.getAttributes().get("role").equals("client") ? Role.CLIENT : Role.SERVER;
-		Class<?> signature = Clazz.findClassOrFail(n.getAttributes().get("signature"));
-		InterfaceDescription id = new InterfaceDescription(name, role, signature);
-		
-		if (n.getAttributes().get("contigency") != null)
-		{
-			id.setContingency(n.getAttributes().get("contigency").equals("mandatory") ? Contingency.MANDATORY : Contingency.OPTIONAL);
-		}
-
-		if (n.getAttributes().get("cardinality") != null)
-		{
-			id.setCardinality(n.getAttributes().get("cardinality").equals("singleton") ? Cardinality.SINGLETON : Cardinality.COLLECTION);
-		}
-
-		return id;
-	}
 
 	@Override
 	public XMLNode toXMLNode()

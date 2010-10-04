@@ -44,12 +44,6 @@ public class BindingDescription extends Description
 	
 
 	
-	
-	public static BindingDescription createBindingDescription(XMLNode n)
-	{
-		Assertions.ensure(n.getName().equals("binding"), "binding description tag must be named 'binding''");
-		return new BindingDescription(n.getAttributes().get("client"), n.getAttributes().get("server"));
-	}
 
 	@Override
 	public XMLNode toXMLNode()
