@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+
+
+<definition name="demo" extends="superdemo" n="a${varname}a${varname}a">
+  <interface name="r" role="server" signature="java.util.List"/>
+  <component name="impl">
+    <interface name="s" role="server" signature="java.util.${varname}"/>
+    <content class="java.util.ArrayList"/>
+  </component>
+  <binding client="this.r" server="impl.s" />
+</definition>

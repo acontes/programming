@@ -11,8 +11,8 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import lucci.io.FileUtilities;
-import lucci.io.JavaResource;
 import lucci.io.Utilities;
+import lucci.text.TextUtilities;
 import lucci.text.xml.XMLNode;
 import lucci.text.xml.XMLUtilities;
 
@@ -31,7 +31,6 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.Utils;
-import org.objectweb.proactive.core.component.adl.luc.demo.ExampleComponent;
 import org.objectweb.proactive.core.component.adl.luc.description.BindingDescription;
 import org.objectweb.proactive.core.component.adl.luc.description.ComponentDescription;
 import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription;
@@ -43,12 +42,13 @@ public class NewFactory
 {
 	public static void main(String... args) throws IOException, ParserConfigurationException, SAXException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, org.objectweb.proactive.core.component.adl.luc.ADLException
 	{
-		File adlFile = new File("src/Core/org/objectweb/proactive/core/component/adl/luc/demo/ExampleComponent.fractal");
-		Component component = new NewFactory().createComponent(adlFile, null, null);
+		File adlFile = new File("src/Core/org/objectweb/proactive/core/component/adl/luc/demo/demo.fractal");
+		File argFile = new File("src/Core/org/objectweb/proactive/core/component/adl/luc/demo/demo.fractal.args");
+		Component component = new NewFactory().createComponent(adlFile, argFile, null);
 		GCM.getLifeCycleController(component).startFc();
-		((ExampleComponent) component.getFcInterface("r")).printOk();
+		System.out.println(((List<?>) component.getFcInterface("r")).size());
 	}
-	
+
 	public NewFactory()
 	{
 		if (System.getProperty("gcm.provider") == null)
@@ -60,20 +60,21 @@ public class NewFactory
 	public Component createComponent(File adlFile, File argumentFile, File deploymentFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, ADLException
 	{
 		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
-		
+
 		// inserts the DTD declaration at the top of the XML text
-		//adlDescription = new String(new JavaResource(NewFactory.class, "xmlheader.txt").getByteArray()) + "\n\n" + adlDescription;
-		
+		// adlDescription = new String(new JavaResource(NewFactory.class,
+		// "xmlheader.txt").getByteArray()) + "\n\n" + adlDescription;
+
 		// parse XML
 		XMLNode node = XMLUtilities.xml2node(adlDescription, false);
-		
-		// resolve variables  ${variable_name} -> value
+
+		// resolve variables ${variable_name} -> value
 		resolveVariablesInNode(node, parseArgumentsValueFile(argumentFile));
-		
+		System.out.println(node);
 		// semantic analysis
 		ComponentDescription componentDescription = ComponentDescription.createComponentDescription(node);
 		componentDescription.setFile(adlFile);
-		
+
 		// intantiation and initializion out of the description
 		return createComponent(componentDescription, deploymentFile);
 	}
@@ -82,13 +83,13 @@ public class NewFactory
 	{
 		// verifies that everything in the description and all sub-description
 		componentDescription.check();
-		
-		// create the Fractal "type" for the component, necessary to instantiate the component
+
+		// create the Fractal "type" for the component, necessary to instantiate
+		// the component
 		ComponentType type = createType(componentDescription);
 		Component component = instantiateComponent(componentDescription, type);
 		GCM.getNameController(component).setFcName(componentDescription.getName());
 		Map<String, Component> name_comp = setSubComponents(componentDescription, component, deploymentFile);
-		name_comp.put("this", component);
 		name_comp.put(componentDescription.getName(), component);
 		bindAllInterfaces(componentDescription, name_comp);
 		return component;
@@ -100,7 +101,7 @@ public class NewFactory
 		{
 			InterfaceDescription clientInterfaceDescription = componentDescription.findInterfaceDescription(bd.getClient());
 			Component clientComp = comp_child.get(clientInterfaceDescription.getParentComponentDescription().getName());
-			
+
 			InterfaceDescription serverInterfaceDescription = componentDescription.findInterfaceDescription(bd.getServer());
 			Component serverComp = comp_child.get(serverInterfaceDescription.getParentComponentDescription().getName());
 			Object serverIterface = serverComp.getFcInterface(serverInterfaceDescription.getName());
@@ -152,7 +153,6 @@ public class NewFactory
 
 	private ComponentType createType(ComponentDescription componentDescription) throws InstantiationException, NoSuchInterfaceException
 	{
-
 		GCMTypeFactory typeFactory = GCM.getGCMTypeFactory(Utils.getBootstrapComponent());
 		List<InterfaceType> interfaceTypes = new ArrayList<InterfaceType>();
 
@@ -166,21 +166,14 @@ public class NewFactory
 
 	public void resolveVariablesInNode(XMLNode node, Map<String, String> argumentValues) throws ADLException
 	{
-		// for every variable name
-		for (String n : argumentValues.keySet())
+		// for every attribute of the node
+		for (String attrName : node.getAttributes().keySet())
 		{
 			// get the raw value for the attribute
-			String v = node.getAttributes().get(n);
+			String attrValue = node.getAttributes().get(attrName);
 
-			if (v == null)
-			{
-				throw new ADLException("no value was found for argument " + n);
-			}
-			else
-			{
-				// replace the raw value by the evaluated one
-				node.getAttributes().put(n, replaceVariableValues(v, argumentValues));
-			}
+			// replace the raw value by the evaluated one
+			node.getAttributes().put(attrName, TextUtilities.replaceVariableValues(attrValue, argumentValues));
 		}
 
 		for (XMLNode c : node.getChildren())
@@ -189,15 +182,7 @@ public class NewFactory
 		}
 	}
 
-	public String replaceVariableValues(String v, Map<String, String> argumentValues)
-	{
-		for (String a : argumentValues.keySet())
-		{
-			v = v.replace("${" + a + "}", argumentValues.get(a));
-		}
 
-		return v;
-	}
 
 	public Map<String, String> parseArgumentsValueFile(File argFile) throws IOException
 	{
