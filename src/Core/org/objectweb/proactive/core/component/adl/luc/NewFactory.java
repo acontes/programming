@@ -89,6 +89,7 @@ public class NewFactory
 		GCM.getNameController(component).setFcName(componentDescription.getName());
 		Map<String, Component> name_comp = setSubComponents(componentDescription, component, deploymentFile);
 		name_comp.put("this", component);
+		name_comp.put(componentDescription.getName(), component);
 		bindAllInterfaces(componentDescription, name_comp);
 		return component;
 	}
@@ -97,10 +98,8 @@ public class NewFactory
 	{
 		for (BindingDescription bd : componentDescription.getAllBindingDescriptions())
 		{
-			System.out.println(comp_child);
 			InterfaceDescription clientInterfaceDescription = componentDescription.findInterfaceDescription(bd.getClient());
 			Component clientComp = comp_child.get(clientInterfaceDescription.getParentComponentDescription().getName());
-			System.out.println(clientComp);
 			
 			InterfaceDescription serverInterfaceDescription = componentDescription.findInterfaceDescription(bd.getServer());
 			Component serverComp = comp_child.get(serverInterfaceDescription.getParentComponentDescription().getName());
