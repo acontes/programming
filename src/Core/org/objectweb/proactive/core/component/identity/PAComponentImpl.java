@@ -707,7 +707,14 @@ public class PAComponentImpl implements PAComponent, Serializable {
                         }
                     }
                 }
-
+            	// cruz: here, the controller has not been initialized (f.e., the Multicast and Gathercast controllers, when added manually)
+    			// The Multicast Controller (just like the Gathercast Controller), needs to execute "initController".
+    			// In PAComponentImpl constructor, when the NFType has been specified, the controllers that have not been assigned 
+    			//    (f.e. the controllers created in this method) are not initialized, so it must be done here.
+                else {
+                	((PAController)(controller.getFcItfImpl())).initController();	
+                }
+            	//--cruz
                 controlItfs.put(controller.getFcItfName(), controller);
             } else { /* The controller class does not implement the specified interface */
                 throw new IllegalBindingException("The class " + classToCreate + " does not implement the " +
