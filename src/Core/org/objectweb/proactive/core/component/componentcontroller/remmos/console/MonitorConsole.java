@@ -23,6 +23,7 @@ import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.utils.RemmosUtils;
 import org.objectweb.proactive.core.component.componentcontroller.sla.SLAService;
 import org.objectweb.proactive.core.component.control.PABindingController;
+import org.objectweb.proactive.core.component.control.PAMulticastController;
 import org.objectweb.proactive.core.component.control.PASuperController;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
@@ -635,6 +636,7 @@ public class MonitorConsole {
 		
 		PASuperController pasc;
 		PABindingController pabc = null;
+		PAMulticastController pamc = null;
 		PAComponentRepresentative pacr;
 		PAComponent parent = null;
 		InterfaceType[] interfaceTypes = null;
@@ -727,36 +729,70 @@ public class MonitorConsole {
 		boolean foundParent;
 		for(InterfaceType itf : interfaceTypes) {
 			foundParent = false;
-			// only server-singleton supported ... others ignored ... foooor the moment
-			if(itf.isFcClientItf() && ((PAGCMInterfaceType)itf).isGCMSingletonItf() && !((PAGCMInterfaceType)itf).isGCMCollectiveItf()) {
+			// client singleton/multicast supported
+			// TODO: support the others
+			if(itf.isFcClientItf() /*&& ((PAGCMInterfaceType)itf).isGCMSingletonItf() && !((PAGCMInterfaceType)itf).isGCMCollectiveItf() */ ) {
 				interfaceName = itf.getFcItfName();
-				// get the component bound to this interface .... (if there is one) !!!!!!!!!!!!!!
+				// get the component(s) bound to this interface ....
 				Component destItfOwner = null;
-				try {
-					destItfOwner = ((PAInterface) pabc.lookupFc(interfaceName)).getFcItfOwner();
-				} catch (NoSuchInterfaceException e1) {
-					e1.printStackTrace();
-				}
-				// if the component is bound to a WSComponent (which is not a PAComponentRepresentative), we cannot monitor it.
-				if(destItfOwner instanceof PAComponentRepresentative) {
-					componentDest = (PAComponentRepresentative) destItfOwner;
-					componentDestName = componentDest.getComponentParameters().getName();
-					logger.debug("   Client interface: "+ interfaceName + ", bound to "+ componentDestName);
-					// if the component destination is the same as the parent of the current component, 
-					// then I don't need to continue from this interface
-					if(componentDest.equals(parent)) {
-						foundParent = true;
-					}
-					// if I find to the internal interface of the parent, then I don't continue with him, otherwise I'll get into a cycle
-					if(!foundParent) {
-						if(componentDest != null) {
-							// if the component is not already added
-							if(!managedComponents.containsKey(componentDestName)) {
-								logger.debug("Adding component "+ componentDestName);
-								managedComponents.put(componentDestName, componentDest);
+				
+				// For Multicast (at least client) interfaces
+				if( ((PAGCMInterfaceType)itf).isGCMMulticastItf()) {
+					logger.debug("   Client interface: "+ interfaceName + " is MULTICAST");
+					pamc = Utils.getPAMulticastController(c);
+					// get all the components bound to this Multicast interface
+					Object[] destinations = pamc.lookupGCMMulticast(interfaceName);
+					for(Object destination : destinations) {
+						foundParent = false;
+						destItfOwner = ((PAInterface)destination).getFcItfOwner();
+						componentDest = (PAComponentRepresentative) destItfOwner;
+						componentDestName = componentDest.getComponentParameters().getName();
+						logger.debug("   Client MC interface: "+ interfaceName + ", bound to "+ componentDestName);
+						// if the component destination is the same as the parent of the current component, 
+						// then I don't need to continue from this interface
+						if(componentDest.equals(parent)) {
+							foundParent = true;
+						}
+						// if I find the internal interface of the parent, then I don't continue with him, otherwise I'll get into a cycle
+						if(!foundParent) {
+							if(componentDest != null) {
+								// if the component is not already added
+								if(!managedComponents.containsKey(componentDestName)) {
+									logger.debug("Adding component "+ componentDestName);
+									managedComponents.put(componentDestName, componentDest);
+								}
+								// now it should continue with the destination component ...
+								discoverComponents(componentDest);
 							}
-							// now it should continue with the destination component ...
-							discoverComponents(componentDest);
+						}
+					}
+				}
+				
+				// For Singleton interfaces
+				if( ((PAGCMInterfaceType)itf).isGCMSingletonItf() ) {
+
+					destItfOwner = ((PAInterface) pabc.lookupFc(interfaceName)).getFcItfOwner();
+					// if the component is bound to a WSComponent (which is not a PAComponentRepresentative), we cannot monitor it.
+					if(destItfOwner instanceof PAComponentRepresentative) {
+						componentDest = (PAComponentRepresentative) destItfOwner;
+						componentDestName = componentDest.getComponentParameters().getName();
+						logger.debug("   Client interface: "+ interfaceName + ", bound to "+ componentDestName);
+						// if the component destination is the same as the parent of the current component, 
+						// then I don't need to continue from this interface
+						if(componentDest.equals(parent)) {
+							foundParent = true;
+						}
+						// if I find the internal interface of the parent, then I don't continue with him, otherwise I'll get into a cycle
+						if(!foundParent) {
+							if(componentDest != null) {
+								// if the component is not already added
+								if(!managedComponents.containsKey(componentDestName)) {
+									logger.debug("Adding component "+ componentDestName);
+									managedComponents.put(componentDestName, componentDest);
+								}
+								// now it should continue with the destination component ...
+								discoverComponents(componentDest);
+							}
 						}
 					}
 				}
