@@ -245,7 +245,7 @@ public class ComponentDescription extends Description
 
 			if (!contentNodes.isEmpty())
 			{
-				String contentClassname = contentNodes.get(0).getAttributes().remove("class");
+				String contentClassname = contentNodes.get(0).getAttributes().get("class");
 				Class<?> contentClass = Clazz.findClass(contentClassname);
 
 				if (contentClass == null) throw new ADLException("cannot find content class " + contentClassname);
@@ -261,30 +261,34 @@ public class ComponentDescription extends Description
 			{
 				description.setMembraneDescription(MembraneDescription.createMembraneDescription(membraneNodes.get(0)));
 			}
-			else if ((membraneNodes.size() > 1))
-			{
-				throw new ADLException("only one membrane description is allowed");
-			}
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "interface"))
 		{
-			description.getDeclaredInterfaceDescriptions().add(InterfaceDescription.createInterfaceDescription(n));
+			InterfaceDescription id = InterfaceDescription.createInterfaceDescription(n);
+			id.setParentDescription(description);
+			description.getDeclaredInterfaceDescriptions().add(id);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "component"))
 		{
-			description.getDeclaredSubcomponentDescriptions().add(createComponentDescription(n));
+			ComponentDescription cd = createComponentDescription(n);
+			cd.setParentDescription(description);
+			description.getDeclaredSubcomponentDescriptions().add(cd);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "binding"))
 		{
-			description.getDeclaredBindingDescriptions().add(BindingDescription.createBindingDescription(n));
+			BindingDescription bd = BindingDescription.createBindingDescription(n);
+			bd.setParentDescription(description);
+			description.getDeclaredBindingDescriptions().add(bd);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "attributes"))
 		{
-			description.getDeclaredAttributesDescriptions().add(AttributeDescription.createAttributeDescription(n));
+			AttributeDescription ad = AttributeDescription.createAttributeDescription(n);
+			ad.setParentDescription(description);
+			description.getDeclaredAttributesDescriptions().add(ad);
 		}
 
 		return description;

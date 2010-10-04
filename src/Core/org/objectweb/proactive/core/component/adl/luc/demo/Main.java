@@ -25,14 +25,7 @@ import org.xml.sax.SAXException;
 public class Main
 {
 	
-	public static void main(String... args) throws IOException, ParserConfigurationException, SAXException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, org.objectweb.proactive.core.component.adl.luc.ADLException
-	{
-		System.out.println(FileUtilities.getCurrentDirectory());
-		File adlFile = new File("src/Core/org/objectweb/proactive/core/component/adl/luc/demo/ExampleComponent.fractal");
-		Component component = new NewFactory().createComponent(adlFile, null	);
-		GCM.getLifeCycleController(component).startFc();
-		((ExampleComponent) component.getFcInterface("r")).printOk();
-	}
+
 	public static void main2(String... args) throws ADLException, NoSuchInterfaceException, InterruptedException, IllegalLifeCycleException
 	{
 		System.setProperty("fractal.provider", "org.objectweb.proactive.core.component.Fractive");

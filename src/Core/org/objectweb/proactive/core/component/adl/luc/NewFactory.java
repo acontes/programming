@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import lucci.io.FileUtilities;
+import lucci.io.JavaResource;
 import lucci.io.Utilities;
 import lucci.text.xml.XMLNode;
 import lucci.text.xml.XMLUtilities;
@@ -30,6 +31,7 @@ import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.Utils;
+import org.objectweb.proactive.core.component.adl.luc.demo.ExampleComponent;
 import org.objectweb.proactive.core.component.adl.luc.description.BindingDescription;
 import org.objectweb.proactive.core.component.adl.luc.description.ComponentDescription;
 import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription;
@@ -39,6 +41,14 @@ import org.xml.sax.SAXException;
 
 public class NewFactory
 {
+	public static void main(String... args) throws IOException, ParserConfigurationException, SAXException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, org.objectweb.proactive.core.component.adl.luc.ADLException
+	{
+		File adlFile = new File("src/Core/org/objectweb/proactive/core/component/adl/luc/demo/ExampleComponent.fractal");
+		Component component = new NewFactory().createComponent(adlFile, null, null);
+		GCM.getLifeCycleController(component).startFc();
+		((ExampleComponent) component.getFcInterface("r")).printOk();
+	}
+	
 	public NewFactory()
 	{
 		if (System.getProperty("gcm.provider") == null)
@@ -47,23 +57,37 @@ public class NewFactory
 		}
 	}
 
-	public Component createComponent(File adlFile, File argumentFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, ADLException, ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public Component createComponent(File adlFile, File argumentFile, File deploymentFile) throws UnsupportedEncodingException, ParserConfigurationException, SAXException, IOException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException, ADLException
 	{
 		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
+		
+		// inserts the DTD declaration at the top of the XML text
+		//adlDescription = new String(new JavaResource(NewFactory.class, "xmlheader.txt").getByteArray()) + "\n\n" + adlDescription;
+		
+		// parse XML
 		XMLNode node = XMLUtilities.xml2node(adlDescription, false);
-		resolveVariables(parseArgumentsValueFile(argumentFile), node);
+		
+		// resolve variables  ${variable_name} -> value
+		resolveVariablesInNode(node, parseArgumentsValueFile(argumentFile));
+		
+		// semantic analysis
 		ComponentDescription componentDescription = ComponentDescription.createComponentDescription(node);
 		componentDescription.setFile(adlFile);
-		return createComponent(componentDescription);
+		
+		// intantiation and initializion out of the description
+		return createComponent(componentDescription, deploymentFile);
 	}
 
-	public Component createComponent(ComponentDescription componentDescription) throws ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public Component createComponent(ComponentDescription componentDescription, File deploymentFile) throws ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
 	{
+		// verifies that everything in the description and all sub-description
 		componentDescription.check();
+		
+		// create the Fractal "type" for the component, necessary to instantiate the component
 		ComponentType type = createType(componentDescription);
 		Component component = instantiateComponent(componentDescription, type);
 		GCM.getNameController(component).setFcName(componentDescription.getName());
-		Map<String, Component> name_comp = setSubComponents(componentDescription, component);
+		Map<String, Component> name_comp = setSubComponents(componentDescription, component, deploymentFile);
 		name_comp.put("this", component);
 		bindAllInterfaces(componentDescription, name_comp);
 		return component;
@@ -73,22 +97,26 @@ public class NewFactory
 	{
 		for (BindingDescription bd : componentDescription.getAllBindingDescriptions())
 		{
+			System.out.println(comp_child);
 			InterfaceDescription clientInterfaceDescription = componentDescription.findInterfaceDescription(bd.getClient());
-			InterfaceDescription serverInterfaceDescription = componentDescription.findInterfaceDescription(bd.getServer());
 			Component clientComp = comp_child.get(clientInterfaceDescription.getParentComponentDescription().getName());
+			System.out.println(clientComp);
+			
+			InterfaceDescription serverInterfaceDescription = componentDescription.findInterfaceDescription(bd.getServer());
 			Component serverComp = comp_child.get(serverInterfaceDescription.getParentComponentDescription().getName());
 			Object serverIterface = serverComp.getFcInterface(serverInterfaceDescription.getName());
+
 			GCM.getBindingController(clientComp).bindFc(clientInterfaceDescription.getName(), serverIterface);
 		}
 	}
 
-	private Map<String, Component> setSubComponents(ComponentDescription componentDescription, Component component) throws ADLException, IllegalContentException, IllegalLifeCycleException, NoSuchInterfaceException, InstantiationException, IllegalBindingException
+	private Map<String, Component> setSubComponents(ComponentDescription componentDescription, Component component, File deploymentFile) throws ADLException, IllegalContentException, IllegalLifeCycleException, NoSuchInterfaceException, InstantiationException, IllegalBindingException
 	{
 		Map<String, Component> comp_child = new HashMap<String, Component>();
 
 		for (ComponentDescription subD : componentDescription.getAllSubcomponentDescriptions())
 		{
-			Component child = createComponent(subD);
+			Component child = createComponent(subD, deploymentFile);
 			GCM.getContentController(component).addFcSubComponent(child);
 			comp_child.put(GCM.getNameController(child).getFcName(), child);
 		}
@@ -131,14 +159,13 @@ public class NewFactory
 
 		for (InterfaceDescription id : componentDescription.getAllInterfaceDescriptions())
 		{
-			System.out.println(id);
 			interfaceTypes.add(typeFactory.createGCMItfType(id.getName(), id.getSignature().getName(), id.getRole() == Role.CLIENT, id.getContingency() == Contingency.OPTIONAL, id.getCardinality().name()));
 		}
 
 		return typeFactory.createFcType(interfaceTypes.toArray(new InterfaceType[0]));
 	}
 
-	public void resolveVariables(Map<String, String> argumentValues, XMLNode node) throws ADLException
+	public void resolveVariablesInNode(XMLNode node, Map<String, String> argumentValues) throws ADLException
 	{
 		// for every variable name
 		for (String n : argumentValues.keySet())
@@ -159,7 +186,7 @@ public class NewFactory
 
 		for (XMLNode c : node.getChildren())
 		{
-			resolveVariables(argumentValues, c);
+			resolveVariablesInNode(c, argumentValues);
 		}
 	}
 
