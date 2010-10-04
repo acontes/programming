@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import lucci.io.FileUtilities;
+import lucci.io.JavaResource;
 import lucci.io.Utilities;
 import lucci.text.TextUtilities;
 import lucci.text.xml.XMLNode;
@@ -62,8 +63,8 @@ public class NewFactory
 		String adlDescription = new String(FileUtilities.getFileContent(adlFile));
 
 		// inserts the DTD declaration at the top of the XML text
-		// adlDescription = new String(new JavaResource(NewFactory.class,
-		// "xmlheader.txt").getByteArray()) + "\n\n" + adlDescription;
+		 adlDescription = new String(new JavaResource(NewFactory.class,
+		 "xmlheader.txt").getByteArray()) + "\n\n" + adlDescription;
 
 		// parse XML
 		XMLNode node = XMLUtilities.xml2node(adlDescription, false);

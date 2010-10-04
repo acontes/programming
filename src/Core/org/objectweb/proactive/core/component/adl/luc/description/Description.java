@@ -2,6 +2,8 @@ package org.objectweb.proactive.core.component.adl.luc.description;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import lucci.text.xml.XMLNode;
 
@@ -11,6 +13,12 @@ public abstract class Description
 {
 	private Description parentDescription;
 	private File file;
+	private final List<CommentDescription> commentDescriptions = new ArrayList<CommentDescription>();
+
+	public List<CommentDescription> getDeclaredCommentDescriptions()
+	{
+		return this.commentDescriptions;
+	}
 
 	public void setFile(File file)
 	{

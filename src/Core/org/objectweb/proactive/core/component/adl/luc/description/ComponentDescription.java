@@ -14,7 +14,7 @@ import org.objectweb.proactive.core.component.adl.luc.ADLException;
 public class ComponentDescription extends Description
 {
 	private String name;
-	private ComponentDescription superDescription;
+	private final List<ComponentDescription> superDescriptions = new ArrayList<ComponentDescription>();
 	// the content may be null
 	private Class<?> content;
 
@@ -25,24 +25,16 @@ public class ComponentDescription extends Description
 	private final List<InterfaceDescription> interfaceDescriptions = new ArrayList<InterfaceDescription>();
 	private final List<BindingDescription> bindingDescriptions = new ArrayList<BindingDescription>();
 	private final List<AttributeDescription> attributesDescriptions = new ArrayList<AttributeDescription>();
-	
-	
+
 	public ComponentDescription(String name)
 	{
 		setName(name);
 	}
-	
-	public ComponentDescription getSuperDescription()
+
+	public List<ComponentDescription> getSuperDescriptions()
 	{
-		return superDescription;
+		return superDescriptions;
 	}
-
-	public void setSuperDescription(ComponentDescription superDescription)
-	{
-		this.superDescription = superDescription;
-	}
-
-
 
 	public List<AttributeDescription> getDeclaredAttributesDescriptions()
 	{
@@ -51,16 +43,42 @@ public class ComponentDescription extends Description
 
 	public List<AttributeDescription> getAllAttributeDescriptions()
 	{
-		if (getSuperDescription() == null)
+		if (getSuperDescriptions().isEmpty())
 		{
 			return getDeclaredAttributesDescriptions();
 		}
 		else
 		{
-			return Collections.unmodifiableList(Lists.concatene(getSuperDescription().getAllAttributeDescriptions(), getDeclaredAttributesDescriptions()));
+			List<AttributeDescription> l = new ArrayList<AttributeDescription>();
+
+			for (ComponentDescription cd : getSuperDescriptions())
+			{
+				l.addAll(cd.getAllAttributeDescriptions());
+			}
+
+			return Collections.unmodifiableList(Lists.concatene(l, getDeclaredAttributesDescriptions()));
 		}
 	}
 
+	public List<ComponentDescription> getAllSubcomponentDescriptions()
+	{
+		if (getSuperDescriptions().isEmpty())
+		{
+			return getDeclaredSubcomponentDescriptions();
+		}
+		else
+		{
+			List<ComponentDescription> l = new ArrayList<ComponentDescription>();
+
+			for (ComponentDescription cd : getSuperDescriptions())
+			{
+				l.addAll(cd.getAllSubcomponentDescriptions());
+			}
+
+			return Lists.concatene(l, getDeclaredSubcomponentDescriptions());
+		}
+	}
+	
 	public List<BindingDescription> getDeclaredBindingDescriptions()
 	{
 		return bindingDescriptions;
@@ -68,13 +86,20 @@ public class ComponentDescription extends Description
 
 	public List<BindingDescription> getAllBindingDescriptions()
 	{
-		if (getSuperDescription() == null)
+		if (getSuperDescriptions().isEmpty())
 		{
 			return getDeclaredBindingDescriptions();
 		}
 		else
 		{
-			return Collections.unmodifiableList(Lists.concatene(getSuperDescription().getAllBindingDescriptions(), getDeclaredBindingDescriptions()));
+			List<BindingDescription> l = new ArrayList<BindingDescription>();
+
+			for (ComponentDescription cd : getSuperDescriptions())
+			{
+				l.addAll(cd.getAllBindingDescriptions());
+			}
+
+			return Collections.unmodifiableList(Lists.concatene(l, getDeclaredBindingDescriptions()));
 		}
 	}
 
@@ -85,13 +110,20 @@ public class ComponentDescription extends Description
 
 	public List<InterfaceDescription> getAllInterfaceDescriptions()
 	{
-		if (getSuperDescription() == null)
+		if (getSuperDescriptions().isEmpty())
 		{
 			return getDeclaredInterfaceDescriptions();
 		}
 		else
 		{
-			return Collections.unmodifiableList(Lists.concatene(getSuperDescription().getAllInterfaceDescriptions(), getDeclaredInterfaceDescriptions()));
+			List<InterfaceDescription> l = new ArrayList<InterfaceDescription>();
+
+			for (ComponentDescription cd : getSuperDescriptions())
+			{
+				l.addAll(cd.getAllInterfaceDescriptions());
+			}
+
+			return Collections.unmodifiableList(Lists.concatene(l, getDeclaredInterfaceDescriptions()));
 		}
 	}
 
@@ -102,21 +134,30 @@ public class ComponentDescription extends Description
 
 	public void setName(String name)
 	{
-		if (name == null)
-			throw new NullPointerException();
+		if (name == null) throw new NullPointerException();
 
 		this.name = name;
 	}
 
 	public Class<?> getContent()
 	{
-		if (this.content == null && getSuperDescription() != null)
+		if (this.content != null)
 		{
-			return getSuperDescription().getContent();
+			return this.content;
 		}
 		else
 		{
-			return this.content;
+			for (ComponentDescription sd : getSuperDescriptions())
+			{
+				Class<?> content = sd.getContent();
+				
+				if (content != null)
+				{
+					return content;
+				}
+			}
+
+			return null;
 		}
 	}
 
@@ -127,13 +168,23 @@ public class ComponentDescription extends Description
 
 	public MembraneDescription getMembraneDescription()
 	{
-		if (this.membraneDescription == null && getSuperDescription() != null)
+		if (this.membraneDescription != null)
 		{
-			return getSuperDescription().getMembraneDescription();
+			return this.membraneDescription;
 		}
 		else
 		{
-			return this.membraneDescription;
+			for (ComponentDescription sd : getSuperDescriptions())
+			{
+				MembraneDescription md = sd.getMembraneDescription();
+				
+				if (md != null)
+				{
+					return md;
+				}
+			}
+
+			return null;
 		}
 	}
 
@@ -147,17 +198,7 @@ public class ComponentDescription extends Description
 		return subcomponentDescriptions;
 	}
 
-	public List<ComponentDescription> getAllSubcomponentDescriptions()
-	{
-		if (getSuperDescription() == null)
-		{
-			return getDeclaredSubcomponentDescriptions();
-		}
-		else
-		{
-			return Lists.concatene(getSuperDescription().getAllSubcomponentDescriptions(), getDeclaredSubcomponentDescriptions());
-		}
-	}
+
 
 	@Override
 	public XMLNode toXMLNode()
@@ -228,10 +269,10 @@ public class ComponentDescription extends Description
 		{
 			this.membraneDescription.check();
 		}
-		
-		if (getSuperDescription() != null)
+
+		for (ComponentDescription sd : getSuperDescriptions())
 		{
-			getSuperDescription().check();
+			sd.check();
 		}
 	}
 
@@ -289,6 +330,13 @@ public class ComponentDescription extends Description
 			AttributeDescription ad = AttributeDescription.createAttributeDescription(n);
 			ad.setParentDescription(description);
 			description.getDeclaredAttributesDescriptions().add(ad);
+		}
+
+		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "comments"))
+		{
+			CommentDescription ad = CommentDescription.createCommentDescription(n);
+			ad.setParentDescription(description);
+			description.getDeclaredCommentDescriptions().add(ad);
 		}
 
 		return description;
