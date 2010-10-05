@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.parsers.ParserConfigurationException;
 
 import lucci.io.FileUtilities;
+import lucci.io.JavaResource;
 import lucci.io.Utilities;
 import lucci.text.TextUtilities;
 import lucci.text.xml.XMLNode;
@@ -94,19 +95,20 @@ public class NewFactory
 		// parse XML
 		XMLNode node = getLexicalAnalyzer().parse(adlDescription, false);
 
-		// resolve variables ${variable_name} -> value
-		resolveVariablesInNode(node, parseArgumentsValueFile(argumentFile));
 		System.out.println(node);
 		// semantic analysis
 		ComponentDescription componentDescription = getSemanticAnalyzer().createComponentDescription(node);
 		componentDescription.setFile(adlFile);
 
 		// intantiation and initializion out of the description
-		return createComponent(componentDescription, deploymentFile);
+		return createComponent(componentDescription, argumentFile, deploymentFile);
 	}
 
-	public Component createComponent(ComponentDescription componentDescription, File deploymentFile) throws ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
+	public Component createComponent(ComponentDescription componentDescription, File argumentFile, File deploymentFile) throws ADLException, InstantiationException, NoSuchInterfaceException, IllegalContentException, IllegalLifeCycleException, IllegalBindingException
 	{
+		// resolve variables ${variable_name} -> value
+		resolveVariablesInNode(componentDescription, parseArgumentsValueFile(argumentFile));
+
 		// verifies that everything in the description and all sub-description
 		componentDescription.check();
 
@@ -190,7 +192,7 @@ public class NewFactory
 		return typeFactory.createFcType(interfaceTypes.toArray(new InterfaceType[0]));
 	}
 
-	public void resolveVariablesInNode(XMLNode node, Map<String, String> argumentValues) throws ADLException
+	public void resolveVariablesInNode(ComponentDescription node, Map<String, String> argumentValues) throws ADLException
 	{
 		// for every attribute of the node
 		for (String attrName : node.getAttributes().keySet())

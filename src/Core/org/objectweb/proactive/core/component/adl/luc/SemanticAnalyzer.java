@@ -47,6 +47,28 @@ public class SemanticAnalyzer
 		Assertions.ensure(node.getName().matches("component|definition"), "component description tag must be named 'comopnent' or 'definition''");
 		ComponentDescription description = new ComponentDescription(node.getAttributes().get("name"));
 
+		String args = node.getAttributes().get("arguments");
+
+		if (args != null)
+		{
+			for (String arg : args.split(" *, *"))
+			{
+				int p = arg.indexOf('=');
+
+				// if there is no default value
+				if (p < 0)
+				{
+					description.getArguments().put(arg, null);
+				}
+				else
+				{
+					String name = arg.substring(0, p);
+					String defaultValue = arg.substring(p + 1);
+					description.getArguments().put(name, defaultValue);
+				}
+			}
+		}
+
 		{
 			List<XMLNode> contentNodes = XMLNode.findChildrenWhoseNameMatch(node, "content");
 

@@ -2,7 +2,9 @@ package org.objectweb.proactive.core.component.adl.luc.description;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lucci.collections.Lists;
 import lucci.text.xml.XMLNode;
@@ -24,10 +26,16 @@ public class ComponentDescription extends Description
 	private final List<InterfaceDescription> interfaceDescriptions = new ArrayList<InterfaceDescription>();
 	private final List<BindingDescription> bindingDescriptions = new ArrayList<BindingDescription>();
 	private final List<AttributeDescription> attributesDescriptions = new ArrayList<AttributeDescription>();
+	private final Map<String, String> arg_defaultValue = new HashMap<String, String>();
 
 	public ComponentDescription(String name)
 	{
 		setName(name);
+	}
+
+	public Map<String, String> getArguments()
+	{
+		return arg_defaultValue;
 	}
 
 	public List<ComponentDescription> getSuperDescriptions()
@@ -77,7 +85,7 @@ public class ComponentDescription extends Description
 			return Lists.concatene(l, getDeclaredSubcomponentDescriptions());
 		}
 	}
-	
+
 	public List<BindingDescription> getDeclaredBindingDescriptions()
 	{
 		return bindingDescriptions;
@@ -149,7 +157,7 @@ public class ComponentDescription extends Description
 			for (ComponentDescription sd : getSuperDescriptions())
 			{
 				Class<?> content = sd.getContent();
-				
+
 				if (content != null)
 				{
 					return content;
@@ -176,7 +184,7 @@ public class ComponentDescription extends Description
 			for (ComponentDescription sd : getSuperDescriptions())
 			{
 				MembraneDescription md = sd.getMembraneDescription();
-				
+
 				if (md != null)
 				{
 					return md;
@@ -197,14 +205,27 @@ public class ComponentDescription extends Description
 		return subcomponentDescriptions;
 	}
 
-
-
 	@Override
 	public XMLNode toXMLNode()
 	{
 		XMLNode n = new XMLNode();
 		n.setName("component");
 		n.getAttributes().put("name", getName());
+
+		String argumentsValue = "";
+
+		for (String argName : getArguments().keySet())
+		{
+			if (!argumentsValue.isEmpty())
+			{
+				argumentsValue += ", ";
+			}
+
+			String defaultValue = getArguments().get(argName);
+			argumentsValue += argName + defaultValue == null ? "" : "=" + defaultValue;
+		}
+
+		n.getAttributes().put("arguments", argumentsValue);
 
 		for (Description id : getAllInterfaceDescriptions())
 		{

@@ -1,14 +1,27 @@
 package org.objectweb.proactive.core.component.adl.luc.description;
 
+import lucci.Clazz;
 import lucci.text.xml.XMLNode;
+import lucci.util.assertion.Assertions;
 
 import org.objectweb.proactive.core.component.adl.luc.ADLException;
 
 public class InterfaceDescription extends Description
 {
-	public static enum Role { CLIENT, SERVER };
-	public static enum Contingency { MANDATORY, OPTIONAL };
-	public static enum Cardinality { SINGLETON, COLLECTION, gathercast, multicast };
+	public static enum Role
+	{
+		CLIENT, SERVER
+	};
+
+	public static enum Contingency
+	{
+		MANDATORY, OPTIONAL
+	};
+
+	public static enum Cardinality
+	{
+		SINGLETON, COLLECTION, gathercast, multicast
+	};
 
 	private String name;
 	private Role role;
@@ -22,67 +35,66 @@ public class InterfaceDescription extends Description
 		setRole(role);
 		setSignature(signature);
 	}
-	
+
 	public Contingency getContingency()
 	{
 		return contingency;
 	}
+
 	public void setContingency(Contingency contingency)
 	{
-		if (contingency == null)
-			throw new NullPointerException();
-
+		if (contingency == null) throw new NullPointerException();
 
 		this.contingency = contingency;
 	}
+
 	public Cardinality getCardinality()
 	{
 		return cardinality;
 	}
+
 	public void setCardinality(Cardinality cardinality)
 	{
-		if (cardinality == null)
-			throw new NullPointerException();
-
+		if (cardinality == null) throw new NullPointerException();
 
 		this.cardinality = cardinality;
 	}
-	
+
 	public String getName()
 	{
 		return name;
 	}
+
 	public void setName(String name)
 	{
-		if (name == null)
-			throw new NullPointerException();
+		if (name == null) throw new NullPointerException();
 
 		this.name = name;
 	}
+
 	public Role getRole()
 	{
 		return role;
 	}
+
 	public void setRole(Role role)
 	{
-		if (role == null)
-			throw new NullPointerException();
+		if (role == null) throw new NullPointerException();
 
 		this.role = role;
 	}
+
 	public Class<?> getSignature()
 	{
 		return signature;
 	}
+
 	public void setSignature(Class<?> signature)
 	{
-		if (signature == null)
-			throw new NullPointerException();
-		
+		if (signature == null) throw new NullPointerException();
+
 		this.signature = signature;
 	}
-	
-	
 
 	@Override
 	public XMLNode toXMLNode()
@@ -96,12 +108,12 @@ public class InterfaceDescription extends Description
 		n.getAttributes().put("cardinality", getCardinality().name());
 		return n;
 	}
+
 	@Override
 	public void check() throws ADLException
 	{
-		
 	}
-	
+
 	public ComponentDescription getParentComponentDescription()
 	{
 		return (ComponentDescription) getParentDescription();
