@@ -645,6 +645,7 @@ public class Remmos {
 		BindingController bc = null;
 		PASuperController sc = null;
 		PAMembraneController membrane = null;
+		PAMulticastController pamc = null;
 		PAComponent componentDest = null;
 		PAComponent parent = null;
 		MonitorControl externalMonitor = null;
@@ -670,8 +671,7 @@ public class Remmos {
 		else {
 			logger.debug("   No parent");
 		}
-		
-		
+				
 		// Get the Membrane Controller
 		try {
 			membrane = Utils.getPAMembraneController(pacomponent);
@@ -681,21 +681,17 @@ public class Remmos {
 		}
 		if(membrane == null)
 			return;
-		
+
+		// Get the Binding Controller. It is not null for composites, and primitive with client interfaces.
+		try {
+			bc = Utils.getPABindingController(pacomponent);
+		} catch (NoSuchInterfaceException e) {
+			bc = null;
+		}
 		
 		// If it is a composite, first it makes the bindings for the internal components
 		if(composite) {
 			logger.debug("Composite");
-			// Get the Binding Controller of the composite (must have one)
-			try {
-				bc = Utils.getPABindingController(pacomponent);
-			} catch (NoSuchInterfaceException e) {
-				bc = null;
-			}
-			if(bc == null) {
-				logger.debug("A composite without Binding Controller?");
-				return;
-			}
 
 			// get all the functional interfaces
 			InterfaceType[] itfType = pacomponent.getComponentParameters().getComponentType().getFcInterfaceTypes();
@@ -729,70 +725,75 @@ public class Remmos {
 			}
 		}
 		
-		// Get the Binding Controller, if we have not him already. 
-		// If it is a composite, we already have the Binding Controller
-		if(bc == null) {
-			try {
-				bc = Utils.getPABindingController(pacomponent);
-			} catch (NoSuchInterfaceException e) {
-				bc = null;
-			}
-		}
 		// if there is no Binding Controller, then we're in a Primitive without client interfaces, so we don't need to continue
 		if(bc == null) {
 			return;
 		}
 		
-		// Takes all the external client interfaces of the component and creates a binding between the corresponding monitoring interfaces
+		// Takes all the external F client interfaces of the component and creates a binding between the corresponding monitoring interfaces
 		// (provided that the client interfaces are bound)
 		
 		InterfaceType[] fItfType = pacomponent.getComponentParameters().getInterfaceTypes();
-		boolean foundParent;
-		for(int i=0; i<fItfType.length; i++) {
+		boolean foundParent = false;
+		Component destItfOwner = null;
+		for(InterfaceType itfType : fItfType) {
 			foundParent = false;
-			// only server-singleton supported ... others ignored ... foooor the moment
-			if(fItfType[i].isFcClientItf() && ((PAGCMInterfaceType)fItfType[i]).isGCMSingletonItf() && !((PAGCMInterfaceType)fItfType[i]).isGCMCollectiveItf()) {
-				itfName = fItfType[i].getFcItfName();
-				// get the component bound to this interface .... (if there is one) !!!!!!!!!!!!!!
-				Component destItfOwner = null;
-				try {
-					destItfOwner = ((PAInterface) bc.lookupFc(itfName)).getFcItfOwner();
-				} catch (NoSuchInterfaceException e1) {
-					e1.printStackTrace();
+			
+			// client singleton/multicast supported
+			// TODO: support the others
+			if(itfType.isFcClientItf()) {
+				itfName = itfType.getFcItfName();
+				// get the component(s) bound to this interface
+				destItfOwner = null;
+				
+				// For Multicast (at least client) interfaces
+				if( ((PAGCMInterfaceType)itfType).isGCMMulticastItf()) {
+					// PROBLEM: NF Components, so far, does not have multicast interfaces!!!!
 				}
-				// if the component is bound to a WSComponent (which is not a PAComponentRepresentative), we cannot monitor it.
-				if(destItfOwner instanceof PAComponentRepresentative) {
-					componentDest = (PAComponentRepresentative) destItfOwner;
-					componentDestName = componentDest.getComponentParameters().getName();
-					logger.debug("   Client interface: "+ itfName + ", bound to "+ componentDestName);
+				
+				
+				// For Singleton interfaces
+				if( ((PAGCMInterfaceType)itfType).isGCMSingletonItf() ) {
+
 					try {
-						// if the component destination is the same as the parent of the current component, 
-						// then I should bind to internal monitoring interface of the parent
-						if(componentDest.equals(parent)) {
-							foundParent = true;
-							externalMonitor = (MonitorControl)componentDest.getFcInterface("internal-server-"+Constants.MONITOR_CONTROLLER);
-							logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+"internal-server-"+Constants.MONITOR_CONTROLLER+"]");
-						}
-						else {
-							externalMonitor = (MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER);
-							logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");						
-						}
-						// do the NF binding
-						membrane.stopMembrane();
-						membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
-						membrane.startMembrane();
-					} catch (NoSuchInterfaceException e) {
-						e.printStackTrace();
-					} catch (IllegalLifeCycleException e) {
-						e.printStackTrace();
-					} catch (IllegalBindingException e) {
-						e.printStackTrace();
-					} catch (NoSuchComponentException e) {
-						e.printStackTrace();
+						destItfOwner = ((PAInterface) bc.lookupFc(itfName)).getFcItfOwner();
+					} catch (NoSuchInterfaceException e1) {
+						e1.printStackTrace();
 					}
-					// if I just bound to the internal interface of the parent, then don't continue with him, otherwise I'll get into a cycle
-					if(!foundParent) {
-						enableMonitoring(componentDest);
+					// if the component is bound to a WSComponent (which is not a PAComponentRepresentative), we cannot monitor it.
+					if(destItfOwner instanceof PAComponentRepresentative) {
+						componentDest = (PAComponentRepresentative) destItfOwner;
+						componentDestName = componentDest.getComponentParameters().getName();
+						logger.debug("   Client interface: "+ itfName + ", bound to "+ componentDestName);
+						try {
+							// if the component destination is the same as the parent of the current component, 
+							// then I should bind to internal monitoring interface of the parent
+							if(componentDest.equals(parent)) {
+								foundParent = true;
+								externalMonitor = (MonitorControl)componentDest.getFcInterface("internal-server-"+Constants.MONITOR_CONTROLLER);
+								logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+"internal-server-"+Constants.MONITOR_CONTROLLER+"]");
+							}
+							else {
+								externalMonitor = (MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER);
+								logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");						
+							}
+							// do the NF binding
+							membrane.stopMembrane();
+							membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
+							membrane.startMembrane();
+						} catch (NoSuchInterfaceException e) {
+							e.printStackTrace();
+						} catch (IllegalLifeCycleException e) {
+							e.printStackTrace();
+						} catch (IllegalBindingException e) {
+							e.printStackTrace();
+						} catch (NoSuchComponentException e) {
+							e.printStackTrace();
+						}
+						// if I just bound to the internal interface of the parent, then don't continue with him, otherwise I'll get into a cycle
+						if(!foundParent) {
+							enableMonitoring(componentDest);
+						}
 					}
 				}
 			}

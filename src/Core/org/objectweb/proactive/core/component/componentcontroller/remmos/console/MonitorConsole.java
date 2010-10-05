@@ -693,6 +693,7 @@ public class MonitorConsole {
 			
 			for(InterfaceType itf : interfaceTypes) {
 				// only for single server interfaces. Does not consider collective ones (yet)
+				// TODO: add support for Multicast/Gathercast
 				if( !itf.isFcClientItf() && ((PAGCMInterfaceType)itf).isGCMSingletonItf() && !((PAGCMInterfaceType)itf).isGCMCollectiveItf() ) {
 					try {
 						interfaceName = itf.getFcItfName();
@@ -727,14 +728,16 @@ public class MonitorConsole {
 		// If the bound component is the parent, then we don't call it.
 		interfaceTypes = pacr.getComponentParameters().getComponentType().getFcInterfaceTypes();
 		boolean foundParent;
+		Component destItfOwner;
 		for(InterfaceType itf : interfaceTypes) {
 			foundParent = false;
+			
 			// client singleton/multicast supported
 			// TODO: support the others
-			if(itf.isFcClientItf() /*&& ((PAGCMInterfaceType)itf).isGCMSingletonItf() && !((PAGCMInterfaceType)itf).isGCMCollectiveItf() */ ) {
+			if(itf.isFcClientItf()  ) {
 				interfaceName = itf.getFcItfName();
 				// get the component(s) bound to this interface ....
-				Component destItfOwner = null;
+				destItfOwner = null;
 				
 				// For Multicast (at least client) interfaces
 				if( ((PAGCMInterfaceType)itf).isGCMMulticastItf()) {
@@ -796,6 +799,8 @@ public class MonitorConsole {
 						}
 					}
 				}
+				
+				// TODO: And for gathercast interfaces?
 			}
 		}
 
