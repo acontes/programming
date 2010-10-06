@@ -43,95 +43,20 @@ public class ComponentDescription extends Description
 		return superDescriptions;
 	}
 
-	public List<AttributeDescription> getDeclaredAttributesDescriptions()
+	public List<AttributeDescription> getAttributesDescriptions()
 	{
 		return attributesDescriptions;
 	}
 
-	public List<AttributeDescription> getAllAttributeDescriptions()
-	{
-		if (getSuperDescriptions().isEmpty())
-		{
-			return getDeclaredAttributesDescriptions();
-		}
-		else
-		{
-			List<AttributeDescription> l = new ArrayList<AttributeDescription>();
 
-			for (ComponentDescription cd : getSuperDescriptions())
-			{
-				l.addAll(cd.getAllAttributeDescriptions());
-			}
-
-			return Collections.unmodifiableList(Lists.concatene(l, getDeclaredAttributesDescriptions()));
-		}
-	}
-
-	public List<ComponentDescription> getAllSubcomponentDescriptions()
-	{
-		if (getSuperDescriptions().isEmpty())
-		{
-			return getDeclaredSubcomponentDescriptions();
-		}
-		else
-		{
-			List<ComponentDescription> l = new ArrayList<ComponentDescription>();
-
-			for (ComponentDescription cd : getSuperDescriptions())
-			{
-				l.addAll(cd.getAllSubcomponentDescriptions());
-			}
-
-			return Lists.concatene(l, getDeclaredSubcomponentDescriptions());
-		}
-	}
-
-	public List<BindingDescription> getDeclaredBindingDescriptions()
+	public List<BindingDescription> getBindingDescriptions()
 	{
 		return bindingDescriptions;
 	}
 
-	public List<BindingDescription> getAllBindingDescriptions()
-	{
-		if (getSuperDescriptions().isEmpty())
-		{
-			return getDeclaredBindingDescriptions();
-		}
-		else
-		{
-			List<BindingDescription> l = new ArrayList<BindingDescription>();
-
-			for (ComponentDescription cd : getSuperDescriptions())
-			{
-				l.addAll(cd.getAllBindingDescriptions());
-			}
-
-			return Collections.unmodifiableList(Lists.concatene(l, getDeclaredBindingDescriptions()));
-		}
-	}
-
-	public List<InterfaceDescription> getDeclaredInterfaceDescriptions()
+	public List<InterfaceDescription> getInterfaceDescriptions()
 	{
 		return interfaceDescriptions;
-	}
-
-	public List<InterfaceDescription> getAllInterfaceDescriptions()
-	{
-		if (getSuperDescriptions().isEmpty())
-		{
-			return getDeclaredInterfaceDescriptions();
-		}
-		else
-		{
-			List<InterfaceDescription> l = new ArrayList<InterfaceDescription>();
-
-			for (ComponentDescription cd : getSuperDescriptions())
-			{
-				l.addAll(cd.getAllInterfaceDescriptions());
-			}
-
-			return Collections.unmodifiableList(Lists.concatene(l, getDeclaredInterfaceDescriptions()));
-		}
 	}
 
 	public String getName()
@@ -148,26 +73,23 @@ public class ComponentDescription extends Description
 
 	public Class<?> getContent()
 	{
-		if (this.content != null)
-		{
-			return this.content;
-		}
-		else
-		{
-			for (ComponentDescription sd : getSuperDescriptions())
-			{
-				Class<?> content = sd.getContent();
-
-				if (content != null)
-				{
-					return content;
-				}
-			}
-
-			return null;
-		}
+		return content;
 	}
 
+	public List<ComponentDescription> flattenInheritanceTree()
+	{
+		List<ComponentDescription> l = new ArrayList<ComponentDescription>();
+		l.add(this);
+
+		// l.size() must be re-evaluated at every cycle
+		for (int i = 0; i < l.size(); ++i)
+		{
+			l.addAll(l.get(i).getSuperDescriptions());
+		}
+
+		return l;
+	}
+	
 	public void setContent(Class<?> content)
 	{
 		this.content = content;
@@ -175,24 +97,23 @@ public class ComponentDescription extends Description
 
 	public MembraneDescription getMembraneDescription()
 	{
-		if (this.membraneDescription != null)
-		{
-			return this.membraneDescription;
-		}
-		else
-		{
-			for (ComponentDescription sd : getSuperDescriptions())
-			{
-				MembraneDescription md = sd.getMembraneDescription();
+		List<ComponentDescription> l = new ArrayList<ComponentDescription>();
+		l.add(this);
 
-				if (md != null)
-				{
-					return md;
-				}
+		while (!l.isEmpty())
+		{
+			ComponentDescription sd = l.remove(0);
+			MembraneDescription md = sd.getMembraneDescription();
+
+			if (md != null)
+			{
+				return md;
 			}
 
-			return null;
+			l.addAll(sd.getSuperDescriptions());
 		}
+
+		return null;
 	}
 
 	public void setMembraneDescription(MembraneDescription membraneDescription)
@@ -200,7 +121,7 @@ public class ComponentDescription extends Description
 		this.membraneDescription = membraneDescription;
 	}
 
-	public List<ComponentDescription> getDeclaredSubcomponentDescriptions()
+	public List<ComponentDescription> getSubcomponentDescriptions()
 	{
 		return subcomponentDescriptions;
 	}
@@ -227,17 +148,17 @@ public class ComponentDescription extends Description
 
 		n.getAttributes().put("arguments", argumentsValue);
 
-		for (Description id : getAllInterfaceDescriptions())
+		for (Description id : getInterfaceDescriptions())
 		{
 			n.getChildren().add(id.toXMLNode());
 		}
 
-		for (Description id : getAllBindingDescriptions())
+		for (Description id : getBindingDescriptions())
 		{
 			n.getChildren().add(id.toXMLNode());
 		}
 
-		for (Description id : getAllSubcomponentDescriptions())
+		for (Description id : getCommentDescriptions())
 		{
 			n.getChildren().add(id.toXMLNode());
 		}
@@ -263,24 +184,24 @@ public class ComponentDescription extends Description
 	{
 		Assertions.ensure(!getName().trim().isEmpty(), "name can't be empty");
 		Assertions.ensure(!getName().equals("this"), "name can't be 'this'");
-		Assertions.ensure(!getAllInterfaceDescriptions().isEmpty(), "no interface defined");
+		Assertions.ensure(!getInterfaceDescriptions().isEmpty(), "no interface defined");
 
-		for (Description d : getDeclaredInterfaceDescriptions())
+		for (Description d : getInterfaceDescriptions())
 		{
 			d.check();
 		}
 
-		for (Description d : getDeclaredSubcomponentDescriptions())
+		for (Description d : getSubcomponentDescriptions())
 		{
 			d.check();
 		}
 
-		for (Description d : getDeclaredBindingDescriptions())
+		for (Description d : getBindingDescriptions())
 		{
 			d.check();
 		}
 
-		for (Description d : getDeclaredAttributesDescriptions())
+		for (Description d : getAttributesDescriptions())
 		{
 			d.check();
 		}
@@ -298,7 +219,7 @@ public class ComponentDescription extends Description
 
 	public ComponentDescription findSubcomponentDescriptionByName(String name)
 	{
-		for (ComponentDescription d : getAllSubcomponentDescriptions())
+		for (ComponentDescription d : getSubcomponentDescriptions())
 		{
 			if (d.getName().equals(name))
 			{
@@ -316,7 +237,7 @@ public class ComponentDescription extends Description
 		// no dot found so the interface belongs to the current component
 		if (pos < 0)
 		{
-			for (InterfaceDescription id : getAllInterfaceDescriptions())
+			for (InterfaceDescription id : getInterfaceDescriptions())
 			{
 				if (id.getName().equals(name))
 				{
@@ -341,5 +262,12 @@ public class ComponentDescription extends Description
 			}
 		}
 	}
+	
+	public ComponentDescription resolveInheritance()
+	{
+		ComponentDescription r = new ComponentDescription(getName());
+		return r;
+	}
+	
 
 }

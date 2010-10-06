@@ -1,13 +1,8 @@
 package org.objectweb.proactive.core.component.adl.luc.description;
 
-import lucci.Clazz;
 import lucci.text.xml.XMLNode;
-import lucci.util.assertion.Assertions;
 
 import org.objectweb.proactive.core.component.adl.luc.ADLException;
-import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription.Cardinality;
-import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription.Contingency;
-import org.objectweb.proactive.core.component.adl.luc.description.InterfaceDescription.Role;
 
 public class CommentDescription extends Description
 {

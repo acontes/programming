@@ -15,7 +15,7 @@ public abstract class Description
 	private File file;
 	private final List<CommentDescription> commentDescriptions = new ArrayList<CommentDescription>();
 
-	public List<CommentDescription> getDeclaredCommentDescriptions()
+	public List<CommentDescription> getCommentDescriptions()
 	{
 		return this.commentDescriptions;
 	}

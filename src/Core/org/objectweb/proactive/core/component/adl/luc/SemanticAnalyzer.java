@@ -96,35 +96,35 @@ public class SemanticAnalyzer
 		{
 			InterfaceDescription id = createInterfaceDescription(n);
 			id.setParentDescription(description);
-			description.getDeclaredInterfaceDescriptions().add(id);
+			description.getInterfaceDescriptions().add(id);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "component"))
 		{
 			ComponentDescription cd = createComponentDescription(n);
 			cd.setParentDescription(description);
-			description.getDeclaredSubcomponentDescriptions().add(cd);
+			description.getSubcomponentDescriptions().add(cd);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "binding"))
 		{
 			BindingDescription bd = createBindingDescription(n);
 			bd.setParentDescription(description);
-			description.getDeclaredBindingDescriptions().add(bd);
+			description.getBindingDescriptions().add(bd);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "attributes"))
 		{
 			AttributeDescription ad = createAttributeDescription(n);
 			ad.setParentDescription(description);
-			description.getDeclaredAttributesDescriptions().add(ad);
+			description.getAttributesDescriptions().add(ad);
 		}
 
 		for (XMLNode n : XMLNode.findChildrenWhoseNameMatch(node, "comments"))
 		{
 			CommentDescription ad = createCommentDescription(n);
 			ad.setParentDescription(description);
-			description.getDeclaredCommentDescriptions().add(ad);
+			description.getCommentDescriptions().add(ad);
 		}
 
 		return description;
