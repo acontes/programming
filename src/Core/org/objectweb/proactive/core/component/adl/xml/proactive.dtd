@@ -31,6 +31,11 @@
 <?add ast="definition" itf="org.objectweb.fractal.adl.attributes.AttributesContainer" ?>
 <?add ast="component"  itf="org.objectweb.fractal.adl.attributes.AttributesContainer" ?>
 
+<!-- content module -->
+
+<?add ast="component"  itf="org.objectweb.fractal.adl.components.Component" ?>
+<?add ast="definition" itf="org.objectweb.fractal.adl.components.ComponentDefinition" ?>
+
 <!-- implementations module -->
 <?add ast="implementation" itf="org.objectweb.fractal.adl.implementations.Implementation" ?>
 <?add ast="definition"     itf="org.objectweb.fractal.adl.implementations.ImplementationContainer" ?>
@@ -83,6 +88,16 @@
 <?add ast="exportedVirtualNode" itf="org.objectweb.proactive.core.component.adl.vnexportation.ComposedFromContainer" ?>
 <?add ast="composedFrom" itf="org.objectweb.proactive.core.component.adl.vnexportation.ComposingVirtualNodeContainer" ?>
 
+
+<?add ast="implementation"  itf="org.objectweb.proactive.core.component.adl.content.Content" ?>
+<?add ast="implementation" itf="org.objectweb.fractal.adl.interfaces.InterfaceContainer" ?>
+<?add ast="implementation" itf="org.objectweb.fractal.adl.bindings.BindingContainer" ?>
+<?add ast="implementation"     itf="org.objectweb.fractal.adl.components.ComponentContainer" ?>
+
+
+<?add ast="controller"     itf="org.objectweb.fractal.adl.components.ComponentContainer" ?>
+<?add ast="controller"     itf="org.objectweb.fractal.adl.interfaces.InterfaceContainer" ?>
+<?add ast="controller"     itf="org.objectweb.fractal.adl.bindings.BindingContainer" ?>
 
 
 <!-- ********************************************************************** -->
@@ -142,15 +157,18 @@
   value CDATA #REQUIRED
 >
 
-<!ELEMENT controller (comment*) >
+<!ELEMENT controller (comment*,interface*,component*,binding*) >
 <!ATTLIST controller
-  desc CDATA #REQUIRED
+  desc CDATA #IMPLIED
 >
 
-<!ELEMENT content (comment*) >
+<!ELEMENT content (comment*,interface*,component*,binding*) >
 <!ATTLIST content
-  class CDATA #REQUIRED
+  class CDATA #IMPLIED
+  definition CDATA #IMPLIED
 >
+
+
 
 <!ELEMENT logger EMPTY >
 <!ATTLIST logger 
