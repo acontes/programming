@@ -81,7 +81,8 @@ public class TestSCAIntentController extends SCAComponentTest {
                 .createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE), }),
                 Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
-        //@snippet-start component_scauserguide_5        
+        //@snippet-start component_scauserguide_5   
+        
         SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
                 .getSCAIntentController(componentA);
         scaic.addIntentHandler(new IntentHandlerTest());

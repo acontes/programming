@@ -41,6 +41,7 @@ import org.objectweb.proactive.extensions.component.sca.control.IntentJoinPoint;
 
 
 //@snippet-start component_scauserguide_4
+
 public class TimeOutIntentHandler implements IntentHandler {
     private static final long DEFAULT_TIMEOUT = 5000;
 

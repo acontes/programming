@@ -54,6 +54,15 @@ public class Main {
     private static final String orangeURL = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
 
     public static void main(String[] args) throws Exception {
+    	if ((args.length != 2)) {
+            System.out.println("Parameters : [OrangeID] and [Distination number] " +
+                "\n        The first parameter is your OrangeSMS service ID" +
+                "\n        The second parameter is your distination number"
+                );
+            return;
+        }
+    	String OrangeID = args[0];
+    	String DistNumber = args[1];
         SCAPAPropertyRepository.SCA_PROVIDER
                 .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
         Component boot = Utils.getBootstrapComponent();
@@ -74,9 +83,9 @@ public class Main {
         SCAPropertyController scap = Utils.getSCAPropertyController(comp);
         scap.setValue("fromCurrency", "USD");
         scap.setValue("toCurrency", "EUR");
-        scap.setValue("id", "xxxxxxxx"); // Change me
+        scap.setValue("id", OrangeID); // Change me
         scap.setValue("from", "38100");
-        scap.setValue("to", "3360000000"); // Change me
+        scap.setValue("to", DistNumber); // Change me
 
         GCM.getGCMLifeCycleController(comp).startFc();
         ((Runner) comp.getFcInterface("Runner")).execute();

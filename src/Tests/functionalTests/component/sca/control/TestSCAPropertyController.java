@@ -72,6 +72,7 @@ public class TestSCAPropertyController extends SCAComponentTest {
     // -----------------------------------------------------------------------------------
     @Test
     //@snippet-start component_scauserguide_2
+    
     public void testSCAPropertyController() throws Exception {
         Component c = gf.newFcInstance(t, "primitive", PropertyComponent.class.getName());
         GCM.getGCMLifeCycleController(c).startFc();
