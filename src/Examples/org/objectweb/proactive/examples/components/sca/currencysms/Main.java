@@ -44,7 +44,6 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
-import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
 
@@ -54,17 +53,14 @@ public class Main {
     private static final String orangeURL = "http://sms.beta.orange-api.net/sms/sendSMS.xml";
 
     public static void main(String[] args) throws Exception {
-    	if ((args.length != 2)) {
-            System.out.println("Parameters : [OrangeID] and [Distination number] " +
-                "\n        The first parameter is your OrangeSMS service ID" +
-                "\n        The second parameter is your distination number"
-                );
+        if ((args.length != 2)) {
+            System.out.println("Parameters : [Orange_API_Access_Key] [Destination_Number] "
+                + "\n        The first parameter is your Orange API Access Key"
+                + "\n        The second parameter is your destination number");
             return;
         }
-    	String OrangeID = args[0];
-    	String DistNumber = args[1];
-        SCAPAPropertyRepository.SCA_PROVIDER
-                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+        String orangeID = args[0];
+        String destNumber = args[1];
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
         GenericFactory gf = GCM.getGenericFactory(boot);
@@ -83,9 +79,9 @@ public class Main {
         SCAPropertyController scap = Utils.getSCAPropertyController(comp);
         scap.setValue("fromCurrency", "USD");
         scap.setValue("toCurrency", "EUR");
-        scap.setValue("id", OrangeID); // Change me
+        scap.setValue("id", orangeID); // Change me
         scap.setValue("from", "38100");
-        scap.setValue("to", DistNumber); // Change me
+        scap.setValue("to", destNumber); // Change me
 
         GCM.getGCMLifeCycleController(comp).startFc();
         ((Runner) comp.getFcInterface("Runner")).execute();
