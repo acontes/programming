@@ -113,6 +113,9 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
      */
     @Override
     public synchronized Object reify(MethodCall mc) throws InvocationTargetException {
+    	//cruz debug
+//    	System.out.println("\n[ProxyForComponentInterfaceGroup] reifying "+ mc.getName() + "(ComponentMetadata?"+ (mc.getComponentMetadata()!=null) +"), on owner "+ owner.getComponentParameters().getName());
+    	//--cruz
         if (delegatee != null) {
             // check
             if (itfSignatureClass.equals(mc.getReifiedMethod().getDeclaringClass())) {
@@ -141,14 +144,18 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
                     mc.getReifiedMethod().getDeclaringClass() + " cannot be invoked on " +
                     itfSignatureClass.getName());
             }
-
+            
+            //cruz
+//            System.out.println("[ProxyForComponentInterfaceGroup] calling delegatee.reify. Method: "+ mc.getName() + ", ComponentMetadata: "+ mc.getComponentMetadata().getComponentInterfaceName() + ", "+ mc.getComponentMetadata().getSenderItfID());
+        	//--cruz
             return delegatee.reify(mc);
             // System.out.println("delegatee.memberList.size();" +
             // delegatee.memberList.size());
         } else {
 
             // super.memberList = delegatee.memberList;
-            return super.reify(mc);
+//            System.out.println("[ProxyForComponentInterfaceGroup] calling super.reify. Method: "+ mc.getName() + ", ComponentMetadata: "+ mc.getComponentMetadata().getComponentInterfaceName() + ", "+ mc.getComponentMetadata().getSenderItfID());
+        	return super.reify(mc);
         }
     }
 
@@ -181,7 +188,7 @@ public class ProxyForComponentInterfaceGroup<E> extends ProxyForGroup<E> {
 
     protected Object asynchronousCallOnGroup(MethodCall mc) throws InvocationTargetException {
         Object result = super.asynchronousCallOnGroup(mc);
-
+//        System.out.println("[ProxyForComponentInterfaceGroup.asynchronousCallOnGroup] ...");
         // TODO rely on API or method call rather than annotation?
         Reduce reduceAnnotation = mc.getReifiedMethod().getAnnotation(Reduce.class);
         if (reduceAnnotation != null) {

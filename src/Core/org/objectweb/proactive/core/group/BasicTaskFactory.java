@@ -77,6 +77,7 @@ public class BasicTaskFactory implements TaskFactory {
      * 
      */
     public List<MethodCall> generateMethodCalls(MethodCall mc) throws InvocationTargetException {
+    	System.out.println("[BasicTaskFactory] generateMethodCalls from "+ mc.getName());
         List<MethodCall> methodsToDispatch = new ArrayList<MethodCall>(getNbTasks(mc));
         if (!groupProxy.isDispatchingCall(mc)) {
             // enqueue all tasks with same parameters
@@ -141,7 +142,7 @@ public class BasicTaskFactory implements TaskFactory {
     public Queue<AbstractProcessForGroup> generateTasks(MethodCall originalMethodCall,
             List<MethodCall> methodCalls, Object result, ExceptionListException exceptionList,
             CountDownLatch doneSignal, ProxyForGroup<?> groupProxy) {
-
+    	System.out.println("[BasicTaskFactory] generateTasks from "+ originalMethodCall.getName());
         Queue<AbstractProcessForGroup> taskList = new ConcurrentLinkedQueue<AbstractProcessForGroup>();
 
         // not a broadcast: use generated method calls

@@ -59,6 +59,7 @@ import org.objectweb.fractal.util.Fractal;
 import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.ItfStubObject;
 import org.objectweb.proactive.core.component.NFBinding;
 import org.objectweb.proactive.core.component.NFBindings;
 import org.objectweb.proactive.core.component.PAInterface;
@@ -67,6 +68,7 @@ import org.objectweb.proactive.core.component.componentcontroller.HostComponentS
 import org.objectweb.proactive.core.component.exceptions.NoSuchComponentException;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.identity.PAComponentImpl;
+import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeImpl;
 import org.objectweb.proactive.core.component.representative.PANFComponentRepresentative;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
@@ -111,6 +113,8 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         try {
             Class<?> cl = Class.forName(client.getFcItfSignature());
             Class<?> sr = Class.forName(server.getFcItfSignature());
+            
+            // Singleton interfaces
             if (!cl.isAssignableFrom(sr)) {
                 throw new IllegalBindingException("Signatures of interfaces don't correspond (" +
                     client.getFcItfSignature() + " and " + server.getFcItfSignature() + ")");
@@ -118,6 +122,25 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+    
+    private void checkMulticastCompatibility(PAGCMInterfaceType client, PAInterface server) {
+        
+        // Check compatibility for Multicast Interfaces
+        //System.out.println("Checking Multicast ITF "+ client.getFcItfName());
+       	// could the owner's PAMulticastController take care of it ? sure, but I must provide the Interface, instead of the InterfaceType
+        try {
+			GCM.getMulticastController(owner).ensureGCMCompatibility(client, server);
+		} catch (IllegalBindingException e) {
+			e.printStackTrace();
+		} catch (NoSuchInterfaceException e) {
+			e.printStackTrace();
+		}
+		
+		//System.out.println("   ---> Checked !!!");
+
+        
+        
     }
 
     public void addNFSubComponent(Component component) throws IllegalContentException,
@@ -499,6 +522,21 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 throw new IllegalBindingException("The binding :" + " membrane." + clientItf +
                     "--> external NF interface already exists");
             }
+            
+            // binding Multicast Client interface
+            if(clItfType.isGCMMulticastItf()) {
+            	//System.out.println("Checking compatibily of multicast interface "+ clItfType.getFcItfName() + " with "+ srItfType.getFcItfName());
+            	checkMulticastCompatibility(clItfType, srItf);
+            	// copied from PABindingController, after checkBindability (which in this case is checkMulticastCompatibility)
+            	((ItfStubObject) serverItf).setSenderItfID(new ItfID(clientItf, ((PAComponent) getFcItfOwner()).getID()));
+            	
+            	// now perform the binding !!!!
+            	//System.out.println("Performing binding ...");
+            	((PAMulticastControllerImpl) ((PAInterface) GCM.getMulticastController(owner)).getFcItfImpl()).bindFc(clientItf, srItf);
+            	return;
+            }
+            
+            // singleton interfaces
             checkCompatibility(clItfType, srItfType);
             PAInterface cl = (PAInterface) owner.getFcInterface(clientItf);
             cl.setFcItfImpl(serverItf);

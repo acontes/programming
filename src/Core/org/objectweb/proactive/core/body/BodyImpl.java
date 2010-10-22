@@ -93,6 +93,7 @@ import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.body.ComponentBodyImpl;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
+import org.objectweb.proactive.core.component.control.PAMulticastController;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.request.ComponentRequestImpl;
@@ -801,7 +802,13 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                 throws IOException, RenegotiateSessionException, CommunicationForbiddenException {
             long sequenceID = getNextSequenceID();
             
+            //System.out.println("[BodyImpl] Call to SEND REQUEST");
+            //System.out.println("[BodyImpl] Source Body: ["+ BodyImpl.this.getName() +"] --> destination URL ["+ destinationBody.getID() +"]. Method: "+ methodCall.getName() );
+            //System.out.println("[BodyImpl] Component Body? "+ (BodyImpl.this instanceof ComponentBodyImpl));
+            //System.out.println("[BodyImpl] Context: "+ LocalBodyStore.getInstance().getContext() );
+            
             MessageTags tags = applyTags(sequenceID, destinationBody, methodCall);
+            
             
             Request request = this.internalRequestFactory.newRequest(methodCall, BodyImpl.this,
                     future == null, sequenceID, tags);
@@ -810,7 +817,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             if (methodCall.getComponentMetadata() != null) {
                 request = new ComponentRequestImpl(request);
             }
-
+            
             // Registers the Future in the local FuturePool, which will be updated when the reply arrives.
             if (future != null) {
                 future.setID(sequenceID);
@@ -856,6 +863,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
 //                    }
 //                }
                         BodyImpl.CMlogger.debug("REQUEST SENT (BodyImpl) from ["+ this.getName() +"] to ["+ destinationBody.getID() +"], tags "+ tags);
+
+                        //cruz: debug
+                        if(BodyImpl.this instanceof ComponentBodyImpl) {
+                        	PAComponent pac = ((ComponentBodyImpl)BodyImpl.this).getPAComponentImpl();
+                        	ComponentParameters cp = pac.getComponentParameters();
+                        	String componentName = cp.getName();
+                        }
+                        //--cruz
             }
 
             // END JMX Notification
@@ -909,9 +924,10 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             // apply the code of all message TAGs from current context
             Request currentreq = LocalBodyStore.getInstance().getContext().getCurrentRequest();
             MessageTags currentMessagetags = null;
-            MessageTags nextTags = messageTagsFactory.newMessageTags();
-
+            MessageTags nextTags = messageTagsFactory.newMessageTags();            
+            
             if (currentreq != null && (currentMessagetags = currentreq.getTags()) != null) {
+            	            	
                 // there is a request with a MessageTags object in the current context
                 for (Tag t : currentMessagetags.getTags()) {
                     Tag newTag = t.apply();
@@ -951,33 +967,62 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             			if(cmcmd.getSenderItfID() != null) {
             				interfaceSourceName = cmcmd.getSenderItfID().getItfName();
             			}
+
+            			//System.out.println("Sending request from ["+ componentSourceName +"]."+interfaceSourceName + " to destination interface "+ interfaceDestName);	
             			
             			// why does this return false????
             			// System.out.println("::::::::::"+cmcmd.isComponentMethodCall());
             			// if this component is generating a request, it should have a bound client interface,
             			// and should have BindingController, so it shouldn't throw a NoSuchInterfaceException here
             			BindingController bc = null;
-            			try {
-            				// more ugliness ... name must not end with -NF 
-            				// this is to avoid that the tags be propagated in calls inside the membrane ... I don't want to monitor that, and it generates errors
-            				if(!Utils.isControllerItfName(interfaceDestName) && !interfaceDestName.endsWith("-nf") ) {
-            					bc = Fractal.getBindingController(pac);
-            					// Binding Controller shouldn't be null if I'm in a component making a component request
-            					//if(bc != null) {
-            					componentDestName = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(interfaceSourceName)).getFcItfOwner()).getComponentParameters().getName();
-            					//System.out.println("Calling from ["+ componentSourceName +"."+interfaceSourceName+"] to ["+ componentDestName +"."+ interfaceDestName+"]");
-            					//}
-							}
-						} catch (NoSuchInterfaceException e) {
-							// FIXME I shouldn't add tags if the component is NF, I don't want to monitor them
-							// For now I will ignore them, but it should be solved in clean way (detecting before the fact that the component is NF)
-							System.out.println("Couldn't find interface [" + interfaceDestName + "] on component ["+ componentSourceName + "]");
-							//e.printStackTrace();
-						}
-						
             			
+						// more ugliness ... name must not end with "-nf" 
+						// avoid propagating calls through calls inside the membrane ... (I don't want to monitor that, and it generates errors)
+            			if(!Utils.isControllerItfName(interfaceDestName) && !interfaceDestName.endsWith("-nf") ) {
+
+            				try {
+            					// Binding Controller shouldn't be null, because I'm in a component making a component request
+            					bc = Fractal.getBindingController(pac);
+            					
+            					// tags propagation for singleton interface ... normal, as usual
+            					if(Utils.isGCMSingletonItf(interfaceSourceName, pac)) {
+            						//if(bc != null) {
+            						componentDestName = ((PAComponentRepresentative)((PAInterface) bc.lookupFc(interfaceSourceName)).getFcItfOwner()).getComponentParameters().getName();
+            						//System.out.println("Calling from ["+ componentSourceName +"."+interfaceSourceName+"] to ["+ componentDestName +"."+ interfaceDestName+"]");
+            						//}
+            					}
+
+            					else if(Utils.isGCMMulticastItf(interfaceSourceName, pac)) {
+            						
+            						UniqueID destBodyID = destinationBody.getID();
+            						PAMulticastController pamc = Utils.getPAMulticastController(pac);
+            						Object[] bindedInterfaces = pamc.lookupGCMMulticast(interfaceSourceName);
+            						for(Object bindedInterface : bindedInterfaces) {
+            							UniqueID destinationMulticastBodyID = ((PAComponentRepresentative)((PAInterface) bindedInterface).getFcItfOwner()).getID();
+            							if(destinationMulticastBodyID.equals(destBodyID)) {
+            								componentDestName = ((PAComponentRepresentative)((PAInterface) bindedInterface).getFcItfOwner()).getComponentParameters().getName();
+            							}
+            						}
+        							//System.out.println("MULTICAST call from ["+ componentSourceName + "."+interfaceSourceName+"] to ["+ componentDestName +"."+ interfaceDestName+"]");
+
+            					}
+
+
+
+            				} catch (NoSuchInterfaceException e) {
+            					// FIXME I shouldn't add tags if the component is NF, I don't want to monitor them
+            					// For now I will ignore them, but it should be solved in clean way (detecting before the fact that the component is NF)
+            					System.out.println("Couldn't find interface [" + interfaceDestName + "] on component ["+ componentSourceName + "]");
+            					//e.printStackTrace();
+
+            				} catch (Exception e) {
+            					System.out.println("FOUND NotNoSuchInterfaceException exception");
+            					e.printStackTrace();
+            				}						
+
+            			}
             		}
-        			methodName = methodCall.getName();
+            		methodName = methodCall.getName();
 
             		// Remove the current CMTag (if exists), and keep the ID of the previous, as it will be used for the new CMTag attached to this request
         			// Also keep the root ID
@@ -985,6 +1030,11 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
         			long rootID = 0;
             		if(nextTags.check(CMTag.IDENTIFIER)) {
             			CMTag oldTag = (CMTag) nextTags.removeTag(CMTag.IDENTIFIER);
+            			//cruz debug
+            			//if(componentSourceName.equals("componentB") || componentSourceName.equals("componentF")) {
+            				//System.out.println("OldTags ["+ oldTag + "]");	
+            			//}
+            			//--cruz
             			oldSeqID = oldTag.getNewSeqID();
             			rootID = oldTag.getRootID();
             		}
@@ -999,7 +1049,7 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
             		if(!componentDestName.equals("-")) {
                 		// sequenceID is the new one, just generated (in sendRequest).
                 		// needed to find the request that was being served, to be able to associate it in the callLog
-                		nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceDestName, methodName, rootID));            			
+            			nextTags.addTag(new CMTag(bodyID, oldSeqID, sequenceID, componentSourceName, componentDestName, interfaceDestName, methodName, rootID));            			
             		}
             		
 

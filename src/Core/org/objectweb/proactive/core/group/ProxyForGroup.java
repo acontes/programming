@@ -65,6 +65,8 @@ import org.objectweb.proactive.core.body.SendingQueue;
 import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.body.proxy.AbstractProxy;
 import org.objectweb.proactive.core.body.proxy.SendingQueueProxy;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
+import org.objectweb.proactive.core.component.group.ComponentProcessForAsyncCall;
 import org.objectweb.proactive.core.group.spmd.MethodCallSetSPMDGroup;
 import org.objectweb.proactive.core.mop.ClassNotReifiableException;
 import org.objectweb.proactive.core.mop.ConstructionOfReifiedObjectFailedException;
@@ -301,6 +303,10 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         // -- BEGIN ForgetOnSend Control --
         //
         Body sourceBody = LocalBodyStore.getInstance().getContext().getBody();
+        //cruz debug
+        //System.out.println("[ProxyForGroup] reifying call for method "+ mc.getName() + ", Body "+ sourceBody.getName() );
+        //--cruz
+        
         // Check if this sending is "legal" regarding its sterility, otherwise raise an
         // IOException
         if (sourceBody.isSterile()) {
@@ -342,7 +348,9 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
          * if the call is asynchronous the group of result will be a group a future
          */
         else { // with group in general case : SYNC == ASYNC !!!!
+        	//System.out.println("[ProxyForGroup] Calling asynchronousCallOnGroup...");
             result = this.asynchronousCallOnGroup(mc);
+            //System.out.println("[ProxyForGroup] Context: "+ LocalBodyStore.getInstance().getContext() );
         }
 
         /*
@@ -403,7 +411,7 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
      */
     protected Object asynchronousCallOnGroup(MethodCall mc) throws InvocationTargetException {
         Object result;
-
+        //System.out.println("[ProxyForGroup.asynchronousCallOnGroup] ...");
         // Creates a stub + ProxyForGroup for representing the result
         String returnTypeClassName = null;
         try {
@@ -435,8 +443,27 @@ public class ProxyForGroup<E> extends AbstractProxy implements Proxy, Group<E>, 
         Queue<AbstractProcessForGroup> tasksToDispatch = taskFactory.generateTasks(mc, methodsToDispatch,
                 result, null, doneSignal, this);
         // dispatch
+        //cruz debug
+        /*
+        System.out.println("[ProxyForGroup.asynchronousCallOnGroup] Context: "+ LocalBodyStore.getInstance().getContext() );
+        System.out.println("[ProxyForGroup.asynchronousCallOnGroup] Ready to dispatch. Method: "+ mc.getName() +", ComponentMetadata?" + (mc.getComponentMetadata() != null));
+        for(MethodCall m : methodsToDispatch) {
+        	if(m.getComponentMetadata() != null) {
+        		System.out.println("                                        Method: "+ m.getName() + ", SenderItfID: " + (m.getComponentMetadata().getSenderItfID() ) );        	
+        	}
+        	else {
+        		System.out.println("                                        Method: "+ m.getName() + ", No ComponentMetadata" );        	
+        	}
+        }
+        System.out.println("                                        #Tasks: "+ tasksToDispatch.size());
+        for(AbstractProcessForGroup apfg : tasksToDispatch) {
+        	System.out.println("                                        X: "+ ((ComponentProcessForAsyncCall)apfg).memberList.size() );
+        }
+        */
+        //--cruz
         dispatcher.dispatchTasks(tasksToDispatch, doneSignal, mc.getReifiedMethod().getAnnotation(
                 Dispatch.class));
+        //System.out.println("[ProxyForGroup.asynchronousCallOnGroup] Dispatched!!");
 
         // TODO rely on API or method call rather than annotation?
         // Reduce reduceAnnotation = mc.getReifiedMethod().getAnnotation(Reduce.class);

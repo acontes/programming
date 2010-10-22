@@ -43,6 +43,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.core.body.Context;
 import org.objectweb.proactive.core.body.LocalBodyStore;
 import org.objectweb.proactive.core.body.proxy.UniversalBodyProxy;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 import org.objectweb.proactive.core.mop.StubObject;
@@ -59,8 +60,9 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runn
     private Body body;
     CountDownLatch doneSignal;
     DispatchMonitor dispatchMonitor;
+    private Request parentRequest;    //cruz: the Request that was being served when this call was created
 
-    public ProcessForAsyncCall(ProxyForGroup proxyGroup, Vector memberList, Vector memberListOfResultGroup,
+    public ProcessForAsyncCall(ProxyForGroup<?> proxyGroup, Vector<?> memberList, Vector<Object> memberListOfResultGroup,
             int groupIndex, MethodCall mc, int resultIndex, Body body, CountDownLatch doneSignal) {
         this.proxyGroup = proxyGroup;
         this.memberList = memberList;
@@ -71,6 +73,12 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runn
         this.body = body;
         this.doneSignal = doneSignal;
     }
+    
+    public ProcessForAsyncCall(ProxyForGroup<?> proxyGroup, Vector<?> memberList, Vector<Object> memberListOfResultGroup,
+            int groupIndex, MethodCall mc, int resultIndex, Body body, CountDownLatch doneSignal, Request parentRequest) {
+    	this(proxyGroup, memberList, memberListOfResultGroup, groupIndex, mc, resultIndex, body, doneSignal);
+    	this.parentRequest = parentRequest;
+    }
 
     public void setDispatchMonitor(DispatchMonitor dispatchMonitor) {
         this.dispatchMonitor = dispatchMonitor;
@@ -79,7 +87,12 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runn
     public void run() {
         Object object = this.memberList.get(this.groupIndex);
         // push an initial context for this thread
-        LocalBodyStore.getInstance().pushContext(new Context(body, null));
+//        System.out.println("[ProcessForAsyncCall.run0] Body ["+ body.getName() +"] Before pushing new Context. This parent request: "+ this.parentRequest);
+//        System.out.println("[ProcessForAsyncCall.run1] "+ LocalBodyStore.getInstance().getContext());
+        //LocalBodyStore.getInstance().pushContext(new Context(body, null)); // original
+        //LocalBodyStore.getInstance().pushContext(new Context(body, mc.getRequest())); //mine v1
+        LocalBodyStore.getInstance().pushContext(new Context(body, parentRequest)); //mine v2
+//        System.out.println("[ProcessForAsyncCall.run2] "+ LocalBodyStore.getInstance().getContext());
 
         /* only do the communication (reify) if the object is not an error nor an exception */
         if (!(object instanceof Throwable)) {
@@ -110,7 +123,8 @@ public class ProcessForAsyncCall extends AbstractProcessForGroup implements Runn
     }
 
     public void executeMC(MethodCall mc, Object object) throws Throwable {
-
+    	System.out.println("[ProcessForAsyncCall.executeMC] ");
+        
         boolean objectIsLocal = false;
 
         Proxy lastProxy = AbstractProcessForGroup.findLastProxy(object);

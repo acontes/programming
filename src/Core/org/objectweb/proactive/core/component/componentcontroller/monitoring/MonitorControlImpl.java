@@ -68,11 +68,11 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 			throws ProActiveRuntimeException {
 		return null;
 	}
-	@Override
+	/*@Override
 	public MethodStatistics getStatistics(String itfName, String methodName,
 			Class<?>[] parametersTypes) throws ProActiveRuntimeException {
 		return null;
-	}
+	}*/
 	@Override
 	public BooleanWrapper isMonitoringStarted() {
 		return new BooleanWrapper(isGCMMonitoringStarted());
@@ -97,14 +97,14 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		return null;
 	}
 
-	@Override
+	/*@Override
 	public MethodStatistics getGCMStatistics(String itfName, String methodName,
 			Class<?>[] parametersTypes) throws ProActiveRuntimeException {
 		return null;
-	}
+	}*/
 
 	@Override
-	public boolean isGCMMonitoringStarted() {
+	public Boolean isGCMMonitoringStarted() {
 		return started;
 	}
 
@@ -422,10 +422,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		return metricsStore.calculate(name);
 	}
 	
-	@Override
+	/*@Override
 	public Object runMetric(String name, Object[] params) {
 		return metricsStore.calculate(name, params);
-	}
+	}*/
 
 	@Override
 	public List<String> getMetricList() {

@@ -40,6 +40,7 @@ import java.io.Serializable;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.body.UniversalBody;
+import org.objectweb.proactive.core.body.tags.MessageTags;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.Shortcut;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -53,7 +54,9 @@ public class ComponentMethodCallMetadata implements Serializable {
     protected Shortcut shortcut = null;
     protected short priority;
     private ItfID senderItfID = null;
-
+/*    private MessageTags methodTags = null; //cruz: workaround to pass the tags propagate the tags to members of a multicast call
+                                           //      (maybe more than just a workaround if I suceed all the tags here)
+*/
     public void shortcutNotification(UniversalBody sender, UniversalBody intermediate) {
         if (shortcut == null) {
             // store only first sender?
@@ -135,4 +138,16 @@ public class ComponentMethodCallMetadata implements Serializable {
     public void setSenderItfID(ItfID senderItfID) {
         this.senderItfID = senderItfID;
     }
+    /*
+    //cruz
+    public MessageTags getTags() {
+    	return methodTags;
+    }
+    
+    public void setTags(MessageTags mt) {
+    	this.methodTags = mt;
+    }
+    //--cruz
+     * 
+     */
 }

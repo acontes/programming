@@ -146,7 +146,9 @@ public class PAComponentImpl implements PAComponent, Serializable {
         // 2. control interfaces
         if (nfType != null) { // The nf type is specified
             if (!ctrlDesc.configFileIsSpecified()) { // There is no file containing the nf configuration
+            	System.out.println("Generating NFType for component "+ ctrlDesc.getName());
                 generateNfType(nfType, component_is_primitive);
+                System.out.println("Generated ........... "+ ctrlDesc.getName());
             } else { // The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file
                 checkCompatibility();
                 addControllers(component_is_primitive);
@@ -160,10 +162,18 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
         for (Interface itf : controlItfs.values()) {
             // TODO Check with component controller
-            PAController itfImpl = (PAController) ((PAInterfaceImpl) itf).getFcItfImpl();
-            if (itfImpl != null) { // due to non-functional interface implemented using component
-                itfImpl.initController();
-            }
+        	//System.out.print("Control interface "+ itf.getFcItfName() + " is a PAController? " + ((  ((PAInterfaceImpl) itf).getFcItfImpl() instanceof PAController)?"true":"false") );
+        	/* cruz
+        	if( ((PAInterfaceImpl) itf).getFcItfImpl() != null) System.out.println(" Class: "+ ((PAInterfaceImpl) itf).getFcItfImpl().getClass().getName() );
+        	else System.out.println(" Class: null");
+        	  --cruz */
+        	// cruz: IF aggregated. A multicast client interface has an implementation (so, it's != null), but it is not a PAController
+        	if( ((PAInterfaceImpl) itf).getFcItfImpl() instanceof PAController) {
+        		PAController itfImpl = (PAController) ((PAInterfaceImpl) itf).getFcItfImpl();
+        		if (itfImpl != null) { // due to non-functional interface implemented using component
+        			itfImpl.initController();
+        		}
+        	}
         }
 
         // put all in a table
@@ -217,7 +227,11 @@ public class PAComponentImpl implements PAComponent, Serializable {
                         continue;
                     }
                     if (interface_types[i].isGCMMulticastItf() && interface_types[i].isFcClientItf()) {//TODO : This piece of code has to be tested
+//                    	System.out.println("ITF_REF ... calling createInterfaceOnGroupOfDelegatees");
                         itf_ref = createInterfaceOnGroupOfDelegatees(interface_types[i]);
+//                        System.out.println("itf_ref. name:  "+ itf_ref.getFcItfName());
+//                        System.out.println("itf_ref. class: "+ itf_ref.getFcItfImpl().getClass().getName());
+//                        System.out.println("itf_ref. type:  "+ itf_ref.getFcItfType());
                     } else {
                         itf_ref = MetaObjectInterfaceClassGenerator.instance().generateInterface(
                                 interface_types[i].getFcItfName(), this, interface_types[i],

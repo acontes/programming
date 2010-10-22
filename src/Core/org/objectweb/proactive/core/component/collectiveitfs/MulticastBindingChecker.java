@@ -50,6 +50,8 @@ import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDi
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMetadata;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatchMode;
 import org.objectweb.proactive.core.component.type.annotations.multicast.Reduce;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -85,6 +87,7 @@ public class MulticastBindingChecker implements Serializable {
         Class<?>[] clientSideExceptionTypes = clientSideMethod.getExceptionTypes();
         ParamDispatch[] paramDispatchModes = getDispatchModes(clientSideMethod);
 
+        ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("Checking client method: "+ clientSideMethod.getName() + " ... #params: "+ clientSideParametersTypes.length);
         serverSideMethodsLoop: for (Method serverSideMethod : serverSideMethods) {
             if (serverItfIsGathercast) {
                 // look for corresponding method in the gather proxy itf
@@ -131,6 +134,11 @@ public class MulticastBindingChecker implements Serializable {
             // 3. check parameters types
             Type[] serverSideParametersTypes = serverSideMethod.getGenericParameterTypes();
 
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("      against serverSideMethod: "+ serverSideMethod.getName() + ", serverSideParametersTypes.length="+serverSideParametersTypes.length);
+            // cruz: additional check. If the server method has a different number of parameters, then it is not a match
+            if(serverSideParametersTypes.length != clientSideParametersTypes.length) {
+            	continue serverSideMethodsLoop;
+            }//--cruz
             for (int i = 0; i < serverSideMethod.getGenericParameterTypes().length; i++) {
                 if (!(paramDispatchModes[i].match(clientSideParametersTypes[i], serverSideParametersTypes[i]))) {
                     continue serverSideMethodsLoop;

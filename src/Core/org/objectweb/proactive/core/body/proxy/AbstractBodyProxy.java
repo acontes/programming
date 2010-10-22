@@ -103,7 +103,13 @@ public abstract class AbstractBodyProxy extends AbstractProxy implements BodyPro
      * </UL>
      */
     public Object reify(MethodCall methodCall) throws Throwable {
-        Object cachedMethodResult = checkOptimizedMethod(methodCall);
+    	//cruz
+//    	if(methodCall.getComponentMetadata() != null) {
+//    		System.out.println("[AbstractBodyProxy.reify] Method:   "+ methodCall.getName());
+//    		System.out.println("[AbstractBodyProxy.reify] SenderID: "+ methodCall.getComponentMetadata().getSenderItfID());
+//    	}
+    	//--cruz
+    	Object cachedMethodResult = checkOptimizedMethod(methodCall);
         if (cachedMethodResult != null) {
             return cachedMethodResult;
         }

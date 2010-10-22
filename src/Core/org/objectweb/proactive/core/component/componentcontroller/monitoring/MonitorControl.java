@@ -9,8 +9,18 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.control.MethodStatistics;
 import org.objectweb.proactive.core.util.wrapper.BooleanWrapper;
 
-public interface MonitorControl extends MonitorController {
+public interface MonitorControl  {
 
+	//-------------------------------------------------------------------------------------------
+	// GCM Monitoring API
+	
+	void startGCMMonitoring();
+	void stopGCMMonitoring();
+	void resetGCMMonitoring();
+	Boolean isGCMMonitoringStarted();
+	Map<String, Object> getAllGCMStatistics();
+	//MethodStatistics getGCMStatistics(String itfName, String methodName, Class<?>[] parametersTypes) throws ProActiveRuntimeException;
+	
 	//-------------------------------------------------------------------------------------------
 	// Adaptation for the GCM Monitoring API
 	
@@ -20,7 +30,7 @@ public interface MonitorControl extends MonitorController {
 	BooleanWrapper isMonitoringStarted();
 	public Map<String, MethodStatistics> getAllStatistics();
 	public MethodStatistics getStatistics(String itfName, String methodName) throws ProActiveRuntimeException;
-	public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes) throws ProActiveRuntimeException;
+	//public MethodStatistics getStatistics(String itfName, String methodName, Class<?>[] parametersTypes) throws ProActiveRuntimeException;
 	
     //--------------------------------------------------------------------------------------------
     // Extensions for the Monitoring Framework
@@ -68,7 +78,7 @@ public interface MonitorControl extends MonitorController {
     
     void addMetric(String name, Metric<?> metric);
     Object runMetric(String name);
-    Object runMetric(String name, Object[] params);
+    //Object runMetric(String name, Object[] params);
     Object getMetricValue(String name);
     
     List<String> getMetricList();

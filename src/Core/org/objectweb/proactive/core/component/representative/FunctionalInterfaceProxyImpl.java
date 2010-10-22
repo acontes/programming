@@ -126,6 +126,7 @@ public class FunctionalInterfaceProxyImpl implements FunctionalInterfaceProxy, S
         if (newDestinationBody != null) {
             changeRefOnBody(newDestinationBody);
         }
+        System.out.println("[FunctionalInterfaceImpl] InterfaceName: "+ c.getComponentMetadata().getComponentInterfaceName() + ", Method: "+c.getName() + ", bodyProxyDelegatee: "+ ((UniversalBodyProxy) bodyProxyDelegatee).getBody().getID());
         return bodyProxyDelegatee.reify(c);
     }
 

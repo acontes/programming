@@ -40,7 +40,11 @@ import java.util.Vector;
 import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.Body;
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.group.ProcessForAsyncCall;
 import org.objectweb.proactive.core.group.ProxyForGroup;
@@ -59,8 +63,24 @@ public class ComponentProcessForAsyncCall extends ProcessForAsyncCall {
         super(proxyGroup, memberList, memberListOfResultGroup, groupIndex, mc, resultIndex, body, doneSignal);
     }
 
+    public ComponentProcessForAsyncCall(ProxyForGroup proxyGroup, Vector memberList,
+            Vector memberListOfResultGroup, int groupIndex, MethodCall mc, int resultIndex, Body body,
+            CountDownLatch doneSignal, Request parentRequest) {
+        super(proxyGroup, memberList, memberListOfResultGroup, groupIndex, mc, resultIndex, body, doneSignal, parentRequest);
+    }
+
+    
     @Override
     public void executeMC(MethodCall mc, Object object) throws Throwable {
+    	//cruz
+//    	System.out.println("[ComponentProcessForAsyncCall.executeMC] Method: "+ mc.getName() + ", CompMetadata? "+ (mc.getComponentMetadata()!=null)
+//    			+ ", object instanceof PAComponentRepresentative? " + (object instanceof PAComponentRepresentative)
+//    			+ ", object instanceof PAInterface? "+ (object instanceof PAInterface) );
+//    	if(mc.getComponentMetadata() != null) {
+//    		System.out.println("[ComponentProcessForAsyncCall.executeMC] SenderID "+ mc.getComponentMetadata().getSenderItfID() );
+//    	}
+    	//--cruz
+    	
         if (object instanceof PAComponentRepresentative) {
             // delegate to the corresponding interface
             Object target;
@@ -73,6 +93,9 @@ public class ComponentProcessForAsyncCall extends ProcessForAsyncCall {
             }
             this.addToListOfResult(mc.execute(target));
         } else if (object instanceof PAInterface) {
+        	//System.out.println("Context: "+ LocalBodyStore.getInstance().getContext() );
+        	//System.out.println("[ComponentProcessForAsyncCall.executeMC] ItfName "+ ((PAInterface)object).getFcItfName()
+        	//		+ ", Owner: "+ ((PAComponent)((PAInterface)object).getFcItfOwner()).getComponentParameters().getName() );
             this.addToListOfResult(mc.execute(object));
         }
     }

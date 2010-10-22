@@ -1001,7 +1001,9 @@ public abstract class AbstractBody extends AbstractUniversalBody implements Body
             if (!isProActiveInternalObject) {
                 debugger.breakpoint(BreakpointType.SendRequest, destinationBody);
             }
-
+            //cruz debug
+//            System.out.println("--------------------->[AbstractBody] Calling SEND REQUEST. Source ["+this.getName()+"]. Dest ["+destinationBody.getUrl()+"]");
+            //--cruz
             this.localBodyStrategy.sendRequest(methodCall, future, destinationBody);
 
         } catch (RenegotiateSessionException e) {

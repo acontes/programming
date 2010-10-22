@@ -462,7 +462,9 @@ public class MonitorConsole {
 								for(int i=3; i<input.length; i++) {
 									args[i-3] = input[i];
 								}
-								Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, args);
+								Object result = 0;
+								//FIXME: A multicast call cannot receive an array of arguments :(
+								//Object result = ((MonitorControl)found.getFcInterface(Constants.MONITOR_CONTROLLER)).runMetric(metricName, args);
 								System.out.println(name+"."+metricName+" = "+ result + " ("+result.getClass()+")");
 							}
 							// no args supplied for the metric

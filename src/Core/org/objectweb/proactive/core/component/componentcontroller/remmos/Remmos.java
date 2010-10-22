@@ -27,6 +27,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Eve
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.EventListener;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MetricsStore;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MetricsStoreImpl;
+import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlMulticast;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordStore;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RecordStoreImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
@@ -141,6 +142,12 @@ public class Remmos {
 				if(itfType.isFcClientItf() && itfType.isGCMSingletonItf() && !itfType.isGCMCollectiveItf()) {
 					itfName = itfType.getFcItfName() + "-external-" + Constants.MONITOR_CONTROLLER;
 					pagcmItfType = (PAGCMInterfaceType) pagcmTf.createGCMItfType(itfName, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY);
+					typeList.add(pagcmItfType);
+				}
+				// add a multicast client interface ... is it possible?
+				if(itfType.isGCMMulticastItf()) {
+					itfName = itfType.getFcItfName() + "-external-" + Constants.MONITOR_CONTROLLER;
+					pagcmItfType = (PAGCMInterfaceType) pagcmTf.createGCMItfType(itfName, MonitorControlMulticast.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.MULTICAST_CARDINALITY);
 					typeList.add(pagcmItfType);
 				}
 				
@@ -749,6 +756,62 @@ public class Remmos {
 				// For Multicast (at least client) interfaces
 				if( ((PAGCMInterfaceType)itfType).isGCMMulticastItf()) {
 					// PROBLEM: NF Components, so far, does not have multicast interfaces!!!!
+					// OK, now it seems that they have. Here I should bind each destination in the Multicast interface
+					// but ... does the membrane.bindNFc(...) allows that ?
+					logger.debug("   Client interface: "+ itfName + ", it's multicast");
+					// get the Multicast Controller
+					Object[] destinationObjects = null;
+					Component[] destinationItfOwners = null;
+					try {
+						pamc = Utils.getPAMulticastController(pacomponent);
+						destinationObjects = pamc.lookupGCMMulticast(itfName);
+						destinationItfOwners = new Component[destinationObjects.length];
+						for(int i=0; i<destinationObjects.length; i++) {
+							destinationItfOwners[i] = ((PAInterface) destinationObjects[i]).getFcItfOwner();
+						}
+					} catch (NoSuchInterfaceException e) {
+						e.printStackTrace();
+					}
+					// finds all the destination components bound to this client multicast interface
+					for(Component destinationItfOwner : destinationItfOwners) {
+						// discard it if it is a WSComponent or something unexpected
+						if(destinationItfOwner instanceof PAComponentRepresentative) {
+							componentDest = (PAComponentRepresentative) destinationItfOwner;
+							componentDestName = componentDest.getComponentParameters().getName();
+							logger.debug("   Client interface: "+ itfName + ", bound to "+ componentDestName);
+							try {
+								// if it is bound to the parent ... is a weird case (though it may happen)
+								if(componentDest.equals(parent)) {
+									foundParent = true;
+									externalMonitor = (MonitorControl)componentDest.getFcInterface("internal-server-"+Constants.MONITOR_CONTROLLER);
+									logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+"internal-server-"+Constants.MONITOR_CONTROLLER+"]");
+								}
+								else {
+									externalMonitor = (MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER);
+									logger.debug("   Binding ["+componentName+"."+itfName+"-external-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");						
+								}
+								// do the NF binding
+								membrane.stopMembrane();
+								// now FAILs here ... when "checking compatibility"
+								// the solution should be the same than for the functional interfaces
+								membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
+								membrane.startMembrane();
+							} catch (NoSuchInterfaceException e) {
+								e.printStackTrace();
+							} catch (IllegalLifeCycleException e) {
+								e.printStackTrace();
+							} catch (IllegalBindingException e) {
+								e.printStackTrace();
+							} catch (NoSuchComponentException e) {
+								e.printStackTrace();
+							}
+							// if I just bound to the internal interface of the parent, then don't continue with him, otherwise I'll get into a cycle
+							if(!foundParent) {
+								enableMonitoring(componentDest);
+							}
+							
+						}
+					}
 				}
 				
 				

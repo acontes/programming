@@ -44,6 +44,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.request.Request;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastHelper;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.identity.PAComponent;
@@ -64,6 +66,7 @@ public class CollectiveItfsTaskFactory extends BasicTaskFactory {
 
     @Override
     public List<MethodCall> generateMethodCalls(MethodCall mc) throws InvocationTargetException {
+    	//System.out.println("[CollectiveItfsTaskFactory] generateMethodCalls from "+ mc.getName());
         ProxyForComponentInterfaceGroup parent = ((ProxyForComponentInterfaceGroup) groupProxy).getParent();
         if (parent != null && (parent.getInterfaceType().isGCMCollectiveItf())) {
             // ok we are dealing with a delegation proxy for a collective
@@ -87,6 +90,7 @@ public class CollectiveItfsTaskFactory extends BasicTaskFactory {
             List<MethodCall> methodCalls, Object result, ExceptionListException exceptionList,
             CountDownLatch doneSignal, ProxyForGroup<?> groupProxy) {
 
+    	//System.out.println("[CollectiveItfsTaskFactory] generateTasks from "+ originalMethodCall.getName());
         Queue<AbstractProcessForGroup> taskList = new ConcurrentLinkedQueue<AbstractProcessForGroup>();
 
         // not a broadcast: use generated method calls
@@ -102,6 +106,10 @@ public class CollectiveItfsTaskFactory extends BasicTaskFactory {
             memberListOfResultGroup = initializeResultsGroup(result, methodCalls.size());
         }
 
+        //cruz
+        Request parentRequest = LocalBodyStore.getInstance().getContext().getCurrentRequest();
+        //--cruz
+        
         for (int i = 0; i < methodCalls.size(); i++) {
             MethodCall mc = methodCalls.get(i);
             AbstractProcessForGroup task = useOneWayProcess(mc) ? new ComponentProcessForOneWayCall(
@@ -111,8 +119,9 @@ public class CollectiveItfsTaskFactory extends BasicTaskFactory {
 
             : new ComponentProcessForAsyncCall(groupProxy, groupProxy.getMemberList(),
                 memberListOfResultGroup, taskIndexes.get(i), mc, i, PAActiveObject.getBodyOnThis(),
-                doneSignal);
-
+//                doneSignal);
+                doneSignal, parentRequest); //cruz
+                
             setDynamicDispatchTag(task, originalMethodCall);
             taskList.offer(task);
             //          System.out.println("*** worker index = [" + i

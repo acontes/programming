@@ -39,6 +39,7 @@ package org.objectweb.proactive.core.component.type.annotations.multicast;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,6 +47,8 @@ import java.util.List;
 import org.etsi.uri.gcm.api.control.MulticastController;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
@@ -246,9 +249,17 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
             Type cType = ((ParameterizedType) clientSideInputParameterType).getActualTypeArguments()[0];
             if (cType instanceof ParameterizedType) {
                 clientSideElementsType = (Class<?>) ((ParameterizedType) cType).getRawType();
-            } else {
+            } 
+            //cruz
+            else if(cType instanceof WildcardType) {
+            	clientSideElementsType = (Class<?>) ((WildcardType) cType).getUpperBounds()[0];
+            }//--cruz
+            else {
                 clientSideElementsType = (Class<?>) cType;
             }
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("   Type clientSideInputParameterType is " + clientSideInputParameterType.getClass().getName());
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("   Type clientSideRawType is            " + clientSideRawType.getName());
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("   Type clientSideElementsType is       " + clientSideElementsType.getName());
         } else {
             if (clientSideInputParameterType instanceof Class<?>) {
                 clientSideClass = (Class<?>) clientSideInputParameterType;
@@ -267,12 +278,23 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
             Type sType = ((ParameterizedType) serverSideInputParameterType).getActualTypeArguments()[0];
             if (sType instanceof ParameterizedType) {
                 serverSideElementsType = (Class<?>) ((ParameterizedType) sType).getRawType();
-            } else {
+            }
+            //cruz
+            else if (sType instanceof WildcardType){
+            	serverSideElementsType = (Class<?>) ((WildcardType) sType).getUpperBounds()[0];
+            }
+            //--cruz
+            else {
                 serverSideElementsType = (Class<?>) sType;
             }
 
             // serverSideElementsType = ((Class<?>) ((ParameterizedType)
             // serverSideInputParameterType).getOwnerType());
+            
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("   Type serverSideInputParameterType is " + serverSideInputParameterType.getClass().getName());
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("   Type serverSideRawType is            " + serverSideRawType.getName());
+            ProActiveLogger.getLogger(Loggers.COMPONENTS_MULTICAST).debug("   Type serverSideElementsType is       " + serverSideElementsType.getName());
+            
         } else {
             if (serverSideInputParameterType instanceof Class<?>) {
                 serverSideClass = (Class<?>) serverSideInputParameterType;
@@ -288,7 +310,7 @@ public enum ParamDispatchMode implements ParamDispatch, Serializable {
                 if (clientSideParamTypeIsParameterizedType) {
                     if (serverSideParamTypeIsParameterizedType) {
                         result = clientSideRawType.isAssignableFrom(serverSideRawType) &&
-                            clientSideElementsType.isAssignableFrom(clientSideElementsType);
+                            clientSideElementsType.isAssignableFrom(clientSideElementsType); // cruz: SHOULDN'T BE THE PARAMETER serverSideElementsType????
                     } else {
                         result = true; // maybe this constraint should be softened
                     }

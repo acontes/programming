@@ -62,6 +62,7 @@ import org.objectweb.proactive.core.body.future.BodiesAndTags;
 import org.objectweb.proactive.core.body.future.Future;
 import org.objectweb.proactive.core.body.future.FuturePool;
 import org.objectweb.proactive.core.body.future.FutureProxy;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
 import org.objectweb.proactive.core.exceptions.ExceptionHandler;
 import org.objectweb.proactive.core.gc.GCTag;
@@ -545,7 +546,15 @@ public class UniversalBodyProxy extends AbstractBodyProxy implements java.io.Ser
 
     protected void sendRequestInternal(MethodCall methodCall, Future future, Body sourceBody)
             throws java.io.IOException, RenegotiateSessionException, CommunicationForbiddenException {
-        sourceBody.sendRequest(methodCall, future, this.universalBody);
+        //cruz
+//    	System.out.println("--------------------->[UniversalBodyProxy.sendRequestInternal] Calling SEND REQUEST. SourceBody: "+ sourceBody.getName()
+//        		+ " method: "+ methodCall.getName()
+//        		+ " CompMD? "+ (methodCall.getComponentMetadata()!=null));
+//    	if(methodCall.getComponentMetadata() != null) {
+//    		System.out.println("--------------------->[UniversalBodyProxy.sendRequestInternal] SenderID?" + methodCall.getComponentMetadata().getSenderItfID() );
+//    	}
+        //--cruz
+    	sourceBody.sendRequest(methodCall, future, this.universalBody);
     }
 
     //

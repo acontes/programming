@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
@@ -60,12 +61,19 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.api.PAGroup;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.LocalBodyStore;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
+import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.collectiveitfs.MulticastBindingChecker;
 import org.objectweb.proactive.core.component.exceptions.ParameterDispatchException;
 import org.objectweb.proactive.core.component.group.PAComponentGroup;
 import org.objectweb.proactive.core.component.group.ProxyForComponentInterfaceGroup;
+import org.objectweb.proactive.core.component.representative.ItfID;
+import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.component.type.annotations.multicast.ParamDispatch;
@@ -108,14 +116,46 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
                 }
             }
         }
+        
+        // cruz: hack for considering NF interfaces
+        InterfaceType[] itfNFTypes = null;
+        ComponentType compNFType = (ComponentType) owner.getComponentParameters().getComponentNFType();
+        if(compNFType != null) {
+        	itfNFTypes = compNFType.getFcInterfaceTypes();
+        	for(InterfaceType itfType : itfNFTypes) {
+        		PAGCMInterfaceType type = (PAGCMInterfaceType) itfType;
+        		if(type.isGCMMulticastItf()) {
+        			try {
+                        addClientSideProxy(type.getFcItfName(), (PAInterface) owner.getFcInterface(type
+                                .getFcItfName()));
+                    } catch (NoSuchInterfaceException e) {
+                        throw new ProActiveRuntimeException(e);
+                    }	
+        		}
+        	}
+        }
+        //--cruz
+        
         List<InterfaceType> interfaceTypes = Arrays.asList(((ComponentType) owner.getFcType())
                 .getFcInterfaceTypes());
+        
+        //cruz
+        List<InterfaceType> interfaceNFTypes = Arrays.asList(((ComponentType) owner.getComponentParameters().getComponentNFType()).getFcInterfaceTypes());
+        //--cruz
+        
+        // Here it's repeating a very similar iteration as before ... (the method addManagedInterface only works with GCMMulticast interfaces)
+        // it should be optimized
         Iterator<InterfaceType> it = interfaceTypes.iterator();
-
         while (it.hasNext()) {
             // keep ref on interfaces of cardinality multicast
             addManagedInterface((PAGCMInterfaceType) it.next());
         }
+        
+        //cruz
+        for(InterfaceType itf : interfaceNFTypes) {
+        	addManagedInterface((PAGCMInterfaceType)itf);
+        }
+        //--cruz
     }
 
     /**
@@ -220,6 +260,7 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
         }
 
         try {
+        	multicastLogger.debug("   INIT_MC: Adding reference of interface "+ itfType.getFcItfName() );
             PAInterface multicastItf = (PAInterface) owner.getFcInterface(itfType.getFcItfName());
             multicastItfs.put(itfType.getFcItfName(), multicastItf);
         } catch (NoSuchInterfaceException e) {
@@ -300,6 +341,10 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
     public List<MethodCall> generateMethodCallsForMulticastDelegatee(MethodCall mc,
             ProxyForComponentInterfaceGroup delegatee) throws ParameterDispatchException {
         // read from annotations
+    	//System.out.println("[PAMulticastControllerImpl.generateMethodsCallsForMulticastDelegatee] Method: "+ mc.getName() + ", ProxyClass "+ delegatee.getClassName() + ", ProxyType "+ delegatee.getTypeName());
+        //System.out.println("[PAMulticastControllerImpl.generateMethodsCallsForMulticastDelegatee] InterfaceDestName: "+ mc.getComponentMetadata().getComponentInterfaceName() );
+        //System.out.println("[PAMulticastControllerImpl.generateMethodsCallsForMulticastDelegatee] SenderItfID      : "+ mc.getComponentMetadata().getSenderItfID()  );
+
         Object[] clientSideEffectiveArguments = mc.getEffectiveArguments();
 
         PAGCMInterfaceType itfType = (PAGCMInterfaceType) multicastItfs.get(
@@ -422,10 +467,35 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
                     individualEffectiveArguments[parameterIndex] = dispatchedParameters.get(parameterIndex)
                             .get(generatedMethodCallIndex); // initialize
                 }
+                
+                
+                //cruz : What if I want a componentCall ?
+                String sourceInterfaceName = mc.getComponentMetadata().getComponentInterfaceName();
+                String destinationInterfaceName = ((PAInterface) delegatee.get(generatedMethodCallIndex % delegatee.size())).getFcItfName();
+                ItfID senderID = null; //new ItfID(sourceInterfaceName, owner.getID());
+                MessageTags currentTags = null;
+                Request currentRequest = LocalBodyStore.getInstance().getContext().getCurrentRequest();
+                if(currentRequest != null) {
+                	currentTags = currentRequest.getTags();
+                }
+                MethodCall mcMethodCall = MethodCall.getComponentMethodCall(matchingMethodInServerInterface, 
+                		individualEffectiveArguments, mc.getGenericTypesMapping(),  
+                		destinationInterfaceName, senderID, ComponentRequest.STRICT_FIFO_PRIORITY); //, currentTags, currentRequest );
+                
+                result.add(mcMethodCall);
+
+//                System.out.println("[PAMulticastControllerImpl.generateMethodsCallsForMulticastDelegatee] Src:     "+ sourceInterfaceName);
+//                System.out.println("                                                                      SrcName: "+ owner.getComponentParameters().getName());
+//                System.out.println("                                                                      SrcID:   "+ owner.getID());
+//                System.out.println("                                                                      Dest:    "+ destinationInterfaceName);
+//                if(currentTags != null) {
+//                	System.out.println("                                                                      Tags:    "+ currentTags.getTag(CMTag.IDENTIFIER));
+//                }
+                //--cruz
 
                 // no need for a "component" method call
-                result.add(MethodCall.getMethodCall(matchingMethodInServerInterface, mc
-                        .getGenericTypesMapping(), individualEffectiveArguments, mc.getExceptionContext()));
+                //result.add(MethodCall.getMethodCall(matchingMethodInServerInterface, mc
+                //        .getGenericTypesMapping(), individualEffectiveArguments, mc.getExceptionContext()));
                 //                      generatedMethodCallIndex % delegatee.size()); // previous workaround deemed unecessary with new initialization of result group
                 // default is to do some round robin when nbGeneratedMethodCalls > nbReceivers
             }
@@ -443,10 +513,10 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
     }
 
     protected void bindFc(String clientItfName, PAInterface serverItf) {
-        if (logger.isDebugEnabled()) {
+        if (multicastLogger.isDebugEnabled()) {
             try {
                 if (!PAGroup.isGroup(serverItf.getFcItfOwner())) {
-                    logger.debug("multicast binding : " + clientItfName + " to : " +
+                    multicastLogger.debug("multicast binding : " + clientItfName + " to : " +
                         GCM.getNameController(serverItf.getFcItfOwner()).getFcName() + "." +
                         serverItf.getFcItfName());
                 }

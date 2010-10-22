@@ -48,6 +48,7 @@ import org.objectweb.proactive.Body;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.body.LocalBodyStore;
 
 
 /**
@@ -163,6 +164,7 @@ public class Dispatcher {
                         // group index and result index are kept as they have
                         // been generated (i.e. round robin or random for group
                         // index)
+                        //System.out.println("[Dispatcher "+i+"] "+ LocalBodyStore.getInstance().getContext() );
                         threadPool.execute(new BufferedTaskContainer(task, dispatchMonitor));
                         alreadyTargeted.add(task.getGroupIndex());
                         foundTaskWithAvailableTarget = true;

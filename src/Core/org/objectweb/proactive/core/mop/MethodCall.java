@@ -48,6 +48,9 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.api.PAFuture;
+import org.objectweb.proactive.core.body.request.Request;
+import org.objectweb.proactive.core.body.tags.MessageTags;
+import org.objectweb.proactive.core.body.tags.tag.CMTag;
 import org.objectweb.proactive.core.component.ComponentMethodCallMetadata;
 import org.objectweb.proactive.core.component.representative.ItfID;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
@@ -343,6 +346,8 @@ public class MethodCall implements java.io.Serializable, Cloneable {
         mc.genericTypesMapping = this.getGenericTypesMapping();
         mc.key = this.key;
         mc.exceptioncontext = this.exceptioncontext;
+//        mc.cmTag = this.cmTag; //cruz
+//        mc.parentRequest = this.parentRequest; //cruz;
         return mc;
     }
 
@@ -392,6 +397,11 @@ public class MethodCall implements java.io.Serializable, Cloneable {
             // In order to call from this class protected methods of the Active Object,
             // we need to bypass the Java Runtime security. 
             this.reifiedMethod.setAccessible(true);
+            if(this.componentMetaData != null) {
+//            	System.out.println("[MethodCall.execute] Name: "+ this.getName());
+//            	System.out.println("[MethodCall.execute] SenderID: "+ this.componentMetaData.getSenderItfID() );
+//            	System.out.println("[MethodCall.execute] ItfName: "+ this.componentMetaData.getComponentInterfaceName() );
+            }
             return this.reifiedMethod.invoke(targetObject, this.effectiveArguments);
         } catch (IllegalAccessException e) {
             throw new MethodCallExecutionFailedException("Access rights to the method denied: " + e);
@@ -439,7 +449,7 @@ public class MethodCall implements java.io.Serializable, Cloneable {
     public Object[] getEffectiveArguments() {
         return this.effectiveArguments;
     }
-
+    
     /**
      * Make a deep copy of all arguments of the constructor
      */
