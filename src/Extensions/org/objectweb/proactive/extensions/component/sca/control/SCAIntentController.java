@@ -42,6 +42,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchIntentHandlerException;
 
 
 /**
@@ -57,9 +58,11 @@ public interface SCAIntentController {
      * @param intentHandler The intent handler to add.
      * @throws IllegalLifeCycleException If the component is not stopped.
      * @throws IllegalBindingException If a service or reference interface is already bound.
+     * @throws NoSuchInterfaceException 
+     * @throws NoSuchMethodException 
      */
     public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException;
+            IllegalBindingException, NoSuchInterfaceException, NoSuchMethodException;
 
     /**
      * Adds the given intent handler on the given service or reference interface.
@@ -69,9 +72,10 @@ public interface SCAIntentController {
      * @throws NoSuchInterfaceException If the service or reference interface does not exist.
      * @throws IllegalLifeCycleException If the component is not stopped.
      * @throws IllegalBindingException If the service or reference interface is already bound.
+     * @throws NoSuchMethodException 
      */
     public void addIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException;
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException, NoSuchMethodException;
 
     /**
     * Adds the given intent handler on the given method of the given service or reference interface.
@@ -155,9 +159,10 @@ public interface SCAIntentController {
      * @param intentHandler The intent handler to remove.
      * @throws IllegalLifeCycleException If the component is not stopped.
      * @throws IllegalBindingException If a service or reference interface is already bound.
+     * @throws NoSuchIntentHandlerException 
      */
     public void removeIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException;
+            IllegalBindingException, NoSuchIntentHandlerException;
 
     /**
      * Removes the given intent handler on the given service or reference interface.
@@ -167,9 +172,10 @@ public interface SCAIntentController {
      * @throws NoSuchInterfaceException If the service or reference interface does not exist.
      * @throws IllegalLifeCycleException If the component is not stopped.
      * @throws IllegalBindingException If the service or reference interface is already bound.
+     * @throws NoSuchIntentHandlerException 
      */
     public void removeIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException;
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException, NoSuchIntentHandlerException;
 
     /**
     * Removes the given intent handler on the given method of the given service or reference interface.
@@ -181,8 +187,9 @@ public interface SCAIntentController {
     * @throws NoSuchMethodException If the method does not exist.
     * @throws IllegalLifeCycleException If the component is not stopped.
     * @throws IllegalBindingException If the service or reference interface is already bound.
+     * @throws NoSuchIntentHandlerException 
     */
     public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
-            IllegalBindingException;
+            IllegalBindingException, NoSuchIntentHandlerException;
 }

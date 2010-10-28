@@ -34,25 +34,31 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.control.components;
+package org.objectweb.proactive.extensions.component.sca.exceptions;
 
-public class CServer implements TestIntentItf,TestIntentItf2{
-   
-    public void m() {
-        System.err.println("inside public void m() ");
-        //        while (true)
-        //            ;
+import org.objectweb.proactive.annotation.PublicAPI;
+
+
+/**
+ * This exception occurs when trying to access to a property which does not exist.
+ *
+ * @author The ProActive Team
+ */
+@PublicAPI
+public class NoSuchIntentHandlerException extends Exception {
+    public NoSuchIntentHandlerException() {
+        super();
     }
 
-    public int n() {
-        return 0;
+    public NoSuchIntentHandlerException(String message) {
+        super(message);
     }
 
-	public void m2() throws Exception {
-		System.err.println("inside public void m2() ");
-	}
+    public NoSuchIntentHandlerException(String message, Throwable cause) {
+        super(message, cause);
+    }
 
-	public int n2() {
-		return 2;
-	}
+    public NoSuchIntentHandlerException(Throwable cause) {
+        super(cause);
+    }
 }

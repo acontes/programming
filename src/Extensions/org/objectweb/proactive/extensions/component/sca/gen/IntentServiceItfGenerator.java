@@ -134,11 +134,11 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 generatedCtClass.setSuperclass(pool.get(serviceItfClassName));
 
                 // Add intentHandlers instance fields
-                CtField intentHanderlers = CtField
+                CtField fintentHandlers = CtField
                         .make(
                                 "private org.objectweb.proactive.extensions.component.sca.control.IntentHandler[] intentHandlers;",
                                 generatedCtClass);
-                generatedCtClass.addField(intentHanderlers);
+                generatedCtClass.addField(fintentHandlers);
 
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);

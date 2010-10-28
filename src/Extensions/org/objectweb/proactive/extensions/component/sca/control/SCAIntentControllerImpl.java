@@ -36,22 +36,31 @@
  */
 package org.objectweb.proactive.extensions.component.sca.control;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.component.sca.Constants;
+import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchIntentHandlerException;
 
 
 /**
@@ -63,13 +72,27 @@ import org.objectweb.proactive.extensions.component.sca.Constants;
 public class SCAIntentControllerImpl extends AbstractPAController implements SCAIntentController {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
-    private List<IntentHandler> intentHandlers;
+    //private List<IntentHandler> intentHandlers;
+    /*
+     * this HashMap offer the relationship between a given intenthandler and components' service Itf.
+     * first string key contain the name of IntentHandler, 
+     * if the value corresponds to it is null, it means 
+     * this IntentHandler is applied to all service Itf.
+     * else we have a list of valid service Itf.
+     * each service Itf information is been put in a hashMap. 
+     * the key corresponds to the Name of service Itf, 
+     * if the value of list is null, then the intentHandler is applied to all
+     * methods of Itf, else the list of String contain names of methods which are applied to intentHandler 
+     */
+    private HashMap<IntentHandler, HashMap<String, List<String>>> informationPool;
 
     public SCAIntentControllerImpl(Component owner) {
         super(owner);
-        intentHandlers = new ArrayList<IntentHandler>();
+        //intentHandlers = new ArrayList<IntentHandler>();
+        informationPool = new HashMap<IntentHandler, HashMap<String, List<String>>>();
     }
-
+    
+    
     @Override
     protected void setControllerItfType() {
         try {
@@ -80,58 +103,179 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), ie);
         }
     }
-
+    // we build the information pool recursively 
     public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException {
-        intentHandlers.add(intentHandler);
+            IllegalBindingException, NoSuchInterfaceException, NoSuchMethodException {
+    	String [] listFc = GCM.getBindingController(owner).listFc();
+    	for (int i = 0; i < listFc.length; i++) {
+    		System.err.println(listFc[i]);
+			addIntentHandler(intentHandler, listFc[i]);
+		}
+        //informationPool.put(intentHandler, null); //apply to All service interfaces 
     }
 
     public void addIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException {
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException, NoSuchMethodException {
+    	Object itf = GCM.getBindingController(owner).lookupFc(itfName);
+    	String tmp = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature();
+    	System.err.println(tmp);
+    	Method[] methodList=null;
+		try {
+			methodList = Class.forName(tmp).getMethods();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			throw new NoSuchInterfaceException(e.getMessage());
+		}
+    	//Method[] methodList = itf.getClass().getMethods();
+    	for (int i = 0; i < methodList.length; i++) {
+    		addIntentHandler(intentHandler, itfName, methodList[i].getName());
+    	}
     }
-
+    
+    private boolean methodExist(Method[] methodList, String methodName)
+    {
+    	for (int i = 0; i < methodList.length; i++) {
+			if(methodName.equals(methodList[i].getName()))
+			{
+				return true;
+			}
+		}
+    	return false;
+    }
+    
     public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
             IllegalBindingException {
+    	Object itf = GCM.getBindingController(owner).lookupFc(itfName); // it throws a NoSuchInterfaceException
+    	String tmp = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
+    	System.err.println(tmp);
+    	Method[] methodList=null;
+		try {
+			methodList = Class.forName(tmp).getMethods();
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) {
+			throw new NoSuchInterfaceException(e.getMessage());
+		}
+    	if(!methodExist(methodList,methodName)){
+    		throw new NoSuchMethodException("method "+methodName +" doesn't exist!");
+    		//return;
+    	}
+    	HashMap<String,List<String>> itfPool;
+    	List<String> methods;
+    	if(!intentHandlerExist(intentHandler)) // intentHandler not exist
+    	{
+	    	itfPool = new HashMap<String, List<String>>();
+	    	methods = new ArrayList<String>();
+	    	methods.add(methodName);
+	    	itfPool.put(itfName, methods); // all methods in "itfName" interfaces
+	        informationPool.put(intentHandler, itfPool);
+    	}
+    	else
+    	{
+    		itfPool = informationPool.get(intentHandler);
+    		if(!itfPool.containsKey(itfName))
+    		{
+    			methods = new ArrayList<String>();
+    			methods.add(methodName);
+    			itfPool.put(itfName, methods); // all methods in "itfName" interfaces
+    		}
+    		else
+    		{
+    			methods=itfPool.get(itfName);
+    			methods.add(methodName);
+    		}
+    	}
     }
 
+    private boolean intentHandlerExist(IntentHandler ithandler)
+    {
+    	return informationPool.containsKey(ithandler);
+   	}
+    
     public boolean hasIntentHandler() {
-        return intentHandlers.size() != 0;
+        return informationPool.isEmpty();
     }
-
+    
     public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException {
-        return intentHandlers.size() != 0;
+        return listIntentHandler(ItfName).isEmpty();
     }
 
     public boolean hasIntentHandler(String ItfName, String methodName) throws NoSuchInterfaceException,
             NoSuchMethodException {
-        return intentHandlers.size() != 0;
+    	return listIntentHandler(ItfName, methodName).isEmpty();
     }
 
     public List<IntentHandler> listIntentHandler() {
-        return intentHandlers;
+    	return new ArrayList<IntentHandler>(informationPool.keySet());
     }
 
     public List<IntentHandler> listIntentHandler(String ItfName) throws NoSuchInterfaceException {
-        return null;
+    	Object itf = GCM.getBindingController(owner).lookupFc(ItfName); // throw exception it self??
+    	List<IntentHandler> res = new ArrayList<IntentHandler>();
+    	for (Iterator iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
+			IntentHandler key = (IntentHandler) iterator.next();
+			if(informationPool.get(key).containsKey(ItfName))
+			{
+				res.add(key);
+			}	
+		}
+        return res;
     }
 
     public List<IntentHandler> listIntentHandler(String ItfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException {
-        return null;
+    	Object itf = GCM.getBindingController(owner).lookupFc(ItfName); // throw exception it self??
+    	if(!methodExist(itf.getClass().getMethods(), methodName))
+    	{
+    		throw new NoSuchMethodException("method "+methodName +" doesn't exist in Itf: "+itf.getClass().getName());
+    	}
+    	List<IntentHandler> res = new ArrayList<IntentHandler>();
+    	for (Iterator iterator = listIntentHandler(ItfName).iterator(); iterator.hasNext();) {
+			IntentHandler key  = (IntentHandler)iterator.next();
+			if(informationPool.get(key).get(ItfName).contains(methodName))
+			{
+				res.add(key);
+			}
+		}
+        return res;
     }
 
     public void removeIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException {
-        intentHandlers.remove(intentHandler);
+            IllegalBindingException, NoSuchIntentHandlerException {
+    	if(intentHandlerExist(intentHandler))
+    	{
+    		informationPool.remove(intentHandler);
+    	}
+    	else
+    		throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
     }
 
     public void removeIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException {
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException, NoSuchIntentHandlerException {
+    	if(intentHandlerExist(intentHandler))
+    	{
+    		if(hasIntentHandler(itfName))
+    		{
+    			informationPool.get(intentHandler).remove(itfName);
+    		}
+    	}
+    	else
+    		throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
     }
 
     public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
-            IllegalBindingException {
+            IllegalBindingException, NoSuchIntentHandlerException {
+    	if(intentHandlerExist(intentHandler))
+    	{
+	    	if(hasIntentHandler(itfName, methodName))
+	    	{
+	    		informationPool.get(intentHandler).get(itfName).remove(methodName);
+	    	}
+    	}
+    	else
+    		throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
     }
 }

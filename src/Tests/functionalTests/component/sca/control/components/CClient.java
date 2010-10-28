@@ -39,9 +39,10 @@ package functionalTests.component.sca.control.components;
 import org.objectweb.fractal.api.control.BindingController;
 
 
-public class CClient implements BindingController, TestIntentItf {
+public class CClient implements BindingController, TestIntentItf,TestIntentItf2{
     protected TestIntentItf testIntentItf;
-
+    protected TestIntentItf2 testIntentItf2;
+    
     public void m() throws Exception {
         testIntentItf.m();
     }
@@ -50,27 +51,47 @@ public class CClient implements BindingController, TestIntentItf {
         return testIntentItf.n();
     }
 
+	public void m2() throws Exception {
+		testIntentItf2.m2();
+	}
+
+	@Override
+	public int n2() {
+		return testIntentItf2.n2();
+	}
+    
     public String[] listFc() {
-        return new String[] { CLIENT_ITF_NAME };
+        return new String[] { TestIntentItf.CLIENT_ITF_NAME, TestIntentItf2.CLIENT_ITF_NAME };
     }
 
     public Object lookupFc(String clientItfName) {
-        if (clientItfName.equals(CLIENT_ITF_NAME)) {
+        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
             return testIntentItf;
-        } else {
+        }
+        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
+            return testIntentItf2;
+        }
+        else {
             return null;
         }
     }
 
     public void bindFc(String clientItfName, Object serverItf) {
-        if (clientItfName.equals(CLIENT_ITF_NAME)) {
+        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
             testIntentItf = (TestIntentItf) serverItf;
+        }
+        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
+            testIntentItf2 = (TestIntentItf2) serverItf;
         }
     }
 
     public void unbindFc(String clientItfName) {
-        if (clientItfName.equals(CLIENT_ITF_NAME)) {
+        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
             testIntentItf = null;
         }
+        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
+            testIntentItf2 = null;
+        }
     }
+
 }

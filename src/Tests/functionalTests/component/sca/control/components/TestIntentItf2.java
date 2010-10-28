@@ -6,7 +6,7 @@
  *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ *              Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -36,23 +36,11 @@
  */
 package functionalTests.component.sca.control.components;
 
-public class CServer implements TestIntentItf,TestIntentItf2{
-   
-    public void m() {
-        System.err.println("inside public void m() ");
-        //        while (true)
-        //            ;
-    }
+public interface TestIntentItf2 {
+    public static final String CLIENT_ITF_NAME = "client2";
+    public static final String SERVER_ITF_NAME = "server2";
 
-    public int n() {
-        return 0;
-    }
+    public void m2() throws Exception;
 
-	public void m2() throws Exception {
-		System.err.println("inside public void m2() ");
-	}
-
-	public int n2() {
-		return 2;
-	}
+    public int n2();
 }
