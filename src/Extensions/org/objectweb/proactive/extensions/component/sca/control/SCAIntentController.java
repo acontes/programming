@@ -75,7 +75,8 @@ public interface SCAIntentController {
      * @throws NoSuchMethodException 
      */
     public void addIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException, NoSuchMethodException;
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException,
+            NoSuchMethodException;
 
     /**
     * Adds the given intent handler on the given method of the given service or reference interface.
@@ -175,7 +176,8 @@ public interface SCAIntentController {
      * @throws NoSuchIntentHandlerException 
      */
     public void removeIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException, NoSuchIntentHandlerException;
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException,
+            NoSuchIntentHandlerException;
 
     /**
     * Removes the given intent handler on the given method of the given service or reference interface.

@@ -37,6 +37,7 @@
 package org.objectweb.proactive.extensions.component.sca.gen;
 
 import java.lang.reflect.Method;
+import java.util.List;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -110,7 +111,8 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation of the class failed.
      */
-    public Object generateInterface(Object serviceItf, Component owner) throws ClassGenerationFailedException {
+    public Object generateInterface(Object serviceItf, String clientItfName, Component owner)
+            throws ClassGenerationFailedException {
         String serviceItfClassName = serviceItf.getClass().getSimpleName();
         try {
             String componentName = null;
@@ -121,8 +123,9 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
             }
             String generatedClassName = Utils.getIntentInterceptorClassName(componentName,
                     serviceItfClassName);
-            IntentHandler[] intentHandlers = org.objectweb.proactive.extensions.component.sca.Utils
-                    .getSCAIntentController(owner).listIntentHandler().toArray(new IntentHandler[0]);
+            List<IntentHandler> intentHandlersInList = org.objectweb.proactive.extensions.component.sca.Utils
+                    .getSCAIntentController(owner).listIntentHandler();
+            IntentHandler[] intentHandlers = intentHandlersInList.toArray(new IntentHandler[0]);
             Class<?> generatedClass = null;
             try {
                 generatedClass = loadClass(generatedClassName);
@@ -134,11 +137,11 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 generatedCtClass.setSuperclass(pool.get(serviceItfClassName));
 
                 // Add intentHandlers instance fields
-                CtField fintentHandlers = CtField
+                CtField intentHanderlers = CtField
                         .make(
                                 "private org.objectweb.proactive.extensions.component.sca.control.IntentHandler[] intentHandlers;",
                                 generatedCtClass);
-                generatedCtClass.addField(fintentHandlers);
+                generatedCtClass.addField(intentHanderlers);
 
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
@@ -162,17 +165,22 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 CtMethod[] methodsToExtend = getMethodsToExtend(superClass, serviceItfClass);
                 for (int i = 0; i < methodsToExtend.length; i++) {
                     // Create wrapper : inside contains super.method();
+                    //System.err.println(methodsToExtend[i].getName());
+                    IntentHandler[] intentHandlersForGivingMethod = org.objectweb.proactive.extensions.component.sca.Utils
+                            .getSCAIntentController(owner).listIntentHandler(clientItfName,
+                                    methodsToExtend[i].getName()).toArray(new IntentHandler[0]);
                     CtMethod wrapper = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
                     wrapper.setName(wrapper.getName() + 0);
                     generatedCtClass.addMethod(wrapper);
-                    for (int j = 0; j < intentHandlers.length; j++) {
+                    for (int j = 0; j < intentHandlersForGivingMethod.length; j++) {
+                        int indexOfIntent = intentHandlersInList.indexOf(intentHandlersForGivingMethod[j]);
                         CtMethod newMethod = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
-                        newMethod.setBody("{\nreturn ($r)intentHandlers[" + j +
+                        newMethod.setBody("{\nreturn ($r)intentHandlers[" + indexOfIntent +
                             "].invoke(new org.objectweb.proactive.extensions.component.sca.control." +
                             "IntentJoinPoint(this, \"" + newMethod.getName() + j + "\", $sig, $args));\n}");
                         // If there are intents left, then create method wrapper, otherwise create really method
-                        String methodName = (j == intentHandlers.length - 1) ? newMethod.getName()
-                                : newMethod.getName() + (j + 1);
+                        String methodName = (j == intentHandlersForGivingMethod.length - 1) ? newMethod
+                                .getName() : newMethod.getName() + (j + 1);
                         newMethod.setName(methodName);
                         generatedCtClass.addMethod(newMethod);
                     }

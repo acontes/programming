@@ -44,8 +44,12 @@ import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
+import org.objectweb.proactive.extensions.component.sca.SCAFractive;
+import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.component.sca.Utils;
 import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
+
+import functionalTests.component.sca.SCAComponentTest;
 
 
 public class Main {
@@ -59,6 +63,7 @@ public class Main {
                 + "\n        The second parameter is your destination number");
             return;
         }
+        //  SCAPAPropertyRepository.SCA_PROVIDER.setValue(SCAFractive.class.getName());
         String orangeID = args[0];
         String destNumber = args[1];
         Component boot = Utils.getBootstrapComponent();

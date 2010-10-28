@@ -38,6 +38,9 @@ package functionalTests.component.sca.control;
 
 import static org.junit.Assert.fail;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
@@ -47,6 +50,7 @@ import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.extensions.component.sca.Utils;
+import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
 
 import functionalTests.component.sca.SCAComponentTest;
@@ -79,29 +83,30 @@ public class TestSCAIntentController extends SCAComponentTest {
                 type_factory.createFcItfType(TestIntentItf2.SERVER_ITF_NAME, TestIntentItf2.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 type_factory.createFcItfType(TestIntentItf2.CLIENT_ITF_NAME, TestIntentItf2.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE)     
-        }),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 Constants.PRIMITIVE, new ContentDescription(CClient.class.getName(), new Object[] {}));
 
-        componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { 
-        		type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
+        componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
+                type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
                 type_factory.createFcItfType(TestIntentItf2.SERVER_ITF_NAME, TestIntentItf2.class.getName(),
-                                TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE)        
-                        }),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
-        
+
         //@snippet-start component_scauserguide_5   
 
         SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
                 .getSCAIntentController(componentA);
-        scaic.addIntentHandler(new IntentHandlerTest());
+        IntentHandler y = new IntentHandlerTest();
+        scaic.addIntentHandler(y);
+        scaic.addIntentHandler(y);
+        scaic.addIntentHandler(new IntentHandlerTest(), TestIntentItf.CLIENT_ITF_NAME, "m");
         //@snippet-end component_scauserguide_5
         GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
         GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
-        
+
         GCM.getGCMLifeCycleController(componentA).startFc();
         GCM.getGCMLifeCycleController(componentB).startFc();
         TestIntentItf i = (TestIntentItf) componentA.getFcInterface(TestIntentItf.SERVER_ITF_NAME);
@@ -110,7 +115,7 @@ public class TestSCAIntentController extends SCAComponentTest {
             i.m();
             System.out.println("invocation of method m success");
             int x = i2.n2();
-            System.out.println("invocation of method n success, value of n : "+x);
+            System.out.println("invocation of method n success, value of n : " + x);
         } catch (Exception e) {
             fail();
         }

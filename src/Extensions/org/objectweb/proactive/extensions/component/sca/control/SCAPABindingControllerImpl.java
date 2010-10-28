@@ -67,7 +67,8 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             Component owner = getFcItfOwner();
             if (Utils.getSCAIntentController(owner).hasIntentHandler(clientItfName)) {
                 try {
-                    sItf = (PAInterface) IntentServiceItfGenerator.instance().generateInterface(sItf, owner);
+                    sItf = (PAInterface) IntentServiceItfGenerator.instance().generateInterface(sItf,
+                            clientItfName, owner);
                 } catch (ClassGenerationFailedException cgfe) {
                     controllerLogger
                             .error("could not generate intent interceptor for reference (client interface) " +

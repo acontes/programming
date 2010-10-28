@@ -36,8 +36,8 @@
  */
 package functionalTests.component.sca.control.components;
 
-public class CServer implements TestIntentItf,TestIntentItf2{
-   
+public class CServer implements TestIntentItf, TestIntentItf2 {
+
     public void m() {
         System.err.println("inside public void m() ");
         //        while (true)
@@ -48,11 +48,11 @@ public class CServer implements TestIntentItf,TestIntentItf2{
         return 0;
     }
 
-	public void m2() throws Exception {
-		System.err.println("inside public void m2() ");
-	}
+    public void m2() throws Exception {
+        System.err.println("inside public void m2() ");
+    }
 
-	public int n2() {
-		return 2;
-	}
+    public int n2() {
+        return 2;
+    }
 }
