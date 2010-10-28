@@ -55,7 +55,6 @@ public class CClient implements BindingController, TestIntentItf,TestIntentItf2{
 		testIntentItf2.m2();
 	}
 
-	@Override
 	public int n2() {
 		return testIntentItf2.n2();
 	}
