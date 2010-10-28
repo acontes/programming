@@ -38,9 +38,6 @@ package functionalTests.component.sca.control;
 
 import static org.junit.Assert.fail;
 
-import java.util.Iterator;
-import java.util.List;
-
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
@@ -49,9 +46,9 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.extensions.component.sca.Utils;
-import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.component.sca.control.SCAIntentController;
+import org.objectweb.proactive.extensions.sca.Utils;
+import org.objectweb.proactive.extensions.sca.control.IntentHandler;
+import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
 
 import functionalTests.component.sca.SCAComponentTest;
 import functionalTests.component.sca.control.components.CClient;
@@ -95,7 +92,7 @@ public class TestSCAIntentController extends SCAComponentTest {
 
         //@snippet-start component_scauserguide_5   
 
-        SCAIntentController scaic = org.objectweb.proactive.extensions.component.sca.Utils
+        SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentA);
         IntentHandler y = new IntentHandlerTest();
         scaic.addIntentHandler(y);

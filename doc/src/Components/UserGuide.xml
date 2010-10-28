@@ -3264,17 +3264,17 @@ GCM.getBindingController(nfComp1).bindFc("i1",nfComp2.getFcInterface("i2"));
 			<para>
 				SCA features&apos; implementation is split from core package,
 				they are in Extension package:
-				<literal>org.objectweb.proactive.extensions.component.sca.* </literal>.
+				<literal>org.objectweb.proactive.extensions.sca.* </literal>.
 				It is important to know that to configure a SCA/GCM featured
 				component the Utils.java class in
-				<literal>org.objectweb.proactive.extensions.component.sca</literal>
+				<literal>org.objectweb.proactive.extensions.sca</literal>
 				package should be used instead of
 				<literal>org.objectweb.proactive.core.component.Utils</literal>,
 				the first one is an extension of the second one. Also the
 				gcm.provider and fractal.provider system properties are no
 				more used. Instead of those properties, one should use the
 				sca.provider system property sets to
-				<literal>org.objectweb.proactive.extensions.component.sca.SCAFractive</literal>
+				<literal>org.objectweb.proactive.extensions.sca.SCAFractive</literal>
 				to be able to instantiate SCA/GCM components.
 			</para>
 

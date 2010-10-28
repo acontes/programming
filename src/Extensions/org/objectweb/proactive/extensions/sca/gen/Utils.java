@@ -34,31 +34,23 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.exceptions;
-
-import org.objectweb.proactive.annotation.PublicAPI;
-
+package org.objectweb.proactive.extensions.sca.gen;
 
 /**
- * This exception occurs when trying to access to a property which does not exist.
+ * Utility class for bytecode generation operations.
  *
  * @author The ProActive Team
  */
-@PublicAPI
-public class NoSuchPropertyException extends Exception {
-    public NoSuchPropertyException() {
-        super();
+public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
+    public static final String GENERATED_CLASSNAME_SUFFIX = GEN_ESCAPE_CHAR + "SCAClass";
+
+    public static String getPropertyClassName(String className) {
+        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "property" +
+            GENERATED_CLASSNAME_SUFFIX;
     }
 
-    public NoSuchPropertyException(String message) {
-        super(message);
-    }
-
-    public NoSuchPropertyException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public NoSuchPropertyException(Throwable cause) {
-        super(cause);
+    public static String getIntentInterceptorClassName(String componentName, String className) {
+        return GENERATED_DEFAULT_PREFIX + componentName + GEN_MIDDLE_SEPARATOR + escapeString(className) +
+            GEN_MIDDLE_SEPARATOR + "intent" + GENERATED_CLASSNAME_SUFFIX;
     }
 }

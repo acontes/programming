@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.gen;
+package org.objectweb.proactive.extensions.sca.gen;
 
 import java.util.ArrayList;
 
@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
-import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
+import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 
 
 /**

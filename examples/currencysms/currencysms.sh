@@ -18,7 +18,7 @@ if [ $# -lt 2 ]; then
     exit 1
 fi
 
-JAVACMD=$JAVACMD" -Dsca.provider=org.objectweb.proactive.extensions.component.sca.SCAFractive"
+JAVACMD=$JAVACMD" -Dsca.provider=org.objectweb.proactive.extensions.sca.SCAFractive"
 
 $JAVACMD org.objectweb.proactive.examples.components.sca.currencysms.Main "$@"
 

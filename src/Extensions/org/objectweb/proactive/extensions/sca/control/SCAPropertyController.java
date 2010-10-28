@@ -34,11 +34,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.control;
+package org.objectweb.proactive.extensions.sca.control;
 
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.component.sca.exceptions.IncompatiblePropertyTypeException;
-import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchPropertyException;
+import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
+import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
 
 
 /**

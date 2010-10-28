@@ -6,7 +6,7 @@
  *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
- *              Nice-Sophia Antipolis/ActiveEon
+ * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -34,21 +34,31 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca;
+package org.objectweb.proactive.extensions.sca.exceptions;
 
-import org.objectweb.proactive.core.config.PAPropertyString;
-import org.objectweb.proactive.core.config.PAProperties.PAPropertiesLoaderSPI;
+import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * ProActive properties for SCA features.
+ * This exception occurs when the generation of component classes fails.
  *
  * @author The ProActive Team
  */
-public class SCAPAPropertyRepository implements PAPropertiesLoaderSPI {
-    /**
-     * Indicates the SCA provider class, to the ProActive implementation of
-     * SCA/GCM set it to org.objectweb.proactive.core.component.sca.SCAFractive
-     */
-    static public PAPropertyString SCA_PROVIDER = new PAPropertyString("sca.provider", true);
+@PublicAPI
+public class ClassGenerationFailedException extends Exception {
+    public ClassGenerationFailedException() {
+        super();
+    }
+
+    public ClassGenerationFailedException(String message) {
+        super(message);
+    }
+
+    public ClassGenerationFailedException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ClassGenerationFailedException(Throwable cause) {
+        super(cause);
+    }
 }

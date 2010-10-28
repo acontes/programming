@@ -34,18 +34,31 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca;
+package org.objectweb.proactive.extensions.sca.exceptions;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * Constant strings used throughout the SCA components implementation.
+ * This exception occurs when trying to access to a property which does not exist.
  *
  * @author The ProActive Team
  */
 @PublicAPI
-public interface Constants extends org.objectweb.proactive.core.component.Constants {
-    public final static String SCA_INTENT_CONTROLLER = "sca-intent-controller";
-    public final static String SCA_PROPERTY_CONTROLLER = "sca-property-controller";
+public class NoSuchIntentHandlerException extends Exception {
+    public NoSuchIntentHandlerException() {
+        super();
+    }
+
+    public NoSuchIntentHandlerException(String message) {
+        super(message);
+    }
+
+    public NoSuchIntentHandlerException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public NoSuchIntentHandlerException(Throwable cause) {
+        super(cause);
+    }
 }

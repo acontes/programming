@@ -5,7 +5,7 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
+ * Copyright (C) 1997-2010 INRIA/University of
  * 				Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
@@ -24,7 +24,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
+ * If needed, contact us to obtain a release under GPL Version 2
  * or a different license than the GPL.
  *
  *  Initial developer(s):               The ProActive Team
@@ -34,31 +34,34 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.exceptions;
+package org.objectweb.proactive.extensions.sca.control;
+
+import java.io.Serializable;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * This exception occurs when trying to set the type or the value of a property with an incompatible type or value.
+ * Interface implemented by intent handlers.
+ * <br>
+ * Intent handlers are useful for non functional features (e.g. security, logging, ...) which must be applied on
+ * SCA/GCM components. Intent handlers intercepts calls on service methods or from reference methods. When the method
+ * is invoked, the invocation is intercepted and the {@link #invoke(IntentJoinPoint)} method of the intent handler is
+ * called. The given {@link IntentJoinPoint} instance allows to introspect the intercepted method (e.g. which
+ * interface, which method, ...) and allows to resume the intercepted invocation method by calling the method
+ * {@link IntentJoinPoint#proceed()}. If several intent handlers are added on the same method, they are executed in
+ * the order in which they were added.
  *
  * @author The ProActive Team
+ * @see IntentJoinPoint
  */
 @PublicAPI
-public class IncompatiblePropertyTypeException extends Exception {
-    public IncompatiblePropertyTypeException() {
-        super();
-    }
-
-    public IncompatiblePropertyTypeException(String message) {
-        super(message);
-    }
-
-    public IncompatiblePropertyTypeException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public IncompatiblePropertyTypeException(Throwable cause) {
-        super(cause);
-    }
+public interface IntentHandler extends Serializable {
+    /**
+     * Defines the actions performed by the intent handler.
+     *
+     * @param ijp The join point where the interception occurred.
+     * @return The value returned by the intercepted method.
+     */
+    public Object invoke(IntentJoinPoint ijp) throws Throwable;
 }

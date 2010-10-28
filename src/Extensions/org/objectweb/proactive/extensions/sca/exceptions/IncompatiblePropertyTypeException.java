@@ -34,31 +34,31 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.exceptions;
+package org.objectweb.proactive.extensions.sca.exceptions;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * This exception occurs when trying to access to a property which does not exist.
+ * This exception occurs when trying to set the type or the value of a property with an incompatible type or value.
  *
  * @author The ProActive Team
  */
 @PublicAPI
-public class NoSuchIntentHandlerException extends Exception {
-    public NoSuchIntentHandlerException() {
+public class IncompatiblePropertyTypeException extends Exception {
+    public IncompatiblePropertyTypeException() {
         super();
     }
 
-    public NoSuchIntentHandlerException(String message) {
+    public IncompatiblePropertyTypeException(String message) {
         super(message);
     }
 
-    public NoSuchIntentHandlerException(String message, Throwable cause) {
+    public IncompatiblePropertyTypeException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public NoSuchIntentHandlerException(Throwable cause) {
+    public IncompatiblePropertyTypeException(Throwable cause) {
         super(cause);
     }
 }

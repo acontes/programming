@@ -21,7 +21,7 @@ goto doit
 SETLOCAL ENABLEDELAYEDEXPANSION
 IF NOT DEFINED PROACTIVE set PROACTIVE=%CD%\..\..
 call "..\init.bat"
-set JAVA_CMD=%JAVA_CMD% -Dsca.provider=org.objectweb.proactive.extensions.component.sca.SCAFractive
+set JAVA_CMD=%JAVA_CMD% -Dsca.provider=org.objectweb.proactive.extensions.sca.SCAFractive
 %JAVA_CMD%  org.objectweb.proactive.examples.components.sca.currencysms.Main %*
 ENDLOCAL
 

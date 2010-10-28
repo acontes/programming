@@ -37,7 +37,7 @@
 package functionalTests.component.sca;
 
 import org.junit.BeforeClass;
-import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
+import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
 
 import functionalTests.ComponentTest;
 
@@ -49,8 +49,7 @@ public abstract class SCAComponentTest extends ComponentTest {
 
     @BeforeClass
     public static void componentPreConditions() throws Exception {
-        //-Dsca.provider=org.objectweb.proactive.extensions.component.sca.SCAFractive
-        SCAPAPropertyRepository.SCA_PROVIDER
-                .setValue("org.objectweb.proactive.extensions.component.sca.SCAFractive");
+        //-Dsca.provider=org.objectweb.proactive.extensions.sca.SCAFractive
+        SCAPAPropertyRepository.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
     }
 }

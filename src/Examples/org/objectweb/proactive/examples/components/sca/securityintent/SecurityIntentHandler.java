@@ -38,8 +38,8 @@ package org.objectweb.proactive.examples.components.sca.securityintent;
 
 import java.util.Scanner;
 
-import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.component.sca.control.IntentJoinPoint;
+import org.objectweb.proactive.extensions.sca.control.IntentHandler;
+import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 
 //@snippet-start component_scauserguide_3

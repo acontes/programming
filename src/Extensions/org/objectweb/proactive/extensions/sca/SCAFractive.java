@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca;
+package org.objectweb.proactive.extensions.sca;
 
 import java.lang.reflect.Field;
 
@@ -50,9 +50,9 @@ import org.objectweb.proactive.core.component.factory.PAGenericFactory;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
-import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
-import org.objectweb.proactive.extensions.component.sca.gen.PropertyClassGenerator;
+import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
+import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
 import org.osoa.sca.annotations.Property;
 
 
@@ -68,7 +68,7 @@ import org.osoa.sca.annotations.Property;
 @PublicAPI
 public class SCAFractive extends Fractive {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
-    public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/extensions/component/sca/config/default-component-config.xml";
+    public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/extensions/sca/config/default-component-config.xml";
 
     /**
      * no-arg constructor (used by ProActive to get a bootstrap component)

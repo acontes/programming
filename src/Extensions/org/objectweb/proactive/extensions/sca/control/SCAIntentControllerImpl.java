@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.control;
+package org.objectweb.proactive.extensions.sca.control;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -56,8 +56,8 @@ import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.component.sca.Constants;
-import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchIntentHandlerException;
+import org.objectweb.proactive.extensions.sca.Constants;
+import org.objectweb.proactive.extensions.sca.exceptions.NoSuchIntentHandlerException;
 
 
 /**

@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.control;
+package org.objectweb.proactive.extensions.sca.control;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -44,9 +44,9 @@ import org.objectweb.proactive.api.PAFuture;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
-import org.objectweb.proactive.extensions.component.sca.Utils;
-import org.objectweb.proactive.extensions.component.sca.exceptions.ClassGenerationFailedException;
-import org.objectweb.proactive.extensions.component.sca.gen.IntentServiceItfGenerator;
+import org.objectweb.proactive.extensions.sca.Utils;
+import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
+import org.objectweb.proactive.extensions.sca.gen.IntentServiceItfGenerator;
 
 
 /**

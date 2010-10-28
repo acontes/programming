@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.control;
+package org.objectweb.proactive.extensions.sca.control;
 
 import java.util.List;
 
@@ -42,7 +42,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchIntentHandlerException;
+import org.objectweb.proactive.extensions.sca.exceptions.NoSuchIntentHandlerException;
 
 
 /**

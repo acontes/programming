@@ -34,7 +34,7 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.component.sca.control;
+package org.objectweb.proactive.extensions.sca.control;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -53,9 +53,9 @@ import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.component.sca.Constants;
-import org.objectweb.proactive.extensions.component.sca.exceptions.IncompatiblePropertyTypeException;
-import org.objectweb.proactive.extensions.component.sca.exceptions.NoSuchPropertyException;
+import org.objectweb.proactive.extensions.sca.Constants;
+import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
+import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
 import org.osoa.sca.annotations.Property;
 
 

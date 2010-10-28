@@ -36,8 +36,8 @@
  */
 package functionalTests.component.sca.control.components;
 
-import org.objectweb.proactive.extensions.component.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.component.sca.control.IntentJoinPoint;
+import org.objectweb.proactive.extensions.sca.control.IntentHandler;
+import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 
 public class IntentHandlerTest implements IntentHandler {

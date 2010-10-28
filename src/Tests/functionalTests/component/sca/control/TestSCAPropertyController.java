@@ -46,8 +46,8 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
-import org.objectweb.proactive.extensions.component.sca.Utils;
-import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.sca.Utils;
+import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 
 import functionalTests.component.sca.SCAComponentTest;
 import functionalTests.component.sca.control.components.PropertyComponent;

@@ -55,10 +55,10 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
         testIntentItf2.m2();
     }
 
-	public int n2() {
-		return testIntentItf2.n2();
-	}
-    
+    public int n2() {
+        return testIntentItf2.n2();
+    }
+
     public String[] listFc() {
         return new String[] { TestIntentItf.CLIENT_ITF_NAME, TestIntentItf2.CLIENT_ITF_NAME };
     }
