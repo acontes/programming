@@ -41,6 +41,7 @@ import org.objectweb.proactive.core.remoteobject.RemoteObjectFactorySPI;
 
 
 /**
+ * The SPI providing plain PNP communication protocol
  *
  * @since ProActive 4.3.0
  */
@@ -51,7 +52,6 @@ public class PNPRemoteObjectFactorySPI implements RemoteObjectFactorySPI {
     }
 
     public String getProtocolId() {
-        return PNPRemoteObjectFactory.PROTOCOL_ID;
+        return PNPRemoteObjectFactory.PROTO_ID;
     }
-
 }
