@@ -204,6 +204,9 @@
 
 
 	<target name="compile.extensions" depends="compile.core, -deploy.mkdir" description="Compile ProActive Extensions classes">
+		<copy todir="${cl.extensions.dir}">
+			<fileset dir="${src.extensions.dir}" includes="META-INF/**"/>
+		</copy>
 		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extensions.dir}" includes="**/build.xml" />
 		</subant>
@@ -211,6 +214,9 @@
 
 
 	<target name="compile.extra" depends="compile.core" description="Compile ProActive Extensions classes">
+		<copy todir="${cl.extra.dir}">
+			<fileset dir="${src.extra.dir}" includes="META-INF/**"/>
+		</copy>
 		<subant target="-compile" inheritall="yes" failonerror="true">
 			<fileset dir="${src.extra.dir}" includes="**/build.xml" />
 		</subant>
@@ -661,6 +667,15 @@
 		<junitMacro communication.protocol="rmissl" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite" />
 	</target>
 
+
+	<target name="junit.pnps" depends="compile.tests, deploy.all" description="Run all non regression tests on the current host only">
+		<junitMacro communication.protocol="pnps" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocal.xml" testsuite="testsuite" >
+			<jvmargs>
+				<jvmarg value="-Djava.security.egd=file:/dev/urandom" />
+			</jvmargs>
+		</junitMacro>
+	</target>
+
 	<target name="junit.ibis" depends="deploy.all">
 		<junitMacro communication.protocol="ibis" nodedescriptor="/functionalTests/descriptor/defaultnodes/NodesLocalIbis.xml" testsuite="testsuite">
 			<jvmargs>
@@ -1100,7 +1115,7 @@
 				<include name="**" />
 			</lib>
 			<lib dir="${deploy.dir}/lib">
-				<include name="ProActive.jar" />
+				<include name="*.jar" />
 			</lib>
 			<webinf dir="${temp.class.dir}/WEB-INF" />
 			<fileset dir="${temp.class.dir}">
@@ -1116,7 +1131,7 @@
 				<include name="cxf-servlet.xml" />
 			</webinf>
 			<lib dir="${deploy.dir}/lib">
-				<include name="ProActive.jar" />
+				<include name="*.jar" />
 			</lib>
 			<lib dir="${cxf.lib.dir}">
 				<include name="*.jar" />
