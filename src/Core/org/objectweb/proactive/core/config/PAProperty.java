@@ -103,7 +103,7 @@ abstract public class PAProperty {
 
     /**
      * Set the default value of this property
-     * @param value new value of the property
+     * @param booleanValue new value of the property
      */
     protected String getDefaultValue() {
         return this.defaultValue;
@@ -115,6 +115,15 @@ abstract public class PAProperty {
      */
     public boolean isSet() {
         return ProActiveConfiguration.getInstance().getProperty(this.name) != null;
+    }
+
+    /**
+     * Unset the property 
+     * 
+     * @since ProActive 4.4.0
+     */
+    public void unset() {
+        ProActiveConfiguration.getInstance().unsetProperty(this.name);
     }
 
     /**

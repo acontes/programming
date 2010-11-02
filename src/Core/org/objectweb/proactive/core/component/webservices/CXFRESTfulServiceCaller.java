@@ -6,7 +6,7 @@
  *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ *              Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -36,60 +36,54 @@
  */
 package org.objectweb.proactive.core.component.webservices;
 
-import javax.xml.namespace.QName;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
-import org.apache.axis2.AxisFault;
-import org.apache.axis2.addressing.EndpointReference;
-import org.apache.axis2.rpc.client.RPCServiceClient;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.component.webservices.PAWSCaller;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
 /**
- * Implementation of the {@link PAWSCaller} interface using the <a href="http://ws.apache.org/axis2/">
- * Axis2</a> API.
+ * Implementation of the {@link PAWSCaller} interface using the <a href="http://cxf.apache.org/">CXF</a>
+ * API to call RESTful services. The service class must use annotations of the javax.ws.rs package.
  *
  * @author The ProActive Team
  * @see PAWSCaller
  */
 @PublicAPI
-public class Axis2WSCaller implements PAWSCaller {
+public class CXFRESTfulServiceCaller implements PAWSCaller {
     private static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_REQUESTS);
 
-    private RPCServiceClient rsc;
-
-    public Axis2WSCaller() {
-    }
+    private String restServiceUrl;
+    private Object restService;
 
     public void setup(Class<?> serviceClass, String wsUrl) {
-        try {
-            rsc = new RPCServiceClient();
-            rsc.getOptions().setTo(new EndpointReference(wsUrl));
-        } catch (AxisFault e) {
-            logger.error("[Axis2] Cannot create RPCServiceClient with the given address: " + wsUrl);
-        }
+        this.restServiceUrl = wsUrl;
+        this.restService = JAXRSClientFactory.create(wsUrl, serviceClass);
     }
 
     public Object callWS(String methodName, Object[] args, Class<?> returnType) {
-        if (rsc != null) {
-            try {
-                rsc.getOptions().setAction(methodName);
-                QName qName = new QName(methodName);
-                if (returnType == null) {
-                    rsc.invokeRobust(qName, args);
-                    return null;
-                } else {
-                    return rsc.invokeBlocking(qName, args, new Class<?>[] { returnType })[0];
-                }
-            } catch (AxisFault af) {
-                logger.error(
-                        "[Axis2] Failed to invoke web service: " + rsc.getOptions().getTo().getAddress(), af);
+        try {
+            Class<?>[] parameterTypes = new Class<?>[args.length];
+            for (int i = 0; i < parameterTypes.length; i++) {
+                parameterTypes[i] = args[i].getClass();
             }
-        } else {
-            logger
-                    .error("[Axis2] Cannot invoke web service since the set up has not been done or has failed");
+            Method method = restService.getClass().getDeclaredMethod(methodName, parameterTypes);
+            return method.invoke(restService, args);
+        } catch (SecurityException se) {
+            logger.error("[CXF] Failed to invoke RESTful service: " + restServiceUrl, se);
+        } catch (NoSuchMethodException nsme) {
+            logger.error("[CXF] Failed to invoke RESTful service: " + restServiceUrl, nsme);
+        } catch (IllegalArgumentException iae) {
+            logger.error("[CXF] Failed to invoke RESTful service: " + restServiceUrl, iae);
+        } catch (IllegalAccessException iae) {
+            logger.error("[CXF] Failed to invoke RESTful service: " + restServiceUrl, iae);
+        } catch (InvocationTargetException ite) {
+            logger.error("[CXF] Failed to invoke RESTful service: " + restServiceUrl, ite);
         }
         return null;
     }

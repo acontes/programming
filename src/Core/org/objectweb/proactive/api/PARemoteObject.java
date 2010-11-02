@@ -135,8 +135,7 @@ public class PARemoteObject {
     @SuppressWarnings("unchecked")
     public static <T> T turnRemote(T object) throws ProActiveException {
         RemoteObjectExposer<T> roe = newRemoteObject(object.getClass().getName(), object);
-        RemoteRemoteObject rro = roe
-                .createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet(), false);
+        RemoteRemoteObject rro = roe.createRemoteObject(getUniqueName(), false);
         RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
         return (T) roa.getObjectProxy();
     }
@@ -151,10 +150,20 @@ public class PARemoteObject {
     @SuppressWarnings("unchecked")
     public static <T> T turnRemote(T object, String protocol) throws ProActiveException {
         RemoteObjectExposer<T> roe = newRemoteObject(object.getClass().getName(), object);
-        RemoteRemoteObject rro = roe.createRemoteObject(TURN_REMOTE_PREFIX + counter.incrementAndGet(),
-                false, protocol);
+        RemoteRemoteObject rro = roe.createRemoteObject(getUniqueName(), false, protocol);
         RemoteObjectAdapter roa = new RemoteObjectAdapter(rro);
         return (T) roa.getObjectProxy();
+    }
+
+    /**
+     * generate a unique name (that contains '/') on the current host. Should work fine even
+     * with several jvm on the same host.
+     * This algorithm simply uses the field 'name' from the VMinformation class and 
+     * postfixes it with a counter incremented each time
+     * @return a unique name (that contains '/') to serve as unique identifier
+     */
+    public static String getUniqueName() {
+        return TURN_REMOTE_PREFIX + counter.incrementAndGet();
     }
 
     // -----------------------
@@ -209,4 +218,5 @@ public class PARemoteObject {
     public static void addProtocol(RemoteObjectExposer<?> roe, String protocol) throws ProActiveException {
         roe.createRemoteObject(ADD_PROTOCOL_PREFIX + counter.incrementAndGet(), false, protocol);
     }
+
 }
