@@ -57,10 +57,6 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
     private final static int NB_CALL = 100;
     private final static int NB_CALLER = 10;
 
-    public TestISUniqueThread(int hostCapacity, int vmCapacity) {
-        super(hostCapacity, vmCapacity);
-    }
-
     public TestISUniqueThread() {
         super(2, 1);
     }
@@ -148,9 +144,9 @@ public class TestISUniqueThread extends GCMFunctionalTestDefaultNodes {
         //checks services
         for (int i = 0; i < NB_CALLER; i++) {
             for (int j = 0; j < NB_CALL; j++) {
-                Assert.assertTrue(foo_void[i].get(j).booleanValue());
-                Assert.assertTrue(foo_int[i].get(j).booleanValue());
-                Assert.assertTrue(foo_long_int[i].get(j).booleanValue());
+                Assert.assertTrue(foo_void[i].get(j).getBooleanValue());
+                Assert.assertTrue(foo_int[i].get(j).getBooleanValue());
+                Assert.assertTrue(foo_long_int[i].get(j).getBooleanValue());
             }
         }
 
