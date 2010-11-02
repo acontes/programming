@@ -36,6 +36,14 @@
  */
 package org.objectweb.proactive.examples.components.sca.currencysms;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
+
+
 public interface OrangeService {
-    public boolean sendSMS(String id, String from, String to, String content);
+    @GET
+    @Path("/sms/sendSMS.xml")
+    public String sendSMS(@QueryParam("id") String apiKey, @QueryParam("from") String from,
+            @QueryParam("to") String to, @QueryParam("content") String content);
 }

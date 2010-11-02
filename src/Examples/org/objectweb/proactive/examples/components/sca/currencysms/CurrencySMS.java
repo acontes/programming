@@ -66,11 +66,13 @@ public class CurrencySMS implements BindingController, Runner {
     public void execute() {
         double currency = currencyService.ConversionRate(fromCurrency, toCurrency);
         String message = "1" + fromCurrency + " = " + currency + toCurrency;
-        boolean success = orangeService.sendSMS(id, from, to, message);
-        if (success) {
+        String result = orangeService.sendSMS(id, from, to, message);
+        if (result.contains("<status_code>200</status_code>")) {
             System.out.println("SMS successfully sent");
         } else {
-            System.out.println("Error while sending SMS");
+            System.out.println("Error while sending SMS: " +
+                result.substring(result.indexOf("<status_msg><![CDATA[") + 21, result
+                        .indexOf("]]></status_msg>")));
         }
     }
 

@@ -43,13 +43,12 @@ import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.api.PALifeCycle;
+import org.objectweb.proactive.core.component.webservices.CXFRESTfulServiceCaller;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
-import org.objectweb.proactive.extensions.component.sca.SCAFractive;
-import org.objectweb.proactive.extensions.component.sca.SCAPAPropertyRepository;
-import org.objectweb.proactive.extensions.component.sca.Utils;
-import org.objectweb.proactive.extensions.component.sca.control.SCAPropertyController;
-
-import functionalTests.component.sca.SCAComponentTest;
+import org.objectweb.proactive.extensions.sca.SCAFractive;
+import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
+import org.objectweb.proactive.extensions.sca.Utils;
+import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 
 
 public class Main {
@@ -63,7 +62,7 @@ public class Main {
                 + "\n        The second parameter is your destination number");
             return;
         }
-        //  SCAPAPropertyRepository.SCA_PROVIDER.setValue(SCAFractive.class.getName());
+        SCAPAPropertyRepository.SCA_PROVIDER.setValue(SCAFractive.class.getName());
         String orangeID = args[0];
         String destNumber = args[1];
         Component boot = Utils.getBootstrapComponent();
@@ -80,7 +79,7 @@ public class Main {
         GCM.getBindingController(comp).bindFc(CurrencySMS.CURRENCY_SERVICE_NAME,
                 currencyURL + "(" + WSInfo.DYNAMICCXFWSCALLER_ID + ")");
         GCM.getBindingController(comp).bindFc(CurrencySMS.ORANGE_SERVICE_NAME,
-                orangeURL + "(" + RestOrangeServiceCaller.class.getName() + ")");
+                orangeURL + "(" + CXFRESTfulServiceCaller.class.getName() + ")");
         SCAPropertyController scap = Utils.getSCAPropertyController(comp);
         scap.setValue("fromCurrency", "USD");
         scap.setValue("toCurrency", "EUR");
