@@ -44,6 +44,9 @@ import javax.ws.rs.QueryParam;
 public interface OrangeService {
     @GET
     @Path("/sms/sendSMS.xml")
-    public String sendSMS(@QueryParam("id") String apiKey, @QueryParam("from") String from,
-            @QueryParam("to") String to, @QueryParam("content") String content);
+    public String sendSMS(@QueryParam("id")
+    String id, @QueryParam("from")
+    String from, @QueryParam("to")
+    String to, @QueryParam("content")
+    String content);
 }

@@ -62,7 +62,7 @@ public class Main {
                 + "\n        The second parameter is your destination number");
             return;
         }
-        SCAPAPropertyRepository.SCA_PROVIDER.setValue(SCAFractive.class.getName());
+
         String orangeID = args[0];
         String destNumber = args[1];
         Component boot = Utils.getBootstrapComponent();
@@ -83,9 +83,9 @@ public class Main {
         SCAPropertyController scap = Utils.getSCAPropertyController(comp);
         scap.setValue("fromCurrency", "USD");
         scap.setValue("toCurrency", "EUR");
-        scap.setValue("id", orangeID); // Change me
+        scap.setValue("id", orangeID);
         scap.setValue("from", "38100");
-        scap.setValue("to", destNumber); // Change me
+        scap.setValue("to", destNumber);
 
         GCM.getGCMLifeCycleController(comp).startFc();
         ((Runner) comp.getFcInterface("Runner")).execute();
