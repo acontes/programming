@@ -117,7 +117,7 @@ public class Remmos {
 		// and the rest of the NF interfaces (that are going to be implemented by object controller) should be in a ControllerDesc file.
 		// But the PAComponentImpl ignores the NFType if there is a ControllerDesc file specified :(,
 		// so I better put all the NF interfaces here.
-		// That means that I need another method to add the object controllers for the not yet created controllers.
+		// That means that I need another method to add the object controllers for the (not yet created) controllers.
 		try {
 			// Object controller-managed server interfaces.
 			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.CONTENT_CONTROLLER, PAContentController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
@@ -135,16 +135,16 @@ public class Remmos {
 			
 			// external client Monitoring interfaces
 			// add one client Monitoring interface for each client F interface
-			// TODO collective and multicast/gathercast interfaces not supported (yet)
+			// Support client-singleton, and client-multicast interfaces
 			String itfName;
 			for(PAGCMInterfaceType itfType : fItfType) {
-				// only client-singleton supported ... others ignored
+				// add a client-singleton interface
 				if(itfType.isFcClientItf() && itfType.isGCMSingletonItf() && !itfType.isGCMCollectiveItf()) {
 					itfName = itfType.getFcItfName() + "-external-" + Constants.MONITOR_CONTROLLER;
 					pagcmItfType = (PAGCMInterfaceType) pagcmTf.createGCMItfType(itfName, MonitorControl.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY);
 					typeList.add(pagcmItfType);
 				}
-				// add a multicast client interface ... is it possible?
+				// add a multicast client interface
 				if(itfType.isGCMMulticastItf()) {
 					itfName = itfType.getFcItfName() + "-external-" + Constants.MONITOR_CONTROLLER;
 					pagcmItfType = (PAGCMInterfaceType) pagcmTf.createGCMItfType(itfName, MonitorControlMulticast.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.MULTICAST_CARDINALITY);
@@ -255,10 +255,10 @@ public class Remmos {
 		UniversalBodyProxy ubp = (UniversalBodyProxy) pacr.getProxy();
 		UniversalBody ub = ubp.getBody();
 		String bodyUrl = ub.getNodeURL();
-		logger.debug("   Which is in node ["+ bodyUrl + "]");
+		//logger.debug("   Which is in node ["+ bodyUrl + "]");
 		Node parentNode = NodeFactory.getNode(bodyUrl);
 		ProActiveRuntime part = parentNode.getProActiveRuntime();
-		logger.debug("   and in runtime ["+ part.getURL() + "]");
+		//logger.debug("   and in runtime ["+ part.getURL() + "]");
 		
 		
 		// creates the components used for monitoring
@@ -300,11 +300,19 @@ public class Remmos {
 		String serverItfName;
 		InterfaceType[] fItfType = ((PAComponent) component).getComponentParameters().getInterfaceTypes();
 		for(InterfaceType itfType : fItfType) {
-			// only client-singleton supported ... others ignored
+			// client-singleton
 			if(itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMSingletonItf() && !((PAGCMInterfaceType)itfType).isGCMCollectiveItf()) {
 				itfName = itfType.getFcItfName();
 				clientItfName = itfName+"-external-"+MONITOR_SERVICE_ITF;
 				serverItfName = itfName+"-external-"+Constants.MONITOR_CONTROLLER;
+				membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
+			}
+			// client-multicast
+			if(itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMMulticastItf() ) {
+				itfName = itfType.getFcItfName();
+				clientItfName = itfName+"-external-"+MONITOR_SERVICE_ITF;
+				serverItfName = itfName+"-external-"+Constants.MONITOR_CONTROLLER;
+				logger.debug("   MULTICAST. Binding ["+MONITOR_SERVICE_COMP+"."+clientItfName+"] to ["+serverItfName+"]");
 				membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
 			}
 		}
@@ -538,6 +546,15 @@ public class Remmos {
 					e.printStackTrace();
 				}
 			}
+			if(((PAGCMInterfaceType)itfType).isGCMMulticastItf() ) {
+				itfName = itfType.getFcItfName() + "-external-"+MONITOR_SERVICE_ITF;
+				logger.debug("   There is a MULTICAST client itf! The Monitor Component should have the MULTICAST client interface: "+ itfName);
+				try {
+					monitorServiceItfTypeList.add(patf.createGCMItfType(itfName, MonitorControlMulticast.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+				} catch (InstantiationException e) {
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		// composites also require client interfaces for internal bindings
@@ -747,7 +764,7 @@ public class Remmos {
 			foundParent = false;
 			
 			// client singleton/multicast supported
-			// TODO: support the others
+			// TODO: support the others (server multicast)
 			if(itfType.isFcClientItf()) {
 				itfName = itfType.getFcItfName();
 				// get the component(s) bound to this interface
@@ -792,8 +809,6 @@ public class Remmos {
 								}
 								// do the NF binding
 								membrane.stopMembrane();
-								// now FAILs here ... when "checking compatibility"
-								// the solution should be the same than for the functional interfaces
 								membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
 								membrane.startMembrane();
 							} catch (NoSuchInterfaceException e) {

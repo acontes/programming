@@ -43,6 +43,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	// interfaces for monitors of internal and external components
 	private Map<String, MonitorControl> externalMonitors = new HashMap<String, MonitorControl>();
 	private Map<String, MonitorControl> internalMonitors = new HashMap<String, MonitorControl>();
+	private Map<String, MonitorControlMulticast> externalMonitorsMulticast = new HashMap<String, MonitorControlMulticast>();
 	
 	private String basicItfs[] = {
 			Remmos.EVENT_CONTROL_ITF,
@@ -325,7 +326,14 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		// it refers to the monitoring interface of an external component (bound from an external client interface)
 		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
 			// WARN: does not check if the corresponding external client interface exists in the host component
-			externalMonitors.put(cItf, (MonitorControl)sItf);
+			// The server interface maybe a Multicast. In that case, it must be cast appropriately.!!!
+			if(sItf instanceof MonitorControl) { 
+				externalMonitors.put(cItf, (MonitorControl)sItf);
+			}
+			if(sItf instanceof MonitorControlMulticast) {
+				//System.out.println("   bindFc. Binding ["+cItf+"] to Multicast interface");
+				externalMonitorsMulticast.put(cItf, (MonitorControlMulticast) sItf);
+			}
 			return;
 		}
 		// it refers to the monitoring interface of an internal component (external server interface bound to an internal server interface)
@@ -341,11 +349,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 	public String[] listFc() {
 		int nExternalMonitors = externalMonitors.size();
 		int nInternalMonitors = internalMonitors.size();
+		int nExternalMonitorsMulticast = externalMonitorsMulticast.size();
 		int nBasicItfs = basicItfs.length;
-		//String[] externalMonitorNames = externalMonitors.keySet().toArray(new String[nExternalMonitors]);
-		//String[] internalMonitorNames = internalMonitors.keySet().toArray(new String[nInternalMonitors]);
 		
-		ArrayList<String> itfsList = new ArrayList<String>(nExternalMonitors+nInternalMonitors+nBasicItfs);
+		ArrayList<String> itfsList = new ArrayList<String>(nExternalMonitors+nInternalMonitors+nExternalMonitorsMulticast+nBasicItfs);
 		for(int i=0;i<nBasicItfs;i++) {
 			itfsList.add(basicItfs[i]);
 		}
@@ -368,7 +375,12 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 			return metricsStore;
 		}
 		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
-			return externalMonitors.get(cItf);
+			//System.out.println("   Looking up ... "+ cItf);
+			//the interface maybe a singleton or a multicast
+			if(externalMonitors.containsKey(cItf)) {
+				return externalMonitors.get(cItf);
+			}
+			return externalMonitorsMulticast.get(cItf);
 		}
 		if(cItf.endsWith("-internal-"+Remmos.MONITOR_SERVICE_ITF)) {
 			return internalMonitors.get(cItf);
@@ -389,7 +401,12 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 			metricsStore = null;
 		}
 		if(cItf.endsWith("-external-"+Remmos.MONITOR_SERVICE_ITF)) {
-			externalMonitors.put(cItf,null);
+			if(externalMonitors.containsKey(cItf)) {
+				externalMonitors.put(cItf,null);
+			}
+			if(externalMonitorsMulticast.containsKey(cItf)) {
+				externalMonitorsMulticast.put(cItf,null);
+			}
 		}
 		if(cItf.endsWith("-internal-"+Remmos.MONITOR_SERVICE_ITF)) {
 			internalMonitors.put(cItf,null);
