@@ -8,15 +8,22 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.UniqueID;
+import org.objectweb.proactive.core.component.Constants;
+import org.objectweb.proactive.core.component.PAInterface;
+import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComponentController;
 import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.control.MethodStatistics;
+import org.objectweb.proactive.core.component.control.PAMulticastController;
+import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -174,6 +181,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	
     	rpLogger.debug("["+this.getMonitoredComponentName()+"] Record ["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
     	
+    	// try the internal monitor controllers (only composites have internal monitor controllers)
     	for(String monitorItfName : internalMonitors.keySet()) {
     		rpLogger.debug("["+this.getMonitoredComponentName()+"] Looking internal interface ["+monitorItfName+"]");
 			if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
@@ -273,6 +281,54 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     						rpLogger.debug("Found!");
     						child = externalMonitors.get(monitorItfName);
     					}
+    				}
+    				// try the external monitor controllers connected through multicast
+    				for(String monitorItfName : externalMonitorsMulticast.keySet()) {
+    					rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying external multicast interface ["+monitorItfName+"]");
+    					rpLogger.debug("Current OutgoingRequestRecord:"+ cr.toString());
+    					// Two options:
+    					// (1) need to get all the destinations of the multicast interface, and call each component (assuming multicast are always broadcast)
+    					// OR
+    					// (2) call only the destination used (if we consider selective multicast, but I should have to copy it from Elton's work)
+    					// so, for now it's (1)
+    					// Select the bound component which has the same name as "destName"
+    					// I need to check the bound component using the PAMulticastController, because the actual set of bound components can change at runtime,
+    					//    whereas in the case of the singleton monitor controllers, it is only one (or zero).
+    					PAMulticastController pamc = null;
+    					Object[] destinationObjects = null;
+    					PAComponentRepresentative destinationPAComponent = null;
+    					String destinationComponentName = null;
+    					try {
+    						// gets all destination components (as objects) bound to this multicast itf
+							pamc = Utils.getPAMulticastController(this.hostComponent);
+							MonitorControlMulticast mcm = externalMonitorsMulticast.get(monitorItfName);
+							rpLogger.debug("mcm is "+ mcm.getClass().getName());
+							rpLogger.debug("PAInterface?"+ (mcm instanceof PAInterface));
+							String externalMulticastItfName = ((PAInterface)mcm).getFcItfName();
+							rpLogger.debug("mcm name: "+ externalMulticastItfName);
+							destinationObjects = pamc.lookupGCMMulticast(externalMulticastItfName);
+						} catch (NoSuchInterfaceException e) {
+							e.printStackTrace();
+						}
+						// WARNING: I'm not sure it works ok with the aliasClientBinding ... but it should ...
+						for(Object destinationObject : destinationObjects) {
+							Component destinationComponent = ((PAInterface)destinationObject).getFcItfOwner();
+							// ignore WSComponents
+							if(destinationComponent instanceof PAComponentRepresentative) {
+								destinationPAComponent = (PAComponentRepresentative) destinationComponent;
+								destinationComponentName = destinationPAComponent.getComponentParameters().getName();
+								if(destinationComponentName.equals(destName)) {
+									rpLogger.debug("Found! (in multicast "+ monitorItfName+")");
+									try {
+										child = (MonitorControl) destinationComponent.getFcInterface(Constants.MONITOR_CONTROLLER);
+									} catch (NoSuchInterfaceException e) {
+										e.printStackTrace();
+									}
+								}
+							}
+							
+						}
+						
     				}
 
     				// and call it
