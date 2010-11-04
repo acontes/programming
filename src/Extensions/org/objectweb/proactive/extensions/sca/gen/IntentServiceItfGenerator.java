@@ -124,7 +124,7 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
             String generatedClassName = Utils.getIntentInterceptorClassName(componentName,
                     serviceItfClassName);
             List<IntentHandler> intentHandlersInList = org.objectweb.proactive.extensions.sca.Utils
-                    .getSCAIntentController(owner).listIntentHandler();
+                    .getSCAIntentController(owner).listExistingIntentHandler();
             IntentHandler[] intentHandlers = intentHandlersInList.toArray(new IntentHandler[0]);
             Class<?> generatedClass = null;
             try {

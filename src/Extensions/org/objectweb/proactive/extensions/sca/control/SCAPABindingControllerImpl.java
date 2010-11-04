@@ -65,7 +65,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
         PAInterface sItf = serverItf;
         try {
             Component owner = getFcItfOwner();
-            if (Utils.getSCAIntentController(owner).hasIntentHandler(clientItfName)) {
+            if (Utils.getSCAIntentController(owner).intentHandlerExists(clientItfName)) {
                 try {
                     sItf = (PAInterface) IntentServiceItfGenerator.instance().generateInterface(sItf,
                             clientItfName, owner);
