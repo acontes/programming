@@ -22,7 +22,6 @@ import org.objectweb.proactive.core.component.componentcontroller.AbstractPAComp
 import org.objectweb.proactive.core.component.componentcontroller.remmos.Remmos;
 import org.objectweb.proactive.core.component.control.MethodStatistics;
 import org.objectweb.proactive.core.component.control.PAMulticastController;
-import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -151,12 +150,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 
 	}
 	
-	// TODO
 	public List<ComponentRequestID> getListOfIncomingRequestIDs() {
 		return recordStore.getListOfRequestIDs();
 	}
 	
-	// TODO
 	public List<ComponentRequestID> getListOfOutgoingRequestIDs() {
 		return recordStore.getListOfCallIDs();
 	}
@@ -165,10 +162,14 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
      * Builds the Request path starting from request with ID id. 
      */
     public RequestPath getPathForID(ComponentRequestID id) {
-    	RequestPath result;
+    	RequestPath result = null;
     	OutgoingRequestRecord cr;
     	
     	rpLogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+")");
+//    	if(!recordStore.exists(id, RecordType.OutgoingRequestRecord).booleanValue()) {
+//    		rpLogger.debug("["+this.getMonitoredComponentName()+"] No outgoing request found here for ("+id+")");
+//    		return null;
+//    	}
     	cr = recordStore.fetchOutgoingRequestRecord(id);
     	
     	ComponentRequestID rootID = cr.getRootID();
@@ -179,29 +180,42 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     	String destName = cr.getCalledComponent();
     	MonitorControl child = null;
     	
-    	rpLogger.debug("["+this.getMonitoredComponentName()+"] Record ["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
+    	rpLogger.debug("["+localName+"] Record ["+id+"] "+ cr.getCalledComponent() + "." + cr.getInterfaceName() + "." + cr.getMethodName() );
     	
     	// try the internal monitor controllers (only composites have internal monitor controllers)
     	for(String monitorItfName : internalMonitors.keySet()) {
-    		rpLogger.debug("["+this.getMonitoredComponentName()+"] Looking internal interface ["+monitorItfName+"]");
+    		rpLogger.debug("["+localName+"] Looking internal interface ["+monitorItfName+"]");
 			if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
 				child = internalMonitors.get(monitorItfName);
 			}
 		}
 		// try the external monitor controllers
 		for(String monitorItfName : externalMonitors.keySet()) {
-    		rpLogger.debug("["+this.getMonitoredComponentName()+"] Looking external interface ["+monitorItfName+"]");
+    		rpLogger.debug("["+localName+"] Looking external interface ["+monitorItfName+"]");
     		if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
 				child = externalMonitors.get(monitorItfName);
 			}
 		}
-		rpLogger.debug("-------------------------------------------------------------");
+		// TODO Warning: Does not work (yet) if the first interface is multicast
+		
+		rpLogger.debug("-------------------------------------------------------------+");
 		rpLogger.debug("["+this.getMonitoredComponentName()+"] getPathFor("+id+") calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
-    	result = child.getPathForID(id, rootID, visited);
-    	result.add(new PathItem(cr.getParentID(), id, cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime() - cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
     	
-    	// sort the results according to the order of the calls
-    	result.getSize();
+		result = child.getPathForID(id, rootID, visited);
+    	
+		//Need to add the new firstPathItem
+		//result.add(new PathItem(cr.getParentID(), id, cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime() - cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
+    	
+		result.getSize();
+		
+		result.getPath().setSendTime(cr.getSentTime());
+		result.getPath().setReplyRecvTime(cr.getReplyReceptionTime());
+//		mainPath.setSendTime(cr.getSentTime());
+//		mainPath.setReplyRecvTime(cr.getReplyReceptionTime());
+//		mainPath.addChildID(result.getPath().getID());
+//		mainPath.addChild(result.getPath().getID(), result.getPath());
+		
+    	//result.getSize();
     	
     	rpLogger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     	return result;
@@ -211,145 +225,223 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     /** 
      * Builds the Request path starting from request with ID id. 
      */
-    public RequestPath getPathForID(ComponentRequestID id, ComponentRequestID rootID, Set<String> visited) {
+    public RequestPath getPathForID(ComponentRequestID incomingID, ComponentRequestID rootID, Set<String> visited) {
 
-    	RequestPath result = new RequestPath();
-    	RequestPath branch = null;
+    	// add this component to the set of visited components
     	String localName = this.hostComponent.getComponentParameters().getName();
-    	String destName;
-    	// add itself to the list of visited components
     	visited.add(localName);
+    	rpLogger.debug("["+localName+"] Visiting, for ID ["+ incomingID + "], rootID ["+rootID+"]");
     	
- 
-    	Map<ComponentRequestID, IncomingRequestRecord> branches = null; //logHandler.getCallRecordsFromParent(rootID);
-    	Map<ComponentRequestID, OutgoingRequestRecord> children = null; 
-    	IncomingRequestRecord rr;
-    	OutgoingRequestRecord cr;
-    	PathItem pi;
-    	MonitorControl child = null;
-
-
-    	// find, in the call log, the list of all calls that were made here, related to the same rootID
-    	branches = recordStore.getIncomingRequestRecordsFromRoot(rootID);
-
-    	rpLogger.debug("["+localName+"] Branches: "+ branches.size());
-
-
-
-    	// call each branch that starts here and has the same rootID
-    	for(ComponentRequestID crid : branches.keySet()) {
-
-    		rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying branch ["+crid+"]");
-    		// get the record of the request
-    		rr = recordStore.fetchIncomingRequestRecord(crid);
-    		// get all the calls that were sent while serving this request
-    		children = recordStore.getOutgoingRequestRecordsFromParent(crid);
-
-
-    		// this path item represents the fact that the call arrived here
-    		pi = new PathItem(crid, rr.getRequestID(), rr.getArrivalTime(), rr.getReplyTime(), rr.getReplyTime()-rr.getArrivalTime(), rr.getCallerComponent(), rr.getCalledComponent(), rr.getInterfaceName(), rr.getMethodName());
-    		// add this PathItem
-    		rpLogger.debug("["+localName+"] Adding pathItem ["+ pi.toString() +"]");
-    		result.add(pi);
-
-
-    		// call each component to which a request was sent
-    		for(ComponentRequestID childID : children.keySet()) {
-    			cr = recordStore.fetchOutgoingRequestRecord(childID);
-    			// get the name of the component to call
-    			destName = cr.getCalledComponent();
-    			rpLogger.debug("["+this.getMonitoredComponentName()+"] Found call to ["+childID+"], component ["+destName+"]");
-    			
-    			// add the item saying that a call was sent. However, while doing the search we won't necessarily call that component now.
-    			result.add(new PathItem(cr.getParentID(), cr.getRequestID(), cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime()-cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
-    			
-    			// if it is in the visited list, don't call it
-    			if(!visited.contains(destName)) {
-    				// select the client interface (can be external or internal) where this component is connected
-    				// try the internal monitor controllers
-    				for(String monitorItfName : internalMonitors.keySet()) {
-    					rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying internal interface ["+monitorItfName+"]");
-    					if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    						rpLogger.debug("Found!");
-    						child = internalMonitors.get(monitorItfName);
-    					}
-    				}
-    				// try the external monitor controllers
-    				for(String monitorItfName : externalMonitors.keySet()) {
-    					rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying external interface ["+monitorItfName+"]");
-    					if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
-    						rpLogger.debug("Found!");
-    						child = externalMonitors.get(monitorItfName);
-    					}
-    				}
-    				// try the external monitor controllers connected through multicast
-    				for(String monitorItfName : externalMonitorsMulticast.keySet()) {
-    					rpLogger.debug("["+this.getMonitoredComponentName()+"] Trying external multicast interface ["+monitorItfName+"]");
-    					rpLogger.debug("Current OutgoingRequestRecord:"+ cr.toString());
-    					// Two options:
-    					// (1) need to get all the destinations of the multicast interface, and call each component (assuming multicast are always broadcast)
-    					// OR
-    					// (2) call only the destination used (if we consider selective multicast, but I should have to copy it from Elton's work)
-    					// so, for now it's (1)
-    					// Select the bound component which has the same name as "destName"
-    					// I need to check the bound component using the PAMulticastController, because the actual set of bound components can change at runtime,
-    					//    whereas in the case of the singleton monitor controllers, it is only one (or zero).
-    					PAMulticastController pamc = null;
-    					Object[] destinationObjects = null;
-    					PAComponentRepresentative destinationPAComponent = null;
-    					String destinationComponentName = null;
-    					try {
-    						// gets all destination components (as objects) bound to this multicast itf
-							pamc = Utils.getPAMulticastController(this.hostComponent);
-							MonitorControlMulticast mcm = externalMonitorsMulticast.get(monitorItfName);
-							rpLogger.debug("mcm is "+ mcm.getClass().getName());
-							rpLogger.debug("PAInterface?"+ (mcm instanceof PAInterface));
-							String externalMulticastItfName = ((PAInterface)mcm).getFcItfName();
-							rpLogger.debug("mcm name: "+ externalMulticastItfName);
-							destinationObjects = pamc.lookupGCMMulticast(externalMulticastItfName);
-						} catch (NoSuchInterfaceException e) {
-							e.printStackTrace();
-						}
-						// WARNING: I'm not sure it works ok with the aliasClientBinding ... but it should ...
-						for(Object destinationObject : destinationObjects) {
-							Component destinationComponent = ((PAInterface)destinationObject).getFcItfOwner();
-							// ignore WSComponents
-							if(destinationComponent instanceof PAComponentRepresentative) {
-								destinationPAComponent = (PAComponentRepresentative) destinationComponent;
-								destinationComponentName = destinationPAComponent.getComponentParameters().getName();
-								if(destinationComponentName.equals(destName)) {
-									rpLogger.debug("Found! (in multicast "+ monitorItfName+")");
-									try {
-										child = (MonitorControl) destinationComponent.getFcInterface(Constants.MONITOR_CONTROLLER);
-									} catch (NoSuchInterfaceException e) {
-										e.printStackTrace();
-									}
-								}
-							}
-							
-						}
-						
-    				}
-
-    				// and call it
-    				rpLogger.debug("["+this.getMonitoredComponentName()+"] calling " + (child==null?"NOBODY":child.getMonitoredComponentName()) );
-    				branch = child.getPathForID(childID, rootID, visited);
-
-    				// add the result to the current RequestPath
-    				result.add(branch);	
-    			}  
-    			else {
-    				rpLogger.debug("["+this.getMonitoredComponentName()+"] Component ["+destName+"] already visited.");
-    			}
+    	// Create new RequestPath object to return. The requestPath is built for the incomingID we're looking for, and with the current visited list
+    	RequestPath result = new RequestPath(incomingID);
+    	result.addSetVisited(visited);
+    	
+    	// get the time when the request 'incomingID' was received
+    	IncomingRequestRecord objectiveIrr = recordStore.fetchIncomingRequestRecord(incomingID);
+    	final long arrivalTimeIncomingRequest = objectiveIrr.getArrivalTime();
+    	final ComponentRequestID root = rootID;
+    	
+    	// obtains all incomingRequestRecords with arrivalTime >= arrivalTimeIncomingRequest, and the same rootID
+    	List<IncomingRequestRecord> incomingRequests = recordStore.getIncomingRequestRecords(new Condition<IncomingRequestRecord>() {
+    		@Override
+    		public boolean evaluate(IncomingRequestRecord rr) {
+    			return rr.getArrivalTime() >= arrivalTimeIncomingRequest && rr.getRootID().equals(root);
     		}
+    	});
+    	rpLogger.debug("["+localName+"] Found "+ incomingRequests.size() + " incoming requests.");
+
+    	// process each incoming request found (there must be at least one)
+    	for(IncomingRequestRecord irr : incomingRequests) {
+        	rpLogger.debug("["+localName+"]    Processing incomingRequest ["+ irr.getRequestID()+"]");
+    		// assertion
+    		if(!irr.getCalledComponent().equals(localName)) System.out.println("["+localName+"]    ERROR! Different component names!!!!");
+    		// create new PathItem. If the request ID is the same as the incomingID, then it is the expected pathItem. Otherwise, it is another subtree.
+    		PathItem pi = new PathItem(irr.getRequestID(), localName, irr.getInterfaceName(), irr.getMethodName());
+    		// add the "server view" information
+    		pi.setRecvTime(irr.getArrivalTime());
+    		pi.setReplySentTime(irr.getReplyTime());
+
+    		// obtains all outgoingRequestRecords generated from the current request
+    		Map<ComponentRequestID, OutgoingRequestRecord> outgoingRequests = recordStore.getOutgoingRequestRecordsFromParent(irr.getRequestID());
+    		rpLogger.debug("["+localName+"]    Found "+ outgoingRequests.size() + " outgoing requests from "+ irr.getRequestID());
+    		// process each outgoing request found (there may be 0)
+    		for(OutgoingRequestRecord orr : outgoingRequests.values()) {
+    			
+				rpLogger.debug("["+localName+"]       Processing outgoing request ID ["+ orr.getRequestID() +"]");
+    			// add the ID of this outgoing requests as child of the current PathItem
+    			pi.addChildID(orr.getRequestID());
+    			
+    			String destinationComponent = orr.getCalledComponent();
+		
+    			// don't call an already visited component
+    			if(!visited.contains(destinationComponent)) {
+    				
+    				rpLogger.debug("["+localName+"]       Looking for monitor of (not visited) component ["+ destinationComponent +"]");
+    				// find the appropriate monitor controller to call
+        			MonitorControl mc = findMonitorControl(destinationComponent);
+        			// assertion
+        			if(mc == null) System.out.println("["+localName+"]       ERROR! No MonitorControl found!!!");
+        			
+    				rpLogger.debug("["+localName+"]       Calling external monitor on Component ["+ destinationComponent +"]");
+    				// find the request path from the ID of the current outgoing request (it will return a path, and 0 or more addition subtrees)
+    				RequestPath rp = mc.getPathForID(orr.getRequestID(), rootID, visited);
+    				// add all the visited nodes (there may be new ones)
+    				visited.addAll(rp.getVisited());
+    				// get the searched path (there must be one)
+    				PathItem childPath = rp.getPath();
+    				// assertion
+    				if(!childPath.getID().equals(orr.getRequestID())) System.out.println("["+localName+"]       ERROR! Obtained path does not begin with search request ID. Obtained path ID: "+ childPath.getID() + ", while OutgoingRequestID was "+ orr.getRequestID());
+    				rpLogger.debug("["+localName+"]       Found path for request ID ["+ orr.getRequestID() +"]");
+
+    				// complete the path with "client view" information
+    				childPath.setSendTime(orr.getSentTime());
+    				childPath.setReplyRecvTime(orr.getReplyReceptionTime());
+    				// add the obtained path as a child of the PathItem that we are creating
+    				pi.addChild(orr.getRequestID(), childPath);
+    				
+    				// copy all the other heads found in the obtained RequestPath (maybe 0)
+    				rpLogger.debug("["+localName+"]       Obtained "+ rp.getHeads().size() +" additional subtrees");
+    				for(PathItem head : rp.getHeads()) {
+        				rpLogger.debug("["+localName+"]          This subtree belong to request ID ["+ head.getID() +"]");
+        				result.addHead(head);
+    				}
+    				// copy the incomplete path entries
+    				rpLogger.debug("["+localName+"]       Obtained "+ rp.getHeads().size() +" incomplete path entries");
+    				for(PathItem inc : rp.getIncompletes()) {
+    					rpLogger.debug("["+localName+"]          Entry for ["+ inc.getID()+"] is incomplete");
+    					result.addIncomplete(inc);
+    				}
+    			}
+    			else {
+    				// the destination component has already been visited !!! Don't visit it again, but add an incomplete entry,
+    				// which must be later "glued" with a subtree (head)
+    				rpLogger.debug("["+localName+"]       Component ["+ destinationComponent +"] already visited. Won't call it again.");
+    				// add incomplete child path
+    				// Warning... the interfaceName maybe different (it seems I'm losing that info)
+    				rpLogger.debug("["+localName+"]          Adding incomplete entry ["+ orr.getRequestID()+"]");
+    				PathItem childIncomplete = new PathItem(orr.getRequestID(), destinationComponent, orr.getInterfaceName(), orr.getMethodName());
+    				childIncomplete.setSendTime(orr.getSentTime());
+    				childIncomplete.setReplyRecvTime(orr.getReplyReceptionTime());
+    				result.addIncomplete(childIncomplete);
+    				// the incomplete entry must also be registered as a child of the current request
+    				pi.addChild(orr.getRequestID(), childIncomplete);
+    			}
+    			
+    		}
+    		// add the new created PathItem as the expected child of this RequestPath
+    		if(pi.getID().equals(incomingID)) {
+    			result.setPath(pi);
+    		}
+    		// it is another incoming request, so put it in the list of heads
+    		else {
+    			result.addHead(pi);
+    		}
+    		
     	}
     	
-
-    	rpLogger.debug("["+localName+"] Returning results with "+ result.getPath().size() +" pathItems");
+    	rpLogger.debug("["+localName+"] Trying to reduce subtrees");
+    	// Now comes the reduction part.
+    	// Check all the 'incomplete' entries, and try to find a match with a 'head' entry.
+    	for(PathItem incomplete : result.getIncompletes()) {
+    		PathItem subtree = result.getHead(incomplete.getID());
+    		if(subtree != null) {
+    			// merge 'subtree' with 'incomplete' 
+    			incomplete.setRecvTime(subtree.getRecvTime());
+    			incomplete.setReplySentTime(subtree.getReplySentTime());
+    			incomplete.setChildrenID(subtree.getChildrenID());
+    			incomplete.setChildren(subtree.getChildren());
+    		}
+    		// now the incomplete entry must be removed from the 'incomplete' list, and from the 'subtree' list
+    		result.removeHead(incomplete.getID());
+    		// I'm inside an iteration over 'incomplete' ... maybe I shouldn't remove an entry now
+    			
+    		// TODO remove the entry from the 'incomplete' list
+    	}
+    	
+    	rpLogger.debug("["+localName+"] Returning results with "+ result.getHeads().size() +" additional subtrees and "+ result.getIncompletes().size() + " incomplete entries.");
 
     	return result;    	
     }
-
+    
+    /**
+     * Look on each internal/external monitor interface to find the Monitor for the indicate name.
+     * Warning!!... It may still block if I try with the MonitorControl of a "working component" (in a cycle). 
+     *              I should avoid consulting the internal/external monitor for the name, and rely on a "cached" name.
+     *              The name of the component does not change (normally) anyway. 
+     *              The only problem is the multicast interfaces, because the names may of the bound components may change.
+     *                 In that case, I'd need to do something upon each multicast binding to keep the consistency.
+     * @param destName
+     * @return
+     */
+    private MonitorControl findMonitorControl(String destName) {
+    	MonitorControl child = null;
+    	// select the client interface (can be external or internal) where this component is connected
+		// try the internal monitor controllers
+		for(String monitorItfName : internalMonitors.keySet()) {
+			rpLogger.debug("["+this.getMonitoredComponentName()+"]          Trying internal interface ["+monitorItfName+"]");
+			if(internalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+				rpLogger.debug("["+this.getMonitoredComponentName()+"]          Found!!");
+				child = internalMonitors.get(monitorItfName);
+			}
+		}
+		// try the external monitor controllers
+		for(String monitorItfName : externalMonitors.keySet()) {
+			rpLogger.debug("["+this.getMonitoredComponentName()+"]          Trying external interface ["+monitorItfName+"]");
+			if(externalMonitors.get(monitorItfName).getMonitoredComponentName().equals(destName)) {
+				rpLogger.debug("["+this.getMonitoredComponentName()+"]          Found!!");
+				child = externalMonitors.get(monitorItfName);
+			}
+		}
+		// try the external monitor controllers connected through multicast
+		for(String monitorItfName : externalMonitorsMulticast.keySet()) {
+			rpLogger.debug("["+this.getMonitoredComponentName()+"]          Trying external multicast interface ["+monitorItfName+"]");
+//			rpLogger.debug("Current OutgoingRequestRecord:"+ cr.toString());
+			// Two options:
+			// (1) need to get all the destinations of the multicast interface, and call each component (assuming multicast are always broadcast)
+			// OR
+			// (2) call only the destination used (if we consider selective multicast, but I should have to copy it from Elton's work)
+			// so, for now it's (1)
+			// Select the bound component which has the same name as "destName"
+			// I need to check the bound component using the PAMulticastController, because the actual set of bound components can change at runtime,
+			//    whereas in the case of the singleton monitor controllers, it is only one (or zero).
+			PAMulticastController pamc = null;
+			Object[] destinationObjects = null;
+			PAComponentRepresentative destinationPAComponent = null;
+			String destinationComponentName = null;
+			try {
+				// gets all destination components (as objects) bound to this multicast itf
+				pamc = Utils.getPAMulticastController(this.hostComponent);
+				MonitorControlMulticast mcm = externalMonitorsMulticast.get(monitorItfName);
+				rpLogger.debug("mcm is "+ mcm.getClass().getName());
+				rpLogger.debug("PAInterface?"+ (mcm instanceof PAInterface));
+				String externalMulticastItfName = ((PAInterface)mcm).getFcItfName();
+				rpLogger.debug("mcm name: "+ externalMulticastItfName);
+				destinationObjects = pamc.lookupGCMMulticast(externalMulticastItfName);
+			} catch (NoSuchInterfaceException e) {
+				e.printStackTrace();
+			}
+			// WARNING: I'm not sure it works ok with the aliasClientBinding ... but it should ...
+			for(Object destinationObject : destinationObjects) {
+				Component destinationComponent = ((PAInterface)destinationObject).getFcItfOwner();
+				// ignore WSComponents
+				if(destinationComponent instanceof PAComponentRepresentative) {
+					destinationPAComponent = (PAComponentRepresentative) destinationComponent;
+					destinationComponentName = destinationPAComponent.getComponentParameters().getName();
+					if(destinationComponentName.equals(destName)) {
+						rpLogger.debug("["+this.getMonitoredComponentName()+"]          Found! (in multicast "+ monitorItfName+")");
+						try {
+							child = (MonitorControl) destinationComponent.getFcInterface(Constants.MONITOR_CONTROLLER);
+						} catch (NoSuchInterfaceException e) {
+							e.printStackTrace();
+						}
+					}
+				}
+				
+			}
+			
+		}
+		return child;
+    }
 	// TODO
     public RequestPath getPathStatisticsForId(ComponentRequestID id) {
     	return null;

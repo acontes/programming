@@ -107,7 +107,6 @@ public class EventListener extends AbstractPAComponentController implements Noti
             }
             started = true;
             logger.debug("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);
-            System.out.println("[EventListener] Monitoring Started for component ["+ monitoredComponentName + "] "+ " bodyID: "+ monitoredBodyID + " @ "+ runtimeURL);
 		}
 	}
 	

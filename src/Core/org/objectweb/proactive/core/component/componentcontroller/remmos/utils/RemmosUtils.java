@@ -1,5 +1,7 @@
 package org.objectweb.proactive.core.component.componentcontroller.remmos.utils;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -220,11 +222,45 @@ public class RemmosUtils {
 	}
 	
 	public static void displayPath(RequestPath rp) {
-		List<PathItem> paths = rp.getPath();
+		
+		PathItem pi = rp.getPath();
+		System.out.println("Request Path from request "+ pi.getID());
+		displayPath(pi,0);
+		
+		/*List<PathItem> paths = rp.getPath();
 		System.out.println("Request Path ("+ paths.size()+")");
 		for(PathItem path:paths) {
 			System.out.println("*" + path.toString());
+		}*/
+		/*System.out.println("--- Subtrees");
+		for(PathItem subtree : rp.getHeads()) {
+			System.out.println("--- Request Path from subtree "+ subtree.getID());	
+			displayPath(subtree,1);
 		}
+		System.out.println("--- Incomplete entries");
+		for(PathItem incomplete : rp.getIncompletes()) {
+			System.out.println("    "+ incomplete.toString());
+		}*/
+	}
+	
+	private static void displayPath(PathItem pi, int level) {
+		
+		// print this
+		System.out.print("* ");
+		for(int i=0;i<level;i++) {
+			System.out.print("   ");
+		}
+		System.out.println(pi.toString());
+		
+		// print children
+		// TODO order the children before
+		List<PathItem> children = new ArrayList<PathItem>();
+		children.addAll(pi.getChildren().values());
+		Collections.sort(children);		
+		for(PathItem child : children) {
+			displayPath(child,level+1);
+		}
+		
 	}
 	
 	public static void displayMetrics(Component comp) throws NoSuchInterfaceException {
