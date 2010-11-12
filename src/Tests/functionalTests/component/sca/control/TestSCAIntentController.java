@@ -38,10 +38,16 @@ package functionalTests.component.sca.control;
 
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
+import org.junit.Assert;
 import org.junit.Before;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.IllegalBindingException;
+import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
@@ -62,12 +68,12 @@ import functionalTests.component.sca.control.components.TestIntentItf2;
 public class TestSCAIntentController extends SCAComponentTest {
     Component componentA;
     Component componentB;
-    SCAIntentController scaic;
+    
     
     public TestSCAIntentController() {
         super();
     }
-
+    
     @Before
     public void initTest() throws Exception {
     	Component boot = Utils.getBootstrapComponent();
@@ -92,13 +98,200 @@ public class TestSCAIntentController extends SCAComponentTest {
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
     }
+    @org.junit.Test
+    public void testAddIntentHandler1() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih);
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler());
+    }
+    
+    @org.junit.Test
+    public void testAddIntentHandler2() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler());
+    }
+    
+    @org.junit.Test
+    public void testAddIntentHandler3() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler());
+    }
+    
+    @org.junit.Test(expected=NoSuchInterfaceException.class)
+    public void testAddIntentHandlerNoSuchInterfaceException() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, "whateverItf");
+    }
+    
+    @org.junit.Test(expected=NoSuchMethodException.class)
+    public void testAddIntentHandlerNoSuchMethodException() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"whateverMethod");
+    }
+    
+    @org.junit.Test(expected=IllegalBindingException.class)
+    public void testAddIntentHandlerIllegalBindingException() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih);
+    	GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
+        GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
+        scaic.addIntentHandler(new IntentHandlerTest());
+    }
+    
+    @org.junit.Test(expected=IllegalLifeCycleException.class)
+    public void testAddIntentHandlerIllegalLifeCycleException() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih);
+    	GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
+        GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
+        GCM.getGCMLifeCycleController(componentA).startFc();
+        GCM.getGCMLifeCycleController(componentB).startFc();
+        scaic.addIntentHandler(new IntentHandlerTest());
+    }
+    
+    @org.junit.Test
+    public void testlistExistingIntentHandler() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME, "m");
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME, "n");
+    	scaic.addIntentHandler(ih, TestIntentItf2.CLIENT_ITF_NAME);
+    	List<IntentHandler> tmp = scaic.listExistingIntentHandler();
+    	Assert.assertEquals(1, tmp.size());
+    }
+    
+    @org.junit.Test
+    public void testlistIntentHandler() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	{
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME, "m");
+    	List<IntentHandler> tmp1 = scaic.listIntentHandler();
+    	List<IntentHandler> tmp2 = scaic.listIntentHandler(TestIntentItf.CLIENT_ITF_NAME);
+    	List<IntentHandler> tmp3 = scaic.listIntentHandler(TestIntentItf.CLIENT_ITF_NAME,"m");
+    	Assert.assertEquals(0, tmp1.size());
+    	Assert.assertEquals(0, tmp2.size());
+    	Assert.assertEquals(1, tmp3.size());
+    	}
+    	{
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
+    	List<IntentHandler> tmp1 = scaic.listIntentHandler();
+    	List<IntentHandler> tmp2 = scaic.listIntentHandler(TestIntentItf.CLIENT_ITF_NAME);
+    	List<IntentHandler> tmp3 = scaic.listIntentHandler(TestIntentItf.CLIENT_ITF_NAME,"m");
+    	Assert.assertEquals(0, tmp1.size());
+    	Assert.assertEquals(1, tmp2.size());
+    	Assert.assertEquals(2, tmp3.size());
+    	}
+    	{
+        	scaic.addIntentHandler(ih);
+        	List<IntentHandler> tmp1 = scaic.listIntentHandler();
+        	List<IntentHandler> tmp2 = scaic.listIntentHandler(TestIntentItf.CLIENT_ITF_NAME);
+        	List<IntentHandler> tmp3 = scaic.listIntentHandler(TestIntentItf.CLIENT_ITF_NAME,"m");
+        	Assert.assertEquals(1, tmp1.size());
+        	Assert.assertEquals(2, tmp2.size());
+        	Assert.assertEquals(3, tmp3.size());
+        }
+    }
+    
+    @org.junit.Test
+    public void testRemoveIntentHandler1() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih);
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler());
+    	scaic.removeIntentHandler(ih);
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler());
+    }
+    
+    @org.junit.Test
+    public void testRemoveIntentHandler2() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler());
+    	scaic.removeIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    }
+    
+    
+    @org.junit.Test
+    public void testRemoveIntentHandler3() throws Exception{
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
+        .getSCAIntentController(componentA);
+    	IntentHandler ih = new IntentHandlerTest();
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertFalse(scaic.hasIntentHandler());
+    	scaic.removeIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
+    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    }
+    
+  //@snippet-start component_scauserguide_5   
+    
+//    scaic = org.objectweb.proactive.extensions.sca.Utils
+//            .getSCAIntentController(componentA);
+//    IntentHandler y = new IntentHandlerTest();
+//    scaic.addIntentHandler(y);
+//    scaic.addIntentHandler(y);
+//    scaic.addIntentHandler(new IntentHandlerTest(), TestIntentItf.CLIENT_ITF_NAME, "m");
+    //@snippet-end component_scauserguide_5
     
     @org.junit.Test
     public void action() throws Exception {
         
         //@snippet-start component_scauserguide_5   
 
-        scaic = org.objectweb.proactive.extensions.sca.Utils
+    	SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentA);
         IntentHandler y = new IntentHandlerTest();
         scaic.addIntentHandler(y);
@@ -122,5 +315,9 @@ public class TestSCAIntentController extends SCAComponentTest {
             //fail();
         	e.printStackTrace();
         }
+        GCM.getGCMLifeCycleController(componentA).stopFc();
+        GCM.getGCMLifeCycleController(componentB).stopFc();
+        GCM.getBindingController(componentA).unbindFc(TestIntentItf.CLIENT_ITF_NAME);
+        GCM.getBindingController(componentA).unbindFc(TestIntentItf2.CLIENT_ITF_NAME);
     }
 }

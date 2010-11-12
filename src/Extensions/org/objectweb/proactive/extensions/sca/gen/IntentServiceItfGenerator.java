@@ -150,10 +150,12 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     generatedClassName +
                     "(org.objectweb.proactive.extensions.sca.control.IntentHandler[] intentHandlers)" +
                     "{\n" +
-                    "if($1.length != " +
-                    intentHandlers.length +
-                    ") {\nthrow new org.objectweb.proactive.core.ProActiveRuntimeException(\"Number of intents is not correct\");\n}\n" +
-                    "this.intentHandlers = intentHandlers;\n}";
+                    "if($1.length != " + intentHandlers.length +") " +
+                    "{\n" +
+                    "throw new org.objectweb.proactive.core.ProActiveRuntimeException(\"Number of intents is not correct \"+$1.length);\n" +
+                    "}\n" +
+                    "this.intentHandlers = intentHandlers;\n" +
+                    "}";
                 CtConstructor SecondConstructor = CtNewConstructor.make(secondConstructorBody,
                         generatedCtClass);
                 generatedCtClass.addConstructor(SecondConstructor);

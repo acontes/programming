@@ -85,6 +85,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      * methods of Itf, else the list of String contain names of methods which are applied to intentHandler 
      */
     private HashMap<IntentHandler, HashMap<String, List<String>>> informationPool;
+    
 
     public SCAIntentControllerImpl(Component owner) {
         super(owner);
@@ -100,6 +101,15 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         } catch (InstantiationException ie) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), ie);
         }
+    }
+    
+    private boolean methodExist(Method[] methodList, String methodName) {
+        for (int i = 0; i < methodList.length; i++) {
+            if (methodName.equals(methodList[i].getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // we build the information pool recursively 
@@ -128,23 +138,20 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         }
     }
 
-    private boolean methodExist(Method[] methodList, String methodName) {
-        for (int i = 0; i < methodList.length; i++) {
-            if (methodName.equals(methodList[i].getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
 
     public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
-            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
-            IllegalBindingException {
+            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException, IllegalBindingException
+    {
     	LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
     	if(lcCtr.getFcState().equals(lcCtr.STARTED))
     	{
     		throw new IllegalLifeCycleException("component already started, impossible to add an Intent Handler.");
     	}
+    	Object Itf = GCM.getBindingController(owner).lookupFc(itfName);
+    	if(Itf != null)
+    	{
+    		throw new IllegalBindingException("binding already done for the Interface!");
+    	}	
         String tmp = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
         Method[] methodList = null;
         try {
@@ -166,19 +173,16 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             methods.add(methodName);
             itfPool.put(itfName, methods); // all methods in "itfName" interfaces
             informationPool.put(intentHandler, itfPool);
-            //System.err.println("added1 "+methodName);
         } else {
             itfPool = informationPool.get(intentHandler);
-            if (!itfPool.containsKey(itfName)) {
+            if ((!itfPool.containsKey(itfName))||itfPool==null) {
                 methods = new ArrayList<String>();
                 methods.add(methodName);
                 itfPool.put(itfName, methods); // all methods in "itfName" interfaces
-                //System.err.println("added2"+methodName);
             } else //possibility to have several same intent on one method
             {
                 methods = itfPool.get(itfName);
                 methods.add(methodName);
-                //System.err.println("added3"+methodName);
             }
         }
     }
@@ -218,13 +222,18 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             larger = list1;
         }
         
-        HashSet<E> hashSet = new HashSet<E>(smaller);
-
+        //HashSet<E> hashSet = new HashSet<E>(smaller);
+        List<? extends E> tmp = new ArrayList<E>(smaller);
         for (E e : larger) {
-            if (hashSet.contains(e)) {
-                result.add(e);
-                hashSet.remove(e);
-            }
+        	if(tmp.contains(e))
+        	{
+        		result.add(e);
+        		tmp.remove(e);
+        	}
+//            if (hashSet.contains(e)) {
+//                result.add(e);
+//                hashSet.remove(e);
+//            }
         }
         return result;
     }

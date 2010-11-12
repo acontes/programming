@@ -225,4 +225,5 @@ public interface SCAIntentController {
     public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
             IllegalBindingException, NoSuchIntentHandlerException;
+  
 }
