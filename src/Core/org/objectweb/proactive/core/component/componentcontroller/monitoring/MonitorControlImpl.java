@@ -204,18 +204,10 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
 		result = child.getPathForID(id, rootID, visited);
     	
 		//Need to add the new firstPathItem
-		//result.add(new PathItem(cr.getParentID(), id, cr.getSentTime(), cr.getReplyReceptionTime(), cr.getReplyReceptionTime() - cr.getSentTime(), localName, destName, cr.getInterfaceName(), cr.getMethodName()));
-    	
 		result.getSize();
 		
 		result.getPath().setSendTime(cr.getSentTime());
 		result.getPath().setReplyRecvTime(cr.getReplyReceptionTime());
-//		mainPath.setSendTime(cr.getSentTime());
-//		mainPath.setReplyRecvTime(cr.getReplyReceptionTime());
-//		mainPath.addChildID(result.getPath().getID());
-//		mainPath.addChild(result.getPath().getID(), result.getPath());
-		
-    	//result.getSize();
     	
     	rpLogger.debug("+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
     	return result;
@@ -276,7 +268,7 @@ public class MonitorControlImpl extends AbstractPAComponentController implements
     			// don't call an already visited component
     			if(!visited.contains(destinationComponent)) {
     				
-    				rpLogger.debug("["+localName+"]       Looking for monitor of (not visited) component ["+ destinationComponent +"]");
+    				rpLogger.debug("["+localName+"]       Looking for monitor of (not visited) component ["+ destinationComponent +"]. Interface called: "+ orr.getInterfaceName());
     				// find the appropriate monitor controller to call
         			MonitorControl mc = findMonitorControl(destinationComponent);
         			// assertion

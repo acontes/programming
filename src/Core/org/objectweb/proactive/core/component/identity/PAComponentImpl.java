@@ -146,9 +146,9 @@ public class PAComponentImpl implements PAComponent, Serializable {
         // 2. control interfaces
         if (nfType != null) { // The nf type is specified
             if (!ctrlDesc.configFileIsSpecified()) { // There is no file containing the nf configuration
-            	System.out.println("Generating NFType for component "+ ctrlDesc.getName());
+            	//System.out.println("Generating NFType for component "+ ctrlDesc.getName());
                 generateNfType(nfType, component_is_primitive);
-                System.out.println("Generated ........... "+ ctrlDesc.getName());
+                //System.out.println("Generated ........... "+ ctrlDesc.getName());
             } else { // The nfType and a config file is specified. We have to check that the specified nfType corresponds to the interfaces defined in the config file
                 checkCompatibility();
                 addControllers(component_is_primitive);
