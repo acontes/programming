@@ -47,6 +47,7 @@ import org.objectweb.proactive.core.config.PAProperties.PAPropertiesLoaderSPI;
  */
 @PublicAPI
 final public class PNPConfig implements PAPropertiesLoaderSPI {
+
     /**
      * The TCP port to bind to
      *
@@ -76,6 +77,40 @@ final public class PNPConfig implements PAPropertiesLoaderSPI {
      */
     static final public PAPropertyInteger PA_PNP_IDLE_TIMEOUT = new PAPropertyInteger(
         "proactive.pnp.idle_timeout", false, 60 * 1000);
+
+    private int port;
+    private int idleTimeout;
+    private int defaultHeartbeat;
+
+    public PNPConfig() {
+        this.port = 0;
+        this.idleTimeout = 600 * 1000;
+        this.defaultHeartbeat = 60 * 1000;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
+    }
+
+    public void setIdleTimeout(int idleTimeout) {
+        this.idleTimeout = idleTimeout;
+    }
+
+    public void setDefaultHeartbeat(int defaultHeartbeat) {
+        this.defaultHeartbeat = defaultHeartbeat;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public int getIdleTimeout() {
+        return idleTimeout;
+    }
+
+    public int getDefaultHeartbeat() {
+        return defaultHeartbeat;
+    }
 
     public interface Loggers {
         static final public String PNP = org.objectweb.proactive.core.util.log.Loggers.CORE + ".pnp";

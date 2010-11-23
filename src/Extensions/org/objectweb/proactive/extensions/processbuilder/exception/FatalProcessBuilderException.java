@@ -6,7 +6,7 @@
  *    Enterprise Grids & Clouds
  *
  * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ *              Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
@@ -34,19 +34,43 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive;
+package org.objectweb.proactive.extensions.processbuilder.exception;
+
+import java.io.Serializable;
+
+import org.objectweb.proactive.annotation.PublicAPI;
+
 
 /**
- * An object implementing this Interface provides access to its jobID
- *
+ * This exception is used to signal an internal error encountered by the OSProcessBuilder while
+ * preparing for the command to run. By internal we mean a problem related to the scripts and
+ * other resources used by the process builder.
+ * <p>
+ * This error comes in several flavors:
+ * <ul>
+ *  <li>Lack of output from scripts - This error can have different causes on different 
+ *  operating systems, however it will usually be related to stream redirection, or piping
+ *  issues.
+ *  </li>
+ *  <li>Corruption of scripts - Which means that the scripts are not respecting the messaging
+ *  interface. Typos and version mismatches between scripts and class files can cause this failure.
+ *  </li>
+ *  <li>Inability to launch - Other reasons</li>
+ * </ul>
+ * </p>
+ * @author Zsolt Istvan
+ * 
+ * @since ProActive 4.4.0
  */
-public interface Job {
+@PublicAPI
+public class FatalProcessBuilderException extends Exception implements Serializable {
 
-    /** If JOBID is not specified, a node belong to this JOB */
-    static final public String DEFAULT_JOBID = "Undefined_JOBID";
+    public FatalProcessBuilderException(String descr) {
+        super(descr);
+    }
 
-    /**
-     * @return the jobID associated with this object
-     */
-    public String getJobID();
+    public FatalProcessBuilderException(String descr, Throwable cause) {
+        super(descr, cause);
+    }
+
 }

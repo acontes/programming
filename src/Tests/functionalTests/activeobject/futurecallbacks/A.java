@@ -59,7 +59,7 @@ public class A {
         }
     }
 
-    public void start() {
+    public void start() throws NoSuchMethodException {
         MutableInteger slow = this.brother.slow();
         PAEventProgramming.addActionOnFuture(slow, "myCallback");
         MutableInteger fast = this.brother.fast();

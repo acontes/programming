@@ -112,7 +112,6 @@ public class RTBroadcaster implements Runnable, RTBroadcasterAction, RTBroadcast
             e.printStackTrace();
         }
 
-        rtAction.add(new RTBroadcastActionDefaultImpl());
         isAlive = true;
         issetCallback = false;
 
@@ -139,18 +138,22 @@ public class RTBroadcaster implements Runnable, RTBroadcasterAction, RTBroadcast
     //
     // -- GETTER SINGLETON -----------------------------------------------
     //
+
+    /**
+     * Returns the instance of {@link RTBroadcaster} is enabled or null is disabled.
+     */
     public static synchronized RTBroadcaster getInstance() {
+        if (CentralPAPropertyRepository.PA_RUNTIME_BROADCAST.getValue() == false) {
+            return null;
+        }
 
         if (rtBroadcaster == null) {
-
             rtBroadcaster = new RTBroadcaster();
             // wrap into a thread and start it
             new Thread(rtBroadcaster, "Thread for RTBroadcast").start(); // ref on the thread ??,
-
         }
 
         return rtBroadcaster;
-
     }
 
     public URI getCallbackUri() {
@@ -167,6 +170,7 @@ public class RTBroadcaster implements Runnable, RTBroadcasterAction, RTBroadcast
     public void run() {
 
         // --Initialize
+
         try {
 
             MulticastSocket socket = new MulticastSocket(
@@ -177,6 +181,7 @@ public class RTBroadcaster implements Runnable, RTBroadcasterAction, RTBroadcast
 
             while (getIsAlive()) // add a isAlive variable (kill() must be synchronized !!)
             {
+
                 try {
                     /***************************************************************
                      * Receive *
@@ -225,7 +230,6 @@ public class RTBroadcaster implements Runnable, RTBroadcasterAction, RTBroadcast
             // --Close connection
             socket.leaveGroup(address);
             socket.close();
-
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -243,7 +247,7 @@ public class RTBroadcaster implements Runnable, RTBroadcasterAction, RTBroadcast
     // -- ISALIVE GETTER -----------------------------------------------
     //
     public synchronized boolean getIsAlive() {
-        return isAlive;
+        return isAlive && (rtBroadcaster != null);
     }
 
     //
