@@ -68,6 +68,7 @@ public interface Constants {
     public final static String PRIORITY_CONTROLLER = "priority-controller";
     public final static String REQUEST_QUEUE_CONTROLLER = "request-queue-controller";
     public final static String SLA_CONTROLLER = "sla-controller";
+    public final static String RECONFIGURATION_CONTROLLER = "reconfiguration-controller";
     public final static String SUPER_CONTROLLER = "super-controller";
 
     public final static String FACTORY = "factory";

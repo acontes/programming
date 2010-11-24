@@ -33,6 +33,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Rec
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.MonitorControlImpl;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.event.RemmosEventListener;
+import org.objectweb.proactive.core.component.componentcontroller.reconfiguration.ReconfigurationImpl;
 import org.objectweb.proactive.core.component.componentcontroller.sla.MetricsListener;
 import org.objectweb.proactive.core.component.componentcontroller.sla.SLANotifier;
 import org.objectweb.proactive.core.component.componentcontroller.sla.SLAService;
@@ -63,6 +64,8 @@ import org.objectweb.proactive.core.runtime.ProActiveRuntime;
 import org.objectweb.proactive.core.runtime.ProActiveRuntimeImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extra.component.fscript.control.PAReconfigurationController;
+import org.objectweb.proactive.extra.component.fscript.control.PAReconfigurationControllerImpl;
 
 
 /**
@@ -130,8 +133,11 @@ public class Remmos {
 			
 			// server Monitoring interface
 			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.MONITOR_CONTROLLER, MonitorControl.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+			// SLA management interface
 			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.SLA_CONTROLLER, SLAService.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
-			// TODO the NF interfaces for Actions
+			// TODO missing a "decision" interface
+			// reconfiguration interface
+			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.RECONFIGURATION_CONTROLLER, PAReconfigurationController.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			
 			// external client Monitoring interfaces
 			// add one client Monitoring interface for each client F interface
@@ -396,7 +402,7 @@ public class Remmos {
 		// bindings between NF components
 		membrane.bindNFc(SLA_SERVICE_COMP+"."+SLO_STORE_ITF, SLO_STORE_COMP+"."+SLO_STORE_ITF);
 		membrane.bindNFc(SLO_STORE_COMP+"."+MONITOR_SERVICE_ITF, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
-		// binding between the NF Monitoring Interface of the host component, and the Monitor Component
+		// binding between the NF SLA Interface of the host component, and the SLA Component
 		membrane.bindNFc(Constants.SLA_CONTROLLER, SLA_SERVICE_COMP+"."+SLA_SERVICE_ITF);
 		
 		// restore membrane and component lifecycle after having made changes
@@ -411,6 +417,64 @@ public class Remmos {
 
 		
 		
+	}
+	
+	/**
+	 * Add the Reconfiguration component and put it in the membrane.
+	 * TODO: add the binding from the SLA component, if it exists.
+	 * 
+	 * After the execution of this method, the component (composite or primitive) will have a Reconfiguration component embedding a PAGCMScript engine
+	 * 
+	 * @param component
+	 * @throws Exception
+	 */
+	public static void addReconfiguration(Component component) throws Exception {
+
+		// bootstrapping component and factories
+		Component boot = Fractal.getBootstrapComponent();
+		PAGCMTypeFactory patf = null;
+		PAGenericFactory pagf = null;
+		patf = (PAGCMTypeFactory) Fractal.getTypeFactory(boot);
+		pagf = (PAGenericFactory) Fractal.getGenericFactory(boot);
+		
+		logger.debug("Currently on runtime: "+ ProActiveRuntimeImpl.getProActiveRuntime().getURL() );
+		PAComponent pac = (PAComponent) component;
+		PAComponentRepresentative pacr = (PAComponentRepresentative) component;
+		logger.debug("Adding reconfiguration component for component ["+ pac.getComponentParameters().getName()+"], with ID ["+ pac.getID() +"]");
+		UniversalBodyProxy ubp = (UniversalBodyProxy) pacr.getProxy();
+		UniversalBody ub = ubp.getBody();
+		String bodyUrl = ub.getNodeURL();
+		//logger.debug("   Which is in node ["+ bodyUrl + "]");
+		Node parentNode = NodeFactory.getNode(bodyUrl);
+		ProActiveRuntime part = parentNode.getProActiveRuntime();
+		//logger.debug("   and in runtime ["+ part.getURL() + "]");
+		
+		// creates the components used for reconfiguration
+		Component reconfiguration = createReconfigurationComponent(patf, pagf, ReconfigurationImpl.class.getName(), parentNode);
+
+		// performs the NF assembly
+		PAMembraneController membrane = Utils.getPAMembraneController(component);
+		PAGCMLifeCycleController lifeCycle = Utils.getPAGCMLifeCycleController(component);
+		// stop the membrane and component lifecycle before making changes
+		String membraneOldState = membrane.getMembraneState();
+		String componentOldState = lifeCycle.getFcState();
+		membrane.stopMembrane();
+		lifeCycle.stopFc();
+		
+		// add components to the membrane
+		membrane.addNFSubComponent(reconfiguration);
+		// binding between the NF Reconfiguration interface of the host component, and the Reconfiguration Component
+		membrane.bindNFc(Constants.RECONFIGURATION_CONTROLLER, RECONFIGURATION_SERVICE_COMP+"."+ACTIONS_ITF);
+		
+		// restore membrane and component lifecycle after having made changes
+		if(membraneOldState.equals(PAMembraneController.MEMBRANE_STARTED)) {
+			membrane.startMembrane();
+		}
+		if(componentOldState.equals(PAGCMLifeCycleController.STARTED)) {
+			lifeCycle.startFc();
+		}
+		
+		logger.debug("   Done for component ["+pac.getComponentParameters().getName()+"] !");
 	}
 	
 	/**
@@ -641,6 +705,29 @@ public class Remmos {
 		return sloStore;
 	}
 	
+	private static Component createReconfigurationComponent(PAGCMTypeFactory patf, PAGenericFactory pagf, String reconfigurationClass, Node node) {
+		
+		Component reconfiguration = null;
+		InterfaceType[] reconfigurationItfType = null;
+		ComponentType reconfigurationType = null;
+		
+		try {
+			reconfigurationItfType = new InterfaceType[] {
+					patf.createGCMItfType(ACTIONS_ITF, PAReconfigurationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
+			};
+			reconfigurationType = patf.createFcType(reconfigurationItfType);
+			reconfiguration = pagf.newNFcInstance(reconfigurationType, 
+					new ControllerDescription(RECONFIGURATION_SERVICE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
+					new ContentDescription(reconfigurationClass),
+					node
+			);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		}
+		
+		
+		return reconfiguration;
+	}
 	
 	/**
 	 * Starts monitoring in this component and all its connections.

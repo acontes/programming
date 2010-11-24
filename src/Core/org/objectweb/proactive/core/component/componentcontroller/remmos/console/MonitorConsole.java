@@ -7,6 +7,7 @@ import java.util.Scanner;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.type.InterfaceType;
@@ -31,6 +32,7 @@ import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.core.util.wrapper.StringWrapper;
+import org.objectweb.proactive.extra.component.fscript.control.PAReconfigurationController;
 
 /**
  * A textual monitor console to get information of components, and interact with the Monitoring and Management features.
@@ -80,6 +82,8 @@ public class MonitorConsole {
 	
 	final String COM_ADD_SLO = "addSLO";
 	
+	final String COM_REPLACE = "replace";
+	
 	final String COM_QUIT = "q";
 	
 	final String commandDescriptions[][] = {
@@ -107,6 +111,7 @@ public class MonitorConsole {
 			{COM_ADD_SLO, "add an SLO to the SLA Monitor, that will be checked"},
 			{COM_ADD_RECONF, "add reconfiguration capabilities (NF components) to a component"},
 			{COM_PATH, "get path for a request"},
+			{COM_REPLACE, "replace a component for another, changing all the bindings"},
 			{COM_QUIT, "quit"}
 	};
 
@@ -180,7 +185,7 @@ public class MonitorConsole {
 				System.out.println("Looked-up ["+name+"] @ ["+url+"]");
 				managedComponents.put(name, c);
 			}
-			// list comopnents
+			// list components
 			else if(command.equals(COM_LIST)) {
 				for(String name : managedComponents.keySet()) {
 					System.out.println("   "+ name);
@@ -579,6 +584,83 @@ public class MonitorConsole {
 					System.out.println("Usage: "+ COM_ADD_SLO + " <componentName> <sloName> <metricType> [args]* <conditionName> <threshold>");
 				}
 			}
+			// add reconfiguration component
+			else if(command.equals(COM_ADD_RECONF)) {
+				System.out.println("Adding reconfiguration component ... ");
+				// args supplied --> add reconfiguration to specified component
+				if(args != null) {
+					String name = input[1];
+					Component found = managedComponents.get(name);
+					if(found == null) {
+						System.out.println("Component "+name+" not found.");
+						continue;
+					}
+					System.out.println("Adding Reconfiguration components to "+ name +" ...");
+					Remmos.addReconfiguration(found);
+				}
+				// no args ... add monitoring to all components
+				else {
+					for(String name : managedComponents.keySet()) {
+						System.out.println("Adding Reconfiguration components to "+ name +" ...");
+						Remmos.addReconfiguration(managedComponents.get(name));
+					}
+				}
+			}
+			// execute a replacement
+			else if(command.equals(COM_REPLACE)) {
+				
+				
+				
+				// here I should execute the reconfiguration, but via a PAGCMScript controller 
+				if(args != null) {
+					if(input.length > 3) {
+						System.out.println("Changing binding "+ input[1] + "-->"+ input[2] + " by " + input[1] + "-->" + input[3]);
+						
+						Component source = managedComponents.get(input[1]);
+						Component first = managedComponents.get(input[2]);
+						if(source==null || first==null) {
+							System.out.println("Missing a component ... ");
+							continue;							
+						}
+						PAReconfigurationController parc = (PAReconfigurationController) source.getFcInterface(Constants.RECONFIGURATION_CONTROLLER);
+						
+					}
+					else {
+						System.out.println("Usage: "+ COM_REPLACE + " <clientComponent> <oldComponent> <newComponent>");
+					}
+				}
+				else {
+					System.out.println("Usage: "+ COM_REPLACE + " <clientComponent> <oldComponent> <newComponent>");
+				}
+				
+				/*
+				// prefixed: replace service weather1 by weather2
+				System.out.println("Looking up components");
+				Component w1 = managedComponents.get("weather1");
+				Component w2 = managedComponents.get("weather2");
+				Component sa = managedComponents.get("services-access");
+				if(sa==null || w1==null || w2==null) {
+					System.out.println("Missing a component ... ");
+					continue;
+				}
+				System.out.println("Replacing weather1 by weather2");
+				GCM.getLifeCycleController(sa).stopFc();
+				GCM.getLifeCycleController(w1).stopFc();
+				GCM.getLifeCycleController(w2).stopFc();
+				
+				System.out.println("Changing bindings...");
+				GCM.getBindingController(sa).unbindFc("weather");
+				GCM.getBindingController(sa).bindFc("weather", w2.getFcInterface("service"));
+				
+				System.out.println("Restarting components ...");
+				GCM.getLifeCycleController(sa).startFc();
+				GCM.getLifeCycleController(w1).startFc();
+				GCM.getLifeCycleController(w2).startFc();
+				*/
+				// don't forget: monitoring bindings must also be changed coherently
+				
+			}
+			
 		}
 
 		// Finish

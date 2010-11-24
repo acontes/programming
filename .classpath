@@ -143,5 +143,7 @@
 	<classpathentry kind="lib" path="lib/saaj-impl.jar"/>
 	<classpathentry kind="lib" path="lib/wbem.jar"/>
 	<classpathentry kind="lib" path="lib/wiseman-tools.jar"/>
+	<classpathentry kind="lib" path="/PAGCMScript/pagcmscript-1.0.jar"/>
+	<classpathentry kind="lib" path="/PAGCMScript/lib/fscript-2.1.2-SNAPSHOT.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
