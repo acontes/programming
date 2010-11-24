@@ -84,12 +84,15 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      * if the value of list is null, then the intentHandler is applied to all
      * methods of Itf, else the list of String contain names of methods which are applied to intentHandler 
      */
-    private HashMap<IntentHandler, HashMap<String, List<String>>> informationPool;
-    
+    //*private HashMap<IntentHandler, HashMap<String, List<String>>> informationPool;
+    private HashMap<Integer, HashMap<String, List<String>>> informationPool;
+    private List<IntentHandler> listOfIntent;
 
     public SCAIntentControllerImpl(Component owner) {
         super(owner);
-        informationPool = new HashMap<IntentHandler, HashMap<String, List<String>>>();
+        //informationPool = new HashMap<IntentHandler, HashMap<String, List<String>>>();
+        informationPool = new HashMap<Integer, HashMap<String, List<String>>>();
+        listOfIntent = new ArrayList<IntentHandler>();
     }
 
     @Override
@@ -101,6 +104,45 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         } catch (InstantiationException ie) {
             throw new ProActiveRuntimeException("cannot create controller " + this.getClass().getName(), ie);
         }
+    }
+    
+    /**
+     * get associated index of a given IntentHandler in listOfIntent. -1 if not exist
+     * @param i
+     * @return
+     */
+    private int indexAssociatedWithIntent(IntentHandler i)
+    {
+    	return ListContainsIntent(i, listOfIntent);
+    }
+    
+    /**
+     * get the intentHandler associated with index
+     * @param index
+     * @return
+     */
+    private IntentHandler intentAssociatedWithIndex(int index)
+    {
+    	return listOfIntent.get(index);
+    }
+    
+    /**
+     * get associated index of a given IntentHandler in a given list. -1 if not exist
+     * @param i
+     * @param list
+     * @return
+     */
+    private int ListContainsIntent(IntentHandler i, List<IntentHandler> list)
+    {
+    	int index = 0;
+    	for (IntentHandler it : list) {
+			if(i.ID == it.ID)
+			{
+				return index;
+			}
+			index++;
+		}
+    	return -1;
     }
     
     private boolean methodExist(Method[] methodList, String methodName) {
@@ -166,15 +208,21 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         }
         HashMap<String, List<String>> itfPool;
         List<String> methods;
-        if (!informationPool.containsKey(intentHandler)) // intentHandler not exist
+        int intentIndex = indexAssociatedWithIntent(intentHandler);
+        if (!informationPool.containsKey(intentIndex)) // intentHandler not exist
+        //*if (!informationPool.containsKey(intentHandler)) // intentHandler not exist
         {
             itfPool = new HashMap<String, List<String>>();
             methods = new ArrayList<String>();
             methods.add(methodName);
             itfPool.put(itfName, methods); // all methods in "itfName" interfaces
-            informationPool.put(intentHandler, itfPool);
+            
+            informationPool.put(listOfIntent.size(), itfPool);
+            listOfIntent.add(intentHandler);
+            //*informationPool.put(intentHandler, itfPool);
         } else {
-            itfPool = informationPool.get(intentHandler);
+        	itfPool = informationPool.get(intentIndex);
+            //*itfPool = informationPool.get(intentHandler);
             if ((!itfPool.containsKey(itfName))||itfPool==null) {
                 methods = new ArrayList<String>();
                 methods.add(methodName);
@@ -230,10 +278,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         		result.add(e);
         		tmp.remove(e);
         	}
-//            if (hashSet.contains(e)) {
-//                result.add(e);
-//                hashSet.remove(e);
-//            }
         }
         return result;
     }
@@ -279,16 +323,20 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     private List<IntentHandler> listExistingIntentHandler(String ItfName) {
         List<IntentHandler> res = new ArrayList<IntentHandler>();
         for (Iterator iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
-            IntentHandler key = (IntentHandler) iterator.next();
+        	int key = (Integer) iterator.next();
+            //*IntentHandler key = (IntentHandler) iterator.next();
             if (informationPool.get(key).containsKey(ItfName)) {
-                res.add(key);
+            	IntentHandler tmp = intentAssociatedWithIndex(key);
+            	res.add(tmp);
+                //*res.add(key);
             }
         }
         return res;
     }
     
     public List<IntentHandler> listExistingIntentHandler() {
-    	return new ArrayList<IntentHandler>(informationPool.keySet());
+    	//*return new ArrayList<IntentHandler>(informationPool.keySet());
+    	return listOfIntent;
     }
     
     public boolean intentHandlerExists(String ItfName)
@@ -314,7 +362,9 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         List<IntentHandler> res = new ArrayList<IntentHandler>();
         for (Iterator iterator = listExistingIntentHandler(itfName).iterator(); iterator.hasNext();) {
             IntentHandler key = (IntentHandler) iterator.next();
-            List<String> tmp = informationPool.get(key).get(itfName);
+            int indexKey = indexAssociatedWithIntent(key);
+            List<String> tmp = informationPool.get(indexKey).get(itfName);
+            //*List<String> tmp = informationPool.get(key).get(itfName);
             for (Iterator listIter = tmp.iterator(); listIter.hasNext();) { //possibility to have several same intent on one method
                 String mName = (String) listIter.next();
                 if (mName.equals(methodName)) {
@@ -333,9 +383,17 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     		throw new IllegalLifeCycleException("component already started, impossible to add an Intent Handler.");
     	}
     	List<IntentHandler> tmp = listIntentHandler();
-    	if(tmp.contains(intentHandler))
+    	int intentExist = ListContainsIntent(intentHandler, tmp);
+    	if(intentExist != -1)
+    	//*if(tmp.contains(intentHandler))
     	{
-    		informationPool.remove(intentHandler);
+    		String[] listFc = GCM.getBindingController(owner).listFc();
+        	if(listFc.length > 0) // at least on interface
+        	{
+        		for (int i = 0; i < listFc.length; i++) {
+        			removeIntentHandler(intentHandler, listFc[i]);
+        		}
+        	}
     	}
     	else
             throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
@@ -350,9 +408,26 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     		throw new IllegalLifeCycleException("component already started, impossible to add an Intent Handler.");
     	}
     	List<IntentHandler> tmp = listIntentHandler(itfName);
-    	if(tmp.contains(intentHandler))
+    	System.err.println(tmp.size());
+    	String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
+    	Method[] methodList=null;
+    	int intentExist = ListContainsIntent(intentHandler, tmp);
+    	if(intentExist != -1)
+    	//*if(tmp.contains(intentHandler))
     	{
-    		informationPool.get(intentHandler).remove(itfName);
+			try {
+				methodList = Class.forName(ItfSignature).getMethods();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				throw new NoSuchInterfaceException(e.getMessage());
+			}
+			if(methodList.length > 0) // at least one element
+			{
+				for (int i = 0; i < methodList.length; i++) {
+					removeIntentHandler(intentHandler, itfName, methodList[i].getName());
+				}
+			}
     	}
     	else
             throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
@@ -366,10 +441,41 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     	{
     		throw new IllegalLifeCycleException("component already started, impossible to add an Intent Handler.");
     	}
+    	String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
     	List<IntentHandler> tmp = listIntentHandler(itfName,methodName);
-    	if(tmp.contains(intentHandler))
+    	int intentExist = ListContainsIntent(intentHandler, tmp);
+    	if(intentExist != -1)
+    	//*if(tmp.contains(intentHandler))
     	{
-    		informationPool.get(intentHandler).get(itfName).remove(methodName);
+    		Method[] methodList=null;
+    		try {
+				methodList = Class.forName(ItfSignature).getMethods();
+			} catch (SecurityException e) {
+				e.printStackTrace();
+			} catch (ClassNotFoundException e) {
+				throw new NoSuchInterfaceException(e.getMessage());
+			}
+			if (!methodExist(methodList, methodName)) {
+	            throw new NoSuchMethodException("method " + methodName + " doesn't exist!");
+	        }
+			else{
+				int intentIndex = indexAssociatedWithIntent(intentHandler);
+				informationPool.get(intentIndex).get(itfName).remove(methodName);
+				//informationPool.get(intentHandler).get(itfName).remove(methodName);
+				if(informationPool.get(intentIndex).get(itfName).isEmpty())
+				//if(informationPool.get(intentHandler).get(itfName).isEmpty())
+				{
+					informationPool.get(intentIndex).remove(itfName);
+					//*informationPool.get(intentHandler).remove(itfName);
+					if(informationPool.get(intentIndex).isEmpty())
+			        //*if(informationPool.get(intentHandler).isEmpty())
+			        {
+			        	informationPool.remove(intentIndex);
+			        	listOfIntent.remove(intentIndex);
+			        	//*informationPool.remove(intentHandler);
+			        }
+				}
+			}
     	}
         else
             throw new NoSuchIntentHandlerException("intent handler doesn't exist!");

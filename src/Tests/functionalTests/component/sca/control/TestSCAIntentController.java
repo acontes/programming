@@ -232,6 +232,12 @@ public class TestSCAIntentController extends SCAComponentTest {
         .getSCAIntentController(componentA);
     	IntentHandler ih = new IntentHandlerTest();
     	scaic.addIntentHandler(ih);
+    	scaic.addIntentHandler(ih);
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler());
+    	scaic.removeIntentHandler(ih);
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
@@ -249,15 +255,16 @@ public class TestSCAIntentController extends SCAComponentTest {
         .getSCAIntentController(componentA);
     	IntentHandler ih = new IntentHandlerTest();
     	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
     	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
     	Assert.assertFalse(scaic.hasIntentHandler());
     	scaic.removeIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME);
-    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
-    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
-    	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
     }
     
     
@@ -267,13 +274,17 @@ public class TestSCAIntentController extends SCAComponentTest {
         .getSCAIntentController(componentA);
     	IntentHandler ih = new IntentHandlerTest();
     	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
+    	scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
     	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
     	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "n"));
     	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME));
     	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf2.CLIENT_ITF_NAME));
     	Assert.assertFalse(scaic.hasIntentHandler());
     	scaic.removeIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
+    	Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	scaic.removeIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME,"m");
     	Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
+    	Assert.assertEquals(scaic.listExistingIntentHandler().size(),0);
     }
     
   //@snippet-start component_scauserguide_5   

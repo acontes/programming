@@ -57,7 +57,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @see IntentJoinPoint
  */
 @PublicAPI
-public abstract class IntentHandler implements Serializable {
+public interface IntentHandler extends Serializable {
 	
 	static public long ID = Calendar.getInstance().getTimeInMillis();
 	
@@ -67,36 +67,6 @@ public abstract class IntentHandler implements Serializable {
      * @param ijp The join point where the interception occurred.
      * @return The value returned by the intercepted method.
      */
-    public abstract Object invoke(IntentJoinPoint ijp) throws Throwable;
-    
-    /**
-     * Redefine the Equal method of the Object, intentHandler objects exist on both side of server and client
-     * so they are equal if their ID are equal, the address equivalence is not necessary.
-     */
-    public boolean equals(Object obj)
-    {
-    	if(this == obj)
-    	{
-    		return true;
-    	}
-    	if((obj == null) || (obj.getClass() != this.getClass()))
-    	{
-    		return false;
-    	}
-    		// object must be Test at this point
-    	IntentHandler ithd = (IntentHandler)obj;
-   		return ID == ithd.ID;
-    }
-    
-    /**
-     * redefinition of hashCode method, it helps to identify objects, it is used when equal method is been called
-     */
-    public int hashCode()
-    {
-    	int hash = 7;
-    	int var_code = (int)(ID ^ (ID >>> 32));
-    	hash = 31 * hash + var_code;
-    	return hash;
-    }
+    public  Object invoke(IntentJoinPoint ijp) throws Throwable;
     
 }
