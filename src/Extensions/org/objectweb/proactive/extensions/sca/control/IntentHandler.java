@@ -59,7 +59,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 @PublicAPI
 public interface IntentHandler extends Serializable {
 	
-	static public long ID = Calendar.getInstance().getTimeInMillis();
+	public long ID = Calendar.getInstance().getTimeInMillis();
 	
     /**
      * Defines the actions performed by the intent handler.

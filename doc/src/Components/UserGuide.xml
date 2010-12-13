@@ -3322,17 +3322,28 @@ int timeOut</programlisting>
 					<textdata fileref="automatic_snippets/component_scauserguide_2.snip"/>
 				</textobject>
 			</programlisting>
-
-			<para>
-				A final remark on SCA featured component: the property fields
-				should be declared as &quot;public&quot; or
-				&quot;protected&quot;, because the internal mechanism generate
-				a child class based on original component class, in case of
-				private property, when setValue() routine be called,
-				&quot; java.lang.IllegalAccessError&quot; exception will be
-				raised.
-			</para>
-
+		</section>
+		<section xml:id="COMMON_MISTAKE_SCA_Property"><info><title>Common programming mistakes on SCA Properties component</title></info>
+			<orderedlist>
+				<listitem>
+					<para>
+						the property fields
+						are declared as &quot;private&quot; and a &quot; java.lang.IllegalAccessError&quot; exception is
+						raised, during excution. all the property fields should be declared as &quot;public&quot; or 
+						&quot;protected&quot;, because the internal mechanism generate
+						a child class based on the original component class, in case of
+						private property, the child class can not access to the fields .
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						one of the property fields is a non-serializable object. and a &quot;SendRequestCommunicationException&quot; 
+						exception is raised, during excution. All property fields should be primitives or a serializable 
+						object. ProActive create an Active Object which corresponds to the local object at the remote JVM,
+						this Object should only contains primitive or serializable fields.  
+					</para>
+				</listitem>
+			</orderedlist>
 		</section>
 
 		<section xml:id="SCA_Intent"><info><title>SCA Intent feature</title></info>
@@ -3351,7 +3362,7 @@ int timeOut</programlisting>
 				specific user, a security intent can be add to check
 				user&apos;s authentication, if it success, routine will be
 				proceeded, otherwise after failing several attempts, a
-				security warming can be raised to system administrator.
+				security warning can be raised to system administrator.
 			</para>
 
 			<section xml:id="Write_Intent"><info><title>Write a custom intent handler</title></info>
@@ -3432,12 +3443,12 @@ int timeOut</programlisting>
 					with an infinite loop inside. Unfortunately it would
 					not catch the timeout exception, because the method
 					call is asynchronous, the method has been executed
-					successfully and the infinite loop would terminate
+					successfully and the infinite loop would be terminated
 					silently when the &quot;main&quot; is finished.
 				</para>
 
 				<para>
-					But this is not what we expective, to avoid this kind
+					But this is not what we expected, to avoid this kind
 					of behaviors, a method can become synchronous by adding
 					throws exception at end of the method declaration.
 				</para>
@@ -3465,7 +3476,12 @@ int timeOut</programlisting>
 						<textdata fileref="automatic_snippets/component_scauserguide_5.snip"/>
 					</textobject>
 				</programlisting>
-
+				<para>
+					Our intent can be added over whole interface of a component, or a choosing interface, or a given method
+					on a choosing interface. Upon exemple, an intent is added on all interfaces of the component A, then the 
+					same intent is applied again only on all methods of <literal>TestIntentItf2 </literal>, then a new intent is 
+					applied on the method <literal>m()</literal> of the interface <literal>TestIntentItf</literal>
+				</para>
 			</section>
 
 		</section>

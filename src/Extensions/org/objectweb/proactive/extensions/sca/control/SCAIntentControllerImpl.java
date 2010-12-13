@@ -136,7 +136,8 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     {
     	int index = 0;
     	for (IntentHandler it : list) {
-			if(i.ID == it.ID)
+			//if(i.ID == it.ID)
+    		if(i.getClass().getName() .equals(it.getClass().getName()))
 			{
 				return index;
 			}
@@ -209,6 +210,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         HashMap<String, List<String>> itfPool;
         List<String> methods;
         int intentIndex = indexAssociatedWithIntent(intentHandler);
+        System.err.println("cool"+intentIndex+methodName+intentHandler.getClass().getName()+IntentHandler.ID);
         if (!informationPool.containsKey(intentIndex)) // intentHandler not exist
         //*if (!informationPool.containsKey(intentHandler)) // intentHandler not exist
         {
@@ -408,7 +410,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     		throw new IllegalLifeCycleException("component already started, impossible to add an Intent Handler.");
     	}
     	List<IntentHandler> tmp = listIntentHandler(itfName);
-    	System.err.println(tmp.size());
     	String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
     	Method[] methodList=null;
     	int intentExist = ListContainsIntent(intentHandler, tmp);

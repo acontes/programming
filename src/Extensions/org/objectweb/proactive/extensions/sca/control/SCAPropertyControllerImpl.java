@@ -244,8 +244,14 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     public void setValue(String name, Object value) throws NoSuchPropertyException,
             IncompatiblePropertyTypeException {
         assertPropertyExist(name);
-        Class<?> currentType = propertyTypes.containsKey(name) ? propertyTypes.get(name)
-                : declaredPropertyTypes.get(name);
+        Class<?> currentType = null;
+        if(propertyTypes.containsKey(name)){
+        	currentType= propertyTypes.get(name);
+        }
+        else{
+            currentType= declaredPropertyTypes.get(name);
+            propertyTypes.put(name, value.getClass());  
+        }
         if (!currentType.isInstance(value)) {
             logger.error("Cannot set value of property \"" + name +
                 "\" because the given value is not assignable to the type of the property");

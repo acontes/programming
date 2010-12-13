@@ -52,7 +52,7 @@ public class SecurityIntentHandler implements IntentHandler {
     }
 
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        System.out.println("enter the password: ");
+        System.err.println("enter the password: ");
         Scanner in = new Scanner(System.in);
         String password = in.next();
         if (this.password.equals(password)) {

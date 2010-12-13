@@ -36,24 +36,43 @@
  */
 package functionalTests.component.sca.control.components;
 
+import java.io.Serializable;
+
 import org.osoa.sca.annotations.Property;
 
 
 //@snippet-start component_scauserguide_1
 
-public class PropertyComponent {
+public class PropertyComponent implements Serializable{
     @Property
     public boolean x1;
     @Property
     protected byte x2;
     @Property
     protected char x3;
+    @Property
+    protected short x4;
+    @Property
+    protected int x5;
+    @Property
+    protected long x6;
+    @Property
+    protected float x7;
+    @Property
+    protected double x8;
+    @Property
+    protected String x9 ;
+    @Property
+    protected String[] x10 ;
+    @Property
+    protected Object x11 ;
 
     public PropertyComponent() {
     }
 
     public String toString() {
-        return "The properties inside this class : " + x1 + " x2 " + x2 + " x3 " + x3;
+        return "The properties inside this class : " + x1 + " x2 " + x2 + " x3 " + x3 + " x4 " + x4
+        + "\n x5 " + x5  + " x6 " + x6 + " x7 " + x7 + " x8 " + x8 + " x9 " + x9 + " x10 " + x10;
     }
 }
 //@snippet-end component_scauserguide_1
