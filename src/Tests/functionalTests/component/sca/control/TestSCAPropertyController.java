@@ -74,10 +74,10 @@ public class TestSCAPropertyController extends SCAComponentTest {
     // -----------------------------------------------------------------------------------
     // Full test
     // -----------------------------------------------------------------------------------
-    
+
     @org.junit.Test
-    public void testContainsDeclaredPropertyName() throws Exception{
-    	GCM.getGCMLifeCycleController(component).startFc();
+    public void testContainsDeclaredPropertyName() throws Exception {
+        GCM.getGCMLifeCycleController(component).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(component);
         Assert.assertTrue(scac.containsDeclaredPropertyName("x1"));
         Assert.assertTrue(scac.containsDeclaredPropertyName("x2"));
@@ -91,12 +91,12 @@ public class TestSCAPropertyController extends SCAComponentTest {
         Assert.assertTrue(scac.containsDeclaredPropertyName("x10"));
         Assert.assertTrue(scac.containsDeclaredPropertyName("x11"));
     }
-    
+
     @org.junit.Test
-    public void testGetDeclaredPropertyNames() throws Exception{
-    	GCM.getGCMLifeCycleController(component).startFc();
+    public void testGetDeclaredPropertyNames() throws Exception {
+        GCM.getGCMLifeCycleController(component).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(component);
-        String [] listProperties = scac.getDeclaredPropertyNames();
+        String[] listProperties = scac.getDeclaredPropertyNames();
         Assert.assertEquals("x1", listProperties[0]);
         Assert.assertEquals("x2", listProperties[1]);
         Assert.assertEquals("x3", listProperties[2]);
@@ -109,10 +109,10 @@ public class TestSCAPropertyController extends SCAComponentTest {
         Assert.assertEquals("x10", listProperties[9]);
         Assert.assertEquals("x11", listProperties[10]);
     }
-    
+
     @org.junit.Test
-    public void testGetDeclaredPropertyType() throws Exception{
-    	GCM.getGCMLifeCycleController(component).startFc();
+    public void testGetDeclaredPropertyType() throws Exception {
+        GCM.getGCMLifeCycleController(component).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(component);
         Assert.assertEquals(scac.getDeclaredPropertyType("x1"), Boolean.class);
         Assert.assertEquals(scac.getDeclaredPropertyType("x2"), Byte.class);
@@ -126,30 +126,30 @@ public class TestSCAPropertyController extends SCAComponentTest {
         Assert.assertEquals(scac.getDeclaredPropertyType("x10"), String[].class);
         Assert.assertEquals(scac.getDeclaredPropertyType("x11"), Object.class);
     }
-    
+
     @org.junit.Test
-    public void testContainsPropertyName() throws Exception{
-    	GCM.getGCMLifeCycleController(component).startFc();
+    public void testContainsPropertyName() throws Exception {
+        GCM.getGCMLifeCycleController(component).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(component);
         scac.setValue("x1", true);
         Assert.assertTrue(scac.containsPropertyName("x1"));
         Assert.assertFalse(scac.containsPropertyName("x2"));
         Assert.assertFalse(scac.containsPropertyName("x3"));
     }
-    
+
     @org.junit.Test
-    public void testGetPropertyNames() throws Exception{
-    	GCM.getGCMLifeCycleController(component).startFc();
+    public void testGetPropertyNames() throws Exception {
+        GCM.getGCMLifeCycleController(component).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(component);
         scac.setValue("x1", true);
-        String [] listProperties = scac.getPropertyNames();
+        String[] listProperties = scac.getPropertyNames();
         Assert.assertEquals(1, listProperties.length);
         Assert.assertEquals(listProperties[0], "x1");
     }
-    
+
     @org.junit.Test
-    public void testGetType() throws Exception{
-    	GCM.getGCMLifeCycleController(component).startFc();
+    public void testGetType() throws Exception {
+        GCM.getGCMLifeCycleController(component).startFc();
         SCAPropertyController scac = Utils.getSCAPropertyController(component);
         scac.setValue("x1", true);
         Assert.assertEquals(scac.getType("x1"), Boolean.class);
@@ -160,19 +160,19 @@ public class TestSCAPropertyController extends SCAComponentTest {
         Assert.assertNull(scac.getType("x6"));
         Assert.assertNull(scac.getType("x7"));
         Assert.assertNull(scac.getType("x8"));
-        
+
         scac.setValue("x9", "x9");
         assertEquals(scac.getType("x9"), String.class);
-        
-        String [] list = new String[]{"1","2","3"};
-        scac.setValue("x10",list);
+
+        String[] list = new String[] { "1", "2", "3" };
+        scac.setValue("x10", list);
         assertEquals(scac.getType("x10"), String[].class);
-        
+
         SerializableObj obj1 = new SerializableObj();
         scac.setValue("x11", obj1);
         assertEquals(scac.getType("x11"), SerializableObj.class);
     }
-    
+
     @Test
     //@snippet-start component_scauserguide_2
     public void testGetValueGetValue() throws Exception {
@@ -184,29 +184,29 @@ public class TestSCAPropertyController extends SCAComponentTest {
         assertEquals((byte) 1, scac.getValue("x2"));
         scac.setValue("x3", (char) 1);
         assertEquals((char) 1, scac.getValue("x3"));
-        
-        scac.setValue("x4", (short)1);
-        assertEquals((short)1, scac.getValue("x4"));
+
+        scac.setValue("x4", (short) 1);
+        assertEquals((short) 1, scac.getValue("x4"));
         scac.setValue("x5", (int) 1);
         assertEquals((int) 1, scac.getValue("x5"));
         scac.setValue("x6", (long) 1);
         assertEquals((long) 1, scac.getValue("x6"));
-        
-        scac.setValue("x7", (float)1);
-        assertEquals((float)1, scac.getValue("x7"));
+
+        scac.setValue("x7", (float) 1);
+        assertEquals((float) 1, scac.getValue("x7"));
         scac.setValue("x8", (double) 1);
         assertEquals((double) 1, scac.getValue("x8"));
         scac.setValue("x9", "x9");
         assertEquals("x9", scac.getValue("x9"));
-        
-        String [] list = new String[]{"1","2","3"};
-        scac.setValue("x10",list);
-        Assert.assertArrayEquals("OKAY",list, (Object[]) scac.getValue("x10"));
-        
+
+        String[] list = new String[] { "1", "2", "3" };
+        scac.setValue("x10", list);
+        Assert.assertArrayEquals("OKAY", list, (Object[]) scac.getValue("x10"));
+
         SerializableObj obj1 = new SerializableObj();
         scac.setValue("x11", obj1);
         SerializableObj obj2 = (SerializableObj) scac.getValue("x11");
-        Assert.assertEquals(obj1.x,obj2.x);
+        Assert.assertEquals(obj1.x, obj2.x);
     }
     //@snippet-end component_scauserguide_2
 }

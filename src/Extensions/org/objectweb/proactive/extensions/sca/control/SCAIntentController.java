@@ -112,7 +112,7 @@ public interface SCAIntentController {
      * one methods of given interface, false otherwise
      */
     public boolean intentHandlerExists(String ItfName);
-    
+
     /**
      * Indicates if the given service or reference interface has intent handlers.
      * 
@@ -123,7 +123,6 @@ public interface SCAIntentController {
      * @throws NoSuchMethodException 
      */
     public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException, NoSuchMethodException;
-    
 
     /**
      * Indicates if the given method of the given service or reference interface has intent handlers.
@@ -138,14 +137,13 @@ public interface SCAIntentController {
     public boolean hasIntentHandler(String ItfName, String methodName) throws NoSuchInterfaceException,
             NoSuchMethodException;
 
-    
     /**
      * Returns the list of all intent handlers associated with any service and reference interfaces.
      *
      * @return The list of all intent handlers associated with any service and reference interfaces.
      */
-    public List<IntentHandler> listExistingIntentHandler() ;
-    
+    public List<IntentHandler> listExistingIntentHandler();
+
     /**
      * Returns the list of all intent handlers associated with all service and reference interfaces.
      *
@@ -164,7 +162,8 @@ public interface SCAIntentController {
      * @throws NoSuchInterfaceException If the service or reference interface does not exist.
      * @throws NoSuchMethodException 
      */
-    public List<IntentHandler> listIntentHandler(String ItfName) throws NoSuchInterfaceException, NoSuchMethodException;
+    public List<IntentHandler> listIntentHandler(String ItfName) throws NoSuchInterfaceException,
+            NoSuchMethodException;
 
     /**
      * Returns the list of all intent handlers associated with the given method of the given service or reference
@@ -192,7 +191,8 @@ public interface SCAIntentController {
      * @throws NoSuchInterfaceException 
      */
     public void removeIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException, NoSuchIntentHandlerException, NoSuchInterfaceException, NoSuchMethodException;
+            IllegalBindingException, NoSuchIntentHandlerException, NoSuchInterfaceException,
+            NoSuchMethodException;
 
     /**
      * Removes the given intent handler on the given service or reference interface.
@@ -225,5 +225,5 @@ public interface SCAIntentController {
     public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
             IllegalBindingException, NoSuchIntentHandlerException;
-  
+
 }

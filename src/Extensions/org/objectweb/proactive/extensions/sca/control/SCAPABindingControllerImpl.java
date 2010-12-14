@@ -74,7 +74,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                             .error("could not generate intent interceptor for reference (client interface) " +
                                 clientItfName + ": " + cgfe.getMessage());
                     IllegalBindingException ibe = new IllegalBindingException(
-                        "could not generate intent interceptor for reference (client interface) " +
+                        "could not generate intent controller for reference (client interface) " +
                             clientItfName + ": " + cgfe.getMessage());
                     ibe.initCause(cgfe);
                     throw ibe;

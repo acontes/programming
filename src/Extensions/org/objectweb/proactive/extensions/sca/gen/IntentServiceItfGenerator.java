@@ -150,12 +150,12 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     generatedClassName +
                     "(org.objectweb.proactive.extensions.sca.control.IntentHandler[] intentHandlers)" +
                     "{\n" +
-                    "if($1.length != " + intentHandlers.length +") " +
+                    "if($1.length != " +
+                    intentHandlers.length +
+                    ") " +
                     "{\n" +
                     "throw new org.objectweb.proactive.core.ProActiveRuntimeException(\"Number of intents is not correct \"+$1.length);\n" +
-                    "}\n" +
-                    "this.intentHandlers = intentHandlers;\n" +
-                    "}";
+                    "}\n" + "this.intentHandlers = intentHandlers;\n" + "}";
                 CtConstructor SecondConstructor = CtNewConstructor.make(secondConstructorBody,
                         generatedCtClass);
                 generatedCtClass.addConstructor(SecondConstructor);
@@ -188,9 +188,9 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     }
                 }
 
-                //                generatedCtClass.stopPruning(true);
-                //                generatedCtClass.writeFile("generated/");
-                //                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                generatedCtClass.stopPruning(true);
+                generatedCtClass.writeFile("generated/");
+                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // 	Generate and add to cache the generated class
                 generatedCtClass.defrost();
@@ -202,7 +202,6 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 }
                 generatedClass = Utils.defineClass(generatedClassName, bytecode);
             }
-
             // Instantiate class
             PAInterfaceImpl reference = (PAInterfaceImpl) generatedClass.getConstructor(
                     intentHandlers.getClass()).newInstance((Object) intentHandlers);

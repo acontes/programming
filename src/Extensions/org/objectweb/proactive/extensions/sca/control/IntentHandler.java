@@ -58,15 +58,12 @@ import org.objectweb.proactive.annotation.PublicAPI;
  */
 @PublicAPI
 public interface IntentHandler extends Serializable {
-	
-	public long ID = Calendar.getInstance().getTimeInMillis();
-	
     /**
      * Defines the actions performed by the intent handler.
      *
      * @param ijp The join point where the interception occurred.
      * @return The value returned by the intercepted method.
      */
-    public  Object invoke(IntentJoinPoint ijp) throws Throwable;
-    
+    public Object invoke(IntentJoinPoint ijp) throws Throwable;
+
 }

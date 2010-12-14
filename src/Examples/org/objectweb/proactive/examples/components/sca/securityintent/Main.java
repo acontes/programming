@@ -59,10 +59,11 @@ import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        
+
         try {
-        	SCAPAPropertyRepository.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
-        	Component boot = Utils.getBootstrapComponent();
+            SCAPAPropertyRepository.SCA_PROVIDER
+                    .setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
+            Component boot = Utils.getBootstrapComponent();
             GCMTypeFactory typeFact = GCM.getGCMTypeFactory(boot);
             GenericFactory genericFact = GCM.getGenericFactory(boot);
 
@@ -75,30 +76,34 @@ public class Main {
                             TypeFactory.MANDATORY, TypeFactory.SINGLE),
                     typeFact.createFcItfType("compute-itf", ComputeItf.class.getName(), TypeFactory.CLIENT,
                             TypeFactory.MANDATORY, TypeFactory.SINGLE) });
-            //Component comp = gf.newFcInstance(t, "primitive", CurrencySMS.class.getName());
+            ComponentType wrapperType = typeFact.createFcType(new InterfaceType[] { typeFact.createFcItfType(
+                    "run", Runnable.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                    TypeFactory.SINGLE) });
             // components creation
-            Component primitiveComputer = genericFact.newFcInstance(computerType, "primitive", PrimitiveComputer.class
-                    .getName());
-            Component primitiveMaster = genericFact.newFcInstance(masterType,"primitive",PrimitiveMaster.class
-                    .getName());
+            Component primitiveComputer = genericFact.newFcInstance(computerType, "primitive",
+                    PrimitiveComputer.class.getName());
+            Component primitiveMaster = genericFact.newFcInstance(masterType, "primitive",
+                    PrimitiveMaster.class.getName());
+            Component compositeWrapper = genericFact.newFcInstance(wrapperType, "composite", null);
+
             //add security intent
             SCAIntentController scai = Utils.getSCAIntentController(primitiveMaster);
             scai.addIntentHandler(new SecurityIntentHandler("pass"));
             // component assembling
+            GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
+            GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);
+            GCM.getBindingController(compositeWrapper).bindFc("run", primitiveMaster.getFcInterface("run"));
             GCM.getBindingController(primitiveMaster).bindFc("compute-itf",
                     primitiveComputer.getFcInterface("compute-itf"));
-
             // start CompositeWrapper component
-            GCM.getGCMLifeCycleController(primitiveComputer).startFc();
-            GCM.getGCMLifeCycleController(primitiveMaster).startFc();
-            ComputeItf itf = (ComputeItf)GCM.getBindingController(primitiveMaster).lookupFc("compute-itf");
-            itf.compute(5);
+            GCM.getGCMLifeCycleController(compositeWrapper).startFc();
+
             // get the run interface
-            //Runnable itf = ((Runnable) primitiveMaster.getFcInterface("run"));
-            //ComputeItf itf = (ComputeItf) primitiveMaster.getFcInterface(PrimitiveMaster.COMPUTER_CLIENT_ITF);
-            //itf.compute(0);
+            Runnable itf2 = ((Runnable) compositeWrapper.getFcInterface("run"));
+            ComputeItf itf = (ComputeItf) GCM.getBindingController(primitiveMaster).lookupFc("compute-itf");
             // call component
-            //itf.run();
+            itf.compute(5);
+            itf2.run();
         } catch (Exception e) {
             e.printStackTrace();
         }

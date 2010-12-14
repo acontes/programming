@@ -245,12 +245,11 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             IncompatiblePropertyTypeException {
         assertPropertyExist(name);
         Class<?> currentType = null;
-        if(propertyTypes.containsKey(name)){
-        	currentType= propertyTypes.get(name);
-        }
-        else{
-            currentType= declaredPropertyTypes.get(name);
-            propertyTypes.put(name, value.getClass());  
+        if (propertyTypes.containsKey(name)) {
+            currentType = propertyTypes.get(name);
+        } else {
+            currentType = declaredPropertyTypes.get(name);
+            propertyTypes.put(name, value.getClass());
         }
         if (!currentType.isInstance(value)) {
             logger.error("Cannot set value of property \"" + name +

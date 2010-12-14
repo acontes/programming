@@ -39,7 +39,7 @@ package functionalTests.component.sca.control.components;
 import org.objectweb.fractal.api.control.BindingController;
 
 
-public class CClient implements BindingController, TestIntentItf, TestIntentItf2 {
+public class CClient implements BindingController, TestIntentItf, TestIntentItf2, ExecuteItf {
     protected TestIntentItf testIntentItf;
     protected TestIntentItf2 testIntentItf2;
 
@@ -48,6 +48,7 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
     }
 
     public int n() {
+        System.err.println("in method n of testIntentItf!!!!!");
         return testIntentItf.n();
     }
 
@@ -90,6 +91,11 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
         if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
             testIntentItf2 = null;
         }
+    }
+
+    public void execute() {
+        // TODO Auto-generated method stub
+        n2();
     }
 
 }
