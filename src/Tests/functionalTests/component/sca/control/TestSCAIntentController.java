@@ -320,16 +320,19 @@ public class TestSCAIntentController extends SCAComponentTest {
             System.out.println("invocation of method m success");
             int x = i2.n2();
             System.out.println("invocation of method n success, value of n : " + x);
-            //i3.execute();
+            i3.execute();
         } catch (Exception e) {
             //fail();
             e.printStackTrace();
         }
-        //PALifeCycle.exitSuccess();
-        GCM.getGCMLifeCycleController(componentB).stopFc();
         GCM.getGCMLifeCycleController(componentA).stopFc();
+        System.err.println("FINI1");
+        GCM.getGCMLifeCycleController(componentB).stopFc();
+        System.err.println("FINI2");
         GCM.getBindingController(componentA).unbindFc(TestIntentItf.CLIENT_ITF_NAME);
+        System.err.println("FINI3");
         GCM.getBindingController(componentA).unbindFc(TestIntentItf2.CLIENT_ITF_NAME);
+        System.err.println("FINI");
 
     }
 }

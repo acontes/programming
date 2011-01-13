@@ -40,8 +40,6 @@ public class CServer implements TestIntentItf, TestIntentItf2 {
 
     public void m() {
         System.err.println("inside public void m() ");
-        //        while (true)
-        //            ;
     }
 
     public int n() {

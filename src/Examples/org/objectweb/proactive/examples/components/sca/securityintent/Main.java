@@ -85,10 +85,11 @@ public class Main {
             Component primitiveMaster = genericFact.newFcInstance(masterType, "primitive",
                     PrimitiveMaster.class.getName());
             Component compositeWrapper = genericFact.newFcInstance(wrapperType, "composite", null);
-
+            System.err.println(genericFact.getClass().getName());
+            System.err.println(primitiveComputer.getClass().getName());
             //add security intent
             SCAIntentController scai = Utils.getSCAIntentController(primitiveMaster);
-            scai.addIntentHandler(new SecurityIntentHandler("pass"));
+            //scai.addIntentHandler(new SecurityIntentHandler("pass"));
             // component assembling
             GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveComputer);
             GCM.getContentController(compositeWrapper).addFcSubComponent(primitiveMaster);

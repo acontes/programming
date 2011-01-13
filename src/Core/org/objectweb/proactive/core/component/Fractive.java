@@ -613,7 +613,8 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      * @param container The container containing objects for the generation of component representative
      * @return The created component
      */
-    private PAComponentRepresentative fComponent(Type type, ActiveObjectWithComponentParameters container) {
+    //private PAComponentRepresentative fComponent(Type type, ActiveObjectWithComponentParameters container) {
+    protected PAComponentRepresentative fComponent(Type type, ActiveObjectWithComponentParameters container) {
         ComponentParameters componentParameters = container.getParameters();
         StubObject ao = container.getActiveObject();
         org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();
@@ -632,6 +633,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      * @return The created component
      */
     private PAComponentRepresentative nfComponent(Type type, ActiveObjectWithComponentParameters container) {
+    //protected PAComponentRepresentative nfComponent(Type type, ActiveObjectWithComponentParameters container) {
         ComponentParameters componentParameters = container.getParameters();
         StubObject ao = container.getActiveObject();
         org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();
@@ -646,7 +648,8 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         return representative;
     }
 
-    private static class ActiveObjectWithComponentParameters {
+    //private static class ActiveObjectWithComponentParameters {
+    protected class ActiveObjectWithComponentParameters {
         StubObject activeObject;
         ComponentParameters parameters;
 

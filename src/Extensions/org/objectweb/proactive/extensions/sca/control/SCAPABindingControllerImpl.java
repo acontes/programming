@@ -61,28 +61,28 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
 
     protected void primitiveBindFc(String clientItfName, PAInterface serverItf)
             throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-        serverItf = PAFuture.getFutureValue(serverItf);
+//        serverItf = PAFuture.getFutureValue(serverItf);
         PAInterface sItf = serverItf;
-        try {
-            Component owner = getFcItfOwner();
-            if (Utils.getSCAIntentController(owner).intentHandlerExists(clientItfName)) {
-                try {
-                    sItf = (PAInterface) IntentServiceItfGenerator.instance().generateInterface(sItf,
-                            clientItfName, owner);
-                } catch (ClassGenerationFailedException cgfe) {
-                    controllerLogger
-                            .error("could not generate intent interceptor for reference (client interface) " +
-                                clientItfName + ": " + cgfe.getMessage());
-                    IllegalBindingException ibe = new IllegalBindingException(
-                        "could not generate intent controller for reference (client interface) " +
-                            clientItfName + ": " + cgfe.getMessage());
-                    ibe.initCause(cgfe);
-                    throw ibe;
-                }
-            }
-        } catch (NoSuchInterfaceException nsie) {
-            // No SCAIntentController, nothing to do
-        }
+//        try {
+//            Component ownerLocal = this.getFcItfOwner();
+//            if (Utils.getSCAIntentController(ownerLocal).intentHandlerExists(clientItfName)) {
+//                try {
+//                    sItf = (PAInterface) IntentServiceItfGenerator.instance().generateInterface(sItf,
+//                            clientItfName, ownerLocal);
+//                } catch (ClassGenerationFailedException cgfe) {
+//                    controllerLogger
+//                            .error("could not generate intent interceptor for reference (client interface) " +
+//                                clientItfName + ": " + cgfe.getMessage());
+//                    IllegalBindingException ibe = new IllegalBindingException(
+//                        "could not generate intent controller for reference (client interface) " +
+//                            clientItfName + ": " + cgfe.getMessage());
+//                    ibe.initCause(cgfe);
+//                    throw ibe;
+//                }
+//            }
+//        } catch (NoSuchInterfaceException nsie) {
+//            // No SCAIntentController, nothing to do
+//        }
         super.primitiveBindFc(clientItfName, sItf);
     }
 }

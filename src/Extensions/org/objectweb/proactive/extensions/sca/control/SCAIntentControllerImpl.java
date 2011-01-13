@@ -42,17 +42,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.tools.ant.util.CollectionUtils;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
@@ -88,6 +92,12 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     private HashMap<Integer, HashMap<String, List<String>>> informationPool;
     private List<IntentHandler> listOfIntent;
 
+    public void printInfo()
+    {
+    	System.err.println("get info of information pool ");
+    	System.err.println(informationPool);
+    }
+    
     public SCAIntentControllerImpl(Component owner) {
         super(owner);
         //informationPool = new HashMap<IntentHandler, HashMap<String, List<String>>>();
@@ -124,6 +134,20 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         return listOfIntent.get(index);
     }
 
+    public int[] indexesOfIntentsOfMethod(String itfName,String methodName) 
+    	throws NoSuchInterfaceException, NoSuchMethodException
+    {
+    	int i = 0;
+    	List<IntentHandler> l_intents = listIntentHandler(itfName, methodName);
+    	List<IntentHandler> all_intents = listExistingIntentHandler();
+    	int [] res = new int[l_intents.size()];
+    	for (Iterator<IntentHandler> iterator = l_intents.iterator(); iterator.hasNext();) {
+    		IntentHandler object = (IntentHandler) iterator.next();
+			res[i]=all_intents.indexOf(object);
+			i++;
+		}
+    	return res;
+    }
     /**
      * get associated index of a given IntentHandler in a given list. -1 if not exist
      * @param i
@@ -154,7 +178,11 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     // we build the information pool recursively 
     public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
             IllegalBindingException, NoSuchInterfaceException, NoSuchMethodException {
-        String[] listFc = GCM.getBindingController(owner).listFc();
+        InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
+        String[] listFc = new String[itftps.length];
+        for (int i = 0; i < itftps.length; i++) {
+			listFc[i]=itftps[i].getFcItfName();
+		}
         for (int i = 0; i < listFc.length; i++) {
             addIntentHandler(intentHandler, listFc[i]);
         }
@@ -181,14 +209,23 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
             IllegalBindingException {
         LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(lcCtr.STARTED)) {
+        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
             throw new IllegalLifeCycleException(
                 "component already started, impossible to add an Intent Handler.");
         }
-        Object Itf = GCM.getBindingController(owner).lookupFc(itfName);
-        if (Itf != null) {
-            throw new IllegalBindingException("binding already done for the Interface!");
+        BindingController bctr=null;
+        Object Itf=null;
+        try{
+	        bctr = GCM.getBindingController(owner);
+	         Itf=bctr.lookupFc(itfName);
+        }catch(NoSuchInterfaceException ex)
+        {
+        	logger.info("server component doesn't implement binding controller");
         }
+	    if (Itf != null) {
+	    	throw new IllegalBindingException("binding already done for the Interface!");
+	    }
+        
         String tmp = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
         Method[] methodList = null;
         try {
@@ -276,7 +313,12 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
 
     public List<IntentHandler> listIntentHandler() throws NoSuchInterfaceException, NoSuchMethodException {
         List<IntentHandler> res = new ArrayList<IntentHandler>();
-        String[] listFc = GCM.getBindingController(owner).listFc();
+        //String[] listFc = GCM.getBindingController(owner).listFc();
+        InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
+        String[] listFc = new String[itftps.length];
+        for (int i = 0; i < itftps.length; i++) {
+			listFc[i]=itftps[i].getFcItfName();
+		}
         if (listFc.length > 0) // at least on interface
         {
             res = listIntentHandler(listFc[0]);
@@ -312,7 +354,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         return res;
     }
 
-    private List<IntentHandler> listExistingIntentHandler(String ItfName) {
+    private List<IntentHandler> listExistingIntentHandlerOfAItface(String ItfName) {
         List<IntentHandler> res = new ArrayList<IntentHandler>();
         for (Iterator iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
             int key = (Integer) iterator.next();
@@ -332,7 +374,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public boolean intentHandlerExists(String ItfName) {
-        return !listExistingIntentHandler(ItfName).isEmpty();
+        return !listExistingIntentHandlerOfAItface(ItfName).isEmpty();
     }
 
     public List<IntentHandler> listIntentHandler(String itfName, String methodName)
@@ -351,7 +393,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             throw new NoSuchMethodException("method " + methodName + " doesn't exist!");
         }
         List<IntentHandler> res = new ArrayList<IntentHandler>();
-        for (Iterator iterator = listExistingIntentHandler(itfName).iterator(); iterator.hasNext();) {
+        for (Iterator iterator = listExistingIntentHandlerOfAItface(itfName).iterator(); iterator.hasNext();) {
             IntentHandler key = (IntentHandler) iterator.next();
             int indexKey = indexAssociatedWithIntent(key);
             List<String> tmp = informationPool.get(indexKey).get(itfName);
@@ -370,7 +412,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             IllegalBindingException, NoSuchIntentHandlerException, NoSuchInterfaceException,
             NoSuchMethodException {
         LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(lcCtr.STARTED)) {
+        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
             throw new IllegalLifeCycleException(
                 "component already started, impossible to add an Intent Handler.");
         }
@@ -379,7 +421,12 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         if (intentExist != -1)
         //*if(tmp.contains(intentHandler))
         {
-            String[] listFc = GCM.getBindingController(owner).listFc();
+            //String[] listFc = GCM.getBindingController(owner).listFc();
+            InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
+            String[] listFc = new String[itftps.length];
+            for (int i = 0; i < itftps.length; i++) {
+    			listFc[i]=itftps[i].getFcItfName();
+    		}
             if (listFc.length > 0) // at least on interface
             {
                 for (int i = 0; i < listFc.length; i++) {
@@ -394,7 +441,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException,
             NoSuchIntentHandlerException, NoSuchMethodException {
         LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(lcCtr.STARTED)) {
+        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
             throw new IllegalLifeCycleException(
                 "component already started, impossible to add an Intent Handler.");
         }
@@ -427,7 +474,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
             IllegalBindingException, NoSuchIntentHandlerException {
         LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(lcCtr.STARTED)) {
+        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
             throw new IllegalLifeCycleException(
                 "component already started, impossible to add an Intent Handler.");
         }

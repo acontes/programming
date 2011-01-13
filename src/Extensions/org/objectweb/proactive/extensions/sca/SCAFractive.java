@@ -43,16 +43,21 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.annotation.PublicAPI;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
+import org.objectweb.proactive.extensions.sca.representative.PA_SCAComponentRepresentativeFactory;
 import org.osoa.sca.annotations.Property;
 
 
@@ -147,4 +152,24 @@ public class SCAFractive extends Fractive {
 
         return false;
     }
+    
+    /**
+     * Creates a component representative for a functional component (to be used with commonInstanciation method)
+     * @param container The container containing objects for the generation of component representative
+     * @return The created component
+     */
+    protected PAComponentRepresentative fComponent(Type type, ActiveObjectWithComponentParameters container) {
+    	//System.err.println("initial new stub");
+    	ComponentParameters componentParameters = container.getParameters();
+        StubObject ao = container.getActiveObject();
+        org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();
+        if (myProxy == null) {
+            throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + ao);
+        }
+        PAComponentRepresentative representative = PA_SCAComponentRepresentativeFactory.instance()
+                .createComponentRepresentative(componentParameters, myProxy);
+        representative.setStubOnBaseObject(ao);
+        return representative;
+    }
+    
 }

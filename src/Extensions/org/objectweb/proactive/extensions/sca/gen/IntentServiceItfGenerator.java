@@ -58,7 +58,9 @@ import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFail
 import org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
+import org.objectweb.proactive.extensions.sca.Constants;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
+import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 
 
@@ -111,7 +113,7 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation of the class failed.
      */
-    public Object generateInterface(Object serviceItf, String clientItfName, Component owner)
+    public Object generateInterface(Object serviceItf, String ItfName, Component owner)
             throws ClassGenerationFailedException {
         String serviceItfClassName = serviceItf.getClass().getSimpleName();
         try {
@@ -123,8 +125,7 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
             }
             String generatedClassName = Utils.getIntentInterceptorClassName(componentName,
                     serviceItfClassName);
-            List<IntentHandler> intentHandlersInList = org.objectweb.proactive.extensions.sca.Utils
-                    .getSCAIntentController(owner).listExistingIntentHandler();
+            List<IntentHandler> intentHandlersInList = ((SCAIntentController) owner.getFcInterface(Constants.SCA_INTENT_CONTROLLER)).listExistingIntentHandler();
             IntentHandler[] intentHandlers = intentHandlersInList.toArray(new IntentHandler[0]);
             Class<?> generatedClass = null;
             try {
@@ -168,14 +169,20 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 for (int i = 0; i < methodsToExtend.length; i++) {
                     // Create wrapper : inside contains super.method();
                     //System.err.println(methodsToExtend[i].getName());
-                    IntentHandler[] intentHandlersForGivingMethod = org.objectweb.proactive.extensions.sca.Utils
-                            .getSCAIntentController(owner).listIntentHandler(clientItfName,
-                                    methodsToExtend[i].getName()).toArray(new IntentHandler[0]);
-                    CtMethod wrapper = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
+                	IntentHandler[] intentHandlersForGivingMethod = 
+                		((SCAIntentController) owner.getFcInterface(Constants.SCA_INTENT_CONTROLLER)).
+                	listIntentHandler(ItfName,methodsToExtend[i].getName()).toArray(new IntentHandler[0]);
+                	
+                	int[] indexes = ((SCAIntentController) owner.getFcInterface(Constants.SCA_INTENT_CONTROLLER)).
+                		indexesOfIntentsOfMethod(ItfName, methodsToExtend[i].getName());
+                	
+                	CtMethod wrapper = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
                     wrapper.setName(wrapper.getName() + 0);
                     generatedCtClass.addMethod(wrapper);
-                    for (int j = 0; j < intentHandlersForGivingMethod.length; j++) {
-                        int indexOfIntent = intentHandlersInList.indexOf(intentHandlersForGivingMethod[j]);
+                    //for (int j = 0; j < intentHandlersForGivingMethod.length; j++) {
+                    for (int j = 0; j < indexes.length; j++) {	
+                        //int indexOfIntent = intentHandlersInList.indexOf(intentHandlersForGivingMethod[j]);
+                    	int indexOfIntent = indexes[j];
                         CtMethod newMethod = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
                         newMethod.setBody("{\nreturn ($r)intentHandlers[" + indexOfIntent +
                             "].invoke(new org.objectweb.proactive.extensions.sca.control." +
@@ -188,9 +195,9 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     }
                 }
 
-                generatedCtClass.stopPruning(true);
-                generatedCtClass.writeFile("generated/");
-                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+//                generatedCtClass.stopPruning(true);
+//                generatedCtClass.writeFile("generated/");
+//                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // 	Generate and add to cache the generated class
                 generatedCtClass.defrost();
