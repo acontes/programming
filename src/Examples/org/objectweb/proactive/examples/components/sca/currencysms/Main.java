@@ -45,9 +45,7 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.webservices.CXFRESTfulServiceCaller;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
-import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.sca.Utils;
-import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 
 
@@ -62,7 +60,6 @@ public class Main {
                 + "\n        The second parameter is your destination number");
             return;
         }
-        SCAPAPropertyRepository.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
         String orangeID = args[0];
         String destNumber = args[1];
         Component boot = Utils.getBootstrapComponent();
@@ -81,7 +78,6 @@ public class Main {
         GCM.getBindingController(comp).bindFc(CurrencySMS.ORANGE_SERVICE_NAME,
                 orangeURL + "(" + CXFRESTfulServiceCaller.class.getName() + ")");
         SCAPropertyController scap = Utils.getSCAPropertyController(comp);
-        SCAIntentController scai = Utils.getSCAIntentController(comp);
         scap.setValue("fromCurrency", "USD");
         scap.setValue("toCurrency", "EUR");
         scap.setValue("id", orangeID);

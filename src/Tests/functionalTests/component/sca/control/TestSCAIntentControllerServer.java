@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of 
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package functionalTests.component.sca.control;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
@@ -9,11 +45,9 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.examples.components.sca.securityintent.SecurityIntentHandler;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
-import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 
 import functionalTests.component.sca.SCAComponentTest;
 import functionalTests.component.sca.control.components.CClient;
@@ -23,8 +57,9 @@ import functionalTests.component.sca.control.components.IntentHandlerTest;
 import functionalTests.component.sca.control.components.TestIntentItf;
 import functionalTests.component.sca.control.components.TestIntentItf2;
 
-public class TestSCAIntentControllerServer extends SCAComponentTest{
-	Component componentA;
+
+public class TestSCAIntentControllerServer extends SCAComponentTest {
+    Component componentA;
     Component componentB;
 
     public TestSCAIntentControllerServer() {
@@ -36,7 +71,7 @@ public class TestSCAIntentControllerServer extends SCAComponentTest{
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
-//        System.err.println("cf type"+cf.getClass().getName());
+        //        System.err.println("cf type"+cf.getClass().getName());
         componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
                 type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
@@ -57,13 +92,14 @@ public class TestSCAIntentControllerServer extends SCAComponentTest{
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
     }
+
     @org.junit.Test
     public void action() throws Exception {
-    	SCAIntentController scaic1 = org.objectweb.proactive.extensions.sca.Utils
-        .getSCAIntentController(componentA); //client
+        SCAIntentController scaic1 = org.objectweb.proactive.extensions.sca.Utils
+                .getSCAIntentController(componentA); //client
         SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentB); //server
-        
+
         //SCAPropertyController scac3 = Utils.getSCAPropertyController(componentA);
         //SCAPropertyController scac4 = Utils.getSCAPropertyController(componentB);
         IntentHandler y1 = new IntentHandlerTest("test server");

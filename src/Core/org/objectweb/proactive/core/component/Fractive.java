@@ -633,7 +633,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      * @return The created component
      */
     private PAComponentRepresentative nfComponent(Type type, ActiveObjectWithComponentParameters container) {
-    //protected PAComponentRepresentative nfComponent(Type type, ActiveObjectWithComponentParameters container) {
+        //protected PAComponentRepresentative nfComponent(Type type, ActiveObjectWithComponentParameters container) {
         ComponentParameters componentParameters = container.getParameters();
         StubObject ao = container.getActiveObject();
         org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();

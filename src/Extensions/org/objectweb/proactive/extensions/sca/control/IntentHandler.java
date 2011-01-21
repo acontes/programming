@@ -37,7 +37,6 @@
 package org.objectweb.proactive.extensions.sca.control;
 
 import java.io.Serializable;
-import java.util.Calendar;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -65,5 +64,4 @@ public interface IntentHandler extends Serializable {
      * @return The value returned by the intercepted method.
      */
     public Object invoke(IntentJoinPoint ijp) throws Throwable;
-
 }

@@ -41,20 +41,18 @@ import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 
 public class IntentHandlerTest implements IntentHandler {
-	
-	private String msg;
-	
-	public IntentHandlerTest()
-	{
-		
-	}
-	
-	public IntentHandlerTest(String msg)
-	{
-		this.msg = msg;
-	}
+    private String msg;
+
+    public IntentHandlerTest() {
+
+    }
+
+    public IntentHandlerTest(String msg) {
+        this.msg = msg;
+    }
+
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        System.err.println("INTENT "+msg);
+        System.err.println("INTENT " + msg);
         return ijp.proceed();
     }
 }

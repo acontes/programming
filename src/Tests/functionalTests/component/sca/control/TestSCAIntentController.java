@@ -36,8 +36,6 @@
  */
 package functionalTests.component.sca.control;
 
-import static org.junit.Assert.fail;
-
 import java.util.List;
 
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
@@ -51,7 +49,6 @@ import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
-import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.examples.components.sca.securityintent.SecurityIntentHandler;

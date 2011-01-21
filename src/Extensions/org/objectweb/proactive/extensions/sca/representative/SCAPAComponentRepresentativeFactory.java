@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2010 INRIA/University of 
+ *              Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 
+ * or a different license than the GPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.sca.representative;
 
 import org.objectweb.fractal.api.type.ComponentType;
@@ -5,29 +41,32 @@ import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
-import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeFactory;
-import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeImpl;
 import org.objectweb.proactive.core.component.request.ComponentRequest;
 import org.objectweb.proactive.core.mop.MethodCall;
 import org.objectweb.proactive.core.mop.Proxy;
 
-public class PA_SCAComponentRepresentativeFactory{
-	private static PA_SCAComponentRepresentativeFactory INSTANCE = null;
-    private PA_SCAComponentRepresentativeFactory() {
+
+/**
+ * @author The ProActive Team
+ */
+public class SCAPAComponentRepresentativeFactory {
+    private static SCAPAComponentRepresentativeFactory INSTANCE = null;
+
+    private SCAPAComponentRepresentativeFactory() {
     }
 
     /**
      * returns the unique instance in the jvm
      * @return the unique instance in the jvm
      */
-    public static PA_SCAComponentRepresentativeFactory instance() {
+    public static SCAPAComponentRepresentativeFactory instance() {
         if (INSTANCE == null) {
-            return (INSTANCE = new PA_SCAComponentRepresentativeFactory());
+            return (INSTANCE = new SCAPAComponentRepresentativeFactory());
         } else {
             return INSTANCE;
         }
     }
-    
+
     /**
      * Creates a component representative according to the type of the component
      * (it also generates the required functional interfaces), and connects the representative to
@@ -40,14 +79,14 @@ public class PA_SCAComponentRepresentativeFactory{
      */
     public PAComponentRepresentative createComponentRepresentative(ComponentType componentType,
             String hierarchicalType, Proxy proxy, String controllerConfigFileLocation) {
-    	PAComponentRepresentative representative = new PA_SCAComponentRepresentativeImpl(componentType,
-                hierarchicalType, controllerConfigFileLocation);
-            representative.setProxy(proxy);
-            return representative;
+        PAComponentRepresentative representative = new SCAPAComponentRepresentativeImpl(componentType,
+            hierarchicalType, controllerConfigFileLocation);
+        representative.setProxy(proxy);
+        return representative;
     }
-    
+
     public PAComponentRepresentative createComponentRepresentative(ComponentParameters params, Proxy proxy) {
-        PAComponentRepresentative representative = new PA_SCAComponentRepresentativeImpl(params);
+        PAComponentRepresentative representative = new SCAPAComponentRepresentativeImpl(params);
         representative.setProxy(proxy);
         return representative;
     }
@@ -71,7 +110,7 @@ public class PA_SCAComponentRepresentativeFactory{
                         new Class[] {}), new Object[] {}, null, Constants.COMPONENT, null,
                         ComponentRequest.STRICT_FIFO_PRIORITY));
 
-        return PA_SCAComponentRepresentativeFactory.instance().createComponentRepresentative(componentParameters,
-                proxy);
+        return SCAPAComponentRepresentativeFactory.instance().createComponentRepresentative(
+                componentParameters, proxy);
     }
 }

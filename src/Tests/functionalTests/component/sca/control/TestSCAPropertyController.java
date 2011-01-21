@@ -187,8 +187,8 @@ public class TestSCAPropertyController extends SCAComponentTest {
 
         scac.setValue("x4", (short) 1);
         assertEquals((short) 1, scac.getValue("x4"));
-        scac.setValue("x5", (int) 1);
-        assertEquals((int) 1, scac.getValue("x5"));
+        scac.setValue("x5", 1);
+        assertEquals(1, scac.getValue("x5"));
         scac.setValue("x6", (long) 1);
         assertEquals((long) 1, scac.getValue("x6"));
 
