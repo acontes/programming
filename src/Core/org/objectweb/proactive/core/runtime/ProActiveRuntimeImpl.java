@@ -5,34 +5,34 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of
- *              Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
  *  Contributor(s):
  *
  * ################################################################
- * $$ACTIVEEON_CONTRIBUTOR$$
+ * $$PROACTIVE_INITIAL_DEV$$
  */
 package org.objectweb.proactive.core.runtime;
 
@@ -110,6 +110,7 @@ import org.objectweb.proactive.core.process.UniversalProcess;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectExposer;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.rmi.FileProcess;
+import org.objectweb.proactive.core.runtime.broadcast.BroadcastDisabledException;
 import org.objectweb.proactive.core.runtime.broadcast.RTBroadcaster;
 import org.objectweb.proactive.core.security.PolicyServer;
 import org.objectweb.proactive.core.security.ProActiveSecurity;
@@ -148,10 +149,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl implements ProActiveRuntime,
         LocalProActiveRuntime {
 
-    /**
-     * 
-     */
-
     //
     // -- STATIC MEMBERS
     // -----------------------------------------------------------
@@ -163,25 +160,41 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     private static Logger jmxLogger = ProActiveLogger.getLogger(Loggers.JMX);
     private static final Logger clLogger = ProActiveLogger.getLogger(Loggers.CLASSLOADING);
 
-    static {
-        try {
-            proActiveRuntime = new ProActiveRuntimeImpl();
-            proActiveRuntime.createMBean();
-            System.setProperty(PALifeCycle.PA_STARTED_PROP, "true");
-            if (CentralPAPropertyRepository.PA_RUNTIME_PING.isTrue()) {
-                new PARTPinger().start();
-            }
+    /**
+     *
+     * @return the proactive runtime associated to this jvm according to
+     * the current classloader
+     */
+    private static synchronized ProActiveRuntimeImpl getProActiveRuntimeImpl() {
 
-            if (CentralPAPropertyRepository.PA_RUNTIME_BROADCAST.isTrue()) {
-                RTBroadcaster rtBrodcaster = RTBroadcaster.getInstance();
-                // notify our presence on the lan
-                rtBrodcaster.sendDiscover();
-            }
+        if (proActiveRuntime == null) {
+            try {
+                proActiveRuntime = new ProActiveRuntimeImpl();
+                proActiveRuntime.createMBean();
+                System.setProperty(PALifeCycle.PA_STARTED_PROP, "true");
+                if (CentralPAPropertyRepository.PA_RUNTIME_PING.isTrue()) {
+                    new PARTPinger().start();
+                }
 
-        } catch (UnknownProtocolException e) {
-            e.printStackTrace();
-        } catch (ProActiveException e) {
-            e.printStackTrace();
+                RTBroadcaster rtBrodcaster;
+                try {
+                    rtBrodcaster = RTBroadcaster.getInstance();
+                    // notify our presence on the lan
+                    rtBrodcaster.sendCreation();
+                } catch (Exception e) {
+                    // just keep it the feature is disabled
+                    logger.debug("unable to activate RTBroadcast, reason is " + e.getMessage());
+                    ProActiveLogger.logEatedException(logger, e);
+                }
+
+            } catch (UnknownProtocolException e) {
+                e.printStackTrace();
+            } catch (ProActiveException e) {
+                e.printStackTrace();
+            }
+            return proActiveRuntime;
+        } else {
+            return proActiveRuntime;
         }
     }
 
@@ -316,7 +329,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     // -----------------------------------------------------------
     //
     public static ProActiveRuntimeImpl getProActiveRuntime() {
-        return proActiveRuntime;
+        return getProActiveRuntimeImpl();
     }
 
     /**
@@ -344,7 +357,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#getMBeanServerName()
      */
     public String getMBeanServerName() {
-        return URIBuilder.getNameFromURI(proActiveRuntime.getURL());
+        return URIBuilder.getNameFromURI(getProActiveRuntimeImpl().getURL());
     }
 
     /**
@@ -419,7 +432,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     private void createServerConnector() {
         // One the Serverconnector is launched any ProActive JMX Connector
         // client can connect to it remotely and manage the MBeans.
-        serverConnector = new ServerConnector(URIBuilder.getNameFromURI(proActiveRuntime.getURL()));
+        serverConnector = new ServerConnector(URIBuilder.getNameFromURI(getProActiveRuntimeImpl().getURL()));
         try {
             serverConnector.start();
         } catch (IOException e) {
@@ -446,17 +459,17 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
         try {
             mbs.registerMBean(jmxClassLoader, objectName);
         } catch (InstanceAlreadyExistsException e) {
-            jmxLogger.error("A MBean with the object name " + objectName + " already exists", e);
+            jmxLogger.debug("A MBean with the object name " + objectName + " already exists", e);
         } catch (MBeanRegistrationException e) {
             jmxLogger.error("Can't register the MBean of the JMX ClassLoader", e);
         } catch (NotCompliantMBeanException e) {
             jmxLogger.error("The MBean of the JMX ClassLoader is not JMX compliant", e);
         }
 
-        String runtimeUrl = proActiveRuntime.getURL();
+        String runtimeUrl = getProActiveRuntimeImpl().getURL();
         objectName = FactoryName.createRuntimeObjectName(runtimeUrl);
         if (!mbs.isRegistered(objectName)) {
-            mbean = new ProActiveRuntimeWrapper(proActiveRuntime);
+            mbean = new ProActiveRuntimeWrapper(getProActiveRuntimeImpl());
             try {
                 mbs.registerMBean(mbean, objectName);
             } catch (InstanceAlreadyExistsException e) {
@@ -696,14 +709,23 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
     /**
      * @see org.objectweb.proactive.core.runtime.ProActiveRuntime#killRT(boolean)
      */
-    public void killRT(boolean softly) {
+    public synchronized void killRT(boolean softly) {
 
+        cleanJvmFromPA();
+
+        // END JMX unregistration
+        System.exit(0);
+
+    }
+
+    public synchronized void cleanJvmFromPA() {
         // JMX Notification
         if (getMBean() != null) {
             getMBean().sendNotification(NotificationType.runtimeDestroyed);
         }
-
         // END JMX Notification
+
+        //terminates the nodes and their active objects
         killAllNodes();
 
         logger.info("terminating Runtime " + vmInformation.getName());
@@ -725,8 +747,26 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
             mbean = null;
         }
 
-        // END JMX unregistration
-        System.exit(0);
+        //  terminate the broadcast thread if exist
+        RTBroadcaster broadcaster;
+        try {
+            broadcaster = RTBroadcaster.getInstance();
+            broadcaster.kill();
+        } catch (BroadcastDisabledException e1) {
+            // just display the message
+            logger.debug(e1.getMessage());
+        }
+
+        // unexport the runtime
+        try {
+            this.roe.unexportAll();
+        } catch (ProActiveException e) {
+            logger.warn("unable to unexport the runtime", e);
+        }
+
+        this.roe = null;
+
+        proActiveRuntime = null;
 
     }
 
@@ -1580,7 +1620,7 @@ public class ProActiveRuntimeImpl extends RuntimeRegistrationEventProducerImpl i
      * 
      * 
      * 
-     * @since ProActive 4.4.0
+     * @since ProActive 5.0.0
      * 
      * @return The value of {@link CentralPAPropertyRepository#PA_HOME} if it is set. Otherwise
      * the path is computed according to the class or jar location. 

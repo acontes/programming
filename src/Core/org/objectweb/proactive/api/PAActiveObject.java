@@ -3,29 +3,29 @@
  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds 
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -1084,40 +1084,6 @@ public class PAActiveObject {
             }
 
             throw new ActiveObjectCreationException(t);
-        }
-    }
-
-    /**
-     * Registers an active object into a registry(RMI or IBIS or HTTP, default is RMI). In fact it
-     * is the remote version of the body of the active object that is registered into the registry
-     * under the given URL. According to the type of the associated body(default is Rmi), the
-     * registry in which to register is automatically found.
-     * 
-     * @param obj
-     *            the active object to register.
-     * @param url
-     *            the url under which the remote body is registered. The url must point to the
-     *            localhost since registering is always a local action. The url can take the
-     *            form:protocol://localhost:port/nam or //localhost:port/name if protocol is RMI or
-     *            //localhost/name if port is 1099 or only the name. The registered object will be
-     *            reachable with the following url: protocol://machine_name:port/name using
-     *            lookupActive method. Protocol and port can be removed if default
-     * @exception ProActiveException
-     *                if the remote body cannot be registered
-     */
-    @Deprecated
-    public static void register(Object obj, String url) throws ProActiveException {
-        UniversalBody body = getRemoteBody(obj);
-
-        try {
-            body.register(url);
-            body.setRegistered(true);
-            if (PAActiveObject.logger.isInfoEnabled()) {
-                PAActiveObject.logger.info("Success at binding url " + url);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ProActiveException("Failed to register active object " + obj + "at " + url, e);
         }
     }
 
