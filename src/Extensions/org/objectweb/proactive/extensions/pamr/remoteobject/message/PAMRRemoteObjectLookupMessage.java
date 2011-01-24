@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -39,15 +39,16 @@ package org.objectweb.proactive.extensions.pamr.remoteobject.message;
 import java.io.Serializable;
 import java.net.URI;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.remoteobject.AbstractRemoteObjectFactory;
 import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolException;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.pamr.client.Agent;
-import org.objectweb.proactive.extensions.pamr.remoteobject.MessageRoutingRemoteObject;
-import org.objectweb.proactive.extensions.pamr.remoteobject.MessageRoutingRemoteObjectFactory;
-import org.objectweb.proactive.extensions.pamr.remoteobject.util.MessageRoutingRegistry;
+import org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObject;
+import org.objectweb.proactive.extensions.pamr.remoteobject.PAMRRemoteObjectFactory;
+import org.objectweb.proactive.extensions.pamr.remoteobject.util.PAMRRegistry;
 
 
 /** Represents a lookup message
@@ -58,7 +59,7 @@ import org.objectweb.proactive.extensions.pamr.remoteobject.util.MessageRoutingR
  * @since ProActive 4.1.0
  */
 
-public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessage implements Serializable {
+public class PAMRRemoteObjectLookupMessage extends PAMRMessage implements Serializable {
 
     /**
      * Construct a lookup message
@@ -69,7 +70,7 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
      *            The local agent to use to send the message
      */
 
-    public MessageRoutingRemoteObjectLookupMessage(URI uri, Agent agent) {
+    public PAMRRemoteObjectLookupMessage(URI uri, Agent agent) {
         super(uri, agent);
     }
 
@@ -87,16 +88,16 @@ public class MessageRoutingRemoteObjectLookupMessage extends MessageRoutingMessa
         }
 
         if (this.uri != null) {
-            InternalRemoteRemoteObject irro = MessageRoutingRegistry.singleton.lookup(uri);
+            InternalRemoteRemoteObject irro = PAMRRegistry.singleton.lookup(uri);
             if (irro != null) {
                 RemoteRemoteObject rro = null;
                 try {
-                    MessageRoutingRemoteObjectFactory f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
-                            .getRemoteObjectFactory(MessageRoutingRemoteObjectFactory.PROTOCOL_ID);
+                    PAMRRemoteObjectFactory f = (PAMRRemoteObjectFactory) AbstractRemoteObjectFactory
+                            .getRemoteObjectFactory(PAMRRemoteObjectFactory.PROTOCOL_ID);
                     rro = f.newRemoteObject(irro);
-                    ((MessageRoutingRemoteObject) rro).setURI(uri);
+                    ((PAMRRemoteObject) rro).setURI(uri);
                     return rro;
-                } catch (UnknownProtocolException e) {
+                } catch (ProActiveException e) {
                     // Impossible because that class has been created by the factory
                     ProActiveLogger.logImpossibleException(logger, e);
                 }

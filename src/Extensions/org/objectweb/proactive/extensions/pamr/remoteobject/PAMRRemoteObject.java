@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -51,7 +51,7 @@ import org.objectweb.proactive.core.remoteobject.exception.UnknownProtocolExcept
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.pamr.client.Agent;
-import org.objectweb.proactive.extensions.pamr.remoteobject.message.MessageRoutingRemoteObjectRequest;
+import org.objectweb.proactive.extensions.pamr.remoteobject.message.PAMRRemoteObjectRequest;
 
 
 /**
@@ -59,9 +59,8 @@ import org.objectweb.proactive.extensions.pamr.remoteobject.message.MessageRouti
  * @since ProActive 4.1.0
  */
 
-public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializable {
-    final static private Logger logger = ProActiveLogger
-            .getLogger(PAMRConfig.Loggers.FORWARDING_REMOTE_OBJECT);
+public class PAMRRemoteObject implements RemoteRemoteObject, Serializable {
+    final static private Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.PAMR_REMOTE_OBJECT);
 
     /** The URL of the RemoteObject */
     private URI remoteObjectURL;
@@ -76,8 +75,7 @@ public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializa
 
     protected transient InternalRemoteRemoteObject remoteObject;
 
-    public MessageRoutingRemoteObject(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
-            Agent agent) {
+    public PAMRRemoteObject(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL, Agent agent) {
         this.remoteObject = remoteObject;
         this.remoteObjectURL = remoteObjectURL;
         this.agent = agent;
@@ -85,8 +83,7 @@ public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializa
 
     public Reply receiveMessage(Request message) throws ProActiveException {
 
-        MessageRoutingRemoteObjectRequest req = new MessageRoutingRemoteObjectRequest(message,
-            this.remoteObjectURL, getAgent());
+        PAMRRemoteObjectRequest req = new PAMRRemoteObjectRequest(message, this.remoteObjectURL, getAgent());
         req.send();
         SynchronousReplyImpl rep = (SynchronousReplyImpl) req.getReturnedObject();
         return rep;
@@ -104,9 +101,8 @@ public class MessageRoutingRemoteObject implements RemoteRemoteObject, Serializa
         if (this.agent == null) {
             try {
                 // FIXME: The factory cast is a hack but there is no clean way to do it
-                MessageRoutingRemoteObjectFactory f;
-                f = (MessageRoutingRemoteObjectFactory) AbstractRemoteObjectFactory
-                        .getRemoteObjectFactory("pamr");
+                PAMRRemoteObjectFactory f;
+                f = (PAMRRemoteObjectFactory) AbstractRemoteObjectFactory.getRemoteObjectFactory("pamr");
                 this.agent = f.getAgent();
             } catch (UnknownProtocolException e) {
                 logger.fatal("Failed to get the local message routing agent", e);

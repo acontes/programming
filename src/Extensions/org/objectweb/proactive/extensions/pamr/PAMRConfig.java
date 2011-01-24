@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ActiveEon Team
+ *                        http://www.activeeon.com/
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$ACTIVEEON_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.pamr;
 
 import java.net.Socket;
@@ -103,14 +139,13 @@ public class PAMRConfig implements PAPropertiesLoaderSPI {
     public interface Loggers {
 
         // Forwarding
-        static final public String FORWARDING = org.objectweb.proactive.core.util.log.Loggers.CORE +
-            ".forwarding";
-        static final public String FORWARDING_MESSAGE = FORWARDING + ".message";
-        static final public String FORWARDING_ROUTER = FORWARDING + ".router";
-        static final public String FORWARDING_CLIENT = FORWARDING + ".client";
-        static final public String FORWARDING_CLIENT_TUNNEL = FORWARDING_CLIENT + ".tunnel";
-        static final public String FORWARDING_REMOTE_OBJECT = FORWARDING + ".remoteobject";
-        static final public String FORWARDING_ROUTER_ADMIN = FORWARDING_ROUTER + ".admin";
-        static final public String FORWARDING_CLASSLOADING = FORWARDING + ".classloading";
+        static final public String PAMR = org.objectweb.proactive.core.util.log.Loggers.CORE + ".pamr";
+        static final public String PAMR_MESSAGE = PAMR + ".message";
+        static final public String PAMR_ROUTER = PAMR + ".router";
+        static final public String PAMR_CLIENT = PAMR + ".client";
+        static final public String PAMR_CLIENT_TUNNEL = PAMR_CLIENT + ".tunnel";
+        static final public String PAMR_REMOTE_OBJECT = PAMR + ".remoteobject";
+        static final public String PAMR_ROUTER_ADMIN = PAMR_ROUTER + ".admin";
+        static final public String PAMR_CLASSLOADING = PAMR + ".classloading";
     }
 }

@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -45,9 +45,9 @@ import org.objectweb.proactive.extensions.vfsprovider.FileSystemServerDeployer;
 
 
 /**
- * Class for starting PA Provider server manually.
+ * Class for starting PAdataserver manually.
  */
-public class PAProviderServerStarter {
+public class PADataserverStarter {
 
     private static String rootDirectory;
 
@@ -61,15 +61,15 @@ public class PAProviderServerStarter {
      * @throws URISyntaxException
      */
     public static void main(String[] args) throws IOException {
-        final String name = PAProviderServerStarter.class.getName();
+        final String name = PADataserverStarter.class.getName();
 
         try {
             parseArgs(args);
         } catch (IllegalArgumentException e) {
-            System.out.println("Usage: java " + name + " <root directory> [PAProvider name]");
+            System.out.println("Usage: java " + name + " <root directory> [PAdataserver name]");
             System.out.println("       java " + name + " --help");
             System.out
-                    .println("Starts the PA Provider server for <root directory> with default or specified name.");
+                    .println("Starts the ProActive dataserver for <root directory> with default or specified name.");
             System.out.println("\t--help\tprints this screen");
             return;
         }
@@ -109,7 +109,7 @@ public class PAProviderServerStarter {
             deployer = new FileSystemServerDeployer(providerName, rootDirectory, true);
 
         final String url = deployer.getVFSRootURL();
-        System.out.println("PAProvider successfully started.\nVFS URL of this provider: " + url);
+        System.out.println("ProActive dataserver successfully started.\nVFS URL of this provider: " + url);
     }
 
     private static void stopServer() throws ProActiveException {

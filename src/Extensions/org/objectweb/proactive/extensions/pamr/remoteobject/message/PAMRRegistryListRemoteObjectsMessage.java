@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -40,7 +40,7 @@ import java.io.Serializable;
 import java.net.URI;
 
 import org.objectweb.proactive.extensions.pamr.client.Agent;
-import org.objectweb.proactive.extensions.pamr.remoteobject.util.MessageRoutingRegistry;
+import org.objectweb.proactive.extensions.pamr.remoteobject.util.PAMRRegistry;
 
 
 /** Represents a MessageRoutingMessage. 
@@ -50,8 +50,7 @@ import org.objectweb.proactive.extensions.pamr.remoteobject.util.MessageRoutingR
  * @since ProActive 4.1.0
  */
 
-public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRoutingMessage implements
-        Serializable {
+public class PAMRRegistryListRemoteObjectsMessage extends PAMRMessage implements Serializable {
 
     /**
      * Construct a list message
@@ -62,7 +61,7 @@ public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRouti
      * @param agent
      *            the local agent to use to send the message
      */
-    public MessageRoutingRegistryListRemoteObjectsMessage(URI uri, Agent agent) {
+    public PAMRRegistryListRemoteObjectsMessage(URI uri, Agent agent) {
         super(uri, agent);
     }
 
@@ -77,6 +76,6 @@ public class MessageRoutingRegistryListRemoteObjectsMessage extends MessageRouti
             logger.trace("Executing a list message");
         }
 
-        return MessageRoutingRegistry.singleton.list();
+        return PAMRRegistry.singleton.list();
     }
 }

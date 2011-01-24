@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
@@ -34,35 +34,24 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.pamr.exceptions;
+package org.objectweb.proactive.extensions.pamr.remoteobject;
 
-import org.objectweb.proactive.core.ProActiveException;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactory;
+import org.objectweb.proactive.core.remoteobject.RemoteObjectFactorySPI;
 
 
-/** Signals that an error of some sort has occurred.
+/** 
  *
- * This class is the general class of exceptions produced by failed message sending.
- * 
  * @since ProActive 4.1.0
  */
+public class PAMRRemoteObjectFactorySPI implements RemoteObjectFactorySPI {
 
-public class MessageRoutingException extends ProActiveException {
-
-    public MessageRoutingException() {
-        super();
+    public Class<? extends RemoteObjectFactory> getFactoryClass() {
+        return PAMRRemoteObjectFactory.class;
     }
 
-    public MessageRoutingException(String message) {
-        super(message);
-    }
-
-    public MessageRoutingException(Throwable cause) {
-        super(cause);
-    }
-
-    public MessageRoutingException(String msg, Throwable cause) {
-        super(msg);
-        this.initCause(cause);
+    public String getProtocolId() {
+        return "pamr";
     }
 
 }

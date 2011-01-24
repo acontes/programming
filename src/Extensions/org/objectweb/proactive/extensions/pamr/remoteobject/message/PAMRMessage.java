@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -46,7 +46,7 @@ import org.objectweb.proactive.core.util.converter.remote.ProActiveMarshaller;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.pamr.PAMRConfig;
 import org.objectweb.proactive.extensions.pamr.client.Agent;
-import org.objectweb.proactive.extensions.pamr.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extensions.pamr.exceptions.PAMRException;
 
 
 /** Any kind of routed message.
@@ -54,8 +54,8 @@ import org.objectweb.proactive.extensions.pamr.exceptions.MessageRoutingExceptio
  * @since ProActive 4.1.0 
  */
 
-public abstract class MessageRoutingMessage implements Serializable {
-    static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.FORWARDING_REMOTE_OBJECT);
+public abstract class PAMRMessage implements Serializable {
+    static final Logger logger = ProActiveLogger.getLogger(PAMRConfig.Loggers.PAMR_REMOTE_OBJECT);
 
     /** The recipient of this message */
     final protected URI uri;
@@ -83,7 +83,7 @@ public abstract class MessageRoutingMessage implements Serializable {
 
     protected boolean isAsynchronous = false;
 
-    public MessageRoutingMessage(URI uri, Agent agent) {
+    public PAMRMessage(URI uri, Agent agent) {
         this.uri = uri;
         this.agent = agent;
         this.returnedObject = null;
@@ -102,16 +102,16 @@ public abstract class MessageRoutingMessage implements Serializable {
 
     /** Send the message to its recipient using the local agent
      * 
-     * @throws MessageRoutingException if something bad happened when sending this message
+     * @throws PAMRException if something bad happened when sending this message
      */
-    public final void send() throws MessageRoutingException {
+    public final void send() throws PAMRException {
         try {
             byte[] bytes = this.marshaller.marshallObject(this);
             byte[] response = agent.sendMsg(this.uri, bytes, isAsynchronous);
             if (!isAsynchronous) {
                 this.returnedObject = this.marshaller.unmarshallObject(response);
             }
-        } catch (MessageRoutingException e) {
+        } catch (PAMRException e) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Failed to send message to " + this.uri, e);
             }
@@ -120,12 +120,12 @@ public abstract class MessageRoutingMessage implements Serializable {
             if (logger.isDebugEnabled()) {
                 logger.error("Failed to serialize this message, reason:" + e.getMessage(), e);
             }
-            throw new MessageRoutingException(e);
+            throw new PAMRException(e);
         } catch (ClassNotFoundException e) {
             if (logger.isDebugEnabled()) {
                 logger.error("Failed to deserialize the reply for this message, reason:" + e.getMessage(), e);
             }
-            throw new MessageRoutingException(e);
+            throw new PAMRException(e);
         }
     }
 }
