@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ActiveEon Team
  *                        http://www.activeeon.com/
@@ -34,7 +34,7 @@
  * ################################################################
  * $$ACTIVEEON_INITIAL_DEV$$
  */
-package functionalTests.messagerouting.client;
+package functionalTests.pamr.client;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -43,19 +43,19 @@ import java.net.UnknownHostException;
 import org.junit.Before;
 import org.junit.Test;
 import org.objectweb.proactive.core.ProActiveException;
-import org.objectweb.proactive.core.util.Sleeper;
 import org.objectweb.proactive.extensions.pamr.client.AgentImpl;
 import org.objectweb.proactive.extensions.pamr.client.MessageHandler;
-import org.objectweb.proactive.extensions.pamr.exceptions.MessageRoutingException;
+import org.objectweb.proactive.extensions.pamr.exceptions.PAMRException;
 import org.objectweb.proactive.extensions.pamr.protocol.AgentID;
 import org.objectweb.proactive.extensions.pamr.protocol.MagicCookie;
 import org.objectweb.proactive.extensions.pamr.protocol.message.DataRequestMessage;
 import org.objectweb.proactive.extensions.pamr.protocol.message.DebugMessage;
-import org.objectweb.proactive.extensions.pamr.protocol.message.Message;
 import org.objectweb.proactive.extensions.pamr.protocol.message.DebugMessage.DebugType;
-import org.objectweb.proactive.extensions.pamr.remoteobject.util.socketfactory.MessageRoutingPlainSocketFactory;
+import org.objectweb.proactive.extensions.pamr.protocol.message.Message;
+import org.objectweb.proactive.extensions.pamr.remoteobject.util.socketfactory.PAMRPlainSocketFactory;
+import org.objectweb.proactive.utils.Sleeper;
 
-import functionalTests.messagerouting.BlackBox;
+import functionalTests.pamr.BlackBox;
 
 
 public class ClientIOException extends BlackBox {
@@ -66,7 +66,7 @@ public class ClientIOException extends BlackBox {
     }
 
     @Test
-    public void test() throws UnknownHostException, ProActiveException, MessageRoutingException {
+    public void test() throws UnknownHostException, ProActiveException, PAMRException {
         InetAddress localhost = InetAddress.getLocalHost();
         Agent agent = new Agent(localhost, super.router.getPort(), FakeMessageHandler.class);
         AgentID agentId = agent.getAgentID();
@@ -101,10 +101,10 @@ public class ClientIOException extends BlackBox {
         public Agent(InetAddress routerAddr, int routerPort,
                 Class<? extends MessageHandler> messageHandlerClass) throws ProActiveException {
             super(routerAddr, routerPort, null, new MagicCookie(), messageHandlerClass,
-                    new MessageRoutingPlainSocketFactory());
+                    new PAMRPlainSocketFactory());
         }
 
-        public void sendMsg(Message message) throws MessageRoutingException {
+        public void sendMsg(Message message) throws PAMRException {
             super.internalSendMsg(message);
         }
 
