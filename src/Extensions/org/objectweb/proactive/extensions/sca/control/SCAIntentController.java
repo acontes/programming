@@ -52,7 +52,6 @@ import org.objectweb.proactive.extensions.sca.exceptions.NoSuchIntentHandlerExce
  */
 @PublicAPI
 public interface SCAIntentController {
-    public void printInfo();
 
     public int[] indexesOfIntentsOfMethod(String itfName, String methodName) throws NoSuchInterfaceException,
             NoSuchMethodException;

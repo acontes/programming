@@ -43,6 +43,7 @@ public class CServer implements TestIntentItf, TestIntentItf2 {
     }
 
     public int n() {
+    	System.err.println("inside public void n() ");
         return 0;
     }
 
@@ -51,6 +52,7 @@ public class CServer implements TestIntentItf, TestIntentItf2 {
     }
 
     public int n2() {
+    	System.err.println("inside public void n2() ");
         return 2;
     }
 }

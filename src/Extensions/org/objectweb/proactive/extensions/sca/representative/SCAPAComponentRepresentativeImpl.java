@@ -66,17 +66,6 @@ public class SCAPAComponentRepresentativeImpl extends PAComponentRepresentativeI
      */
     public Object getFcInterface(String interfaceName) throws NoSuchInterfaceException {
         Object itfObjetct = super.getFcInterface(interfaceName);
-        //    	System.err.println(stubOnBaseObject.getClass().getName()+" DEBUG "+interfaceName);
-        //    	if(interfaceName.endsWith("intent-controller"))
-        //    	{
-        //    		try {
-        //				throw new Exception("shit1");
-        //			} catch (Exception e) {
-        //				System.err.println(stubOnBaseObject.getClass().getName()+" DEBUG "+interfaceName+" exception catched!");
-        //				e.printStackTrace();
-        //			}
-        //    	}
-
         if (fcInterfaceReferences.containsKey(interfaceName)) {
             SCAIntentController scaic = (SCAIntentController) super
                     .getFcInterface(Constants.SCA_INTENT_CONTROLLER);

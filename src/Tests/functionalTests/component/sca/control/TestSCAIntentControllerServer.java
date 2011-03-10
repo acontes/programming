@@ -71,19 +71,18 @@ public class TestSCAIntentControllerServer extends SCAComponentTest {
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
-        //        System.err.println("cf type"+cf.getClass().getName());
         componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
-                type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                type_factory.createFcItfType(TestIntentItf.CLIENT_ITF_NAME, TestIntentItf.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                type_factory.createFcItfType(TestIntentItf2.SERVER_ITF_NAME, TestIntentItf2.class.getName(),
-                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                type_factory.createFcItfType("run", ExecuteItf.class.getName(), TypeFactory.SERVER,
-                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
-                type_factory.createFcItfType(TestIntentItf2.CLIENT_ITF_NAME, TestIntentItf2.class.getName(),
-                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
-                Constants.PRIMITIVE, new ContentDescription(CClient.class.getName(), new Object[] {}));
+        		type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
+        				TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+        				type_factory.createFcItfType(TestIntentItf.CLIENT_ITF_NAME, TestIntentItf.class.getName(),
+        						TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+        						type_factory.createFcItfType(TestIntentItf2.SERVER_ITF_NAME, TestIntentItf2.class.getName(),
+        								TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+        								type_factory.createFcItfType("run", ExecuteItf.class.getName(), TypeFactory.SERVER,
+        										TypeFactory.MANDATORY, TypeFactory.SINGLE),
+        										type_factory.createFcItfType(TestIntentItf2.CLIENT_ITF_NAME, TestIntentItf2.class.getName(),
+        												TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
+        												Constants.PRIMITIVE, new ContentDescription(CClient.class.getName(), new Object[] {}));
 
         componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
                 type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
@@ -99,15 +98,14 @@ public class TestSCAIntentControllerServer extends SCAComponentTest {
                 .getSCAIntentController(componentA); //client
         SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentB); //server
-
         //SCAPropertyController scac3 = Utils.getSCAPropertyController(componentA);
         //SCAPropertyController scac4 = Utils.getSCAPropertyController(componentB);
         IntentHandler y1 = new IntentHandlerTest("test server");
         IntentHandler y2 = new IntentHandlerTest("test client");
         scaic.addIntentHandler(y1);
         scaic1.addIntentHandler(y2);
-        //scaic.addIntentHandler(y, TestIntentItf2.SERVER_ITF_NAME);
-        //scaic.addIntentHandler(new SecurityIntentHandler("pass"), TestIntentItf.CLIENT_ITF_NAME, "m");
+        //scaic1.addIntentHandler(y2,TestIntentItf.SERVER_ITF_NAME);
+        //scaic1.addIntentHandler(y2, TestIntentItf.CLIENT_ITF_NAME);
         GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
         GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
@@ -121,8 +119,8 @@ public class TestSCAIntentControllerServer extends SCAComponentTest {
             i.m();
             System.out.println("invocation of method m success");
             int x = i2.n2();
-            System.out.println("invocation of method n success, value of n : " + x);
-            i3.execute();
+            //System.out.println("invocation of method n success, value of n : " + x);
+            //i3.execute();
         } catch (Exception e) {
             //fail();
             e.printStackTrace();

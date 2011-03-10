@@ -38,6 +38,7 @@ package org.objectweb.proactive.extensions.sca.gen;
 
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.UUID;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -127,7 +128,6 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     serviceItfClassName);
             List<IntentHandler> intentHandlersInList = ((SCAIntentController) owner
                     .getFcInterface(Constants.SCA_INTENT_CONTROLLER)).listExistingIntentHandler();
-            IntentHandler[] intentHandlers = intentHandlersInList.toArray(new IntentHandler[0]);
             Class<?> generatedClass = null;
             try {
                 generatedClass = loadClass(generatedClassName);
@@ -138,12 +138,6 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 CtClass superClass = pool.get(serviceItfClassName);
                 generatedCtClass.setSuperclass(pool.get(serviceItfClassName));
              
-                // Add intentHandlers instance fields
-                CtField intentHanderlers = CtField
-                        .make(
-                                "private org.objectweb.proactive.extensions.sca.control.IntentHandler[] intentHandlers;",
-                                generatedCtClass);
-                generatedCtClass.addField(intentHanderlers);
                 CtField intentHandlerArray = CtField
                 		.make("private java.util.List intentArray;"
                 				, generatedCtClass);
@@ -151,19 +145,6 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
                 generatedCtClass.addConstructor(defaultConstructor);
-                String secondConstructorBody = "public " +
-                    generatedClassName +
-                    "(org.objectweb.proactive.extensions.sca.control.IntentHandler[] intentHandlers)" +
-                    "{\n" +
-                    "if($1.length != " +
-                    intentHandlers.length +
-                    ") " +
-                    "{\n" +
-                    "throw new org.objectweb.proactive.core.ProActiveRuntimeException(\"Number of intents is not correct \"+$1.length);\n" +
-                    "}\n" + "this.intentHandlers = intentHandlers;\n" + "}";
-                CtConstructor SecondConstructor = CtNewConstructor.make(secondConstructorBody,
-                        generatedCtClass);
-                generatedCtClass.addConstructor(SecondConstructor);
                 
                 String thirdConstructorBody = "public " +
                 generatedClassName +
@@ -173,34 +154,14 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 CtConstructor ThirdConstructor = CtNewConstructor.make(thirdConstructorBody,
                         generatedCtClass);
                 generatedCtClass.addConstructor(ThirdConstructor);
-                
-                
+ 
                 // Add extended methods 
                 String serviceItfSignature = ((InterfaceType) ((Interface) serviceItf).getFcItfType())
                         .getFcItfSignature();
                 Class<?> serviceItfClass = Class.forName(serviceItfSignature);
                 CtMethod[] methodsToExtend = getMethodsToExtend(superClass, serviceItfClass);
                 for (int i = 0; i < methodsToExtend.length; i++) {
-                	//work_zone
-                	CtField tmp = CtField
-                    .make(
-                            "private int compteur"+methodsToExtend[i].getName()+"=0;",
-                            generatedCtClass);
-                	generatedCtClass.addField(tmp);
-                	
-//                	CtField tmp_array = CtField
-//                    .make(
-//                            "private int[] indexArray"+methodsToExtend[i].getName()+"=" +
-//                            		"((org.objectweb.proactive.extensions.sca.control.SCAIntentController)owner"+
-//                            ".getFcInterface(org.objectweb.proactive.extensions.sca.Constants.SCA_INTENT_CONTROLLER))." +
-//                            "indexesOfIntentsOfMethod("+
-//                            ItfName+","+ methodsToExtend[i].getName()+");",
-//                            generatedCtClass);
-//                	generatedCtClass.addField(tmp_array);
-                	//work_zone
-                	
                     // Create wrapper : inside contains super.method();
-                    //System.err.println(methodsToExtend[i].getName());
                     IntentHandler[] intentHandlersForGivingMethod = ((SCAIntentController) owner
                             .getFcInterface(Constants.SCA_INTENT_CONTROLLER)).listIntentHandler(ItfName,
                             methodsToExtend[i].getName()).toArray(new IntentHandler[0]);
@@ -210,49 +171,27 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                             ItfName, methodsToExtend[i].getName());
 
                     CtMethod wrapper = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
-                    wrapper.setName(wrapper.getName() + 0);
+                    String wrapperNameBase = wrapper.getName()+UUID.randomUUID().toString(); // unique method name
+                    wrapper.setName(wrapperNameBase+0);
                     generatedCtClass.addMethod(wrapper);
-                    // working zone
-                    
-                    CtMethod newMethod_work = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
-                    newMethod_work.setBody("{\n" +
-                    		"int compteur =0;\n"+
-                    		"if(compteur < intentArray.size()){\n"+
-	                    		"return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)intentArray.get(compteur++))" +
-	                    		".invoke(new org.objectweb.proactive.extensions.sca.control." +
-	                          "IntentJoinPoint(this, \"" + newMethod_work.getName()  + "\", $sig, $args));"+
-                    		"}\n"+
-                    		"else{\n"+
-                    			"compteur=0;" +
-                    			"return ($r)this."+wrapper.getName()+"();" +
-                    		"}\n}\n"
-                    		);
-                    newMethod_work.setName(newMethod_work.getName()+"_work");
-                    generatedCtClass.addMethod(newMethod_work);
-                    // working zone
-                    //for (int j = 0; j < intentHandlersForGivingMethod.length; j++) {
                     for (int j = 0; j < indexes.length; j++) {
-                        //int indexOfIntent = intentHandlersInList.indexOf(intentHandlersForGivingMethod[j]);
                         int indexOfIntent = indexes[j];
                         CtMethod newMethod = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
-//                        newMethod.setBody("{\nreturn ($r)intentHandlers[" + indexOfIntent +
-//                            "].invoke(new org.objectweb.proactive.extensions.sca.control." +
-//                            "IntentJoinPoint(this, \"" + newMethod.getName() + j + "\", $sig, $args));\n}");
                         newMethod.setBody("{\n" +
                         		"return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)intentArray.get(" + indexOfIntent +
                               ")).invoke(new org.objectweb.proactive.extensions.sca.control." +
-                              "IntentJoinPoint(this, \"" + newMethod.getName() + j + "\", $sig, $args));\n}");
+                              "IntentJoinPoint(this, \"" + wrapperNameBase + j + "\", $sig, $args));\n}");
                         // If there are intents left, then create method wrapper, otherwise create really method
                         String methodName = (j == intentHandlersForGivingMethod.length - 1) ? newMethod
-                                .getName() : newMethod.getName() + (j + 1);
+                                .getName() : wrapperNameBase + (j + 1);
                         newMethod.setName(methodName);
                         generatedCtClass.addMethod(newMethod);
                     }
                 }
 
-                                generatedCtClass.stopPruning(true);
-                                generatedCtClass.writeFile("generated/");
-                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                generatedCtClass.stopPruning(true);
+                generatedCtClass.writeFile("generated/");
+                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // 	Generate and add to cache the generated class
                 generatedCtClass.defrost();
@@ -266,7 +205,6 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
             }
             // Instantiate class
             PAInterfaceImpl reference = (PAInterfaceImpl) generatedClass.getConstructor(
-                    //intentHandlers.getClass()).newInstance((Object) intentHandlers);
             		java.util.List.class).newInstance(intentHandlersInList);
             PAInterfaceImpl sItf = (PAInterfaceImpl) serviceItf;
             reference.setFcItfOwner(sItf.getFcItfOwner());

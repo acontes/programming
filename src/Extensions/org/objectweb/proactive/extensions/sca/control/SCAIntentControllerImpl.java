@@ -85,18 +85,11 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      * if the value of list is null, then the intentHandler is applied to all
      * methods of Itf, else the list of String contain names of methods which are applied to intentHandler 
      */
-    //*private HashMap<IntentHandler, HashMap<String, List<String>>> informationPool;
     private HashMap<Integer, HashMap<String, List<String>>> informationPool;
     private List<IntentHandler> listOfIntent;
 
-    public void printInfo() {
-        System.err.println("get info of information pool ");
-        System.err.println(informationPool);
-    }
-
     public SCAIntentControllerImpl(Component owner) {
         super(owner);
-        //informationPool = new HashMap<IntentHandler, HashMap<String, List<String>>>();
         informationPool = new HashMap<Integer, HashMap<String, List<String>>>();
         listOfIntent = new ArrayList<IntentHandler>();
     }
@@ -236,38 +229,36 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         HashMap<String, List<String>> itfPool;
         List<String> methods;
         int intentIndex = indexAssociatedWithIntent(intentHandler);
-        //System.err.println("cool"+intentIndex+methodName+intentHandler.getClass().getName()+IntentHandler.ID);
         if (!informationPool.containsKey(intentIndex)) // intentHandler not exist
-        //*if (!informationPool.containsKey(intentHandler)) // intentHandler not exist
         {
             itfPool = new HashMap<String, List<String>>();
             methods = new ArrayList<String>();
             methods.add(methodName);
-            addToBaseObject(methodName,intentHandler);
+            addToBaseObject(itfName,methodName,intentHandler);
             itfPool.put(itfName, methods); // all methods in "itfName" interfaces
 
             informationPool.put(listOfIntent.size(), itfPool);
             listOfIntent.add(intentHandler);
-            //*informationPool.put(intentHandler, itfPool);
         } else {
             itfPool = informationPool.get(intentIndex);
-            //*itfPool = informationPool.get(intentHandler);
             if ((!itfPool.containsKey(itfName)) || itfPool == null) {
                 methods = new ArrayList<String>();
                 methods.add(methodName);
-                addToBaseObject(methodName,intentHandler);
+                addToBaseObject(itfName,methodName,intentHandler);
                 itfPool.put(itfName, methods); // all methods in "itfName" interfaces
             } else //possibility to have several same intent on one method
             {
                 methods = itfPool.get(itfName);
                 methods.add(methodName);
-                addToBaseObject(methodName,intentHandler);
+                addToBaseObject(itfName,methodName,intentHandler);
             }
         }
     }
     
-    private void addToBaseObject(String methodName, IntentHandler intentHandler) throws SecurityException, NoSuchMethodException {
-    	//System.err.println("DEBUG!");
+    private void addToBaseObject(String itfName,String methodName, IntentHandler intentHandler) throws SecurityException, NoSuchMethodException, NoSuchInterfaceException {
+    	if(((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()){
+    		return;
+    	}
     	String invokingName = "addIntointentArray"+methodName;
 		Object obj = owner.getReferenceOnBaseObject();
 		Class cla  = obj.getClass();
@@ -311,8 +302,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             smaller = list2;
             larger = list1;
         }
-
-        //HashSet<E> hashSet = new HashSet<E>(smaller);
         List<? extends E> tmp = new ArrayList<E>(smaller);
         for (E e : larger) {
             if (tmp.contains(e)) {
@@ -325,7 +314,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
 
     public List<IntentHandler> listIntentHandler() throws NoSuchInterfaceException, NoSuchMethodException {
         List<IntentHandler> res = new ArrayList<IntentHandler>();
-        //String[] listFc = GCM.getBindingController(owner).listFc();
         InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
         String[] listFc = new String[itftps.length];
         for (int i = 0; i < itftps.length; i++) {
@@ -370,18 +358,15 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         List<IntentHandler> res = new ArrayList<IntentHandler>();
         for (Iterator<Integer> iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
             int key = iterator.next();
-            //*IntentHandler key = (IntentHandler) iterator.next();
             if (informationPool.get(key).containsKey(ItfName)) {
                 IntentHandler tmp = intentAssociatedWithIndex(key);
                 res.add(tmp);
-                //*res.add(key);
             }
         }
         return res;
     }
 
     public List<IntentHandler> listExistingIntentHandler() {
-        //*return new ArrayList<IntentHandler>(informationPool.keySet());
         return listOfIntent;
     }
 
@@ -410,7 +395,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             IntentHandler key = iterator.next();
             int indexKey = indexAssociatedWithIntent(key);
             List<String> tmp = informationPool.get(indexKey).get(itfName);
-            //*List<String> tmp = informationPool.get(key).get(itfName);
             for (Iterator<String> listIter = tmp.iterator(); listIter.hasNext();) { //possibility to have several same intent on one method
                 String mName = listIter.next();
                 if (mName.equals(methodName)) {
@@ -432,9 +416,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         List<IntentHandler> tmp = listIntentHandler();
         int intentExist = ListContainsIntent(intentHandler, tmp);
         if (intentExist != -1)
-        //*if(tmp.contains(intentHandler))
         {
-            //String[] listFc = GCM.getBindingController(owner).listFc();
             InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
             String[] listFc = new String[itftps.length];
             for (int i = 0; i < itftps.length; i++) {
@@ -464,7 +446,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         Method[] methodList = null;
         int intentExist = ListContainsIntent(intentHandler, tmp);
         if (intentExist != -1)
-        //*if(tmp.contains(intentHandler))
         {
             try {
                 methodList = Class.forName(ItfSignature).getMethods();
@@ -496,7 +477,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         List<IntentHandler> tmp = listIntentHandler(itfName, methodName);
         int intentExist = ListContainsIntent(intentHandler, tmp);
         if (intentExist != -1)
-        //*if(tmp.contains(intentHandler))
         {
             Method[] methodList = null;
             try {
@@ -511,22 +491,18 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             } else {
                 int intentIndex = indexAssociatedWithIntent(intentHandler);
                 informationPool.get(intentIndex).get(itfName).remove(methodName);
-                //informationPool.get(intentHandler).get(itfName).remove(methodName);
                 if (informationPool.get(intentIndex).get(itfName).isEmpty())
-                //if(informationPool.get(intentHandler).get(itfName).isEmpty())
                 {
                     informationPool.get(intentIndex).remove(itfName);
-                    //*informationPool.get(intentHandler).remove(itfName);
                     if (informationPool.get(intentIndex).isEmpty())
-                    //*if(informationPool.get(intentHandler).isEmpty())
                     {
                         informationPool.remove(intentIndex);
                         listOfIntent.remove(intentIndex);
-                        //*informationPool.remove(intentHandler);
                     }
                 }
             }
         } else
             throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
     }
+
 }

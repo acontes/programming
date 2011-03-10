@@ -44,6 +44,7 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
     protected TestIntentItf2 testIntentItf2;
 
     public void m() throws Exception {
+    	System.out.println("calcul on client side");
         testIntentItf.m();
     }
 
@@ -57,7 +58,6 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
     }
 
     public int n2() {
-        System.err.println("in method n2 of testIntentItf2!!!!!");
         return testIntentItf2.n2();
     }
 
