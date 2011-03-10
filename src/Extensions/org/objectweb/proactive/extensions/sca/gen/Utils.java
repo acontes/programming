@@ -51,6 +51,11 @@ public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
         return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "property" +
             GENERATED_CLASSNAME_SUFFIX;
     }
+    
+    public static String getIntentClassName(String className) {
+        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "intent" +
+            GENERATED_CLASSNAME_SUFFIX;
+    }
 
     public static String getIntentInterceptorClassName(String componentName, String className) {
         return GENERATED_DEFAULT_PREFIX + componentName + GEN_MIDDLE_SEPARATOR + escapeString(className) +

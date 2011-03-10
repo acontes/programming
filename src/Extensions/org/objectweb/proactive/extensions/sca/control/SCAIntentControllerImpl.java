@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.extensions.sca.control;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -242,6 +243,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             itfPool = new HashMap<String, List<String>>();
             methods = new ArrayList<String>();
             methods.add(methodName);
+            addToBaseObject(methodName,intentHandler);
             itfPool.put(itfName, methods); // all methods in "itfName" interfaces
 
             informationPool.put(listOfIntent.size(), itfPool);
@@ -253,14 +255,30 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             if ((!itfPool.containsKey(itfName)) || itfPool == null) {
                 methods = new ArrayList<String>();
                 methods.add(methodName);
+                addToBaseObject(methodName,intentHandler);
                 itfPool.put(itfName, methods); // all methods in "itfName" interfaces
             } else //possibility to have several same intent on one method
             {
                 methods = itfPool.get(itfName);
                 methods.add(methodName);
+                addToBaseObject(methodName,intentHandler);
             }
         }
     }
+    
+    private void addToBaseObject(String methodName, IntentHandler intentHandler) throws SecurityException, NoSuchMethodException {
+    	//System.err.println("DEBUG!");
+    	String invokingName = "addIntointentArray"+methodName;
+		Object obj = owner.getReferenceOnBaseObject();
+		Class cla  = obj.getClass();
+		Method mAdd = cla.getDeclaredMethod(invokingName, IntentHandler.class);
+		try {
+			mAdd.invoke(obj, new Object[]{intentHandler});
+		} catch (Exception e) {
+			System.err.println("problem on invoking add intent into base object");
+			e.printStackTrace();
+		} 
+	}
 
     public boolean hasIntentHandler() throws NoSuchInterfaceException, NoSuchMethodException {
         return !listIntentHandler().isEmpty();

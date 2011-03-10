@@ -43,8 +43,8 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * IntentJoinPoint class definition. The class is initialized with all necessary informations for a stand alone
- * method invocation.
+ * IntentJoinPoint class definition. The class is initialized with 
+ * all necessary informations for a stand alone method invocation.
  *
  * @author The ProActive Team
  * @see IntentHandler
