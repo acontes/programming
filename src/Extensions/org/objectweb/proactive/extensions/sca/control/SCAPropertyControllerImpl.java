@@ -56,7 +56,8 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.sca.Constants;
 import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
 import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
-import org.osoa.sca.annotations.Property;
+import org.oasisopen.sca.annotation.Property;
+//import org.osoa.sca.annotations.Property;
 
 
 /**

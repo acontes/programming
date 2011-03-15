@@ -59,9 +59,8 @@ import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedEx
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
 import org.objectweb.proactive.extensions.sca.representative.SCAPAComponentRepresentativeFactory;
-import org.osoa.sca.annotations.Property;
-
-
+import org.oasisopen.sca.annotation.Property;
+//import org.osoa.sca.annotations.Property;
 /**
  * This class is used for creating SCA/GCM components. It acts as :
  * <ol>
@@ -109,9 +108,10 @@ public class SCAFractive extends Fractive {
         if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
             controllerDesc.getControllersSignatures().containsKey(SCAPropertyController.class.getName())) {
             String className = contentDesc.getClassName();
-            String generatedIntentClassName=null;
+            
+            String generatedIntentClassName=className;
 			try {
-				generatedIntentClassName = IntentClassGenerator.instance().generateClass(className);
+				generatedIntentClassName = IntentClassGenerator.instance().generateClass(className,className);
 				contentDesc.setClassName(generatedIntentClassName); // a retire
 			} catch (ClassGenerationFailedException  cgfe) {
 				logger.error("Cannot generate SCA Intent class for " + className + " : " +
@@ -121,10 +121,12 @@ public class SCAFractive extends Fractive {
                     ie.initCause(cgfe);
                     throw ie;
 			}
+            
+            String generatedClassName=null;
             // Test whether the component class has a property annotation
             if (hasPropertyAnnotation(className)) {
                 try {
-                    String generatedClassName = PropertyClassGenerator.instance().generateClass(generatedIntentClassName);
+                    generatedClassName = PropertyClassGenerator.instance().generateClass(generatedIntentClassName,className);
                     contentDesc.setClassName(generatedClassName);
                 } catch (ClassGenerationFailedException cgfe) {
                     logger.error("Cannot generate SCA Property class for " + className + " : " +
@@ -135,6 +137,7 @@ public class SCAFractive extends Fractive {
                     throw ie;
                 }
             }
+//           
         }
         return super.newFcInstance(type, controllerDesc, contentDesc, node);
     }

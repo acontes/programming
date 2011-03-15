@@ -40,7 +40,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.osoa.sca.annotations.Property;
+import org.oasisopen.sca.annotation.Property;
 
 
 public class CurrencySMS implements BindingController, Runner {

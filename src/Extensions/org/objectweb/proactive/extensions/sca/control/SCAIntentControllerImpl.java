@@ -262,7 +262,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     	String invokingName = "addIntointentArray"+methodName;
 		Object obj = owner.getReferenceOnBaseObject();
 		Class cla  = obj.getClass();
-		Method mAdd = cla.getDeclaredMethod(invokingName, IntentHandler.class);
+		Method mAdd = cla.getMethod(invokingName, IntentHandler.class);
 		try {
 			mAdd.invoke(obj, new Object[]{intentHandler});
 		} catch (Exception e) {

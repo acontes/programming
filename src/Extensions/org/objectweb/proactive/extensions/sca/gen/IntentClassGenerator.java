@@ -37,26 +37,29 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 	 * Generates a subclass from root class, if it contains org.osoa.sca.annotations.Property annotation. It adds to
 	 * the subclass the getter/setter corresponding to the properties.
 	 *
-	 * @param className Name of the component content class.
+	 * @param classToExtend Name of the class to be set as super class.
+	 * @param classToHerit Name of class contains the methods we want to inherit
 	 * @return The generated class name.
 	 * @throws ClassGenerationFailedException If the generation failed.
 	 * @throws NotFoundException 
 	 */
-	public String generateClass(String className) throws ClassGenerationFailedException{
-		String generatedClassName = Utils.getIntentClassName(className);
+	public String generateClass(String classToExtend,String classToHerit) throws ClassGenerationFailedException{
+		String generatedClassName = Utils.getIntentClassName(classToExtend);
 		try {
 			loadClass(generatedClassName);
 		} catch (ClassNotFoundException cnfe) {
 			try{
 				CtClass generatedCtClass = pool.makeClass(generatedClassName);
 				generatedCtClass.defrost();
-				CtClass superClass = pool.get(className);
+				CtClass superClass = pool.get(classToExtend);
 				generatedCtClass.setSuperclass(superClass);
+				
+				CtClass superClassToHerit = pool.get(classToHerit);
 
-				CtMethod[] methods = superClass.getDeclaredMethods();
+				CtMethod[] methods = superClassToHerit.getDeclaredMethods();
 				List<CtMethod> extentedMethodes = new ArrayList<CtMethod>();
-				String superClassName = superClass.getName();
 				for (CtMethod ctMethod : methods) {
+					//System.err.println(ctMethod.getName());
 					extentedMethodes.add(ctMethod);
 				}
 				// Add intentHandlers instance fields
@@ -101,9 +104,9 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 				CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
 				generatedCtClass.addConstructor(defaultConstructor);
 
-				generatedCtClass.stopPruning(true);
-				generatedCtClass.writeFile("generated/");
-				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+//				generatedCtClass.stopPruning(true);
+//				generatedCtClass.writeFile("generated/");
+//				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
 				// Generate and add to cache the generated class
 				byte[] bytecode = generatedCtClass.toBytecode();
@@ -117,9 +120,9 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 				// Defrost the generated class
 				generatedCtClass.defrost();
 			} catch (Exception e) {
-				logger.error("Cannot generate subClass of [" + className + "] with javassist: " +
+				logger.error("Cannot generate subClass of [" + classToExtend + "] with javassist: " +
 						e.getMessage());
-				throw new ClassGenerationFailedException("Cannot generate subClass of [" + className +
+				throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
 						"] with javassist", e);
 			}
 

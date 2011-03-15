@@ -52,6 +52,8 @@ import org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerato
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
+import org.oasisopen.sca.annotation.Property;
+//import org.osoa.sca.annotations.Property;
 
 
 /**
@@ -89,12 +91,13 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
      * Generates a subclass from root class, if it contains org.osoa.sca.annotations.Property annotation. It adds to
      * the subclass the getter/setter corresponding to the properties.
      *
-     * @param className Name of the component content class.
+     * @param classToExtend Name of the class to be set as super class.
+	 * @param classToHerit Name of class contains the methods we want to inherit
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation failed.
      */
-    public String generateClass(String className) throws ClassGenerationFailedException {
-        String generatedClassName = Utils.getPropertyClassName(className);
+    public String generateClass(String classToExtend,String classToHerit) throws ClassGenerationFailedException {
+        String generatedClassName = Utils.getPropertyClassName(classToExtend);
         try {
             loadClass(generatedClassName);
         } catch (ClassNotFoundException cnfe) {
@@ -103,14 +106,16 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                 generatedCtClass.defrost();
 
                 // Set super class
-                CtClass superClass = pool.get(className);
+                CtClass superClass = pool.get(classToExtend);
                 generatedCtClass.setSuperclass(superClass);
+                
+                CtClass superClassToHerit = pool.get(classToHerit);
 
                 // Get property fields of superclass
-                CtField[] fields = superClass.getDeclaredFields();
+                CtField[] fields = superClassToHerit.getDeclaredFields();
                 ArrayList<CtField> propertyFields = new ArrayList<CtField>();
                 for (int i = 0; i < fields.length; i++) {
-                    if (fields[i].hasAnnotation(org.osoa.sca.annotations.Property.class)) {
+                    if (fields[i].hasAnnotation(Property.class)) {
                         propertyFields.add(fields[i]);
                     }
                 }
@@ -130,9 +135,9 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                     generatedCtClass.addMethod(setter);
                 }
 
-                //                generatedCtClass.stopPruning(true);
-                //                generatedCtClass.writeFile("generated/");
-                //                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                                generatedCtClass.stopPruning(true);
+                                generatedCtClass.writeFile("generated/");
+                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // Generate and add to cache the generated class
                 byte[] bytecode = generatedCtClass.toBytecode();
@@ -146,9 +151,9 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                 // Defrost the generated class
                 generatedCtClass.defrost();
             } catch (Exception e) {
-                logger.error("Cannot generate subClass of [" + className + "] with javassist: " +
+                logger.error("Cannot generate subClass of [" + classToExtend + "] with javassist: " +
                     e.getMessage());
-                throw new ClassGenerationFailedException("Cannot generate subClass of [" + className +
+                throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
                     "] with javassist", e);
             }
         }

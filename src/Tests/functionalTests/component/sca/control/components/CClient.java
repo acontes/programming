@@ -36,10 +36,14 @@
  */
 package functionalTests.component.sca.control.components;
 
+import org.oasisopen.sca.annotation.Property;
 import org.objectweb.fractal.api.control.BindingController;
 
 
 public class CClient implements BindingController, TestIntentItf, TestIntentItf2, ExecuteItf {
+	@Property
+	public String PropertyClient;
+	
     protected TestIntentItf testIntentItf;
     protected TestIntentItf2 testIntentItf2;
 
@@ -54,6 +58,7 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
     }
 
     public void m2() throws Exception {
+    	System.err.println(PropertyClient);
         testIntentItf2.m2();
     }
 

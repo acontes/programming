@@ -189,9 +189,9 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     }
                 }
 
-                generatedCtClass.stopPruning(true);
-                generatedCtClass.writeFile("generated/");
-                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+//                generatedCtClass.stopPruning(true);
+//                generatedCtClass.writeFile("generated/");
+//                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // 	Generate and add to cache the generated class
                 generatedCtClass.defrost();

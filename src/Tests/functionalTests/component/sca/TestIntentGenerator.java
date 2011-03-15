@@ -18,7 +18,7 @@ public class TestIntentGenerator extends ComponentTest{
 		IntentHandler ith = new IntentHandlerTest("cool1!");
 		IntentHandler ith2 = new IntentHandlerTest("cool2!");
 		CServer cs = new CServer();
-		String generatedIntentClassName = IntentClassGenerator.instance().generateClass(CServer.class.getName());
+		String generatedIntentClassName = IntentClassGenerator.instance().generateClass(CServer.class.getName(),CServer.class.getName());
 		Class cl = Class.forName(generatedIntentClassName);
 		CServer csGen = (CServer) cl.getConstructor(null).newInstance(null);
 		Method x = cl.getDeclaredMethod("addIntointentArraym", IntentHandler.class);
