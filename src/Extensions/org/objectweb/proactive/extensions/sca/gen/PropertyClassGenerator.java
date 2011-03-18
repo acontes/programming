@@ -115,7 +115,8 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                 CtField[] fields = superClassToHerit.getDeclaredFields();
                 ArrayList<CtField> propertyFields = new ArrayList<CtField>();
                 for (int i = 0; i < fields.length; i++) {
-                    if (fields[i].hasAnnotation(Property.class)) {
+                    if (fields[i].hasAnnotation(org.oasisopen.sca.annotation.Property.class) || 
+                    		fields[i].hasAnnotation(org.osoa.sca.annotations.Property.class)) {
                         propertyFields.add(fields[i]);
                     }
                 }

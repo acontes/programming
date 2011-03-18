@@ -36,7 +36,7 @@
  */
 package functionalTests.component.sca.control.components;
 
-import org.oasisopen.sca.annotation.Property;
+import org.osoa.sca.annotations.Property;
 
 public class CServer implements TestIntentItf, TestIntentItf2 {
 	@Property

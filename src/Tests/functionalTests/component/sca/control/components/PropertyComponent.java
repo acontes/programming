@@ -44,27 +44,27 @@ import org.oasisopen.sca.annotation.Property;
 //@snippet-start component_scauserguide_1
 
 public class PropertyComponent implements Serializable {
-    @Property
+    @org.oasisopen.sca.annotation.Property
     public boolean x1;
-    @Property
+    @org.osoa.sca.annotations.Property
     protected byte x2;
-    @Property
+    @org.oasisopen.sca.annotation.Property
     protected char x3;
-    @Property
+    @org.osoa.sca.annotations.Property
     protected short x4;
-    @Property
+    @org.oasisopen.sca.annotation.Property
     protected int x5;
-    @Property
+    @org.osoa.sca.annotations.Property
     protected long x6;
-    @Property
+    @org.oasisopen.sca.annotation.Property
     protected float x7;
-    @Property
+    @org.osoa.sca.annotations.Property
     protected double x8;
-    @Property
+    @org.oasisopen.sca.annotation.Property
     protected String x9;
-    @Property
+    @org.osoa.sca.annotations.Property
     protected String[] x10;
-    @Property
+    @org.oasisopen.sca.annotation.Property
     protected Object x11;
 
     public PropertyComponent() {

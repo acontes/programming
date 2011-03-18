@@ -1,5 +1,7 @@
 package functionalTests.component.sca.control;
 
+import static org.junit.Assert.assertEquals;
+
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.junit.Before;
@@ -89,6 +91,8 @@ public class TestSCAControllers  extends SCAComponentTest{
         ExecuteItf i3 = ((ExecuteItf) componentA.getFcInterface("run"));
         try {
             i2.m2();
+            assertEquals("client\'s property", scapcClient.getValue("PropertyClient"));
+            assertEquals("server\'s property", scapcServer.getValue("PropertyServer"));
             System.out.println("invocation of method m2 success");
         } catch (Exception e) {
             e.printStackTrace();

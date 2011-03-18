@@ -39,18 +39,15 @@ package org.objectweb.proactive.extensions.sca;
 import java.lang.reflect.Field;
 
 import org.apache.log4j.Logger;
+//import org.oasisopen.sca.annotation.Property;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.proactive.annotation.PublicAPI;
-import org.objectweb.proactive.core.ProActiveRuntimeException;
-import org.objectweb.proactive.core.component.ComponentParameters;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
-import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
-import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -58,8 +55,6 @@ import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
-import org.objectweb.proactive.extensions.sca.representative.SCAPAComponentRepresentativeFactory;
-import org.oasisopen.sca.annotation.Property;
 //import org.osoa.sca.annotations.Property;
 /**
  * This class is used for creating SCA/GCM components. It acts as :
@@ -154,7 +149,8 @@ public class SCAFractive extends Fractive {
             Class<?> clazz = Class.forName(className);
             Field[] fields = clazz.getDeclaredFields();
             for (int i = 0; i < fields.length; i++) {
-                if (fields[i].isAnnotationPresent(Property.class)) {
+                if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Property.class) || 
+                		fields[i].isAnnotationPresent( org.osoa.sca.annotations.Property.class)) {
                     return true;
                 }
             }

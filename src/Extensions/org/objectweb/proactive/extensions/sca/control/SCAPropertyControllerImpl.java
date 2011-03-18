@@ -56,7 +56,7 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.sca.Constants;
 import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
 import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
-import org.oasisopen.sca.annotation.Property;
+//import org.oasisopen.sca.annotation.Property;
 //import org.osoa.sca.annotations.Property;
 
 
@@ -139,7 +139,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
                 while (!currentClass.equals(Object.class)) {
                     Field[] fields = currentClass.getDeclaredFields();
                     for (int i = 0; i < fields.length; i++) {
-                        if (fields[i].isAnnotationPresent(Property.class)) {
+                        if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Property.class) || 
+                        		fields[i].isAnnotationPresent(org.osoa.sca.annotations.Property.class)) {
                             declaredPropertyNames.add(fields[i].getName());
                             Class<?> type = fields[i].getType();
                             if (type.isPrimitive()) {
