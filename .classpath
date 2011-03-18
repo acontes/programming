@@ -145,5 +145,6 @@
 	<classpathentry kind="lib" path="lib/ws-common/wstx-asl-3.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/ws-common/XmlSchema-1.4.5.jar"/>
 	<classpathentry kind="lib" path="/home/Stage/SHORT_ComponentSCAControllers/SHORT_ComponentSCAControllers/lib/sca-caa-apis-1.1-CD04.jar"/>
+	<classpathentry kind="lib" path="/home/Stage/SHORT_ComponentSCAControllers/SHORT_ComponentSCAControllers/lib/osoa-java-api-1.0.jar"/>
 	<classpathentry kind="output" path="classes"/>
 </classpath>
