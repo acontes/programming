@@ -370,7 +370,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         return listOfIntent;
     }
 
-    public boolean intentHandlerExists(String ItfName) {
+    public boolean hasAtleastOneIntentHandler(String ItfName) {
         return !listExistingIntentHandlerOfAItface(ItfName).isEmpty();
     }
 

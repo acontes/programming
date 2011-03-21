@@ -115,7 +115,7 @@ public interface SCAIntentController {
      * @return True if the given service or reference interface has at least one intent applied to 
      * one methods of given interface, false otherwise
      */
-    public boolean intentHandlerExists(String ItfName);
+    public boolean hasAtleastOneIntentHandler(String ItfName);
 
     /**
      * Indicates if the given service or reference interface has intent handlers.
