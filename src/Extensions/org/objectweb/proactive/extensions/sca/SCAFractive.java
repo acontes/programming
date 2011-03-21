@@ -132,7 +132,20 @@ public class SCAFractive extends Fractive {
                     throw ie;
                 }
             }
-//           
+            
+            if (hasRequiresAnnotation(className)) {
+//                try {
+//                    generatedClassName = PropertyClassGenerator.instance().generateClass(generatedIntentClassName,className);
+//                    contentDesc.setClassName(generatedClassName);
+//                } catch (ClassGenerationFailedException cgfe) {
+//                    logger.error("Cannot generate SCA Property class for " + className + " : " +
+//                        cgfe.getMessage());
+//                    InstantiationException ie = new InstantiationException(
+//                        "Cannot generate SCA Property class for " + className + " : " + cgfe.getMessage());
+//                    ie.initCause(cgfe);
+//                    throw ie;
+//                }
+            }     
         }
         return super.newFcInstance(type, controllerDesc, contentDesc, node);
     }
@@ -165,22 +178,31 @@ public class SCAFractive extends Fractive {
         return false;
     }
 
-//    /*
-//     * Creates a component representative for a functional component (to be used with commonInstanciation method)
-//     * @param container The container containing objects for the generation of component representative
-//     * @return The created component
-//     */
-//    protected PAComponentRepresentative fComponent(Type type, ActiveObjectWithComponentParameters container) {
-//        //System.err.println("initial new stub");
-//        ComponentParameters componentParameters = container.getParameters();
-//        StubObject ao = container.getActiveObject();
-//        org.objectweb.proactive.core.mop.Proxy myProxy = (ao).getProxy();
-//        if (myProxy == null) {
-//            throw new ProActiveRuntimeException("Cannot find a Proxy on the stub object: " + ao);
-//        }
-//        PAComponentRepresentative representative = SCAPAComponentRepresentativeFactory.instance()
-//                .createComponentRepresentative(componentParameters, myProxy);
-//        representative.setStubOnBaseObject(ao);
-//        return representative;
-//    }
+    
+    /*
+     * Determines if a class contains org.osoa.sca.annotations.Property annotation.
+     *
+     * @param className Class to introspect.
+     * @return True if the given class contains org.osoa.sca.annotations.Property annotation.
+     * @throws InstantiationException If the class cannot be found.
+     */
+    private boolean hasRequiresAnnotation(String className) throws InstantiationException {
+        try {
+            Class<?> clazz = Class.forName(className);
+            Field[] fields = clazz.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                if (fields[i].isAnnotationPresent(org.objectweb.fractal.fraclet.annotations.Requires.class)) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            logger.error("Cannot find classe " + className + " : " + cnfe.getMessage());
+            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
+                cnfe.getMessage());
+            ie.initCause(cnfe);
+            throw ie;
+        }
+
+        return false;
+    }
 }
