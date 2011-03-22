@@ -37,8 +37,6 @@
 package functionalTests.component.sca.control.components;
 
 import org.oasisopen.sca.annotation.Property;
-import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.fraclet.annotations.Requires;
 
 
 public class CClient implements TestIntentItf, TestIntentItf2, ExecuteItf {

@@ -685,13 +685,14 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     private boolean hasRequiresAnnotation(String className) throws InstantiationException {
         try {
             Class<?> clazz = Class.forName(className);
-            List<Field> fields = new ArrayList<Field>(Arrays.asList(clazz.getFields()));
+            List<Field> fields = new ArrayList<Field>(Arrays.asList(clazz.getDeclaredFields()));
             do{
             	clazz = clazz.getSuperclass();
             	List<Field> asList = Arrays.asList(clazz.getDeclaredFields());
 				fields.addAll(asList);
             }while(!clazz.equals(Object.class));
             for (int i = 0; i < fields.size(); i++) {
+            	//System.err.println(fields.get(i).getName());
                 if (((AccessibleObject) fields.get(i)).isAnnotationPresent(org.objectweb.fractal.fraclet.annotations.Requires.class)) {
                     return true;
                 }

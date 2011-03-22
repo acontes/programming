@@ -39,7 +39,6 @@ package org.objectweb.proactive.extensions.sca;
 import java.lang.reflect.Field;
 
 import org.apache.log4j.Logger;
-//import org.oasisopen.sca.annotation.Property;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -47,9 +46,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
 import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
-import org.objectweb.proactive.core.component.gen.RequiresClassGenerator;
 import org.objectweb.proactive.core.node.Node;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -133,20 +130,6 @@ public class SCAFractive extends Fractive {
                     throw ie;
                 }
             }
-//            if (hasRequiresAnnotation(className)) {
-//    			try {
-//    				generatedClassName = RequiresClassGenerator.instance().generateClass(generatedClassName,className);
-//    				contentDesc.setClassName(generatedClassName);
-//    			} catch (InterfaceGenerationFailedException cgfe) {
-//    				logger.error("Cannot generate requires class for " + className + " : " +
-//    						cgfe.getMessage());
-//    				InstantiationException ie = new InstantiationException(
-//    						"Cannot generate SCA Property class for " + className + " : " + cgfe.getMessage());
-//    				ie.initCause(cgfe);
-//    				throw ie;
-//    			}
-//    		}     
-            
         }
         return super.newFcInstance(type, controllerDesc, contentDesc, node);
     }

@@ -52,8 +52,6 @@ import org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerato
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
-import org.oasisopen.sca.annotation.Property;
-//import org.osoa.sca.annotations.Property;
 
 
 /**

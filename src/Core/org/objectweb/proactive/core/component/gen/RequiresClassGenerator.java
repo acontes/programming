@@ -1,9 +1,7 @@
 package org.objectweb.proactive.core.component.gen;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 
 import javassist.CtClass;
@@ -18,7 +16,6 @@ import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.fraclet.annotations.Requires;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
-import org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
@@ -64,7 +61,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
 				CtClass superClassToHerit = pool.get(classToHerit);
 				
 				// Get property fields of superclass
-				List<CtField> fields = new ArrayList<CtField>(Arrays.asList(superClassToHerit.getFields()));
+				List<CtField> fields = new ArrayList<CtField>(Arrays.asList(superClassToHerit.getDeclaredFields()));
 	            do{
 	            	superClassToHerit = superClassToHerit.getSuperclass();
 	            	List<CtField> asList = Arrays.asList(superClassToHerit.getDeclaredFields());
@@ -120,7 +117,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
 				// Add constructors
 				CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
 				generatedCtClass.addConstructor(defaultConstructor);
-//
+
 //				generatedCtClass.stopPruning(true);
 //				generatedCtClass.writeFile("generated/");
 //				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
