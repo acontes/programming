@@ -37,8 +37,13 @@
 package org.objectweb.proactive.core.component;
 
 import java.io.IOException;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.Field;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.naming.NamingException;
@@ -63,7 +68,9 @@ import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.body.ProActiveMetaObjectFactory;
 import org.objectweb.proactive.core.body.UniversalBody;
 import org.objectweb.proactive.core.component.body.ComponentBody;
+import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
+import org.objectweb.proactive.core.component.gen.RequiresClassGenerator;
 import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentative;
 import org.objectweb.proactive.core.component.representative.PAComponentRepresentativeFactory;
@@ -77,6 +84,8 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
+import org.objectweb.proactive.extensions.sca.Constants;
+
 
 
 /**
@@ -252,20 +261,38 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      *      org.objectweb.proactive.core.node.Node)
      */
     public Component newFcInstance(Type type, ControllerDescription controllerDesc,
-            ContentDescription contentDesc, Node node) throws InstantiationException {
-        try {
-            ActiveObjectWithComponentParameters container = commonInstanciation(type, controllerDesc,
-                    contentDesc, node);
-            return fComponent(type, container);
-        } catch (ActiveObjectCreationException e) {
-            InstantiationException ie = new InstantiationException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
-        } catch (NodeException e) {
-            InstantiationException ie = new InstantiationException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
-        }
+    		ContentDescription contentDesc, Node node) throws InstantiationException {
+    	if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)){
+    		String className = contentDesc.getClassName();
+    		String generatedClassName = className;    
+    		if (hasRequiresAnnotation(className)) {
+    			try {
+    				generatedClassName = RequiresClassGenerator.instance().generateClass(generatedClassName,className);
+    				contentDesc.setClassName(generatedClassName);
+    			} catch (InterfaceGenerationFailedException igfe) {
+    				logger.error("Cannot generate requires class for " + className + " : " +
+    						igfe.getMessage());
+    				InstantiationException ie = new InstantiationException(
+    						"Cannot generate requires class for " + className + " : " + igfe.getMessage());
+    				ie.initCause(igfe);
+    				throw ie;
+    			}
+    		}     
+    	}
+    	try {
+    		ActiveObjectWithComponentParameters container = commonInstanciation(type, controllerDesc,
+    				contentDesc, node);
+    		return fComponent(type, container);
+    	} catch (ActiveObjectCreationException e) {
+    		InstantiationException ie = new InstantiationException(e.getMessage());
+    		ie.initCause(e);
+    		throw ie;
+    	} catch (NodeException e) {
+    		InstantiationException ie = new InstantiationException(e.getMessage());
+    		ie.initCause(e);
+    		throw ie;
+    	}
+
     }
 
     /*
@@ -292,26 +319,26 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     public Component newFcInstance(Type type, Type nfType, ContentDescription contentDesc,
-            ControllerDescription controllerDesc, Node node) throws InstantiationException {
-        if (nfType == null) {
-            return newFcInstance(type, controllerDesc, contentDesc, node);
-        }
-        try {
-            ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
-                    contentDesc, node);
-            return fComponent(type, container);
-        } catch (ActiveObjectCreationException e) {
-            logger
-                    .info("Active object creation error while creating component; an exception occurs with the following message: " +
-                        e.getMessage());
-            InstantiationException ie = new InstantiationException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
-        } catch (NodeException e) {
-            InstantiationException ie = new InstantiationException(e.getMessage());
-            ie.initCause(e);
-            throw ie;
-        }
+    		ControllerDescription controllerDesc, Node node) throws InstantiationException {
+    	if (nfType == null) {
+    		return newFcInstance(type, controllerDesc, contentDesc, node);
+    	}
+    	try {
+    		ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
+    				contentDesc, node);
+    		return fComponent(type, container);
+    	} catch (ActiveObjectCreationException e) {
+    		logger
+    		.info("Active object creation error while creating component; an exception occurs with the following message: " +
+    				e.getMessage());
+    		InstantiationException ie = new InstantiationException(e.getMessage());
+    		ie.initCause(e);
+    		throw ie;
+    	} catch (NodeException e) {
+    		InstantiationException ie = new InstantiationException(e.getMessage());
+    		ie.initCause(e);
+    		throw ie;
+    	}
     }
 
     /*
@@ -648,6 +675,38 @@ public class Fractive implements PAGenericFactory, Component, Factory {
         return representative;
     }
 
+    /*
+     * Determines if a class contains org.osoa.sca.annotations.Property annotation.
+     *
+     * @param className Class to introspect.
+     * @return True if the given class contains org.osoa.sca.annotations.Property annotation.
+     * @throws InstantiationException If the class cannot be found.
+     */
+    private boolean hasRequiresAnnotation(String className) throws InstantiationException {
+        try {
+            Class<?> clazz = Class.forName(className);
+            List<Field> fields = new ArrayList<Field>(Arrays.asList(clazz.getFields()));
+            do{
+            	clazz = clazz.getSuperclass();
+            	List<Field> asList = Arrays.asList(clazz.getDeclaredFields());
+				fields.addAll(asList);
+            }while(!clazz.equals(Object.class));
+            for (int i = 0; i < fields.size(); i++) {
+                if (((AccessibleObject) fields.get(i)).isAnnotationPresent(org.objectweb.fractal.fraclet.annotations.Requires.class)) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            logger.error("Cannot find classe " + className + " : " + cnfe.getMessage());
+            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
+                cnfe.getMessage());
+            ie.initCause(cnfe);
+            throw ie;
+        }
+
+        return false;
+    }
+    
     //private static class ActiveObjectWithComponentParameters {
     protected class ActiveObjectWithComponentParameters {
         StubObject activeObject;

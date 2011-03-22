@@ -38,13 +38,15 @@ package functionalTests.component.sca.control.components;
 
 import org.oasisopen.sca.annotation.Property;
 import org.objectweb.fractal.api.control.BindingController;
+import org.objectweb.fractal.fraclet.annotations.Requires;
 
 
-public class CClient implements BindingController, TestIntentItf, TestIntentItf2, ExecuteItf {
+public class CClient implements TestIntentItf, TestIntentItf2, ExecuteItf {
 	@Property
 	public String PropertyClient;
-	
+	@org.objectweb.fractal.fraclet.annotations.Requires(name="client")
     protected TestIntentItf testIntentItf;
+	@org.objectweb.fractal.fraclet.annotations.Requires(name="client2")
     protected TestIntentItf2 testIntentItf2;
 
     public void m() throws Exception {
@@ -66,38 +68,38 @@ public class CClient implements BindingController, TestIntentItf, TestIntentItf2
         return testIntentItf2.n2();
     }
 
-    public String[] listFc() {
-        return new String[] { TestIntentItf.CLIENT_ITF_NAME, TestIntentItf2.CLIENT_ITF_NAME };
-    }
-
-    public Object lookupFc(String clientItfName) {
-        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
-            return testIntentItf;
-        }
-        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
-            return testIntentItf2;
-        } else {
-            return null;
-        }
-    }
-
-    public void bindFc(String clientItfName, Object serverItf) {
-        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
-            testIntentItf = (TestIntentItf) serverItf;
-        }
-        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
-            testIntentItf2 = (TestIntentItf2) serverItf;
-        }
-    }
-
-    public void unbindFc(String clientItfName) {
-        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
-            testIntentItf = null;
-        }
-        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
-            testIntentItf2 = null;
-        }
-    }
+//    public String[] listFc() {
+//        return new String[] { TestIntentItf.CLIENT_ITF_NAME, TestIntentItf2.CLIENT_ITF_NAME };
+//    }
+//
+//    public Object lookupFc(String clientItfName) {
+//        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
+//            return testIntentItf;
+//        }
+//        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
+//            return testIntentItf2;
+//        } else {
+//            return null;
+//        }
+//    }
+//
+//    public void bindFc(String clientItfName, Object serverItf) {
+//        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
+//            testIntentItf = (TestIntentItf) serverItf;
+//        }
+//        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
+//            testIntentItf2 = (TestIntentItf2) serverItf;
+//        }
+//    }
+//
+//    public void unbindFc(String clientItfName) {
+//        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
+//            testIntentItf = null;
+//        }
+//        if (clientItfName.equals(TestIntentItf2.CLIENT_ITF_NAME)) {
+//            testIntentItf2 = null;
+//        }
+//    }
 
     public void execute() {
         // TODO Auto-generated method stub

@@ -135,10 +135,10 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                             propertyField);
                     generatedCtClass.addMethod(setter);
                 }
-
-                                generatedCtClass.stopPruning(true);
-                                generatedCtClass.writeFile("generated/");
-                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+//
+//                                generatedCtClass.stopPruning(true);
+//                                generatedCtClass.writeFile("generated/");
+//                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // Generate and add to cache the generated class
                 byte[] bytecode = generatedCtClass.toBytecode();

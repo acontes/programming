@@ -1,7 +1,10 @@
-package org.objectweb.proactive.extensions.sca.gen;
+package org.objectweb.proactive.core.component.gen;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
@@ -44,8 +47,8 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
 	 * @throws ClassGenerationFailedException If the generation failed.
 	 * @throws NotFoundException 
 	 */
-	public String generateClass(String classToExtend,String classToHerit) throws ClassGenerationFailedException{
-		String generatedClassName = Utils.getIntentClassName(classToExtend);
+	public String generateClass(String classToExtend,String classToHerit) throws InterfaceGenerationFailedException{
+		String generatedClassName = Utils.getRequiresClassName(classToExtend);
 		try {
 			loadClass(generatedClassName);
 		} catch (ClassNotFoundException cnfe) {
@@ -61,21 +64,28 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
 				CtClass superClassToHerit = pool.get(classToHerit);
 				
 				// Get property fields of superclass
-                CtField[] fields = superClassToHerit.getDeclaredFields();
+				List<CtField> fields = new ArrayList<CtField>(Arrays.asList(superClassToHerit.getFields()));
+	            do{
+	            	superClassToHerit = superClassToHerit.getSuperclass();
+	            	List<CtField> asList = Arrays.asList(superClassToHerit.getDeclaredFields());
+					fields.addAll(asList);
+	            }while(!superClassToHerit.getName().equals(Object.class.getName()));
+
                 ArrayList<CtField> requiresFields = new ArrayList<CtField>();
-                for (int i = 0; i < fields.length; i++) {
-                    if (fields[i].hasAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class)){
-                        requiresFields.add(fields[i]);
+                for (int i = 0; i < fields.size(); i++) {
+                    if (fields.get(i).hasAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class)){
+                        requiresFields.add(fields.get(i));
                     }
                 }
+                
 				String listFCBody = "return new String[] {";
 				int i = 0;
 				for (i = 0 ; i < requiresFields.size()-1 ; i++) {
 					org.objectweb.fractal.fraclet.annotations.Requires tmp = (Requires) requiresFields.get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
-					listFCBody+= tmp.name() + ",";
+					listFCBody+= "\""+tmp.name() + "\",";
 				}
 				org.objectweb.fractal.fraclet.annotations.Requires tmp = (Requires) requiresFields.get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
-				listFCBody+= tmp.name() + "};";
+				listFCBody+="\""+ tmp.name() + "\"};";
                 CtMethod listFC = CtNewMethod.make("public String[] listFc() {"+ listFCBody +"}", generatedCtClass);
                 generatedCtClass.addMethod(listFC);
                 
@@ -93,7 +103,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
                 for (i = 0 ; i < requiresFields.size() ; i++) {
                 	org.objectweb.fractal.fraclet.annotations.Requires tmp3 = (Requires) requiresFields.get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
                 	bindFcBody+="if (clientItfName.equals(\""+ tmp3.name() +"\")) {"+
-                		requiresFields.get(i).getName() +" = ("+ requiresFields.get(i).getName() +")serverItf; }";
+                		requiresFields.get(i).getName() +" = ("+ requiresFields.get(i).getType().getName() +")serverItf; }";
                 }
                 CtMethod bindFc = CtNewMethod.make("public void bindFc(String clientItfName, Object serverItf) {"+bindFcBody+"}", generatedCtClass);
                 generatedCtClass.addMethod(bindFc);
@@ -110,10 +120,10 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
 				// Add constructors
 				CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
 				generatedCtClass.addConstructor(defaultConstructor);
-
-				generatedCtClass.stopPruning(true);
-				generatedCtClass.writeFile("generated/");
-				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+//
+//				generatedCtClass.stopPruning(true);
+//				generatedCtClass.writeFile("generated/");
+//				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
 				// Generate and add to cache the generated class
 				byte[] bytecode = generatedCtClass.toBytecode();
@@ -129,7 +139,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator{
 			} catch (Exception e) {
 				logger.error("Cannot generate subClass of [" + classToExtend + "] with javassist: " +
 						e.getMessage());
-				throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
+				throw new InterfaceGenerationFailedException("Cannot generate subClass of [" + classToExtend +
 						"] with javassist", e);
 			}
 

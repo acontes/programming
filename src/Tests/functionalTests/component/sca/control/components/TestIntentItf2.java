@@ -36,6 +36,7 @@
  */
 package functionalTests.component.sca.control.components;
 
+//@org.objectweb.fractal.fraclet.annotations.Interface(name = "service2")
 public interface TestIntentItf2 {
     public static final String CLIENT_ITF_NAME = "client2";
     public static final String SERVER_ITF_NAME = "server2";

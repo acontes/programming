@@ -101,7 +101,5 @@ public class TestSCAControllers  extends SCAComponentTest{
         GCM.getGCMLifeCycleController(componentB).stopFc();
         GCM.getBindingController(componentA).unbindFc(TestIntentItf.CLIENT_ITF_NAME);
         GCM.getBindingController(componentA).unbindFc(TestIntentItf2.CLIENT_ITF_NAME);
-
     }
-    
 }
