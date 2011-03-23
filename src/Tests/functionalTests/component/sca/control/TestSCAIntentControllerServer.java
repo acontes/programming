@@ -72,17 +72,17 @@ public class TestSCAIntentControllerServer extends SCAComponentTest {
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
         GenericFactory cf = GCM.getGenericFactory(boot);
         componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
-        		type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
-        				TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
-        				type_factory.createFcItfType(TestIntentItf.CLIENT_ITF_NAME, TestIntentItf.class.getName(),
-        						TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE),
-        						type_factory.createFcItfType(TestIntentItf2.SERVER_ITF_NAME, TestIntentItf2.class.getName(),
-        								TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
-        								type_factory.createFcItfType("run", ExecuteItf.class.getName(), TypeFactory.SERVER,
-        										TypeFactory.MANDATORY, TypeFactory.SINGLE),
-        										type_factory.createFcItfType(TestIntentItf2.CLIENT_ITF_NAME, TestIntentItf2.class.getName(),
-        												TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
-        												Constants.PRIMITIVE, new ContentDescription(CClient.class.getName(), new Object[] {}));
+                type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType(TestIntentItf.CLIENT_ITF_NAME, TestIntentItf.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType(TestIntentItf2.SERVER_ITF_NAME, TestIntentItf2.class.getName(),
+                        TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType("run", ExecuteItf.class.getName(), TypeFactory.SERVER,
+                        TypeFactory.MANDATORY, TypeFactory.SINGLE),
+                type_factory.createFcItfType(TestIntentItf2.CLIENT_ITF_NAME, TestIntentItf2.class.getName(),
+                        TypeFactory.CLIENT, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
+                Constants.PRIMITIVE, new ContentDescription(CClient.class.getName(), new Object[] {}));
 
         componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
                 type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),

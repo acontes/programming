@@ -40,24 +40,19 @@ import org.osoa.sca.annotations.Property;
 
 public class CServer implements TestIntentItf, TestIntentItf2 {
 	@Property
-	public String PropertyServer;
+	public String propertyServer;
     
 	public void m() {
-        System.err.println("inside public void m() ");
     }
 
     public int n() {
-    	System.err.println("inside public void n() ");
         return 0;
     }
 
     public void m2() throws Exception {
-        System.err.println(PropertyServer);
     }
 
     public int n2() {
-    	System.err.println("inside public void n2() ");
         return 2;
     }
-   
 }

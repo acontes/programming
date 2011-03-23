@@ -38,9 +38,6 @@ package functionalTests.component.sca.control.components;
 
 import java.io.Serializable;
 
-import org.oasisopen.sca.annotation.Property;
-//import org.osoa.sca.annotations.Property;
-
 //@snippet-start component_scauserguide_1
 
 public class PropertyComponent implements Serializable {

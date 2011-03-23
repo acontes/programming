@@ -36,8 +36,6 @@
  */
 package functionalTests.component.sca.control.components;
 
-import java.util.Calendar;
-
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
@@ -46,7 +44,6 @@ public class IntentHandlerTest implements IntentHandler {
     private String msg;
 
     public IntentHandlerTest() {
-
     }
 
     public IntentHandlerTest(String msg) {
@@ -54,16 +51,7 @@ public class IntentHandlerTest implements IntentHandler {
     }
 
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-    	
-        System.err.println("INTENT before at " +Calendar.getInstance().getTimeInMillis()+ msg);
-        try{
-  		  Thread.currentThread().sleep(1000);//sleep for 1000 ms
-  		}
-  		catch(Exception ie){
-  		//If this thread was intrrupted by nother thread 
-  		}
         Object res =  ijp.proceed();
-        System.err.println("INTENT after at "+Calendar.getInstance().getTimeInMillis() + msg);
         return res;
     }
 }
