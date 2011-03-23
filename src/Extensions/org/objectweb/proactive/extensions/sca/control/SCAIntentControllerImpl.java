@@ -47,8 +47,6 @@ import org.apache.log4j.Logger;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.BindingController;
-import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.control.LifeCycleController;
 import org.objectweb.fractal.api.factory.InstantiationException;
@@ -73,17 +71,17 @@ import org.objectweb.proactive.extensions.sca.exceptions.NoSuchIntentHandlerExce
 public class SCAIntentControllerImpl extends AbstractPAController implements SCAIntentController {
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
-    //private List<IntentHandler> intentHandlers;
     /*
-     * this HashMap offer the relationship between a given intenthandler and components' service
-     * Itf. first string key contain the name of IntentHandler, if the value corresponds to it is
-     * null, it means this IntentHandler is applied to all service Itf. else we have a list of valid
-     * service Itf. each service Itf information is been put in a hashMap. the key corresponds to
-     * the Name of service Itf, if the value of list is null, then the intentHandler is applied to
-     * all methods of Itf, else the list of String contain names of methods which are applied to
-     * intentHandler
+     * This HashMap offers the relationship between a given IntentHandler and component's
+     * interfaces. First string key contains the name of IntentHandler, if the value corresponds to
+     * null, it means this IntentHandler is applied to all interfaces. Else we have a list of valid
+     * interfaces. Each interface information is put in a hashMap. The key corresponds to the name
+     * of the interface, if the value of list is null, then the intentHandler is applied to
+     * all methods of the interface, else the list of String contains the names of the methods which
+     * are applied to the IntentHandler.
      */
     private HashMap<Integer, HashMap<String, List<String>>> informationPool;
+
     private List<IntentHandler> listOfIntent;
 
     public SCAIntentControllerImpl(Component owner) {
@@ -103,165 +101,102 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         }
     }
 
-    /**
-     * get associated index of a given IntentHandler in listOfIntent. -1 if not exist
-     * @param i
-     * @return
-     */
-    private int indexAssociatedWithIntent(IntentHandler i) {
-        return ListContainsIntent(i, listOfIntent);
-    }
-
-    /**
-     * get the intentHandler associated with index
-     * @param index
-     * @return
-     */
-    private IntentHandler intentAssociatedWithIndex(int index) {
-        return listOfIntent.get(index);
-    }
-
-    public int[] indexesOfIntentsOfMethod(String itfName, String methodName) throws NoSuchInterfaceException,
-            NoSuchMethodException {
-        int i = 0;
-        List<IntentHandler> l_intents = listIntentHandler(itfName, methodName);
-        List<IntentHandler> all_intents = listExistingIntentHandler();
-        int[] res = new int[l_intents.size()];
-        for (Iterator<IntentHandler> iterator = l_intents.iterator(); iterator.hasNext();) {
-            IntentHandler object = iterator.next();
-            res[i] = all_intents.indexOf(object);
-            i++;
-        }
-        return res;
-    }
-
-    /**
-     * get associated index of a given IntentHandler in a given list. -1 if not exist
-     * @param i
-     * @param list
-     * @return
-     */
-    private int ListContainsIntent(IntentHandler i, List<IntentHandler> list) {
-        int index = 0;
-        for (IntentHandler it : list) {
-            //if(i.ID == it.ID)
-            if (i.getClass().getName().equals(it.getClass().getName())) {
-                return index;
-            }
-            index++;
-        }
-        return -1;
-    }
-
-    private boolean methodExist(Method[] methodList, String methodName) {
-        for (int i = 0; i < methodList.length; i++) {
-            if (methodName.equals(methodList[i].getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // we build the information pool recursively 
-    public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException {
+    public void addIntentHandler(IntentHandler intentHandler) throws NoSuchInterfaceException, IllegalLifeCycleException {
         InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
-        String[] listFc = new String[itftps.length];
         for (int i = 0; i < itftps.length; i++) {
-            listFc[i] = itftps[i].getFcItfName();
-        }
-        for (int i = 0; i < listFc.length; i++) {
-            try {
-                addIntentHandler(intentHandler, listFc[i]);
-            } catch (NoSuchInterfaceException nsie) {
-                // Should never happen
-            }
+            addIntentHandler(intentHandler, itftps[i].getFcItfName());
         }
     }
 
     public void addIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException {
-        String tmp = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature();
-        Method[] methodList = null;
+            throws NoSuchInterfaceException, IllegalLifeCycleException {
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature();
         try {
-            methodList = Class.forName(tmp).getMethods();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new NoSuchInterfaceException(e.getMessage());
-        }
-        for (int i = 0; i < methodList.length; i++) {
-            try {
-                addIntentHandler(intentHandler, itfName, methodList[i].getName());
-            } catch (NoSuchMethodException nsme) {
-                // Should never happen
+            Method[] methodList = Class.forName(itfSignature).getMethods();
+            for (int i = 0; i < methodList.length; i++) {
+                try {
+                    addIntentHandler(intentHandler, itfName, methodList[i].getName());
+                } catch (NoSuchMethodException nsme) {
+                    // Should never happen
+                }
             }
+        } catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+            pare.initCause(se);
+            throw pare;
+        } catch (ClassNotFoundException cnfe) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to interface " +
+                itfSignature + ": " + cnfe.getMessage());
+            pare.initCause(cnfe);
+            throw pare;
         }
     }
 
     public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
-            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
-            IllegalBindingException {
-        LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
+            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException {
+        LifeCycleController lcc = GCM.getGCMLifeCycleController(owner);
+        if (lcc.getFcState().equals(LifeCycleController.STARTED)) {
             throw new IllegalLifeCycleException(
-                "component already started, impossible to add an Intent Handler.");
-        }
-        BindingController bctr = null;
-        Object Itf = null;
-        try {
-            bctr = GCM.getBindingController(owner);
-            Itf = bctr.lookupFc(itfName);
-        } catch (NoSuchInterfaceException ex) {
-            logger.info("server component doesn't implement binding controller");
-        }
-        if (Itf != null) {
-            throw new IllegalBindingException("binding already done for the Interface!");
+                "Component is started, cannot add an intent handler");
         }
 
-        String tmp = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature(); // can't use lookupFC before binding :'(
-        Method[] methodList = null;
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).getFcItfSignature();
         try {
-            methodList = Class.forName(tmp).getMethods();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new NoSuchInterfaceException(e.getMessage());
-        }
-        if (!methodExist(methodList, methodName)) {
-            throw new NoSuchMethodException("method " + methodName + " doesn't exist!");
-        }
-        HashMap<String, List<String>> itfPool;
-        List<String> methods;
-        int intentIndex = indexAssociatedWithIntent(intentHandler);
-        if (!informationPool.containsKey(intentIndex)) // intentHandler not exist
-        {
-            itfPool = new HashMap<String, List<String>>();
-            methods = new ArrayList<String>();
-            methods.add(methodName);
-            addToBaseObject(itfName, methodName, intentHandler);
-            itfPool.put(itfName, methods); // all methods in "itfName" interfaces
-
-            informationPool.put(listOfIntent.size(), itfPool);
-            listOfIntent.add(intentHandler);
-        } else {
-            itfPool = informationPool.get(intentIndex);
-            if ((!itfPool.containsKey(itfName)) || itfPool == null) {
+            Method[] methodList = Class.forName(itfSignature).getMethods();
+            if (!methodExist(methodList, methodName)) {
+                throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " + itfSignature);
+            }
+            HashMap<String, List<String>> itfPool;
+            List<String> methods;
+            int intentIndex = listContainsIntent(intentHandler, listOfIntent);
+            if (!informationPool.containsKey(intentIndex)) // Intent handler does not exist
+            {
+                itfPool = new HashMap<String, List<String>>();
                 methods = new ArrayList<String>();
                 methods.add(methodName);
-                addToBaseObject(itfName, methodName, intentHandler);
-                itfPool.put(itfName, methods); // all methods in "itfName" interfaces
-            } else //possibility to have several same intent on one method
-            {
-                methods = itfPool.get(itfName);
-                methods.add(methodName);
-                addToBaseObject(itfName, methodName, intentHandler);
+                addToBaseObject(intentHandler, itfName, methodName);
+                itfPool.put(itfName, methods);
+                informationPool.put(listOfIntent.size(), itfPool);
+                listOfIntent.add(intentHandler);
+            } else {
+                itfPool = informationPool.get(intentIndex);
+                if ((!itfPool.containsKey(itfName)) || itfPool == null) {
+                    methods = new ArrayList<String>();
+                    methods.add(methodName);
+                    addToBaseObject(intentHandler, itfName, methodName);
+                    itfPool.put(itfName, methods);
+                } else // Possibility to have several same intent on one method
+                {
+                    methods = itfPool.get(itfName);
+                    methods.add(methodName);
+                    addToBaseObject(intentHandler, itfName, methodName);
+                }
             }
+        } catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+            pare.initCause(se);
+            throw pare;
+        } catch (ClassNotFoundException cnfe) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to interface " +
+                itfSignature + ": " + cnfe.getMessage());
+            pare.initCause(cnfe);
+            throw pare;
         }
     }
 
-    private void addToBaseObject(String itfName, String methodName, IntentHandler intentHandler)
-            throws SecurityException, NoSuchMethodException, NoSuchInterfaceException {
+    /*
+     * Adds an intent to a method of an interface only if this interface is a service interface.
+     *
+     * @param intentHandler The intent handler to add.
+     * @param itfName The service or reference interface name.
+     * @param methodName The method name.
+     * @throws NoSuchInterfaceException If the service or reference interface does not exist.
+     * @throws NoSuchMethodException If the method does not exist.
+     */
+    private void addToBaseObject(IntentHandler intentHandler, String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException {
         if (((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()) {
             return;
         }
@@ -271,35 +206,108 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         Method mAdd = cla.getMethod(invokingName, IntentHandler.class);
         try {
             mAdd.invoke(obj, new Object[] { intentHandler });
-        } catch (Exception e) {
-            System.err.println("problem on invoking add intent into base object");
-            e.printStackTrace();
+        } catch (IllegalArgumentException iae) {
+            throw addIntentError(itfName, methodName, iae);
+        } catch (IllegalAccessException iae) {
+            throw addIntentError(itfName, methodName, iae);
+        } catch (InvocationTargetException ite) {
+            throw addIntentError(itfName, methodName, ite);
         }
+    }
+
+    /*
+     * Returns an exception for errors occurring when trying to add an intent on a method of a service interface.
+     *
+     * @param itfName The service interface name.
+     * @param methodName The name of the method.
+     * @param e Exception which raises the error.
+     * @return ProActiveRuntimeException for errors occurring when trying to add an intent on method of service
+     * interface.
+     */
+    private ProActiveRuntimeException addIntentError(String itfName, String methodName, Exception e) {
+        ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot add intent on the method " +
+            methodName + " of the interface " + itfName + ": " + e.getMessage());
+        pare.initCause(e);
+        return pare;
+    }
+
+    public boolean hasAtleastOneIntentHandler(String itfName) {
+        return !listExistingIntentHandlerOfItf(itfName).isEmpty();
     }
 
     public boolean hasIntentHandler() {
         return !listIntentHandler().isEmpty();
     }
 
-    public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException {
-        return !listIntentHandler(ItfName).isEmpty();
+    public boolean hasIntentHandler(String itfName) throws NoSuchInterfaceException {
+        return !listIntentHandler(itfName).isEmpty();
     }
 
-    public boolean hasIntentHandler(String ItfName, String methodName) throws NoSuchInterfaceException,
+    public boolean hasIntentHandler(String itfName, String methodName) throws NoSuchInterfaceException,
             NoSuchMethodException {
-        return !listIntentHandler(ItfName, methodName).isEmpty();
+        return !listIntentHandler(itfName, methodName).isEmpty();
     }
 
-    /**
-     * Returns a new list containing all elements that are contained in
-     * both given lists. code copied from org.apache.commons.collections.ListUtils.
+    public List<IntentHandler> listAllIntentHandler() {
+        return listOfIntent;
+    }
+
+    public List<IntentHandler> listIntentHandler() {
+        List<IntentHandler> res = new ArrayList<IntentHandler>();
+        InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
+        if (itftps.length > 0) {
+            try {
+                res = listIntentHandler(itftps[0].getFcItfName());
+                for (int i = 1; i < itftps.length; i++) {
+                    List<IntentHandler> tmp = listIntentHandler(itftps[i].getFcItfName());
+                    res = intersection(tmp, res);
+                }
+            } catch (NoSuchInterfaceException nsie) {
+                // Should never happen
+            }
+        }
+        return res;
+    }
+
+    public List<IntentHandler> listIntentHandler(String itfName) throws NoSuchInterfaceException {
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
+                .getFcItfSignature();
+        try {
+            List<IntentHandler> res = new ArrayList<IntentHandler>();
+            Method[] methodList = Class.forName(itfSignature).getMethods();
+            if (methodList.length > 0) {
+                try {
+                    res = listIntentHandler(itfName, methodList[0].getName());
+                    for (int i = 1; i < methodList.length; i++) {
+                        List<IntentHandler> tmp = listIntentHandler(itfName, methodList[i].getName());
+                        res = intersection(tmp, res);
+                    }
+                } catch (NoSuchMethodException nsme) {
+                    // Should never happen
+                }
+            }
+            return res;
+        } catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+            pare.initCause(se);
+            throw pare;
+        } catch (ClassNotFoundException cnfe) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to interface " +
+                itfSignature + ": " + cnfe.getMessage());
+            pare.initCause(cnfe);
+            throw pare;
+        }
+    }
+
+    /*
+     * Returns a new list containing all elements that are contained in both given lists.
      *
-     * @param list1  the first list
-     * @param list2  the second list
-     * @return  the intersection of those two lists
-     * @throws NullPointerException if either list is null
+     * @param list1 The first list.
+     * @param list2 The second list.
+     * @return The intersection of those two lists.
      */
-    public static <E> List<E> intersection(final List<? extends E> list1, final List<? extends E> list2) {
+    private static <E> List<E> intersection(final List<? extends E> list1, final List<? extends E> list2) {
         final List<E> result = new ArrayList<E>();
 
         List<? extends E> smaller = list1;
@@ -318,199 +326,186 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         return result;
     }
 
-    public List<IntentHandler> listIntentHandler() {
-        List<IntentHandler> res = new ArrayList<IntentHandler>();
-        InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
-        String[] listFc = new String[itftps.length];
-        for (int i = 0; i < itftps.length; i++) {
-            listFc[i] = itftps[i].getFcItfName();
-        }
-        if (listFc.length > 0) // at least on interface
-        {
-            try {
-                res = listIntentHandler(listFc[0]);
-                for (int i = 1; i < listFc.length; i++) {
-                    List<IntentHandler> tmp = listIntentHandler(listFc[i]);
-                    res = intersection(tmp, res);
-                }
-            } catch (NoSuchInterfaceException nsie) {
-                // Should never happen
-            }
-        }
-        return res;
-    }
-
-    public List<IntentHandler> listIntentHandler(String itfName) throws NoSuchInterfaceException {
-        List<IntentHandler> res = new ArrayList<IntentHandler>();
-        String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
-                .getFcItfSignature(); // can't use lookupFC before binding :'(
-        Method[] methodList = null;
+    public List<IntentHandler> listIntentHandler(String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException {
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
+                .getFcItfSignature();
         try {
-            methodList = Class.forName(ItfSignature).getMethods();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new NoSuchInterfaceException(e.getMessage());
-        }
-        if (methodList.length > 0) // at least one element
-        {
-            try {
-                res = listIntentHandler(itfName, methodList[0].getName());
-                for (int i = 1; i < methodList.length; i++) {
-                    List<IntentHandler> tmp = listIntentHandler(itfName, methodList[i].getName());
-                    res = intersection(tmp, res);
-                }
-            } catch (NoSuchMethodException nsme) {
-                // Should never happen
+            Method[] methodList = Class.forName(itfSignature).getMethods();
+            if (!methodExist(methodList, methodName)) {
+                throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " + itfName);
             }
+            List<IntentHandler> res = new ArrayList<IntentHandler>();
+            for (Iterator<IntentHandler> iterator = listExistingIntentHandlerOfItf(itfName).iterator(); iterator
+                    .hasNext();) {
+                IntentHandler key = iterator.next();
+                int indexKey = listContainsIntent(key, listOfIntent);
+                List<String> tmp = informationPool.get(indexKey).get(itfName);
+                for (Iterator<String> listIter = tmp.iterator(); listIter.hasNext();) { // Possibility to have several same intent on one method
+                    String mName = listIter.next();
+                    if (mName.equals(methodName)) {
+                        res.add(key);
+                    }
+                }
+            }
+            return res;
+        } catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+            pare.initCause(se);
+            throw pare;
+        } catch (ClassNotFoundException cnfe) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to interface " +
+                itfSignature + ": " + cnfe.getMessage());
+            pare.initCause(cnfe);
+            throw pare;
         }
-        return res;
     }
 
-    private List<IntentHandler> listExistingIntentHandlerOfAItface(String ItfName) {
+    /*
+     * Lists the intents of an interface.
+     *
+     * @param itfName The interface name.
+     * @return The intents of an interface.
+     */
+    private List<IntentHandler> listExistingIntentHandlerOfItf(String itfName) {
         List<IntentHandler> res = new ArrayList<IntentHandler>();
         for (Iterator<Integer> iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
             int key = iterator.next();
-            if (informationPool.get(key).containsKey(ItfName)) {
-                IntentHandler tmp = intentAssociatedWithIndex(key);
+            if (informationPool.get(key).containsKey(itfName)) {
+                IntentHandler tmp = listOfIntent.get(key);
                 res.add(tmp);
             }
         }
         return res;
     }
 
-    public List<IntentHandler> listExistingIntentHandler() {
-        return listOfIntent;
-    }
-
-    public boolean hasAtleastOneIntentHandler(String ItfName) {
-        return !listExistingIntentHandlerOfAItface(ItfName).isEmpty();
-    }
-
-    public List<IntentHandler> listIntentHandler(String itfName, String methodName)
-            throws NoSuchInterfaceException, NoSuchMethodException {
-        String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
-                .getFcItfSignature(); // can't use lookupFC before binding
-        Method[] methodList = null;
-        try {
-            methodList = Class.forName(ItfSignature).getMethods();
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            throw new NoSuchInterfaceException(e.getMessage());
-        }
-        if (!methodExist(methodList, methodName)) {
-            throw new NoSuchMethodException("method " + methodName + " doesn't exist!");
-        }
-        List<IntentHandler> res = new ArrayList<IntentHandler>();
-        for (Iterator<IntentHandler> iterator = listExistingIntentHandlerOfAItface(itfName).iterator(); iterator
-                .hasNext();) {
-            IntentHandler key = iterator.next();
-            int indexKey = indexAssociatedWithIntent(key);
-            List<String> tmp = informationPool.get(indexKey).get(itfName);
-            for (Iterator<String> listIter = tmp.iterator(); listIter.hasNext();) { //possibility to have several same intent on one method
-                String mName = listIter.next();
-                if (mName.equals(methodName)) {
-                    res.add(key);
-                }
-            }
-        }
-        return res;
-    }
-
-    public void removeIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
-            IllegalBindingException, NoSuchIntentHandlerException, NoSuchInterfaceException,
-            NoSuchMethodException {
-        LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
-            throw new IllegalLifeCycleException(
-                "component already started, impossible to add an Intent Handler.");
-        }
+    public void removeIntentHandler(IntentHandler intentHandler) throws NoSuchIntentHandlerException, NoSuchInterfaceException,
+            IllegalLifeCycleException {
         List<IntentHandler> tmp = listIntentHandler();
-        int intentExist = ListContainsIntent(intentHandler, tmp);
+        int intentExist = listContainsIntent(intentHandler, tmp);
         if (intentExist != -1) {
             InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
-            String[] listFc = new String[itftps.length];
-            for (int i = 0; i < itftps.length; i++) {
-                listFc[i] = itftps[i].getFcItfName();
-            }
-            if (listFc.length > 0) // at least on interface
-            {
-                for (int i = 0; i < listFc.length; i++) {
-                    removeIntentHandler(intentHandler, listFc[i]);
+            if (itftps.length > 0) {
+                for (int i = 0; i < itftps.length; i++) {
+                    removeIntentHandler(intentHandler, itftps[i].getFcItfName());
                 }
             }
-        } else
-            throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
+        } else {
+            throw new NoSuchIntentHandlerException("Intent handler does not exist");
+        }
     }
 
     public void removeIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException,
-            NoSuchIntentHandlerException, NoSuchMethodException {
-        LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
-            throw new IllegalLifeCycleException(
-                "component already started, impossible to add an Intent Handler.");
-        }
+            throws NoSuchIntentHandlerException, NoSuchInterfaceException, IllegalLifeCycleException {
         List<IntentHandler> tmp = listIntentHandler(itfName);
-        String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
-                .getFcItfSignature(); // can't use lookupFC before binding :'(
-        Method[] methodList = null;
-        int intentExist = ListContainsIntent(intentHandler, tmp);
-        if (intentExist != -1) {
+        if (listContainsIntent(intentHandler, tmp) != -1) {
+            String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
+            .getFcItfSignature();
             try {
-                methodList = Class.forName(ItfSignature).getMethods();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                throw new NoSuchInterfaceException(e.getMessage());
-            }
-            if (methodList.length > 0) // at least one element
-            {
-                for (int i = 0; i < methodList.length; i++) {
-                    removeIntentHandler(intentHandler, itfName, methodList[i].getName());
+                Method[] methodList = Class.forName(itfSignature).getMethods();
+                if (methodList.length > 0) {
+                    for (int i = 0; i < methodList.length; i++) {
+                        try {
+                            removeIntentHandler(intentHandler, itfName, methodList[i].getName());
+                        } catch (NoSuchMethodException nsme) {
+                            // Should never happen
+                        }
+                    }
                 }
+            } catch (SecurityException se) {
+                ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                    "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+                pare.initCause(se);
+                throw pare;
+            } catch (ClassNotFoundException cnfe) {
+                ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to interface " +
+                    itfSignature + ": " + cnfe.getMessage());
+                pare.initCause(cnfe);
+                throw pare;
             }
-        } else
-            throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
+        } else {
+            throw new NoSuchIntentHandlerException("Intent handler does not exist");
+        }
     }
 
     public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
-            IllegalBindingException, NoSuchIntentHandlerException {
-        LifeCycleController lcCtr = GCM.getGCMLifeCycleController(owner);
-        if (lcCtr.getFcState().equals(LifeCycleController.STARTED)) {
+            NoSuchIntentHandlerException {
+        LifeCycleController lcc = GCM.getGCMLifeCycleController(owner);
+        if (lcc.getFcState().equals(LifeCycleController.STARTED)) {
             throw new IllegalLifeCycleException(
-                "component already started, impossible to add an Intent Handler.");
+                "Component is started, cannot remove an intent handler");
         }
-        String ItfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
-                .getFcItfSignature(); // can't use lookupFC before binding :'(
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
+                .getFcItfSignature();
         List<IntentHandler> tmp = listIntentHandler(itfName, methodName);
-        int intentExist = ListContainsIntent(intentHandler, tmp);
-        if (intentExist != -1) {
-            Method[] methodList = null;
+        if (listContainsIntent(intentHandler, tmp) != -1) {
             try {
-                methodList = Class.forName(ItfSignature).getMethods();
-            } catch (SecurityException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                throw new NoSuchInterfaceException(e.getMessage());
-            }
-            if (!methodExist(methodList, methodName)) {
-                throw new NoSuchMethodException("method " + methodName + " doesn't exist!");
-            } else {
-                int intentIndex = indexAssociatedWithIntent(intentHandler);
-                informationPool.get(intentIndex).get(itfName).remove(methodName);
-                if (informationPool.get(intentIndex).get(itfName).isEmpty()) {
-                    informationPool.get(intentIndex).remove(itfName);
-                    if (informationPool.get(intentIndex).isEmpty()) {
-                        informationPool.remove(intentIndex);
-                        listOfIntent.remove(intentIndex);
+                Method[] methodList = Class.forName(itfSignature).getMethods();
+                if (methodExist(methodList, methodName)) {
+                    int intentIndex = listContainsIntent(intentHandler, listOfIntent);
+                    informationPool.get(intentIndex).get(itfName).remove(methodName);
+                    if (informationPool.get(intentIndex).get(itfName).isEmpty()) {
+                        informationPool.get(intentIndex).remove(itfName);
+                        if (informationPool.get(intentIndex).isEmpty()) {
+                            informationPool.remove(intentIndex);
+                            listOfIntent.remove(intentIndex);
+                        }
                     }
+                } else {
+                    throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " + itfName);
                 }
+            } catch (SecurityException se) {
+                ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                    "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+                pare.initCause(se);
+                throw pare;
+            } catch (ClassNotFoundException cnfe) {
+                ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to interface " +
+                    itfSignature + ": " + cnfe.getMessage());
+                pare.initCause(cnfe);
+                throw pare;
             }
-        } else
-            throw new NoSuchIntentHandlerException("intent handler doesn't exist!");
+        } else {
+            throw new NoSuchIntentHandlerException("Intent handler does not exist");
+        }
     }
 
+    /*
+     * Returns the associated index of the given intent handler in the given list of intent handlers or -1 if not
+     * exist.
+     *
+     * @param intentHandler The intent handler.
+     * @param list The list of intent handlers.
+     * @return The associated index of the given intent handler in the given list of intent handlers or -1 if not
+     * exist.
+     */
+    private int listContainsIntent(IntentHandler intentHandler, List<IntentHandler> list) {
+        int index = 0;
+        for (IntentHandler ih : list) {
+            // if(intentHandler.ID == it.ID)
+            if (intentHandler.getClass().getName().equals(ih.getClass().getName())) {
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    /*
+     * Checks if the given method is present into the given array of methods.
+     *
+     * @param methods The array of methods.
+     * @param methodName The name of the method.
+     * @return True if the given method is present into the given array of methods, false otherwise.
+     */
+    private boolean methodExist(Method[] methods, String methodName) {
+        for (int i = 0; i < methods.length; i++) {
+            if (methodName.equals(methods[i].getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
