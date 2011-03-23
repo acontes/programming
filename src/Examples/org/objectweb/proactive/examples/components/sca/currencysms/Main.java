@@ -45,7 +45,6 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.api.PALifeCycle;
 import org.objectweb.proactive.core.component.webservices.CXFRESTfulServiceCaller;
 import org.objectweb.proactive.core.component.webservices.WSInfo;
-import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 
@@ -63,7 +62,6 @@ public class Main {
         }
         String orangeID = args[0];
         String destNumber = args[1];
-        SCAPAPropertyRepository.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
         Component boot = Utils.getBootstrapComponent();
         GCMTypeFactory tf = GCM.getGCMTypeFactory(boot);
         GenericFactory gf = GCM.getGenericFactory(boot);
