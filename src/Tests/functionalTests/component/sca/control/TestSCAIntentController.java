@@ -44,14 +44,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.factory.GenericFactory;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.ContentDescription;
-import org.objectweb.proactive.examples.components.sca.securityintent.SecurityIntentHandler;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
@@ -171,21 +169,6 @@ public class TestSCAIntentController extends SCAComponentTest {
         scaic.addIntentHandler(new IntentHandlerTest());
     }
 
-    @org.junit.Test(expected = IllegalBindingException.class)
-    public void testAddIntentHandlerIllegalBindingException() throws Exception {
-        SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
-                .getSCAIntentController(componentA);
-        IntentHandler ih = new IntentHandlerTest();
-        scaic.addIntentHandler(ih);
-        GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
-                componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
-        GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
-                componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
-        scaic.addIntentHandler(new IntentHandlerTest());
-        GCM.getBindingController(componentA).unbindFc(TestIntentItf.CLIENT_ITF_NAME);
-        GCM.getBindingController(componentA).unbindFc(TestIntentItf2.CLIENT_ITF_NAME);
-    }
-
     @org.junit.Test
     public void testlistExistingIntentHandler() throws Exception {
         SCAIntentController scaic = org.objectweb.proactive.extensions.sca.Utils
@@ -194,7 +177,7 @@ public class TestSCAIntentController extends SCAComponentTest {
         scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME, "m");
         scaic.addIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME, "n");
         scaic.addIntentHandler(ih, TestIntentItf2.CLIENT_ITF_NAME);
-        List<IntentHandler> tmp = scaic.listExistingIntentHandler();
+        List<IntentHandler> tmp = scaic.listAllIntentHandler();
         Assert.assertEquals(1, tmp.size());
     }
 
@@ -289,7 +272,7 @@ public class TestSCAIntentController extends SCAComponentTest {
         Assert.assertTrue(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
         scaic.removeIntentHandler(ih, TestIntentItf.CLIENT_ITF_NAME, "m");
         Assert.assertFalse(scaic.hasIntentHandler(TestIntentItf.CLIENT_ITF_NAME, "m"));
-        Assert.assertEquals(scaic.listExistingIntentHandler().size(), 0);
+        Assert.assertEquals(scaic.listAllIntentHandler().size(), 0);
     }
 
     @org.junit.Test
@@ -301,7 +284,6 @@ public class TestSCAIntentController extends SCAComponentTest {
         IntentHandler y = new IntentHandlerTest();
         scaic.addIntentHandler(y);
         scaic.addIntentHandler(y, TestIntentItf2.CLIENT_ITF_NAME);
-        scaic.addIntentHandler(new SecurityIntentHandler("pass"), TestIntentItf.CLIENT_ITF_NAME, "m");
         //@snippet-end component_scauserguide_5
         GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
@@ -323,13 +305,8 @@ public class TestSCAIntentController extends SCAComponentTest {
             e.printStackTrace();
         }
         GCM.getGCMLifeCycleController(componentA).stopFc();
-        System.err.println("FINI1");
         GCM.getGCMLifeCycleController(componentB).stopFc();
-        System.err.println("FINI2");
         GCM.getBindingController(componentA).unbindFc(TestIntentItf.CLIENT_ITF_NAME);
-        System.err.println("FINI3");
         GCM.getBindingController(componentA).unbindFc(TestIntentItf2.CLIENT_ITF_NAME);
-        System.err.println("FINI");
-
     }
 }
