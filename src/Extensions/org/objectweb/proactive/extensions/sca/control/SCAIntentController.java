@@ -62,8 +62,6 @@ public interface SCAIntentController {
      * @param intentHandler The intent handler to add.
      * @throws IllegalLifeCycleException If the component is not stopped.
      * @throws IllegalBindingException If a service or reference interface is already bound.
-     * @throws NoSuchInterfaceException 
-     * @throws NoSuchMethodException 
      */
     public void addIntentHandler(IntentHandler intentHandler) throws IllegalLifeCycleException,
             IllegalBindingException, NoSuchInterfaceException, NoSuchMethodException;
@@ -76,11 +74,9 @@ public interface SCAIntentController {
      * @throws NoSuchInterfaceException If the service or reference interface does not exist.
      * @throws IllegalLifeCycleException If the component is not stopped.
      * @throws IllegalBindingException If the service or reference interface is already bound.
-     * @throws NoSuchMethodException 
      */
     public void addIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException,
-            NoSuchMethodException;
+            throws NoSuchInterfaceException, IllegalLifeCycleException, IllegalBindingException;
 
     /**
     * Adds the given intent handler on the given method of the given service or reference interface.
@@ -103,17 +99,15 @@ public interface SCAIntentController {
      *
      * @return True if the component has intent handlers, i.e. if at least one of its service or reference interfaces
      * has intent handlers.
-     * @throws NoSuchMethodException 
-     * @throws NoSuchInterfaceException 
      */
-    public boolean hasIntentHandler() throws NoSuchInterfaceException, NoSuchMethodException;
+    public boolean hasIntentHandler();
 
     /**
      * Indicates if any method in the given service or reference interface has intent handlers.
      * 
      * @param ItfName The service or reference interface name.
      * @return True if the given service or reference interface has at least one intent applied to 
-     * one methods of given interface, false otherwise
+     * one methods of given interface, false otherwise.
      */
     public boolean hasAtleastOneIntentHandler(String ItfName);
 
@@ -126,7 +120,7 @@ public interface SCAIntentController {
      * @throws NoSuchInterfaceException If the service or reference interface does not exist.
      * @throws NoSuchMethodException 
      */
-    public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException, NoSuchMethodException;
+    public boolean hasIntentHandler(String ItfName) throws NoSuchInterfaceException;
 
     /**
      * Indicates if the given method of the given service or reference interface has intent handlers.
