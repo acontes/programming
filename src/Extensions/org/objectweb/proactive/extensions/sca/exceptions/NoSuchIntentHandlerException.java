@@ -40,7 +40,7 @@ import org.objectweb.proactive.annotation.PublicAPI;
 
 
 /**
- * This exception occurs when trying to access to a property which does not exist.
+ * This exception occurs when trying to access to an intent which does not exist.
  *
  * @author The ProActive Team
  */
