@@ -60,6 +60,7 @@ import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
+import org.objectweb.fractal.fraclet.annotations.Requires;
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.api.PAActiveObject;
@@ -84,7 +85,6 @@ import org.objectweb.proactive.core.remoteobject.RemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteObjectHelper;
 import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.extensions.sca.Constants;
 
 
 
@@ -270,10 +270,8 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     				generatedClassName = RequiresClassGenerator.instance().generateClass(generatedClassName,className);
     				contentDesc.setClassName(generatedClassName);
     			} catch (InterfaceGenerationFailedException igfe) {
-    				logger.error("Cannot generate requires class for " + className + " : " +
-    						igfe.getMessage());
     				InstantiationException ie = new InstantiationException(
-    						"Cannot generate requires class for " + className + " : " + igfe.getMessage());
+    						"Cannot generate Requires class for " + className + " : " + igfe.getMessage());
     				ie.initCause(igfe);
     				throw ie;
     			}
@@ -587,7 +585,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
             ControllerDescription controllerDesc, ContentDescription contentDesc, Node node)
             throws InstantiationException, ActiveObjectCreationException, NodeException {
         if (contentDesc == null) {
-            // a composite component, no activitiy/factory/node specified
+            // a composite component, no activity/factory/node specified
             if (Constants.COMPOSITE.equals(controllerDesc.getHierarchicalType())) {
                 contentDesc = new ContentDescription(Composite.class.getName());
             } else {
@@ -676,29 +674,27 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /*
-     * Determines if a class contains org.osoa.sca.annotations.Property annotation.
+     * Determines if a class contains org.objectweb.fractal.fraclet.annotations.Requires annotation.
      *
      * @param className Class to introspect.
-     * @return True if the given class contains org.osoa.sca.annotations.Property annotation.
+     * @return True if the given class contains org.objectweb.fractal.fraclet.annotations.Requires annotation.
      * @throws InstantiationException If the class cannot be found.
      */
     private boolean hasRequiresAnnotation(String className) throws InstantiationException {
         try {
             Class<?> clazz = Class.forName(className);
             List<Field> fields = new ArrayList<Field>(Arrays.asList(clazz.getDeclaredFields()));
-            do{
-            	clazz = clazz.getSuperclass();
-            	List<Field> asList = Arrays.asList(clazz.getDeclaredFields());
-				fields.addAll(asList);
-            }while(!clazz.equals(Object.class));
+            do {
+                clazz = clazz.getSuperclass();
+                List<Field> asList = Arrays.asList(clazz.getDeclaredFields());
+                fields.addAll(asList);
+            } while (!clazz.equals(Object.class));
             for (int i = 0; i < fields.size(); i++) {
-            	//System.err.println(fields.get(i).getName());
-                if (((AccessibleObject) fields.get(i)).isAnnotationPresent(org.objectweb.fractal.fraclet.annotations.Requires.class)) {
+                if (((AccessibleObject) fields.get(i)).isAnnotationPresent(Requires.class)) {
                     return true;
                 }
             }
         } catch (ClassNotFoundException cnfe) {
-            logger.error("Cannot find classe " + className + " : " + cnfe.getMessage());
             InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
                 cnfe.getMessage());
             ie.initCause(cnfe);
