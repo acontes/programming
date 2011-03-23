@@ -56,8 +56,8 @@ import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedEx
 
 /**
  * Defines {@link #generateClass(String)} method which generates a subclass based on original one. It takes care of
- * presence of org.osoa.sca.annotations.Property annotation, the generated subclass contains the getters and setters
- * corresponding to the properties.
+ * presence of Property annotation, the generated subclass contains the getters and setters corresponding to the
+ * properties.
  *
  * @author The ProActive Team
  */
@@ -72,22 +72,9 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
         }
     }
 
-    /*
-     * Converts a string to another string which the first letter become capital.
-     *
-     * @param name Name to convert.
-     * @return String which first letter is capitalized.
-     */
-    private String nameUp(String name) {
-        char[] nameUpper = name.toCharArray();
-        nameUpper[0] = Character.toUpperCase(nameUpper[0]);
-        String nameUp = new String(nameUpper);
-        return nameUp;
-    }
-
     /**
-     * Generates a subclass from root class, if it contains org.osoa.sca.annotations.Property annotation. It adds to
-     * the subclass the getter/setter corresponding to the properties.
+     * Generates a subclass from root class, if it contains Property annotation. It adds to the subclass the
+     * getter/setter corresponding to the properties.
      *
      * @param classToExtend Name of the class to be set as super class.
 	 * @param classToHerit Name of class contains the methods we want to inherit
@@ -133,10 +120,6 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                             propertyField);
                     generatedCtClass.addMethod(setter);
                 }
-//
-//                                generatedCtClass.stopPruning(true);
-//                                generatedCtClass.writeFile("generated/");
-//                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // Generate and add to cache the generated class
                 byte[] bytecode = generatedCtClass.toBytecode();
@@ -150,8 +133,6 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                 // Defrost the generated class
                 generatedCtClass.defrost();
             } catch (Exception e) {
-                logger.error("Cannot generate subClass of [" + classToExtend + "] with javassist: " +
-                    e.getMessage());
                 throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
                     "] with javassist", e);
             }
@@ -160,9 +141,20 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
     }
 
     /*
+     * Converts a string to another string which the first letter become capital.
+     *
+     * @param name Name to convert.
+     * @return String which first letter is capitalized.
+     */
+    private String nameUp(String name) {
+        char[] nameUpper = name.toCharArray();
+        nameUpper[0] = Character.toUpperCase(nameUpper[0]);
+        String nameUp = new String(nameUpper);
+        return nameUp;
+    }
+
+    /*
      * Non used.
-     * (non-Javadoc)
-     * @see org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator#generateInterface(java.lang.String, org.objectweb.fractal.api.Component, org.objectweb.proactive.core.component.type.PAGCMInterfaceType, boolean, boolean)
      */
     public PAInterface generateInterface(String interfaceName, Component owner,
             PAGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)

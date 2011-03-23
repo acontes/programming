@@ -37,6 +37,7 @@
 package org.objectweb.proactive.extensions.sca.gen;
 
 import java.lang.reflect.Method;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -83,29 +84,6 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
         }
     }
 
-    /*
-     * Returns the CtMethods from the given CtClass which implement the methods of the given service interface.
-     *
-     * @param superClass The class which generated class extends.
-     * @param serviceItf The service interface class which contains all functional methods.
-     * @return CtMethods from the given CtClass which implement the methods of the given service interface.
-     * @throws NotFoundException If a CtMethod cannot be found.
-     */
-    private CtMethod[] getMethodsToExtend(CtClass superClass, Class<?> serviceItf) throws NotFoundException {
-        Method[] serviceItfMethods = serviceItf.getMethods();
-        CtMethod[] methodsToExtend = new CtMethod[serviceItfMethods.length];
-        for (int i = 0; i < serviceItfMethods.length; i++) {
-            Class<?>[] paramTypes = serviceItfMethods[i].getParameterTypes();
-            String[] paramClassNames = new String[paramTypes.length];
-            for (int j = 0; j < paramClassNames.length; j++) {
-                paramClassNames[j] = paramTypes[j].getName();
-            }
-            CtClass[] ctParamTypes = pool.get(paramClassNames);
-            methodsToExtend[i] = superClass.getDeclaredMethod(serviceItfMethods[i].getName(), ctParamTypes);
-        }
-        return methodsToExtend;
-    }
-
     /**
      * Extends the given service interface instance to take care of intent handlers.
      *
@@ -127,7 +105,7 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
             String generatedClassName = Utils.getIntentInterceptorClassName(componentName,
                     serviceItfClassName);
             List<IntentHandler> intentHandlersInList = ((SCAIntentController) owner
-                    .getFcInterface(Constants.SCA_INTENT_CONTROLLER)).listExistingIntentHandler();
+                    .getFcInterface(Constants.SCA_INTENT_CONTROLLER)).listAllIntentHandler();
             Class<?> generatedClass = null;
             try {
                 generatedClass = loadClass(generatedClassName);
@@ -137,24 +115,21 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 // Set super class
                 CtClass superClass = pool.get(serviceItfClassName);
                 generatedCtClass.setSuperclass(pool.get(serviceItfClassName));
-             
-                CtField intentHandlerArray = CtField
-                		.make("private java.util.List intentArray;"
-                				, generatedCtClass);
+
+                CtField intentHandlerArray = CtField.make("private java.util.List intentArray;",
+                        generatedCtClass);
                 generatedCtClass.addField(intentHandlerArray);
+
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
                 generatedCtClass.addConstructor(defaultConstructor);
-                
-                String thirdConstructorBody = "public " +
-                generatedClassName +
-                "(java.util.List intentArray)" +
-                "{\n" +
-                 "this.intentArray = intentArray;\n" + "}";
-                CtConstructor ThirdConstructor = CtNewConstructor.make(thirdConstructorBody,
-                        generatedCtClass);
+
+                String thirdConstructorBody = "public " + generatedClassName +
+                    "(java.util.List intentArray)" + "{\n" + "this.intentArray = intentArray;\n" + "}";
+                CtConstructor ThirdConstructor = CtNewConstructor
+                        .make(thirdConstructorBody, generatedCtClass);
                 generatedCtClass.addConstructor(ThirdConstructor);
- 
+
                 // Add extended methods 
                 String serviceItfSignature = ((InterfaceType) ((Interface) serviceItf).getFcItfType())
                         .getFcItfSignature();
@@ -166,21 +141,22 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                             .getFcInterface(Constants.SCA_INTENT_CONTROLLER)).listIntentHandler(ItfName,
                             methodsToExtend[i].getName()).toArray(new IntentHandler[0]);
 
-                    int[] indexes = ((SCAIntentController) owner
-                            .getFcInterface(Constants.SCA_INTENT_CONTROLLER)).indexesOfIntentsOfMethod(
-                            ItfName, methodsToExtend[i].getName());
+                    int[] indexes = indexesOfIntentsOfMethod(owner, ItfName, methodsToExtend[i].getName());
 
                     CtMethod wrapper = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
-                    String wrapperNameBase = wrapper.getName()+UUID.randomUUID().toString(); // unique method name
-                    wrapper.setName(wrapperNameBase+0);
+                    String wrapperNameBase = wrapper.getName() + UUID.randomUUID().toString(); // Unique method name
+                    wrapper.setName(wrapperNameBase + 0);
                     generatedCtClass.addMethod(wrapper);
                     for (int j = 0; j < indexes.length; j++) {
                         int indexOfIntent = indexes[j];
                         CtMethod newMethod = CtNewMethod.delegator(methodsToExtend[i], generatedCtClass);
-                        newMethod.setBody("{\n" +
-                        		"return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)intentArray.get(" + indexOfIntent +
-                              ")).invoke(new org.objectweb.proactive.extensions.sca.control." +
-                              "IntentJoinPoint(this, \"" + wrapperNameBase + j + "\", $sig, $args));\n}");
+                        newMethod
+                                .setBody("{\n" +
+                                    "return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)intentArray.get(" +
+                                    indexOfIntent +
+                                    ")).invoke(new org.objectweb.proactive.extensions.sca.control." +
+                                    "IntentJoinPoint(this, \"" + wrapperNameBase + j +
+                                    "\", $sig, $args));\n}");
                         // If there are intents left, then create method wrapper, otherwise create really method
                         String methodName = (j == intentHandlersForGivingMethod.length - 1) ? newMethod
                                 .getName() : wrapperNameBase + (j + 1);
@@ -189,9 +165,9 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                     }
                 }
 
-//                generatedCtClass.stopPruning(true);
-//                generatedCtClass.writeFile("generated/");
-//                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                //                                generatedCtClass.stopPruning(true);
+                //                                generatedCtClass.writeFile("generated/");
+                //                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // 	Generate and add to cache the generated class
                 generatedCtClass.defrost();
@@ -203,9 +179,10 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
                 }
                 generatedClass = Utils.defineClass(generatedClassName, bytecode);
             }
+
             // Instantiate class
-            PAInterfaceImpl reference = (PAInterfaceImpl) generatedClass.getConstructor(
-            		java.util.List.class).newInstance(intentHandlersInList);
+            PAInterfaceImpl reference = (PAInterfaceImpl) generatedClass.getConstructor(java.util.List.class)
+                    .newInstance(intentHandlersInList);
             PAInterfaceImpl sItf = (PAInterfaceImpl) serviceItf;
             reference.setFcItfOwner(sItf.getFcItfOwner());
             reference.setFcItfName(sItf.getFcItfName());
@@ -214,17 +191,64 @@ public class IntentServiceItfGenerator extends AbstractInterfaceClassGenerator {
             reference.setProxy(sItf.getProxy());
             return reference;
         } catch (Exception e) {
-            logger.error("Cannot generate subclass of [" + serviceItfClassName + "] with javassist: " +
-                e.getMessage());
             throw new ClassGenerationFailedException("Cannot generate subClass of [" + serviceItfClassName +
                 "] with javassist", e);
         }
     }
 
     /*
+     * Returns the CtMethods from the given CtClass which implement the methods of the given service
+     * interface.
+     *
+     * @param superClass The class which the generated class extends.
+     * @param serviceItf The service interface class which contains all functional methods.
+     * @return CtMethods from the given CtClass which implement the methods of the given service
+     * interface.
+     * @throws NotFoundException If a CtMethod cannot be found.
+     */
+    private CtMethod[] getMethodsToExtend(CtClass superClass, Class<?> serviceItf) throws NotFoundException {
+        Method[] serviceItfMethods = serviceItf.getMethods();
+        CtMethod[] methodsToExtend = new CtMethod[serviceItfMethods.length];
+        for (int i = 0; i < serviceItfMethods.length; i++) {
+            Class<?>[] paramTypes = serviceItfMethods[i].getParameterTypes();
+            String[] paramClassNames = new String[paramTypes.length];
+            for (int j = 0; j < paramClassNames.length; j++) {
+                paramClassNames[j] = paramTypes[j].getName();
+            }
+            CtClass[] ctParamTypes = pool.get(paramClassNames);
+            methodsToExtend[i] = superClass.getDeclaredMethod(serviceItfMethods[i].getName(), ctParamTypes);
+        }
+        return methodsToExtend;
+    }
+
+    /*
+     * Returns 
+     *
+     * @param owner
+     * @param itfName
+     * @param methodName
+     * @return
+     * @throws NoSuchInterfaceException
+     * @throws NoSuchMethodException
+     */
+    private int[] indexesOfIntentsOfMethod(Component owner, String itfName, String methodName)
+            throws NoSuchInterfaceException, NoSuchMethodException {
+        SCAIntentController scaic = ((SCAIntentController) owner
+                .getFcInterface(Constants.SCA_INTENT_CONTROLLER));
+        int i = 0;
+        List<IntentHandler> intents = scaic.listIntentHandler(itfName, methodName);
+        List<IntentHandler> allIntents = scaic.listAllIntentHandler();
+        int[] res = new int[intents.size()];
+        for (Iterator<IntentHandler> iterator = intents.iterator(); iterator.hasNext();) {
+            IntentHandler object = iterator.next();
+            res[i] = allIntents.indexOf(object);
+            i++;
+        }
+        return res;
+    }
+
+    /*
      * Non used.
-     * (non-Javadoc)
-     * @see org.objectweb.proactive.core.component.gen.AbstractInterfaceClassGenerator#generateInterface(java.lang.String, org.objectweb.fractal.api.Component, org.objectweb.proactive.core.component.type.PAGCMInterfaceType, boolean, boolean)
      */
     public PAInterface generateInterface(String interfaceName, Component owner,
             PAGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
