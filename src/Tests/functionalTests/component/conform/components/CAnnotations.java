@@ -138,39 +138,6 @@ public class CAnnotations implements CAttributes, I, J {
         this.x11 = x11;
     }
 
-    // BINDING CONTROLLER
-    public String[] listFc() {
-        String[] result = new String[j.size() + 1];
-        j.keySet().toArray(result);
-        result[j.size()] = "client";
-        return result;
-    }
-
-    public Object lookupFc(String s) {
-        if (s.equals("client")) {
-            return i;
-        } else if (s.startsWith("clients")) {
-            return j.get(s);
-        }
-        return null;
-    }
-
-    public void bindFc(String s, Object o) {
-        if (s.equals("client")) {
-            i = (I) o;
-        } else if (s.startsWith("clients")) {
-            j.put(s, o);
-        }
-    }
-
-    public void unbindFc(String s) {
-        if (s.equals("client")) {
-            i = null;
-        } else if (s.startsWith("clients")) {
-            j.remove(s);
-        }
-    }
-
     // FUNCTIONAL INTERFACE
     public void m(boolean v) {
     }
