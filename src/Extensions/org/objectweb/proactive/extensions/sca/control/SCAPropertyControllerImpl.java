@@ -56,8 +56,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.sca.Constants;
 import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
 import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
-//import org.oasisopen.sca.annotation.Property;
-//import org.osoa.sca.annotations.Property;
 
 
 /**
@@ -159,13 +157,11 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
                 }
                 init = true;
             } catch (SecurityException se) {
-                logger.error("Cannot initialize SCAPropertyController: " + se.getMessage());
                 ProActiveRuntimeException pare = new ProActiveRuntimeException(
                     "Cannot initialize SCAPropertyController: " + se.getMessage());
                 pare.initCause(se);
                 throw pare;
             } catch (NoSuchMethodException nsme) {
-                logger.error("Cannot initialize SCAPropertyController: " + nsme.getMessage());
                 ProActiveRuntimeException pare = new ProActiveRuntimeException(
                     "Cannot initialize SCAPropertyController: " + nsme.getMessage());
                 pare.initCause(nsme);
@@ -206,8 +202,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             IncompatiblePropertyTypeException {
         assertPropertyExist(name);
         if (!declaredPropertyTypes.get(name).isAssignableFrom(type)) {
-            logger.error("The given type is not assignable to the declared type of the property \"" + name +
-                "\"");
             throw new IncompatiblePropertyTypeException(
                 "The given type is not assignable to the declared type of the property \"" + name + "\"");
         }
@@ -254,8 +248,6 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
             propertyTypes.put(name, value.getClass());
         }
         if (!currentType.isInstance(value)) {
-            logger.error("Cannot set value of property \"" + name +
-                "\" because the given value is not assignable to the type of the property");
             throw new IncompatiblePropertyTypeException("Cannot set value of property \"" + name +
                 "\" because the given value is not assignable to the type of the property");
         }
@@ -297,19 +289,17 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     }
 
     /*
-     * Writes an error message on logger and returns an exception for errors occurring when trying
-     * to get or set the value of a property.
+     * Returns an exception for errors occurring when trying to get or set the value of a property.
      *
      * @param name Name of the property.
      * @param onGet Boolean indicating if error occurred when trying to get the value of a property.
+     * @param e Exception which raises the error.
      * @return ProActiveRuntimeException for errors occurring when trying to get or set the value of
      * a property.
      */
     private ProActiveRuntimeException propertyValueError(String name, boolean onGet, Exception e) {
-        String message = "Cannot " + (onGet ? "get" : "set") + " value of property \"" + name + "\": " +
-            e.getMessage();
-        logger.error(message);
-        ProActiveRuntimeException pare = new ProActiveRuntimeException(message);
+        ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot " + (onGet ? "get" : "set") + " value of property \"" + name + "\": " +
+                e.getMessage());
         pare.initCause(e);
         return pare;
     }
