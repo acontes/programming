@@ -39,7 +39,6 @@ package functionalTests.component.conform.components;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.fraclet.annotations.Requires;
 
 
