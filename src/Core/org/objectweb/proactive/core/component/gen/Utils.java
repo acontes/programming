@@ -183,10 +183,10 @@ public class Utils {
         return (getMetaObjectClassName(functionalInterfaceName, javaInterfaceName) + GEN_MIDDLE_SEPARATOR +
             escapeString(wsCallerClassName.substring(wsCallerClassName.lastIndexOf('.'))) + WEBSERVICE_PROXY_SUFFIX);
     }
-    
+
     public static String getRequiresClassName(String className) {
-		return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "requires";
-	}
+        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "requires";
+    }
 
     public static Class<?> defineClass(final String className, final byte[] bytes)
             throws ClassNotFoundException, SecurityException, NoSuchMethodException,

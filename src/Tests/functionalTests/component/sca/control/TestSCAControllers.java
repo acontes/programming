@@ -60,14 +60,15 @@ import functionalTests.component.sca.control.components.IntentHandlerTest;
 import functionalTests.component.sca.control.components.TestIntentItf;
 import functionalTests.component.sca.control.components.TestIntentItf2;
 
-public class TestSCAControllers  extends SCAComponentTest{
-	Component componentA;
+
+public class TestSCAControllers extends SCAComponentTest {
+    Component componentA;
     Component componentB;
 
     public TestSCAControllers() {
         super();
     }
-    
+
     @Before
     public void initTest() throws Exception {
         Component boot = Utils.getBootstrapComponent();
@@ -94,32 +95,31 @@ public class TestSCAControllers  extends SCAComponentTest{
                         TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                 Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
     }
-    
+
     @org.junit.Test
     public void action() throws Exception {
-    	SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils
-    			.getSCAPropertyController(componentA);
-    	SCAPropertyController scapcServer = org.objectweb.proactive.extensions.sca.Utils
-    			.getSCAPropertyController(componentB);
+        SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils
+                .getSCAPropertyController(componentA);
+        SCAPropertyController scapcServer = org.objectweb.proactive.extensions.sca.Utils
+                .getSCAPropertyController(componentB);
         SCAIntentController scaicClient = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentA); //client
         SCAIntentController scaicServer = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentB); //server
-        
+
         IntentHandler y1 = new IntentHandlerTest("test server");
         IntentHandler y2 = new IntentHandlerTest("test client");
         scaicServer.addIntentHandler(y1);
         scaicClient.addIntentHandler(y2);
-        
+
         scapcClient.setValue("PropertyClient", "client\'s property");
         scapcServer.setValue("PropertyServer", "server\'s property");
-        
-     
+
         GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
         GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
-        
+
         GCM.getGCMLifeCycleController(componentB).startFc();
         GCM.getGCMLifeCycleController(componentA).startFc();
         TestIntentItf i = (TestIntentItf) componentA.getFcInterface(TestIntentItf.SERVER_ITF_NAME); //here the get interface is from server side 

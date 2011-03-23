@@ -41,8 +41,8 @@ import org.objectweb.fractal.api.control.BindingController;
 
 
 public class CClient implements TestIntentItf, TestIntentItf2, ExecuteItf, BindingController {
-	@Property
-	public String PropertyClient;
+    @Property
+    public String PropertyClient;
 
     private TestIntentItf testIntentItf;
 

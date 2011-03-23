@@ -38,6 +38,7 @@ package functionalTests.component.sca.control.components;
 
 import java.io.Serializable;
 
+
 //@snippet-start component_scauserguide_1
 
 public class PropertyComponent implements Serializable {

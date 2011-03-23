@@ -77,11 +77,12 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
      * getter/setter corresponding to the properties.
      *
      * @param classToExtend Name of the class to be set as super class.
-	 * @param classToHerit Name of class contains the methods we want to inherit
+     * @param classToHerit Name of class contains the methods we want to inherit
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation failed.
      */
-    public String generateClass(String classToExtend,String classToHerit) throws ClassGenerationFailedException {
+    public String generateClass(String classToExtend, String classToHerit)
+            throws ClassGenerationFailedException {
         String generatedClassName = Utils.getPropertyClassName(classToExtend);
         try {
             loadClass(generatedClassName);
@@ -93,15 +94,15 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                 // Set super class
                 CtClass superClass = pool.get(classToExtend);
                 generatedCtClass.setSuperclass(superClass);
-                
+
                 CtClass superClassToHerit = pool.get(classToHerit);
 
                 // Get property fields of superclass
                 CtField[] fields = superClassToHerit.getDeclaredFields();
                 ArrayList<CtField> propertyFields = new ArrayList<CtField>();
                 for (int i = 0; i < fields.length; i++) {
-                    if (fields[i].hasAnnotation(org.oasisopen.sca.annotation.Property.class) || 
-                    		fields[i].hasAnnotation(org.osoa.sca.annotations.Property.class)) {
+                    if (fields[i].hasAnnotation(org.oasisopen.sca.annotation.Property.class) ||
+                        fields[i].hasAnnotation(org.osoa.sca.annotations.Property.class)) {
                         propertyFields.add(fields[i]);
                     }
                 }

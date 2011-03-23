@@ -51,7 +51,7 @@ public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
         return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "property" +
             GENERATED_CLASSNAME_SUFFIX;
     }
-    
+
     public static String getIntentClassName(String className) {
         return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "intent" +
             GENERATED_CLASSNAME_SUFFIX;
@@ -65,5 +65,4 @@ public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
         //adding a time-stamp at the end of class name is proved to be necessary.
     }
 
-	
 }

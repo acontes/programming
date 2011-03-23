@@ -87,7 +87,6 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 
 
-
 /**
  * This class is used for creating components. It acts as :
  * <ol>
@@ -261,35 +260,36 @@ public class Fractive implements PAGenericFactory, Component, Factory {
      *      org.objectweb.proactive.core.node.Node)
      */
     public Component newFcInstance(Type type, ControllerDescription controllerDesc,
-    		ContentDescription contentDesc, Node node) throws InstantiationException {
-    	if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)){
-    		String className = contentDesc.getClassName();
-    		String generatedClassName = className;    
-    		if (hasRequiresAnnotation(className)) {
-    			try {
-    				generatedClassName = RequiresClassGenerator.instance().generateClass(generatedClassName,className);
-    				contentDesc.setClassName(generatedClassName);
-    			} catch (InterfaceGenerationFailedException igfe) {
-    				InstantiationException ie = new InstantiationException(
-    						"Cannot generate Requires class for " + className + " : " + igfe.getMessage());
-    				ie.initCause(igfe);
-    				throw ie;
-    			}
-    		}     
-    	}
-    	try {
-    		ActiveObjectWithComponentParameters container = commonInstanciation(type, controllerDesc,
-    				contentDesc, node);
-    		return fComponent(type, container);
-    	} catch (ActiveObjectCreationException e) {
-    		InstantiationException ie = new InstantiationException(e.getMessage());
-    		ie.initCause(e);
-    		throw ie;
-    	} catch (NodeException e) {
-    		InstantiationException ie = new InstantiationException(e.getMessage());
-    		ie.initCause(e);
-    		throw ie;
-    	}
+            ContentDescription contentDesc, Node node) throws InstantiationException {
+        if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)) {
+            String className = contentDesc.getClassName();
+            String generatedClassName = className;
+            if (hasRequiresAnnotation(className)) {
+                try {
+                    generatedClassName = RequiresClassGenerator.instance().generateClass(generatedClassName,
+                            className);
+                    contentDesc.setClassName(generatedClassName);
+                } catch (InterfaceGenerationFailedException igfe) {
+                    InstantiationException ie = new InstantiationException(
+                        "Cannot generate Requires class for " + className + " : " + igfe.getMessage());
+                    ie.initCause(igfe);
+                    throw ie;
+                }
+            }
+        }
+        try {
+            ActiveObjectWithComponentParameters container = commonInstanciation(type, controllerDesc,
+                    contentDesc, node);
+            return fComponent(type, container);
+        } catch (ActiveObjectCreationException e) {
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
+        } catch (NodeException e) {
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
+        }
 
     }
 
@@ -317,26 +317,26 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     public Component newFcInstance(Type type, Type nfType, ContentDescription contentDesc,
-    		ControllerDescription controllerDesc, Node node) throws InstantiationException {
-    	if (nfType == null) {
-    		return newFcInstance(type, controllerDesc, contentDesc, node);
-    	}
-    	try {
-    		ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
-    				contentDesc, node);
-    		return fComponent(type, container);
-    	} catch (ActiveObjectCreationException e) {
-    		logger
-    		.info("Active object creation error while creating component; an exception occurs with the following message: " +
-    				e.getMessage());
-    		InstantiationException ie = new InstantiationException(e.getMessage());
-    		ie.initCause(e);
-    		throw ie;
-    	} catch (NodeException e) {
-    		InstantiationException ie = new InstantiationException(e.getMessage());
-    		ie.initCause(e);
-    		throw ie;
-    	}
+            ControllerDescription controllerDesc, Node node) throws InstantiationException {
+        if (nfType == null) {
+            return newFcInstance(type, controllerDesc, contentDesc, node);
+        }
+        try {
+            ActiveObjectWithComponentParameters container = commonInstanciation(type, nfType, controllerDesc,
+                    contentDesc, node);
+            return fComponent(type, container);
+        } catch (ActiveObjectCreationException e) {
+            logger
+                    .info("Active object creation error while creating component; an exception occurs with the following message: " +
+                        e.getMessage());
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
+        } catch (NodeException e) {
+            InstantiationException ie = new InstantiationException(e.getMessage());
+            ie.initCause(e);
+            throw ie;
+        }
     }
 
     /*
@@ -703,7 +703,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
 
         return false;
     }
-    
+
     //private static class ActiveObjectWithComponentParameters {
     protected class ActiveObjectWithComponentParameters {
         StubObject activeObject;

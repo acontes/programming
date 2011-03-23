@@ -55,6 +55,7 @@ import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedEx
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
 
+
 /**
  * This class is used for creating SCA/GCM components. It acts as :
  * <ol>
@@ -117,7 +118,8 @@ public class SCAFractive extends Fractive {
             // Test whether the component class has a property annotation
             if (hasPropertyAnnotation(className)) {
                 try {
-                    generatedClassName = PropertyClassGenerator.instance().generateClass(generatedClassName,className);
+                    generatedClassName = PropertyClassGenerator.instance().generateClass(generatedClassName,
+                            className);
                     contentDesc.setClassName(generatedClassName);
                 } catch (ClassGenerationFailedException cgfe) {
                     InstantiationException ie = new InstantiationException(
@@ -125,7 +127,7 @@ public class SCAFractive extends Fractive {
                     ie.initCause(cgfe);
                     throw ie;
                 }
-            }    
+            }
         }
         return super.newFcInstance(type, controllerDesc, contentDesc, node);
     }
@@ -142,8 +144,8 @@ public class SCAFractive extends Fractive {
             Class<?> clazz = Class.forName(className);
             Field[] fields = clazz.getDeclaredFields();
             for (int i = 0; i < fields.length; i++) {
-                if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Property.class) || 
-                		fields[i].isAnnotationPresent( org.osoa.sca.annotations.Property.class)) {
+                if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Property.class) ||
+                    fields[i].isAnnotationPresent(org.osoa.sca.annotations.Property.class)) {
                     return true;
                 }
             }

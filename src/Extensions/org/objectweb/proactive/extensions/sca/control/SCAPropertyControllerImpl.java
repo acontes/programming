@@ -137,8 +137,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
                 while (!currentClass.equals(Object.class)) {
                     Field[] fields = currentClass.getDeclaredFields();
                     for (int i = 0; i < fields.length; i++) {
-                        if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Property.class) || 
-                        		fields[i].isAnnotationPresent(org.osoa.sca.annotations.Property.class)) {
+                        if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Property.class) ||
+                            fields[i].isAnnotationPresent(org.osoa.sca.annotations.Property.class)) {
                             declaredPropertyNames.add(fields[i].getName());
                             Class<?> type = fields[i].getType();
                             if (type.isPrimitive()) {
@@ -298,8 +298,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
      * a property.
      */
     private ProActiveRuntimeException propertyValueError(String name, boolean onGet, Exception e) {
-        ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot " + (onGet ? "get" : "set") + " value of property \"" + name + "\": " +
-                e.getMessage());
+        ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot " + (onGet ? "get" : "set") +
+            " value of property \"" + name + "\": " + e.getMessage());
         pare.initCause(e);
         return pare;
     }

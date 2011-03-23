@@ -55,42 +55,44 @@ import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 
+
 /**
  * Defines {@link #generateClass(String)} method which generates a subclass based on original one. It takes care of
  * presence of intent positioned on service interface of a component.
  *
  * @author The ProActive Team
  */
-public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
-	private static IntentClassGenerator instance;
+public class IntentClassGenerator extends AbstractInterfaceClassGenerator {
+    private static IntentClassGenerator instance;
 
-	public static IntentClassGenerator instance() {
-		if (instance == null) {
-			return new IntentClassGenerator();
-		} else {
-			return instance;
-		}
-	}
+    public static IntentClassGenerator instance() {
+        if (instance == null) {
+            return new IntentClassGenerator();
+        } else {
+            return instance;
+        }
+    }
 
-	/**
-	 * Generates a subclass from root class to manage intents positioned on service interface of a component.
-	 *
-	 * @param classToExtend Name of the class to be set as super class.
-	 * @param classToHerit Name of class contains the methods we want to inherit
-	 * @return The generated class name.
-	 * @throws ClassGenerationFailedException If the generation failed.
-	 */
-	public String generateClass(String classToExtend,String classToHerit) throws ClassGenerationFailedException {
-		String generatedClassName = Utils.getIntentClassName(classToExtend);
-		try {
-			loadClass(generatedClassName);
-		} catch (ClassNotFoundException cnfe) {
-			try{
-				CtClass generatedCtClass = pool.makeClass(generatedClassName);
-				generatedCtClass.defrost();
-				CtClass superClass = pool.get(classToExtend);
-				generatedCtClass.setSuperclass(superClass);
-				CtClass superClassToHerit = pool.get(classToHerit);
+    /**
+     * Generates a subclass from root class to manage intents positioned on service interface of a component.
+     *
+     * @param classToExtend Name of the class to be set as super class.
+     * @param classToHerit Name of class contains the methods we want to inherit
+     * @return The generated class name.
+     * @throws ClassGenerationFailedException If the generation failed.
+     */
+    public String generateClass(String classToExtend, String classToHerit)
+            throws ClassGenerationFailedException {
+        String generatedClassName = Utils.getIntentClassName(classToExtend);
+        try {
+            loadClass(generatedClassName);
+        } catch (ClassNotFoundException cnfe) {
+            try {
+                CtClass generatedCtClass = pool.makeClass(generatedClassName);
+                generatedCtClass.defrost();
+                CtClass superClass = pool.get(classToExtend);
+                generatedCtClass.setSuperclass(superClass);
+                CtClass superClassToHerit = pool.get(classToHerit);
 
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
@@ -102,37 +104,29 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
                     extentedMethodes.add(ctMethod);
                 }
 
-				// Add intent managements
-				for (CtMethod ctExtentedMethod : extentedMethodes) {
-					CtField intentArray = CtField
-					.make("private java.util.List intentArray"+ctExtentedMethod.getName()+"= new java.util.ArrayList();"
-							, generatedCtClass);
-					generatedCtClass.addField(intentArray);
-					String intentArrayName = intentArray.getName(); 
+                // Add intent managements
+                for (CtMethod ctExtentedMethod : extentedMethodes) {
+                    CtField intentArray = CtField.make("private java.util.List intentArray" +
+                        ctExtentedMethod.getName() + "= new java.util.ArrayList();", generatedCtClass);
+                    generatedCtClass.addField(intentArray);
+                    String intentArrayName = intentArray.getName();
 
-					CtField intentCounter = CtField
-					.make("private int counter"+ctExtentedMethod.getName()+"= -1;"
-							, generatedCtClass);
-					generatedCtClass.addField(intentCounter);
-					String intentCounterName = intentCounter.getName();
+                    CtField intentCounter = CtField.make("private int counter" + ctExtentedMethod.getName() +
+                        "= -1;", generatedCtClass);
+                    generatedCtClass.addField(intentCounter);
+                    String intentCounterName = intentCounter.getName();
 
-					CtMethod newMethod = CtNewMethod.delegator(ctExtentedMethod, generatedCtClass);
-					newMethod.setBody("{\n" +
-							intentCounterName+"++;\n"+
-							"if("+intentCounterName+" < "+intentArrayName+".size()){\n"+
-							"return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)"+intentArray.getName()+
-							".get(" + 
-							intentCounter.getName() +
-							")).invoke(new org.objectweb.proactive.extensions.sca.control." +
-							"IntentJoinPoint(this, \"" + newMethod.getName() + "\", $sig, $args));\n" +
-							"}\n"+
-							"else{" +
-							intentCounterName+"= -1;\n" +
-							"return ($r)super." +ctExtentedMethod.getName()+"($$);\n"+
-							"}\n" +
-					"}\n");
+                    CtMethod newMethod = CtNewMethod.delegator(ctExtentedMethod, generatedCtClass);
+                    newMethod.setBody("{\n" + intentCounterName + "++;\n" + "if(" + intentCounterName +
+                        " < " + intentArrayName + ".size()){\n" +
+                        "return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)" +
+                        intentArray.getName() + ".get(" + intentCounter.getName() +
+                        ")).invoke(new org.objectweb.proactive.extensions.sca.control." +
+                        "IntentJoinPoint(this, \"" + newMethod.getName() + "\", $sig, $args));\n" + "}\n" +
+                        "else{" + intentCounterName + "= -1;\n" + "return ($r)super." +
+                        ctExtentedMethod.getName() + "($$);\n" + "}\n" + "}\n");
 
-					generatedCtClass.addMethod(newMethod);
+                    generatedCtClass.addMethod(newMethod);
 
                     generateHelperMethods(intentArray, generatedCtClass);
                 }
@@ -143,58 +137,53 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 
                 // Generate and add to cache the generated class
                 byte[] bytecode = generatedCtClass.toBytecode();
-				ClassDataCache.instance().addClassData(generatedClassName, bytecode);
-				if (logger.isDebugEnabled()) {
-					logger.debug("added " + generatedClassName + " to cache");
-					logger.debug("generated classes cache is: " + ClassDataCache.instance().toString());
-				}
-				Utils.defineClass(generatedClassName, bytecode);
+                ClassDataCache.instance().addClassData(generatedClassName, bytecode);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("added " + generatedClassName + " to cache");
+                    logger.debug("generated classes cache is: " + ClassDataCache.instance().toString());
+                }
+                Utils.defineClass(generatedClassName, bytecode);
 
-				// Defrost the generated class
-				generatedCtClass.defrost();
-			} catch (Exception e) {
-				throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
-						"] with javassist", e);
-			}
-		}
-		return generatedClassName;
-	}
+                // Defrost the generated class
+                generatedCtClass.defrost();
+            } catch (Exception e) {
+                throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
+                    "] with javassist", e);
+            }
+        }
+        return generatedClassName;
+    }
 
-	/*
-	 * Generates some methods useful to manage intents on a method.
-	 *
-	 * @param intentArray Array of intents positioned on a method.
-	 * @param generatedCtClass Generated class.
-	 * @throws CannotCompileException If the generation failed.
-	 */
+    /*
+     * Generates some methods useful to manage intents on a method.
+     *
+     * @param intentArray Array of intents positioned on a method.
+     * @param generatedCtClass Generated class.
+     * @throws CannotCompileException If the generation failed.
+     */
     private void generateHelperMethods(CtField intentArray, CtClass generatedCtClass)
             throws CannotCompileException {
         String intentArrayName = intentArray.getName();
-        CtMethod add = CtNewMethod.make("public void addInto"+intentArrayName+"(org.objectweb.proactive.extensions.sca.control.IntentHandler ih){" +
-				intentArrayName+".add(ih);\n" +
-				"}"
-				, generatedCtClass);	
-		generatedCtClass.addMethod(add);
-		CtMethod remove = CtNewMethod.make("public void removeFrom"+intentArrayName+"(org.objectweb.proactive.extensions.sca.control.IntentHandler ih){" +
-				intentArrayName+".remove(ih);\n" +
-				"}"
-				, generatedCtClass);	
-		generatedCtClass.addMethod(remove);
-		CtMethod list = CtNewMethod.make("public java.util.List list"+intentArrayName+"(){" +
-				"return " + intentArrayName+";" +
-				"}"
-				, generatedCtClass);	
-		generatedCtClass.addMethod(list);
+        CtMethod add = CtNewMethod.make("public void addInto" + intentArrayName +
+            "(org.objectweb.proactive.extensions.sca.control.IntentHandler ih){" + intentArrayName +
+            ".add(ih);\n" + "}", generatedCtClass);
+        generatedCtClass.addMethod(add);
+        CtMethod remove = CtNewMethod.make("public void removeFrom" + intentArrayName +
+            "(org.objectweb.proactive.extensions.sca.control.IntentHandler ih){" + intentArrayName +
+            ".remove(ih);\n" + "}", generatedCtClass);
+        generatedCtClass.addMethod(remove);
+        CtMethod list = CtNewMethod.make("public java.util.List list" + intentArrayName + "(){" + "return " +
+            intentArrayName + ";" + "}", generatedCtClass);
+        generatedCtClass.addMethod(list);
 
-	}
+    }
 
-	/*
+    /*
      * Non used.
      */
     public PAInterface generateInterface(String interfaceName, Component owner,
-			PAGCMInterfaceType interfaceType, boolean isInternal,
-			boolean isFunctionalInterface)
-	throws InterfaceGenerationFailedException {
-		return null;
-	}
+            PAGCMInterfaceType interfaceType, boolean isInternal, boolean isFunctionalInterface)
+            throws InterfaceGenerationFailedException {
+        return null;
+    }
 }
