@@ -54,7 +54,7 @@ import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
-//import org.osoa.sca.annotations.Property;
+
 /**
  * This class is used for creating SCA/GCM components. It acts as :
  * <ol>
@@ -102,28 +102,24 @@ public class SCAFractive extends Fractive {
         if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
             controllerDesc.getControllersSignatures().containsKey(SCAPropertyController.class.getName())) {
             String className = contentDesc.getClassName();
-            
-            String generatedClassName=className;
-			try {
-				generatedClassName = IntentClassGenerator.instance().generateClass(className,className);
-				contentDesc.setClassName(generatedClassName); // a retire
-			} catch (ClassGenerationFailedException  cgfe) {
-				logger.error("Cannot generate SCA Intent class for " + className + " : " +
-                        cgfe.getMessage());
-                    InstantiationException ie = new InstantiationException(
-                        "Cannot generate SCA Intent class for " + className + " : " + cgfe.getMessage());
-                    ie.initCause(cgfe);
-                    throw ie;
-			}
-            
+
+            String generatedClassName = className;
+            try {
+                generatedClassName = IntentClassGenerator.instance().generateClass(className, className);
+                contentDesc.setClassName(generatedClassName);
+            } catch (ClassGenerationFailedException cgfe) {
+                InstantiationException ie = new InstantiationException(
+                    "Cannot generate SCA Intent class for " + className + " : " + cgfe.getMessage());
+                ie.initCause(cgfe);
+                throw ie;
+            }
+
             // Test whether the component class has a property annotation
             if (hasPropertyAnnotation(className)) {
                 try {
                     generatedClassName = PropertyClassGenerator.instance().generateClass(generatedClassName,className);
                     contentDesc.setClassName(generatedClassName);
                 } catch (ClassGenerationFailedException cgfe) {
-                    logger.error("Cannot generate SCA Property class for " + className + " : " +
-                        cgfe.getMessage());
                     InstantiationException ie = new InstantiationException(
                         "Cannot generate SCA Property class for " + className + " : " + cgfe.getMessage());
                     ie.initCause(cgfe);
@@ -135,10 +131,10 @@ public class SCAFractive extends Fractive {
     }
 
     /*
-     * Determines if a class contains org.osoa.sca.annotations.Property annotation.
+     * Determines if a class Property annotation.
      *
      * @param className Class to introspect.
-     * @return True if the given class contains org.osoa.sca.annotations.Property annotation.
+     * @return True if the given class contains Property annotation.
      * @throws InstantiationException If the class cannot be found.
      */
     private boolean hasPropertyAnnotation(String className) throws InstantiationException {
@@ -152,7 +148,6 @@ public class SCAFractive extends Fractive {
                 }
             }
         } catch (ClassNotFoundException cnfe) {
-            logger.error("Cannot find classe " + className + " : " + cnfe.getMessage());
             InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
                 cnfe.getMessage());
             ie.initCause(cnfe);
