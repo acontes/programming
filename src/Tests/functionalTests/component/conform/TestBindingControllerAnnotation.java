@@ -57,7 +57,6 @@ import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.component.Utils;
 
-import functionalTests.component.conform.components.C;
 import functionalTests.component.conform.components.CAnnotations;
 import functionalTests.component.conform.components.I;
 import functionalTests.component.conform.components.J;
