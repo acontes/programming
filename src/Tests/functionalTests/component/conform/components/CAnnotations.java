@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.objectweb.fractal.fraclet.annotations.Requires;
+import org.objectweb.fractal.fraclet.types.Cardinality;
 
 
 public class CAnnotations implements CAttributes, I, J {
@@ -55,6 +56,7 @@ public class CAnnotations implements CAttributes, I, J {
     private boolean x11;
     @Requires(name="client")
     protected I i;
+    @Requires(name="client", cardinality=Cardinality.COLLECTION)
     private Map<String, Object> j = new HashMap<String, Object>();
 
     // ATTRIBUTE CONTROLLER
