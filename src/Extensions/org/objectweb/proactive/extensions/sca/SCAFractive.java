@@ -129,7 +129,7 @@ public class SCAFractive extends Fractive {
                     ie.initCause(cgfe);
                     throw ie;
                 }
-            }
+            }    
         }
         return super.newFcInstance(type, controllerDesc, contentDesc, node);
     }
@@ -161,7 +161,4 @@ public class SCAFractive extends Fractive {
 
         return false;
     }
-
-    
-   
 }
