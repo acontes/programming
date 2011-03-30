@@ -40,10 +40,11 @@ import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 
-public class IntentHandlerTest implements IntentHandler {
+public class IntentHandlerTest extends IntentHandler {
     private String msg;
 
     public IntentHandlerTest() {
+
     }
 
     public IntentHandlerTest(String msg) {
@@ -51,7 +52,7 @@ public class IntentHandlerTest implements IntentHandler {
     }
 
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        Object res = ijp.proceed();
+        Object res =  ijp.proceed();
         return res;
     }
 }

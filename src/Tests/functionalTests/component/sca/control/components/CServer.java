@@ -38,12 +38,11 @@ package functionalTests.component.sca.control.components;
 
 import org.osoa.sca.annotations.Property;
 
-
 public class CServer implements TestIntentItf, TestIntentItf2 {
-    @Property
-    public String propertyServer;
-
-    public void m() {
+	@Property
+	public String PropertyServer;
+    
+	public void m() {
     }
 
     public int n() {
@@ -56,4 +55,5 @@ public class CServer implements TestIntentItf, TestIntentItf2 {
     public int n2() {
         return 2;
     }
+   
 }

@@ -47,13 +47,13 @@ import org.apache.log4j.Logger;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
-import org.objectweb.fractal.api.control.IllegalLifeCycleException;
-import org.objectweb.fractal.api.control.LifeCycleController;
+import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
+import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.control.AbstractPAController;
 import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -80,14 +80,14 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      * all methods of the interface, else the list of String contains the names of the methods which
      * are applied to the IntentHandler.
      */
-    private HashMap<Integer, HashMap<String, List<String>>> informationPool;
-
-    private List<IntentHandler> listOfIntent;
+    private HashMap<IntentHandler, HashMap<String, List<String>>> informationPool;
+    
+    private HashMap<String,PAInterface> mapOfServerRef;
 
     public SCAIntentControllerImpl(Component owner) {
         super(owner);
-        informationPool = new HashMap<Integer, HashMap<String, List<String>>>();
-        listOfIntent = new ArrayList<IntentHandler>();
+        informationPool = new HashMap<IntentHandler, HashMap<String, List<String>>>();
+        mapOfServerRef = new HashMap<String, PAInterface>();
     }
 
     @Override
@@ -101,8 +101,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         }
     }
 
-    public void addIntentHandler(IntentHandler intentHandler) throws NoSuchInterfaceException,
-            IllegalLifeCycleException {
+    public void addIntentHandler(IntentHandler intentHandler) throws NoSuchInterfaceException {
         InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
         for (int i = 0; i < itftps.length; i++) {
             addIntentHandler(intentHandler, itftps[i].getFcItfName());
@@ -110,7 +109,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public void addIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchInterfaceException, IllegalLifeCycleException {
+            throws NoSuchInterfaceException{
         String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
                 .getFcItfSignature();
         try {
@@ -136,12 +135,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
-            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException {
-        LifeCycleController lcc = GCM.getGCMLifeCycleController(owner);
-        if (lcc.getFcState().equals(LifeCycleController.STARTED)) {
-            throw new IllegalLifeCycleException("Component is started, cannot add an intent handler");
-        }
-
+            throws NoSuchInterfaceException, NoSuchMethodException {
         String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
                 .getFcItfSignature();
         try {
@@ -150,32 +144,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
                 throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " +
                     itfSignature);
             }
-            HashMap<String, List<String>> itfPool;
-            List<String> methods;
-            int intentIndex = listContainsIntent(intentHandler, listOfIntent);
-            if (!informationPool.containsKey(intentIndex)) // Intent handler does not exist
-            {
-                itfPool = new HashMap<String, List<String>>();
-                methods = new ArrayList<String>();
-                methods.add(methodName);
-                addToBaseObject(intentHandler, itfName, methodName);
-                itfPool.put(itfName, methods);
-                informationPool.put(listOfIntent.size(), itfPool);
-                listOfIntent.add(intentHandler);
-            } else {
-                itfPool = informationPool.get(intentIndex);
-                if ((!itfPool.containsKey(itfName)) || itfPool == null) {
-                    methods = new ArrayList<String>();
-                    methods.add(methodName);
-                    addToBaseObject(intentHandler, itfName, methodName);
-                    itfPool.put(itfName, methods);
-                } else // Possibility to have several same intent on one method
-                {
-                    methods = itfPool.get(itfName);
-                    methods.add(methodName);
-                    addToBaseObject(intentHandler, itfName, methodName);
-                }
-            }
+            addToBaseObject(intentHandler, itfName, methodName);
         } catch (SecurityException se) {
             ProActiveRuntimeException pare = new ProActiveRuntimeException(
                 "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
@@ -200,11 +169,40 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      */
     private void addToBaseObject(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException {
-        if (((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()) {
-            return;
+    	Object obj = owner.getReferenceOnBaseObject();
+        if (((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()) { // if it is a client itf
+        	BindingController bctr = GCM.getBindingController(owner);
+			Object Itf = bctr.lookupFc(itfName);
+			HashMap<String, List<String>> itfPool;
+            List<String> methods;
+            if (!informationPool.containsKey(intentHandler)) // Intent handler does not exist
+            {
+                itfPool = new HashMap<String, List<String>>();
+                methods = new ArrayList<String>();
+                methods.add(methodName);
+                itfPool.put(itfName, methods);
+                informationPool.put(intentHandler, itfPool);;
+            } else {
+            	itfPool = informationPool.get(intentHandler);
+                if ((!itfPool.containsKey(itfName)) || itfPool == null) {
+                    methods = new ArrayList<String>();
+                    methods.add(methodName);
+                    itfPool.put(itfName, methods);
+                } else // Possibility to have several same intent on one method
+                {
+                    methods = itfPool.get(itfName);
+                    methods.add(methodName);
+                }
+            }
+			if (Itf != null) { // interface already binded
+				obj=mapOfServerRef.get(itfName);
+			}	
+			else
+			{
+	            return;
+			}
         }
         String invokingName = "addIntointentArray" + methodName;
-        Object obj = owner.getReferenceOnBaseObject();
         Class<?> cla = obj.getClass();
         Method mAdd = cla.getMethod(invokingName, IntentHandler.class);
         try {
@@ -252,7 +250,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public List<IntentHandler> listAllIntentHandler() {
-        return listOfIntent;
+        return new ArrayList<IntentHandler>(informationPool.keySet());//listOfIntent; 
     }
 
     public List<IntentHandler> listIntentHandler() {
@@ -264,6 +262,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
                 for (int i = 1; i < itftps.length; i++) {
                     List<IntentHandler> tmp = listIntentHandler(itftps[i].getFcItfName());
                     res = intersection(tmp, res);
+                    
                 }
             } catch (NoSuchInterfaceException nsie) {
                 // Should never happen
@@ -310,17 +309,17 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      * @param list2 The second list.
      * @return The intersection of those two lists.
      */
-    private static <E> List<E> intersection(final List<? extends E> list1, final List<? extends E> list2) {
-        final List<E> result = new ArrayList<E>();
+    private List<IntentHandler> intersection(List<IntentHandler> list1, final List<IntentHandler> list2) {
+        List<IntentHandler> result = new ArrayList<IntentHandler>();
 
-        List<? extends E> smaller = list1;
-        List<? extends E> larger = list2;
+        List<IntentHandler> smaller = list1;
+        List<IntentHandler> larger = list2;
         if (list1.size() > list2.size()) {
             smaller = list2;
             larger = list1;
         }
-        List<? extends E> tmp = new ArrayList<E>(smaller);
-        for (E e : larger) {
+        List<IntentHandler> tmp = new ArrayList<IntentHandler>(smaller);
+        for (IntentHandler e : larger) {
             if (tmp.contains(e)) {
                 result.add(e);
                 tmp.remove(e);
@@ -339,20 +338,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
                 throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " +
                     itfName);
             }
-            List<IntentHandler> res = new ArrayList<IntentHandler>();
-            for (Iterator<IntentHandler> iterator = listExistingIntentHandlerOfItf(itfName).iterator(); iterator
-                    .hasNext();) {
-                IntentHandler key = iterator.next();
-                int indexKey = listContainsIntent(key, listOfIntent);
-                List<String> tmp = informationPool.get(indexKey).get(itfName);
-                for (Iterator<String> listIter = tmp.iterator(); listIter.hasNext();) { // Possibility to have several same intent on one method
-                    String mName = listIter.next();
-                    if (mName.equals(methodName)) {
-                        res.add(key);
-                    }
-                }
-            }
-            return res;
+            return getListFromBaseObject(itfName, methodName);
         } catch (SecurityException se) {
             ProActiveRuntimeException pare = new ProActiveRuntimeException(
                 "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
@@ -366,6 +352,46 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         }
     }
 
+    private List<IntentHandler> getListFromBaseObject(String itfName, String methodName)
+	throws SecurityException, NoSuchMethodException, NoSuchInterfaceException 
+	{
+		String invokingName = "listintentArray"+methodName;
+		Object obj = owner.getReferenceOnBaseObject();
+		if(((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()){ // client interface
+			BindingController bctr = GCM.getBindingController(owner);
+			Object Itf = bctr.lookupFc(itfName);
+			List<IntentHandler> res = new ArrayList<IntentHandler>();
+            for (Iterator<IntentHandler> iterator = listExistingIntentHandlerOfItf(itfName).iterator(); iterator
+                    .hasNext();) {
+                IntentHandler key = iterator.next();
+                List<String> tmp = informationPool.get(key).get(itfName);
+                for (Iterator<String> listIter = tmp.iterator(); listIter.hasNext();) { // Possibility to have several same intent on one method
+                    String mName = listIter.next();
+                    if (mName.equals(methodName)) {
+                        res.add(key);
+                    }
+                }
+            }
+			if (Itf != null) { // interface already binded
+				obj=mapOfServerRef.get(itfName);
+			}
+			else // interface not binding yet, store everything in local hashmap
+			{
+	            return res;
+			}
+		}
+		Class cla  = obj.getClass();
+		Method mList = cla.getMethod(invokingName);
+		List res = null;
+		try {
+			res = (List) mList.invoke(obj);
+		} catch (Exception e) {
+			System.err.println("problem on invoking add intent into base object");
+			e.printStackTrace();
+		} 
+		return res;
+	}
+    
     /*
      * Lists the intents of an interface.
      *
@@ -374,18 +400,17 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
      */
     private List<IntentHandler> listExistingIntentHandlerOfItf(String itfName) {
         List<IntentHandler> res = new ArrayList<IntentHandler>();
-        for (Iterator<Integer> iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
-            int key = iterator.next();
+        for (Iterator<IntentHandler> iterator = informationPool.keySet().iterator(); iterator.hasNext();) {
+        	IntentHandler key = iterator.next();
             if (informationPool.get(key).containsKey(itfName)) {
-                IntentHandler tmp = listOfIntent.get(key);
-                res.add(tmp);
+            	res.add(key);
             }
         }
         return res;
     }
 
     public void removeIntentHandler(IntentHandler intentHandler) throws NoSuchIntentHandlerException,
-            NoSuchInterfaceException, IllegalLifeCycleException {
+            NoSuchInterfaceException {
         List<IntentHandler> tmp = listIntentHandler();
         int intentExist = listContainsIntent(intentHandler, tmp);
         if (intentExist != -1) {
@@ -401,7 +426,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public void removeIntentHandler(IntentHandler intentHandler, String itfName)
-            throws NoSuchIntentHandlerException, NoSuchInterfaceException, IllegalLifeCycleException {
+            throws NoSuchIntentHandlerException, NoSuchInterfaceException {
         List<IntentHandler> tmp = listIntentHandler(itfName);
         if (listContainsIntent(intentHandler, tmp) != -1) {
             String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
@@ -434,31 +459,19 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public void removeIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
-            throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException,
+            throws NoSuchInterfaceException, NoSuchMethodException,
             NoSuchIntentHandlerException {
-        LifeCycleController lcc = GCM.getGCMLifeCycleController(owner);
-        if (lcc.getFcState().equals(LifeCycleController.STARTED)) {
-            throw new IllegalLifeCycleException("Component is started, cannot remove an intent handler");
-        }
         String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
                 .getFcItfSignature();
         List<IntentHandler> tmp = listIntentHandler(itfName, methodName);
         if (listContainsIntent(intentHandler, tmp) != -1) {
             try {
                 Method[] methodList = Class.forName(itfSignature).getMethods();
-                if (methodExist(methodList, methodName)) {
-                    int intentIndex = listContainsIntent(intentHandler, listOfIntent);
-                    informationPool.get(intentIndex).get(itfName).remove(methodName);
-                    if (informationPool.get(intentIndex).get(itfName).isEmpty()) {
-                        informationPool.get(intentIndex).remove(itfName);
-                        if (informationPool.get(intentIndex).isEmpty()) {
-                            informationPool.remove(intentIndex);
-                            listOfIntent.remove(intentIndex);
-                        }
-                    }
+                if (!methodExist(methodList, methodName)) {
+                	throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " +
+                            itfName);
                 } else {
-                    throw new NoSuchMethodException("Method " + methodName + " does not exist in interface " +
-                        itfName);
+                	removeFromBaseObject(itfName, methodName, intentHandler);
                 }
             } catch (SecurityException se) {
                 ProActiveRuntimeException pare = new ProActiveRuntimeException(
@@ -475,6 +488,39 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
             throw new NoSuchIntentHandlerException("Intent handler does not exist");
         }
     }
+    
+    private void removeFromBaseObject(String itfName,String methodName, IntentHandler intentHandler)throws SecurityException, NoSuchMethodException, NoSuchInterfaceException 
+	{
+		String invokingName = "removeFromintentArray"+methodName;
+		Object obj = owner.getReferenceOnBaseObject();
+		Class cla  = obj.getClass();
+		if(((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()){
+			BindingController bctr = GCM.getBindingController(owner);
+			Object Itf = bctr.lookupFc(itfName);
+            IntentHandler intentIndex = intentHandler;
+			informationPool.get(intentIndex).get(itfName).remove(methodName);
+            if (informationPool.get(intentIndex).get(itfName).isEmpty()) {
+                informationPool.get(intentIndex).remove(itfName);
+                if (informationPool.get(intentIndex).isEmpty()) {
+                    informationPool.remove(intentIndex);
+                }
+            }
+			if (Itf != null) { // interface already binded
+				obj=mapOfServerRef.get(itfName);
+			}
+			else // interface not binding yet, store everything in local hashmap
+			{
+                return;
+			}
+		}
+		Method mRemove = cla.getMethod(invokingName, IntentHandler.class);
+		try {
+			mRemove.invoke(obj, new Object[]{intentHandler});
+		} catch (Exception e) {
+			System.err.println("problem on invoking remove intent into base object");
+			e.printStackTrace();
+		} 
+	}
 
     /*
      * Returns the associated index of the given intent handler in the given list of intent handlers or -1 if not
@@ -512,4 +558,13 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         }
         return false;
     }
+
+	public void addServerReference(String clientItfName, PAInterface sItf) {
+		mapOfServerRef.put(clientItfName, sItf);
+	}
+	
+	public void removeServerReference(String clientItfName) {
+		mapOfServerRef.remove(clientItfName);
+	}
+	
 }

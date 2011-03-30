@@ -44,7 +44,7 @@ import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 //@snippet-start component_scauserguide_3
 
-public class SecurityIntentHandler implements IntentHandler {
+public class SecurityIntentHandler extends IntentHandler {
     String password;
 
     public SecurityIntentHandler(String password) {

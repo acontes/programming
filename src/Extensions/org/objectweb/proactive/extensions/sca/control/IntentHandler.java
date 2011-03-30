@@ -37,6 +37,7 @@
 package org.objectweb.proactive.extensions.sca.control;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import org.objectweb.proactive.annotation.PublicAPI;
 
@@ -56,12 +57,33 @@ import org.objectweb.proactive.annotation.PublicAPI;
  * @see IntentJoinPoint
  */
 @PublicAPI
-public interface IntentHandler extends Serializable {
+public abstract class IntentHandler implements Serializable {
     /**
      * Defines the actions performed by the intent handler.
      *
      * @param ijp The join point where the interception occurred.
      * @return The value returned by the intercepted method.
      */
-    public Object invoke(IntentJoinPoint ijp) throws Throwable;
+    public abstract Object invoke(IntentJoinPoint ijp) throws Throwable;
+    
+    private String uuid= UUID.randomUUID().toString(); 
+    
+    public boolean equals(Object obj)
+    {
+    	if(this == obj) {
+            return true;
+       }
+       if (!(obj instanceof IntentHandler)) {
+              return false; 
+       }
+       IntentHandler tmp = (IntentHandler) obj;
+       return tmp.uuid.equals(this.uuid);
+    }
+    
+    public int hashCode() 
+    {
+    	int hash = 7;
+    	hash = 31 * hash + uuid.hashCode();
+    	return hash;
+    }
 }
