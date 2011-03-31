@@ -65,25 +65,23 @@ public abstract class IntentHandler implements Serializable {
      * @return The value returned by the intercepted method.
      */
     public abstract Object invoke(IntentJoinPoint ijp) throws Throwable;
-    
-    private String uuid= UUID.randomUUID().toString(); 
-    
-    public boolean equals(Object obj)
-    {
-    	if(this == obj) {
+
+    private String uuid = UUID.randomUUID().toString();
+
+    public boolean equals(Object obj) {
+        if (this == obj) {
             return true;
-       }
-       if (!(obj instanceof IntentHandler)) {
-              return false; 
-       }
-       IntentHandler ih = (IntentHandler) obj;
-       return ih.uuid.equals(this.uuid);
+        }
+        if (!(obj instanceof IntentHandler)) {
+            return false;
+        }
+        IntentHandler ih = (IntentHandler) obj;
+        return ih.uuid.equals(this.uuid);
     }
-    
-    public int hashCode() 
-    {
-    	int hash = 7;
-    	hash = 31 * hash + uuid.hashCode();
-    	return hash;
+
+    public int hashCode() {
+        int hash = 7;
+        hash = 31 * hash + uuid.hashCode();
+        return hash;
     }
 }

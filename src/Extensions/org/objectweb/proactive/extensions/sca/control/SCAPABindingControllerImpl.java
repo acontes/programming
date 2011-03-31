@@ -62,22 +62,22 @@ import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
  * @author The ProActive Team
  */
 public class SCAPABindingControllerImpl extends PABindingControllerImpl {
-	public SCAPABindingControllerImpl(Component owner) {
-		super(owner);
-	}
-	
-	protected void primitiveBindFc(String clientItfName, PAInterface serverItf)
-	throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-		PAInterface sItf = serverItf;
-		List<List<IntentHandler>> listOfIntents = getIntentsOfEveryMethod(clientItfName);
+    public SCAPABindingControllerImpl(Component owner) {
+        super(owner);
+    }
+
+    protected void primitiveBindFc(String clientItfName, PAInterface serverItf)
+            throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
+        PAInterface sItf = serverItf;
+        List<List<IntentHandler>> listOfIntents = getIntentsOfEveryMethod(clientItfName);
         Component ownerLocal = this.getFcItfOwner();
         if (Utils.getSCAIntentController(ownerLocal).hasAtleastOneIntentHandler(clientItfName)) {
             try {
-                String sItfSignature = IntentClassGenerator.instance().generateClass(sItf.getClass().getName(),
-                        sItf.getClass().getName());
+                String sItfSignature = IntentClassGenerator.instance().generateClass(
+                        sItf.getClass().getName(), sItf.getClass().getName());
                 try {
-                    PAInterfaceImpl reference = (PAInterfaceImpl) Class.forName(sItfSignature).getConstructor()
-                            .newInstance();
+                    PAInterfaceImpl reference = (PAInterfaceImpl) Class.forName(sItfSignature)
+                            .getConstructor().newInstance();
                     reference.setFcItfOwner(serverItf.getFcItfOwner());
                     reference.setFcItfName(serverItf.getFcItfName());
                     reference.setFcType(serverItf.getFcItfType());
@@ -88,7 +88,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                             .getFcItfImpl()).notifyBinding(clientItfName, reference);
                 } catch (ClassNotFoundException cnfe) {
                     ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to class " +
-                            sItfSignature + ": " + cnfe.getMessage());
+                        sItfSignature + ": " + cnfe.getMessage());
                     pare.initCause(cnfe);
                     throw pare;
                 } catch (NoSuchMethodException nsme) {
@@ -133,83 +133,83 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                 throw ibe;
             }
         }
-		super.primitiveBindFc(clientItfName, sItf);
-		addIntentsToEveryMethod(clientItfName, listOfIntents);
-	}
+        super.primitiveBindFc(clientItfName, sItf);
+        addIntentsToEveryMethod(clientItfName, listOfIntents);
+    }
 
-	/*
-	 * Gets all intents of each methods before binding procedure, thus before the generation of the proxy object.
-	 *
-	 * @param clientItfName The client interface name.
-	 * @return All intents of each methods of the client interface.
-	 * @throws NoSuchInterfaceException If there is no SCAIntentController or no such client interface.
-	 */
-	private List<List<IntentHandler>> getIntentsOfEveryMethod(String clientItfName) throws NoSuchInterfaceException
-	{
-	    List<List<IntentHandler>> res = new ArrayList<List<IntentHandler>>();
-		 String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName)
-         .getFcItfSignature();
-		 SCAIntentController scaic = Utils.getSCAIntentController(owner);
-		 try {
-			Method[] methodList = Class.forName(itfSignature).getDeclaredMethods();
-			if (methodList.length > 0) {
+    /*
+     * Gets all intents of each methods before binding procedure, thus before the generation of the proxy object.
+     *
+     * @param clientItfName The client interface name.
+     * @return All intents of each methods of the client interface.
+     * @throws NoSuchInterfaceException If there is no SCAIntentController or no such client interface.
+     */
+    private List<List<IntentHandler>> getIntentsOfEveryMethod(String clientItfName)
+            throws NoSuchInterfaceException {
+        List<List<IntentHandler>> res = new ArrayList<List<IntentHandler>>();
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName)
+                .getFcItfSignature();
+        SCAIntentController scaic = Utils.getSCAIntentController(owner);
+        try {
+            Method[] methodList = Class.forName(itfSignature).getDeclaredMethods();
+            if (methodList.length > 0) {
                 try {
                     for (int i = 0; i < methodList.length; i++) {
-                        List<IntentHandler> tmp = scaic.listIntentHandler(clientItfName, methodList[i].getName());
+                        List<IntentHandler> tmp = scaic.listIntentHandler(clientItfName, methodList[i]
+                                .getName());
                         res.add(tmp);
                     }
                 } catch (NoSuchMethodException nsme) {
                     // Should never happen
                 }
             }
-		} catch (ClassNotFoundException cnfe) {
-			// Should never happen
-		} catch (SecurityException se) {
-            ProActiveRuntimeException pare = new ProActiveRuntimeException(
-                    "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
-                pare.initCause(se);
-                throw pare;
-        }
-		return res;
-	}
-
-	/*
-	 * Adds intents that have been added before binding procedure into proxy object.
-	 *
-     * @param clientItfName The client interface name.
-	 * @param listOfIntents The list of intents.
-     * @throws NoSuchInterfaceException If there is no SCAIntentController or no such client interface.
-     * @throws IllegalLifeCycleException If the component is not stopped.
-	 */
-    private void addIntentsToEveryMethod(String clientItfName,
-            List<List<IntentHandler>> listOfIntents) throws NoSuchInterfaceException,
-            IllegalLifeCycleException {
-		 String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName)
-         .getFcItfSignature();
-		 SCAIntentController scaic = Utils.getSCAIntentController(owner);
-		 try {
-			Method[] methodList = Class.forName(itfSignature).getDeclaredMethods();
-			if (methodList.length > 0) {
-                try {
-                    for (int i = 0; i < methodList.length; i++) {
-                        List<IntentHandler> tmp = listOfIntents.get(i);
-                        for (IntentHandler intentHandler : tmp) {
-                        	scaic.addIntentHandler(intentHandler,clientItfName, methodList[i].getName());
-						}
-                    }
-                } catch (NoSuchMethodException nsme) {
-                    // Should never happen
-                }
-            }
-		} catch (ClassNotFoundException cnfe) {
-			// Should never happen
+        } catch (ClassNotFoundException cnfe) {
+            // Should never happen
         } catch (SecurityException se) {
             ProActiveRuntimeException pare = new ProActiveRuntimeException(
                 "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
             pare.initCause(se);
             throw pare;
         }
-	}
-	
-	// Add unbind procedure
+        return res;
+    }
+
+    /*
+     * Adds intents that have been added before binding procedure into proxy object.
+     *
+     * @param clientItfName The client interface name.
+     * @param listOfIntents The list of intents.
+     * @throws NoSuchInterfaceException If there is no SCAIntentController or no such client interface.
+     * @throws IllegalLifeCycleException If the component is not stopped.
+     */
+    private void addIntentsToEveryMethod(String clientItfName, List<List<IntentHandler>> listOfIntents)
+            throws NoSuchInterfaceException, IllegalLifeCycleException {
+        String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName)
+                .getFcItfSignature();
+        SCAIntentController scaic = Utils.getSCAIntentController(owner);
+        try {
+            Method[] methodList = Class.forName(itfSignature).getDeclaredMethods();
+            if (methodList.length > 0) {
+                try {
+                    for (int i = 0; i < methodList.length; i++) {
+                        List<IntentHandler> tmp = listOfIntents.get(i);
+                        for (IntentHandler intentHandler : tmp) {
+                            scaic.addIntentHandler(intentHandler, clientItfName, methodList[i].getName());
+                        }
+                    }
+                } catch (NoSuchMethodException nsme) {
+                    // Should never happen
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            // Should never happen
+        } catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+            pare.initCause(se);
+            throw pare;
+        }
+    }
+
+    // Add unbind procedure
 }

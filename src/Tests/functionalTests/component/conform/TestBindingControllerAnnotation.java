@@ -140,7 +140,7 @@ public class TestBindingControllerAnnotation extends Conformtest {
             checkList(bc, new String[] { "client" });
         }
     }
-    
+
     protected void checkList(BindingController bc, String[] expected) {
         String[] names = bc.listFc();
         HashSet<String> nameSet = new HashSet<String>();
@@ -219,7 +219,6 @@ public class TestBindingControllerAnnotation extends Conformtest {
         } catch (IllegalBindingException e) {
         }
     }
-
 
     @Test
     public void testNoSuchInterfaceUnind() throws Exception {

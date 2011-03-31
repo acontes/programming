@@ -102,14 +102,15 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                         .get("org.objectweb.fractal.api.control.BindingController");
                 generatedCtClass.addInterface(interfaceToImplement);
 
-                Class<?> superClassToHerit =Class.forName(classToHerit);
+                Class<?> superClassToHerit = Class.forName(classToHerit);
 
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
                 generatedCtClass.addConstructor(defaultConstructor);
 
                 // Get property fields of superclass
-                List<Field> fields = new ArrayList<Field>(Arrays.asList(superClassToHerit.getDeclaredFields()));
+                List<Field> fields = new ArrayList<Field>(Arrays
+                        .asList(superClassToHerit.getDeclaredFields()));
                 do {
                     superClassToHerit = superClassToHerit.getSuperclass();
                     List<Field> asList = Arrays.asList(superClassToHerit.getDeclaredFields());
@@ -119,39 +120,33 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 ArrayList<Field> requiresFields = new ArrayList<Field>();
                 ArrayList<Field> collectionFields = new ArrayList<Field>();
                 for (int i = 0; i < fields.size(); i++) {
-                	Requires tmp = 
-                		fields.get(i).getAnnotation(Requires.class);
+                    Requires tmp = fields.get(i).getAnnotation(Requires.class);
                     if (tmp != null) {
-                    	if(tmp.cardinality().equals(Cardinality.COLLECTION)) {
-                    		collectionFields.add(fields.get(i));
-                    	}
-                    	else {
-                    		requiresFields.add(fields.get(i));
-                    	}
+                        if (tmp.cardinality().equals(Cardinality.COLLECTION)) {
+                            collectionFields.add(fields.get(i));
+                        } else {
+                            requiresFields.add(fields.get(i));
+                        }
                     }
                 }
                 // Begin of the listFCBody construction
                 int requiresSize = requiresFields.size();
-                String collectionFieldSize= "";
+                String collectionFieldSize = "";
                 String keySetTmp = "java.util.Set tmp = new java.util.HashSet();\n";
                 String requiresTmp = "";
-                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
-						.hasNext();) {
-					Field field = iterator.next();
-					collectionFieldSize +=field.getName()+".size() + ";
-					keySetTmp += "tmp.addAll("+field.getName() +".keySet());\n";
-				}
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator.hasNext();) {
+                    Field field = iterator.next();
+                    collectionFieldSize += field.getName() + ".size() + ";
+                    keySetTmp += "tmp.addAll(" + field.getName() + ".keySet());\n";
+                }
                 keySetTmp += "tmp.toArray(result);\n";
                 int i = 0;
                 for (i = 0; i < requiresFields.size(); i++) {
-                    Requires tmp = requiresFields.get(i)
-                            .getAnnotation(Requires.class);
-                    requiresTmp += "result["+ collectionFieldSize +"+" + i +"]= \""+tmp.name()+"\";\n";
+                    Requires tmp = requiresFields.get(i).getAnnotation(Requires.class);
+                    requiresTmp += "result[" + collectionFieldSize + "+" + i + "]= \"" + tmp.name() + "\";\n";
                 }
-                String listFCBody = "String[] result = new String["+collectionFieldSize + requiresSize+"];\n" +
-                		keySetTmp+
-                		requiresTmp+
-                		"return result;\n";
+                String listFCBody = "String[] result = new String[" + collectionFieldSize + requiresSize +
+                    "];\n" + keySetTmp + requiresTmp + "return result;\n";
                 // End of the listFCBody construction
                 CtMethod listFC = CtNewMethod.make("public String[] listFc() {" + listFCBody + "}",
                         generatedCtClass);
@@ -160,41 +155,34 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 // Begin of the lookupFCBody construction
                 String lookupFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
-                    Requires tmp2 = requiresFields
-                            .get(i).getAnnotation(Requires.class);
+                    Requires tmp2 = requiresFields.get(i).getAnnotation(Requires.class);
                     lookupFcBody += "if (clientItfName.equals(\"" + tmp2.name() + "\")) {\n" + "return " +
                         requiresFields.get(i).getName() + ";\n }\n";
                 }
-                
-                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
-                .hasNext();) {
-                	Field field = iterator.next();
-                	lookupFcBody += "if("+field.getName()+".containsKey(clientItfName)){\n" +
-                			"return "+field.getName()+".get(clientItfName);\n" +
-                					"}\n";
+
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator.hasNext();) {
+                    Field field = iterator.next();
+                    lookupFcBody += "if(" + field.getName() + ".containsKey(clientItfName)){\n" + "return " +
+                        field.getName() + ".get(clientItfName);\n" + "}\n";
                 }
                 lookupFcBody += "else { return null; }\n";
                 // End of the lookupFCBody construction
                 CtMethod lookupFc = CtNewMethod.make("public Object lookupFc(String clientItfName) {" +
                     lookupFcBody + "}", generatedCtClass);
                 generatedCtClass.addMethod(lookupFc);
-                
+
                 // Begin of the bindFCBody construction
                 String bindFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
-                    Requires tmp3 = requiresFields
-                            .get(i).getAnnotation(Requires.class);
+                    Requires tmp3 = requiresFields.get(i).getAnnotation(Requires.class);
                     bindFcBody += "if (clientItfName.equals(\"" + tmp3.name() + "\")) \n{" +
                         requiresFields.get(i).getName() + " = (" + requiresFields.get(i).getType().getName() +
                         ")serverItf;\n return; \n }\n";
                 }
-                
-                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
-                .hasNext();) {
-                	Field field = iterator.next();
-                	bindFcBody += "else{\n" +
-                			field.getName()+".put(clientItfName,serverItf);\n" +
-                					"}\n";
+
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator.hasNext();) {
+                    Field field = iterator.next();
+                    bindFcBody += "else{\n" + field.getName() + ".put(clientItfName,serverItf);\n" + "}\n";
                 }
                 // End of the bindFCBody construction
                 CtMethod bindFc = CtNewMethod.make(
@@ -204,18 +192,15 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 // Begin of the unbindFCBody construction
                 String unbindFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
-                    Requires tmp4 = requiresFields
-                            .get(i).getAnnotation(Requires.class);
+                    Requires tmp4 = requiresFields.get(i).getAnnotation(Requires.class);
                     unbindFcBody += "if (clientItfName.equals(\"" + tmp4.name() + "\"))\n {" +
                         requiresFields.get(i).getName() + " = null ;\n return;\n }\n";
                 }
-                
-                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
-                .hasNext();) {
-                	Field field = iterator.next();
-                	unbindFcBody += "if("+field.getName()+".containsKey(clientItfName)){\n" +
-                			field.getName()+".remove(clientItfName);\n" +
-                					"}\n";
+
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator.hasNext();) {
+                    Field field = iterator.next();
+                    unbindFcBody += "if(" + field.getName() + ".containsKey(clientItfName)){\n" +
+                        field.getName() + ".remove(clientItfName);\n" + "}\n";
                 }
                 // End of the unbindFCBody construction
                 CtMethod unbindFc = CtNewMethod.make("public void unbindFc(String clientItfName) {" +
