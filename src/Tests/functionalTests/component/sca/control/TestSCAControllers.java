@@ -129,7 +129,6 @@ public class TestSCAControllers extends SCAComponentTest {
             i2.m2();
             assertEquals("client\'s property", scapcClient.getValue("PropertyClient"));
             assertEquals("server\'s property", scapcServer.getValue("PropertyServer"));
-            //System.out.println("invocation of method m2 success");
         } catch (Exception e) {
             e.printStackTrace();
         }

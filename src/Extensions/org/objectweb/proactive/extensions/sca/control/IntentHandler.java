@@ -76,8 +76,8 @@ public abstract class IntentHandler implements Serializable {
        if (!(obj instanceof IntentHandler)) {
               return false; 
        }
-       IntentHandler tmp = (IntentHandler) obj;
-       return tmp.uuid.equals(this.uuid);
+       IntentHandler ih = (IntentHandler) obj;
+       return ih.uuid.equals(this.uuid);
     }
     
     public int hashCode() 

@@ -109,18 +109,18 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 					.make("private java.util.List intentArray"+ctExtentedMethod.getName()+"= new java.util.ArrayList();"
 							, generatedCtClass);
 					generatedCtClass.addField(intentHandlerArray);
-					String IArrayName = intentHandlerArray.getName(); 
+					String intentArrayName = intentHandlerArray.getName(); 
 
 					CtField intentHandlerCounter = CtField
 					.make("private int counter"+ctExtentedMethod.getName()+"= -1;"
 							, generatedCtClass);
 					generatedCtClass.addField(intentHandlerCounter);
-					String ICounterName = intentHandlerCounter.getName();
+					String intentCounterName = intentHandlerCounter.getName();
 
 					CtMethod newMethod = CtNewMethod.delegator(ctExtentedMethod, generatedCtClass);
 					newMethod.setBody("{\n" +
-							ICounterName+"++;\n"+
-							"if("+ICounterName+" < "+IArrayName+".size()){"+
+							intentCounterName+"++;\n"+
+							"if("+intentCounterName+" < "+intentArrayName+".size()){"+
 							"return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)"+intentHandlerArray.getName()+
 							".get(" + 
 							intentHandlerCounter.getName() +
@@ -128,21 +128,20 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 							"IntentJoinPoint(this, \"" + newMethod.getName() + "\", $sig, $args));\n" +
 							"}\n"+
 							"else{" +
-							ICounterName+"= -1;\n" +
+							intentCounterName+"= -1;\n" +
 							"return ($r)super." +ctExtentedMethod.getName()+"($$);\n"+
 							"}\n" +
 					"}\n");
 
 					generatedCtClass.addMethod(newMethod);
 
-					generateListUtils(intentHandlerArray,generatedCtClass);
+					generateHelperMethods(intentHandlerArray,generatedCtClass);
 
 				}
-			
 
-				generatedCtClass.stopPruning(true);
-//				generatedCtClass.writeFile("generated/");
-//				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                //				generatedCtClass.stopPruning(true);
+                //				generatedCtClass.writeFile("generated/");
+                //				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
 				// Generate and add to cache the generated class
 				byte[] bytecode = generatedCtClass.toBytecode();
@@ -156,8 +155,6 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 				// Defrost the generated class
 				generatedCtClass.defrost();
 			} catch (Exception e) {
-				logger.error("Cannot generate subClass of [" + classToExtend + "] with javassist: " +
-						e.getMessage());
 				throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
 						"] with javassist", e);
 			}
@@ -166,33 +163,29 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator{
 		return generatedClassName;
 	}
 
-
- /*
+	/*
      * Generates some methods useful to manage intents on a method.
      *
      * @param intentArray Array of intents positioned on a method.
      * @param generatedCtClass Generated class.
      * @throws CannotCompileException If the generation failed.
      */
-	private void generateListUtils(CtField intentHandlerArray,CtClass generatedCtClass) throws CannotCompileException {
-		String IArrayName = intentHandlerArray.getName(); 
-		CtMethod add = CtNewMethod.make("public void addInto"+IArrayName+"(org.objectweb.proactive.extensions.sca.control.IntentHandler ith){" +
-				IArrayName+".add(ith);\n" +
-				"}"
-				, generatedCtClass);	
-		generatedCtClass.addMethod(add);
-		CtMethod remove = CtNewMethod.make("public void removeFrom"+IArrayName+"(org.objectweb.proactive.extensions.sca.control.IntentHandler ith){" +
-				IArrayName+".remove(ith);\n" +
-				"}"
-				, generatedCtClass);	
-		generatedCtClass.addMethod(remove);
-		CtMethod list = CtNewMethod.make("public java.util.List list"+IArrayName+"(){" +
-				"return " + IArrayName+";" +
-				"}"
-				, generatedCtClass);	
-		generatedCtClass.addMethod(list);
+    private void generateHelperMethods(CtField intentArray, CtClass generatedCtClass)
+            throws CannotCompileException {
+        String intentArrayName = intentArray.getName();
+        CtMethod add = CtNewMethod.make("public void addInto" + intentArrayName +
+            "(org.objectweb.proactive.extensions.sca.control.IntentHandler ih){" + intentArrayName +
+            ".add(ih);\n" + "}", generatedCtClass);
+        generatedCtClass.addMethod(add);
+        CtMethod remove = CtNewMethod.make("public void removeFrom" + intentArrayName +
+            "(org.objectweb.proactive.extensions.sca.control.IntentHandler ih){" + intentArrayName +
+            ".remove(ih);\n" + "}", generatedCtClass);
+        generatedCtClass.addMethod(remove);
+        CtMethod list = CtNewMethod.make("public java.util.List list" + intentArrayName + "(){" + "return " +
+            intentArrayName + ";" + "}", generatedCtClass);
+        generatedCtClass.addMethod(list);
 
-	}
+    }
 	
 	/*
      * Non used.

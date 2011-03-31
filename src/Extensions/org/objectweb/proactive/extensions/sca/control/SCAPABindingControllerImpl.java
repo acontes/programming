@@ -46,6 +46,7 @@ import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.PAInterfaceImpl;
 import org.objectweb.proactive.core.component.control.PABindingController;
@@ -68,53 +69,84 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
 	protected void primitiveBindFc(String clientItfName, PAInterface serverItf)
 	throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
 		PAInterface sItf = serverItf;
-		List listOfIntents = getIntentsOfEveryMethod(clientItfName);
-		Component ownerLocal = this.getFcItfOwner();
-		try {
-			if (Utils.getSCAIntentController(ownerLocal).hasAtleastOneIntentHandler(clientItfName)) {
-				try {
-					String sItfName = IntentClassGenerator.instance().generateClass(sItf.getClass().getName(), sItf.getClass().getName());
-					PAInterfaceImpl reference=null;
-					try {
-						reference = (PAInterfaceImpl)Class.forName(sItfName).getConstructor().newInstance();
-					} catch (Exception e) {
-
-						e.printStackTrace();
-					} 		
-					reference.setFcItfOwner(serverItf.getFcItfOwner());
-					reference.setFcItfName(serverItf.getFcItfName());
-					reference.setFcType(serverItf.getFcItfType());
-					reference.setFcIsInternal(serverItf.isFcInternalItf());
-					reference.setProxy(serverItf.getProxy());
-					sItf = reference;
-					Utils.getSCAIntentController(ownerLocal).addServerReference(clientItfName,reference);
-					System.err.println(reference.getClass().getName());
-				} catch (ClassGenerationFailedException cgfe) {
-					controllerLogger
-					.error("could not generate intent interceptor for reference (client interface) " +
-							clientItfName + ": " + cgfe.getMessage());
-					IllegalBindingException ibe = new IllegalBindingException(
-							"could not generate intent controller for reference (client interface) " +
-							clientItfName + ": " + cgfe.getMessage());
-					ibe.initCause(cgfe);
-					throw ibe;
-				}
-			}
-		} catch (NoSuchMethodException e) {
-			e.printStackTrace();
-		}
+		List<List<IntentHandler>> listOfIntents = getIntentsOfEveryMethod(clientItfName);
+        Component ownerLocal = this.getFcItfOwner();
+        if (Utils.getSCAIntentController(ownerLocal).hasAtleastOneIntentHandler(clientItfName)) {
+            try {
+                String sItfSignature = IntentClassGenerator.instance().generateClass(sItf.getClass().getName(),
+                        sItf.getClass().getName());
+                try {
+                    PAInterfaceImpl reference = (PAInterfaceImpl) Class.forName(sItfSignature).getConstructor()
+                            .newInstance();
+                    reference.setFcItfOwner(serverItf.getFcItfOwner());
+                    reference.setFcItfName(serverItf.getFcItfName());
+                    reference.setFcType(serverItf.getFcItfType());
+                    reference.setFcIsInternal(serverItf.isFcInternalItf());
+                    reference.setProxy(serverItf.getProxy());
+                    sItf = reference;
+                    ((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(ownerLocal))
+                            .getFcItfImpl()).notifyBinding(clientItfName, reference);
+                } catch (ClassNotFoundException cnfe) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException("Cannot access to class " +
+                            sItfSignature + ": " + cnfe.getMessage());
+                    pare.initCause(cnfe);
+                    throw pare;
+                } catch (NoSuchMethodException nsme) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                        "Cannot access to constructor of class " + sItfSignature + ": " + nsme.getMessage());
+                    pare.initCause(nsme);
+                    throw pare;
+                } catch (SecurityException se) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                        "Cannot access to constructor of class " + sItfSignature + ": " + se.getMessage());
+                    pare.initCause(se);
+                    throw pare;
+                } catch (IllegalArgumentException iae) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                        "Cannot invoke constructor of class " + sItfSignature + ": " + iae.getMessage());
+                    pare.initCause(iae);
+                    throw pare;
+                } catch (InstantiationException ie) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                        "Cannot invoke constructor of class " + sItfSignature + ": " + ie.getMessage());
+                    pare.initCause(ie);
+                    throw pare;
+                } catch (IllegalAccessException iae) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                        "Cannot invoke constructor of class " + sItfSignature + ": " + iae.getMessage());
+                    pare.initCause(iae);
+                    throw pare;
+                } catch (InvocationTargetException ite) {
+                    ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                        "Cannot invoke constructor of class " + sItfSignature + ": " + ite.getMessage());
+                    pare.initCause(ite);
+                    throw pare;
+                }
+            } catch (ClassGenerationFailedException cgfe) {
+                controllerLogger
+                        .error("could not generate intent interceptor for reference (client interface) " +
+                            clientItfName + ": " + cgfe.getMessage());
+                IllegalBindingException ibe = new IllegalBindingException(
+                    "could not generate intent controller for reference (client interface) " + clientItfName +
+                        ": " + cgfe.getMessage());
+                ibe.initCause(cgfe);
+                throw ibe;
+            }
+        }
 		super.primitiveBindFc(clientItfName, sItf);
 		addIntentsToEveryMethod(clientItfName, listOfIntents);
 	}
-	/**
-	 * This method get all intents of each methods before binding procedure, thus before the generation of the proxy object
-	 * @param clientItfName
-	 * @return 
-	 * @throws NoSuchInterfaceException
+
+	/*
+	 * Gets all intents of each methods before binding procedure, thus before the generation of the proxy object.
+	 *
+	 * @param clientItfName The client interface name.
+	 * @return All intents of each methods of the client interface.
+	 * @throws NoSuchInterfaceException If there is no SCAIntentController or no such client interface.
 	 */
-	private List getIntentsOfEveryMethod(String clientItfName) throws NoSuchInterfaceException
+	private List<List<IntentHandler>> getIntentsOfEveryMethod(String clientItfName) throws NoSuchInterfaceException
 	{
-		List res = new ArrayList();
+	    List<List<IntentHandler>> res = new ArrayList<List<IntentHandler>>();
 		 String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName)
          .getFcItfSignature();
 		 SCAIntentController scaic = Utils.getSCAIntentController(owner);
@@ -130,23 +162,28 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                     // Should never happen
                 }
             }
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException cnfe) {
 			// Should never happen
-		}
+		} catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                    "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+                pare.initCause(se);
+                throw pare;
+        }
 		return res;
 	}
-	/**
-	 * This method add intents that have been added before binding procedure into proxy object
-	 * @param clientItfName
-	 * @param listOfIntents
-	 * @return
-	 * @throws NoSuchInterfaceException
+
+	/*
+	 * Adds intents that have been added before binding procedure into proxy object.
+	 *
+     * @param clientItfName The client interface name.
+	 * @param listOfIntents The list of intents.
+     * @throws NoSuchInterfaceException If there is no SCAIntentController or no such client interface.
+     * @throws IllegalLifeCycleException If the component is not stopped.
 	 */
-	private List addIntentsToEveryMethod(String clientItfName, List listOfIntents) throws NoSuchInterfaceException
-	{
-		List res = new ArrayList();
+    private void addIntentsToEveryMethod(String clientItfName,
+            List<List<IntentHandler>> listOfIntents) throws NoSuchInterfaceException,
+            IllegalLifeCycleException {
 		 String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(clientItfName)
          .getFcItfSignature();
 		 SCAIntentController scaic = Utils.getSCAIntentController(owner);
@@ -155,8 +192,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
 			if (methodList.length > 0) {
                 try {
                     for (int i = 0; i < methodList.length; i++) {
-                    	
-                        List<IntentHandler> tmp = (List<IntentHandler>) listOfIntents.get(i);
+                        List<IntentHandler> tmp = listOfIntents.get(i);
                         for (IntentHandler intentHandler : tmp) {
                         	scaic.addIntentHandler(intentHandler,clientItfName, methodList[i].getName());
 						}
@@ -165,14 +201,15 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                     // Should never happen
                 }
             }
-		} catch (SecurityException e) {
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException cnfe) {
 			// Should never happen
-		}
-		return res;
+        } catch (SecurityException se) {
+            ProActiveRuntimeException pare = new ProActiveRuntimeException(
+                "Cannot access to methods of interface " + itfSignature + ": " + se.getMessage());
+            pare.initCause(se);
+            throw pare;
+        }
 	}
 	
-	//add unbind procedure
-	
+	// Add unbind procedure
 }
