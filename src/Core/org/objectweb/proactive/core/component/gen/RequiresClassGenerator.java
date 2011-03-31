@@ -39,14 +39,11 @@ package org.objectweb.proactive.core.component.gen;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import javassist.CtClass;
 import javassist.CtConstructor;
-import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
@@ -105,7 +102,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                         .get("org.objectweb.fractal.api.control.BindingController");
                 generatedCtClass.addInterface(interfaceToImplement);
 
-                Class superClassToHerit =Class.forName(classToHerit);// pool.get(classToHerit);
+                Class<?> superClassToHerit =Class.forName(classToHerit);
 
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
@@ -113,117 +110,114 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
 
                 // Get property fields of superclass
                 List<Field> fields = new ArrayList<Field>(Arrays.asList(superClassToHerit.getDeclaredFields()));
-                //System.err.println("DEBUG====================*"+fields);
                 do {
                     superClassToHerit = superClassToHerit.getSuperclass();
                     List<Field> asList = Arrays.asList(superClassToHerit.getDeclaredFields());
                     fields.addAll(asList);
-                    //System.err.println("DEBUG====================*"+fields);
                 } while (!superClassToHerit.getName().equals(Object.class.getName()));
 
                 ArrayList<Field> requiresFields = new ArrayList<Field>();
-                ArrayList<Field> collection_fields = new ArrayList<Field>();
+                ArrayList<Field> collectionFields = new ArrayList<Field>();
                 for (int i = 0; i < fields.size(); i++) {
-                	org.objectweb.fractal.fraclet.annotations.Requires tmp = 
-                		fields.get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
+                	Requires tmp = 
+                		fields.get(i).getAnnotation(Requires.class);
                     if (tmp != null) {
-                    	if(tmp.cardinality().equals(Cardinality.COLLECTION))
-                    	{
-                    		collection_fields.add(fields.get(i));
+                    	if(tmp.cardinality().equals(Cardinality.COLLECTION)) {
+                    		collectionFields.add(fields.get(i));
                     	}
-                    	else
+                    	else {
                     		requiresFields.add(fields.get(i));
+                    	}
                     }
                 }
-                // begin of the listFCBody construction
+                // Begin of the listFCBody construction
                 int requiresSize = requiresFields.size();
                 String collectionFieldSize= "";
                 String keySetTmp = "java.util.Set tmp = new java.util.HashSet();\n";
                 String requiresTmp = "";
-                for (Iterator iterator = collection_fields.iterator(); iterator
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
 						.hasNext();) {
-					Field field = (Field) iterator.next();
+					Field field = iterator.next();
 					collectionFieldSize +=field.getName()+".size() + ";
 					keySetTmp += "tmp.addAll("+field.getName() +".keySet());\n";
 				}
                 keySetTmp += "tmp.toArray(result);\n";
                 int i = 0;
                 for (i = 0; i < requiresFields.size(); i++) {
-                    org.objectweb.fractal.fraclet.annotations.Requires tmp = (Requires) requiresFields.get(i)
-                            .getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
-                    //requiresTmp + = "\"" + tmp.name() + "\",";
+                    Requires tmp = requiresFields.get(i)
+                            .getAnnotation(Requires.class);
                     requiresTmp += "result["+ collectionFieldSize +"+" + i +"]= \""+tmp.name()+"\";\n";
                 }
                 String listFCBody = "String[] result = new String["+collectionFieldSize + requiresSize+"];\n" +
                 		keySetTmp+
                 		requiresTmp+
                 		"return result;\n";
-                // end of the listFCBody construction
+                // End of the listFCBody construction
                 CtMethod listFC = CtNewMethod.make("public String[] listFc() {" + listFCBody + "}",
                         generatedCtClass);
                 generatedCtClass.addMethod(listFC);
 
-                // begin of the lookupFCBody construction
+                // Begin of the lookupFCBody construction
                 String lookupFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
-                    org.objectweb.fractal.fraclet.annotations.Requires tmp2 = (Requires) requiresFields
-                            .get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
+                    Requires tmp2 = requiresFields
+                            .get(i).getAnnotation(Requires.class);
                     lookupFcBody += "if (clientItfName.equals(\"" + tmp2.name() + "\")) {\n" + "return " +
                         requiresFields.get(i).getName() + ";\n }\n";
                 }
                 
-                for (Iterator iterator = collection_fields.iterator(); iterator
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
                 .hasNext();) {
-                	Field field = (Field) iterator.next();
+                	Field field = iterator.next();
                 	lookupFcBody += "if("+field.getName()+".containsKey(clientItfName)){\n" +
                 			"return "+field.getName()+".get(clientItfName);\n" +
                 					"}\n";
                 }
                 lookupFcBody += "else { return null; }\n";
-                // end of the lookupFCBody construction
+                // End of the lookupFCBody construction
                 CtMethod lookupFc = CtNewMethod.make("public Object lookupFc(String clientItfName) {" +
                     lookupFcBody + "}", generatedCtClass);
                 generatedCtClass.addMethod(lookupFc);
                 
-                // begin of the bindFCBody construction
+                // Begin of the bindFCBody construction
                 String bindFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
-                    org.objectweb.fractal.fraclet.annotations.Requires tmp3 = (Requires) requiresFields
-                            .get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
+                    Requires tmp3 = requiresFields
+                            .get(i).getAnnotation(Requires.class);
                     bindFcBody += "if (clientItfName.equals(\"" + tmp3.name() + "\")) \n{" +
                         requiresFields.get(i).getName() + " = (" + requiresFields.get(i).getType().getName() +
                         ")serverItf;\n return; \n }\n";
                 }
                 
-                for (Iterator iterator = collection_fields.iterator(); iterator
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
                 .hasNext();) {
-                	Field field = (Field) iterator.next();
+                	Field field = iterator.next();
                 	bindFcBody += "else{\n" +
                 			field.getName()+".put(clientItfName,serverItf);\n" +
                 					"}\n";
                 }
-                // end of the bindFCBody construction
+                // End of the bindFCBody construction
                 CtMethod bindFc = CtNewMethod.make(
                         "public void bindFc(String clientItfName, Object serverItf) {" + bindFcBody + "}",
                         generatedCtClass);
                 generatedCtClass.addMethod(bindFc);
-                // begin of the unbindFCBody construction
+                // Begin of the unbindFCBody construction
                 String unbindFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
-                    org.objectweb.fractal.fraclet.annotations.Requires tmp4 = (Requires) requiresFields
-                            .get(i).getAnnotation(org.objectweb.fractal.fraclet.annotations.Requires.class);
+                    Requires tmp4 = requiresFields
+                            .get(i).getAnnotation(Requires.class);
                     unbindFcBody += "if (clientItfName.equals(\"" + tmp4.name() + "\"))\n {" +
                         requiresFields.get(i).getName() + " = null ;\n return;\n }\n";
                 }
                 
-                for (Iterator iterator = collection_fields.iterator(); iterator
+                for (Iterator<Field> iterator = collectionFields.iterator(); iterator
                 .hasNext();) {
-                	Field field = (Field) iterator.next();
+                	Field field = iterator.next();
                 	unbindFcBody += "if("+field.getName()+".containsKey(clientItfName)){\n" +
                 			field.getName()+".remove(clientItfName);\n" +
                 					"}\n";
                 }
-                // end of the unbindFCBody construction
+                // End of the unbindFCBody construction
                 CtMethod unbindFc = CtNewMethod.make("public void unbindFc(String clientItfName) {" +
                     unbindFcBody + "}", generatedCtClass);
                 generatedCtClass.addMethod(unbindFc);
