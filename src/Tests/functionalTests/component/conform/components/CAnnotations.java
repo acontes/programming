@@ -57,7 +57,7 @@ public class CAnnotations implements CAttributes, I, J {
     @Requires(name = "client")
     protected I i;
     @Requires(cardinality = Cardinality.COLLECTION)
-    private Map<String, Object> j = new HashMap<String, Object>();
+    protected Map<String, Object> j = new HashMap<String, Object>();
 
     // ATTRIBUTE CONTROLLER
     public boolean getX1() {

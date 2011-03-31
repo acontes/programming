@@ -127,6 +127,20 @@ public class TestBindingControllerAnnotation extends Conformtest {
         assertEquals(null, bc.lookupFc("client"));
     }
 
+    @Test
+    public void testCollectionBindLookupUnbind() throws Exception {
+        BindingController bc = GCM.getBindingController(c);
+        bc.bindFc("clients0", d.getFcInterface("server"));
+        checkList(bc, new String[] { "client", "clients0" });
+        assertEquals(d.getFcInterface("server"), bc.lookupFc("clients0"));
+        bc.unbindFc("clients0");
+        try {
+            assertEquals(null, bc.lookupFc("clients0"));
+        } catch (NoSuchInterfaceException e) {
+            checkList(bc, new String[] { "client" });
+        }
+    }
+    
     protected void checkList(BindingController bc, String[] expected) {
         String[] names = bc.listFc();
         HashSet<String> nameSet = new HashSet<String>();
@@ -198,7 +212,14 @@ public class TestBindingControllerAnnotation extends Conformtest {
             fail();
         } catch (IllegalBindingException e) {
         }
+        bc.bindFc("clients0", d.getFcInterface("server"));
+        try {
+            bc.bindFc("clients0", d.getFcInterface("server"));
+            fail();
+        } catch (IllegalBindingException e) {
+        }
     }
+
 
     @Test
     public void testNoSuchInterfaceUnind() throws Exception {
