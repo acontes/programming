@@ -73,10 +73,11 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
         super.primitiveBindFc(clientItfName, handleIntentManagement(clientItfName, serverItf));
         addIntentsToEveryMethod(clientItfName, getIntentsOfEveryMethod(clientItfName));
     }
-    
+
     protected void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
-    throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
-        super.compositeBindFc(clientItfName, clientItfType, handleIntentManagement(clientItfName, ((PAInterface) serverItf)));
+            throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
+        super.compositeBindFc(clientItfName, clientItfType, handleIntentManagement(clientItfName,
+                ((PAInterface) serverItf)));
         addIntentsToEveryMethod(clientItfName, getIntentsOfEveryMethod(clientItfName));
     }
 
@@ -227,13 +228,13 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             pare.initCause(se);
             throw pare;
         }
-    
+
     }
-	
-	public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
-    IllegalLifeCycleException {
-		super.unbindFc(clientItfName);
-		 ((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(owner))
-                 .getFcItfImpl()).notifyUnbinding(clientItfName);
-	}
+
+    public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
+            IllegalLifeCycleException {
+        super.unbindFc(clientItfName);
+        ((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(owner)).getFcItfImpl())
+                .notifyUnbinding(clientItfName);
+    }
 }
