@@ -42,15 +42,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
 import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.PAInterfaceImpl;
 import org.objectweb.proactive.core.component.control.PABindingController;
 import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
+import org.objectweb.proactive.core.mop.StubObject;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
@@ -209,7 +212,53 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             pare.initCause(se);
             throw pare;
         }
+    
     }
+    
+	protected void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
+    throws NoSuchInterfaceException {
+		PAInterface sItf = (PAInterface) serverItf;
+		List listOfIntents = getIntentsOfEveryMethod(clientItfName);
+		Component ownerLocal = this.getFcItfOwner();
+		if (Utils.getSCAIntentController(ownerLocal).hasAtleastOneIntentHandler(clientItfName)) {
+			try {
+				String sItfName = IntentClassGenerator.instance().generateClass(sItf.getClass().getName(), sItf.getClass().getName());
+				PAInterfaceImpl reference=null;
+				try {
+					reference = (PAInterfaceImpl)Class.forName(sItfName).getConstructor().newInstance();
+				} catch (Exception e) {
+
+					e.printStackTrace();
+				} 		
+				reference.setFcItfOwner(serverItf.getFcItfOwner());
+				reference.setFcItfName(serverItf.getFcItfName());
+				reference.setFcType(serverItf.getFcItfType());
+				reference.setFcIsInternal(serverItf.isFcInternalItf());
+				reference.setProxy(((StubObject) serverItf).getProxy());
+				sItf = reference;
+				((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(ownerLocal))
+		                    .getFcItfImpl()).notifyBinding(clientItfName, reference);
+				System.err.println(reference.getClass().getName());
+			} catch (ClassGenerationFailedException cgfe) {
+				controllerLogger
+				.error("could not generate intent interceptor for reference (client interface) " +
+						clientItfName + ": " + cgfe.getMessage());
+			}
+		}
+		super.compositeBindFc(clientItfName, clientItfType, sItf);
+		try {
+			addIntentsToEveryMethod(clientItfName, listOfIntents);
+		} catch (IllegalLifeCycleException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
+    IllegalLifeCycleException {
+		super.unbindFc(clientItfName);
+		 ((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(owner))
+                 .getFcItfImpl()).notifyUnbinding(clientItfName);
+	}
 
     // Add unbind procedure
 }
