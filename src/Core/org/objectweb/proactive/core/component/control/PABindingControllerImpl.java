@@ -504,8 +504,9 @@ public class PABindingControllerImpl extends AbstractPAController implements PAB
     /*
      * binding method enforcing Interface type for the server interface, for composite components
      */
+    @SuppressWarnings("unused")
     protected void compositeBindFc(String clientItfName, InterfaceType clientItfType, Interface serverItf)
-            throws NoSuchInterfaceException {
+            throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
         PAInterface clientItf = null;
         clientItf = (PAInterface) getFcItfOwner().getFcInterface(clientItfName);
         // TODO remove this as we should now use multicast interfaces for this purpose

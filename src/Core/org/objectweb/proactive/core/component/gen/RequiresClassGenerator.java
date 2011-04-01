@@ -36,7 +36,6 @@
  */
 package org.objectweb.proactive.core.component.gen;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -103,7 +102,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                         .get("org.objectweb.fractal.api.control.BindingController");
                 generatedCtClass.addInterface(interfaceToImplement);
 
-                CtClass superClassToHerit = pool.get(classToExtend);//Class.forName(classToHerit);
+                CtClass superClassToHerit = pool.get(classToExtend);
 
                 // Add constructors
                 CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
@@ -120,7 +119,6 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 ArrayList<CtField> requiresFields = new ArrayList<CtField>();
                 ArrayList<CtField> collectionFields = new ArrayList<CtField>();
                 for (int i = 0; i < fields.size(); i++) {
-                    //Requires tmp = fields.get(i).getAnnotation(Requires.class);
                 	Requires tmp = (Requires)fields.get(i).getAnnotation(Requires.class);
                     if (tmp != null) {
                         if (tmp.cardinality().equals(Cardinality.COLLECTION)) {
@@ -190,6 +188,7 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                         "public void bindFc(String clientItfName, Object serverItf) {" + bindFcBody + "}",
                         generatedCtClass);
                 generatedCtClass.addMethod(bindFc);
+
                 // Begin of the unbindFCBody construction
                 String unbindFcBody = "";
                 for (i = 0; i < requiresFields.size(); i++) {
