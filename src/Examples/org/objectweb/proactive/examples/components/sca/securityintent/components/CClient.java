@@ -34,27 +34,41 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.control.components;
+package org.objectweb.proactive.examples.components.sca.securityintent.components;
 
-import org.objectweb.proactive.extensions.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
+import org.oasisopen.sca.annotation.Property;
+import org.objectweb.fractal.api.control.BindingController;
 
 
-public class IntentHandlerTest extends IntentHandler {
-    private String msg;
+public class CClient implements TestIntentItf, BindingController {
 
-    public IntentHandlerTest() {
+    private TestIntentItf testIntentItf;
 
+    public byte[] dataTreatment(byte[] data) {
+        return testIntentItf.dataTreatment(data);
     }
 
-    public IntentHandlerTest(String msg) {
-        this.msg = msg;
+    public String[] listFc() {
+        return new String[] { TestIntentItf.CLIENT_ITF_NAME };
     }
 
-    public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        System.err.println("before intent");
-        Object res = ijp.proceed();
-        System.err.println("after intent");
-        return res;
+    public Object lookupFc(String clientItfName) {
+        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
+            return testIntentItf;
+        } else {
+            return null;
+        }
+    }
+
+    public void bindFc(String clientItfName, Object serverItf) {
+        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
+            testIntentItf = (TestIntentItf) serverItf;
+        }
+    }
+
+    public void unbindFc(String clientItfName) {
+        if (clientItfName.equals(TestIntentItf.CLIENT_ITF_NAME)) {
+            testIntentItf = null;
+        }
     }
 }

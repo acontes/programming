@@ -34,27 +34,15 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.control.components;
+package org.objectweb.proactive.examples.components.sca.securityintent.components;
 
-import org.objectweb.proactive.extensions.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
-
-
-public class IntentHandlerTest extends IntentHandler {
-    private String msg;
-
-    public IntentHandlerTest() {
-
-    }
-
-    public IntentHandlerTest(String msg) {
-        this.msg = msg;
-    }
-
-    public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        System.err.println("before intent");
-        Object res = ijp.proceed();
-        System.err.println("after intent");
+public class CServer implements TestIntentItf {
+    public byte[] dataTreatment(byte[] data) {
+        byte[] res = new byte[data.length];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = data[data.length - 1 - i];
+        }
+        //System.err.println("DEBUGGG "+new String(data)+" " + new String(res));
         return res;
     }
 }

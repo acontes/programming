@@ -83,4 +83,13 @@ public class IntentJoinPoint {
             InvocationTargetException {
         return method.invoke(invokeTarget, args);
     }
+
+    public Object[] getArgs() {
+        return args;
+    }
+
+    public void setArgs(Object[] args) {
+        this.args = args;
+    }
+
 }

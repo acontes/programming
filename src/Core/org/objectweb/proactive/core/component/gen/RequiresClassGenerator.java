@@ -56,7 +56,6 @@ import org.objectweb.proactive.core.component.PAInterface;
 import org.objectweb.proactive.core.component.exceptions.InterfaceGenerationFailedException;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 import org.objectweb.proactive.core.util.ClassDataCache;
-import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 
 
 /**
