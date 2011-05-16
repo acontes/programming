@@ -15,6 +15,10 @@ import org.objectweb.proactive.examples.components.sca.securityintent.components
 import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
+import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.DecryptionIntentHandler;
+import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.EncryptionIntentHandler;
+import org.objectweb.proactive.extensions.sca.intentpolicies.integrity.IntegrityIntentHandlerClient;
+import org.objectweb.proactive.extensions.sca.intentpolicies.integrity.IntegrityIntentHandlerServer;
 
 
 public class Main {
@@ -43,12 +47,17 @@ public class Main {
                             TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
                     Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
             //add encryption intent on the client side 
-            SCAIntentController scai = Utils.getSCAIntentController(componentA);
-            scai.addIntentHandler(new EncryptionIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
+            SCAIntentController scaiClient = Utils.getSCAIntentController(componentA);
+            scaiClient.addIntentHandler(new EncryptionIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
+            scaiClient.addIntentHandler(new IntegrityIntentHandlerClient(), TestIntentItf.CLIENT_ITF_NAME);
+            //scaiClient.addIntentHandler(new EncryptionIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
 
             //add decryption intent on the server side 
-            SCAIntentController scaiClient = Utils.getSCAIntentController(componentB);
-            scaiClient.addIntentHandler(new DecryptionIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
+            SCAIntentController scaiServer = Utils.getSCAIntentController(componentB);
+            //scaiServer.addIntentHandler(new DecryptionIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
+            scaiServer.addIntentHandler(new IntegrityIntentHandlerServer(), TestIntentItf.SERVER_ITF_NAME);
+            scaiServer.addIntentHandler(new DecryptionIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
+
             // component assembling
 
             GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,

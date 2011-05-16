@@ -1,4 +1,7 @@
-package org.objectweb.proactive.examples.components.sca.securityintent;
+package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
+
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -8,19 +11,26 @@ import javax.crypto.spec.SecretKeySpec;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
+import edu.emory.mathcs.backport.java.util.Arrays;
 
+
+/**
+ * This class defines the decryption intent handler which is used to decrypt data 
+ * transferation. The secret key is in the first 8 byte of data.
+ * @author mug
+ *
+ */
 public class DecryptionIntentHandler extends IntentHandler {
-    public Object invoke(IntentJoinPoint ijp) throws Throwable {
+    public Object invoke(IntentJoinPoint ijp) throws Exception {
         byte[] rawData = (byte[]) ijp.getArgs()[0];
-        //KeyGenerator kg = KeyGenerator.getInstance("DES");
+        ByteBuffer databuffer = ByteBuffer.wrap(rawData);
         byte[] keyBytes = new byte[8];
         byte[] encrytedData = new byte[rawData.length - 8];
-        System.arraycopy(rawData, 0, keyBytes, 0, keyBytes.length);
-        System.arraycopy(rawData, 8, encrytedData, 0, encrytedData.length);
+        databuffer.get(keyBytes);
+        databuffer.get(encrytedData);
         SecretKey key = new SecretKeySpec(keyBytes, "DES");
         Cipher c1 = Cipher.getInstance("DES/ECB/PKCS5Padding");
         c1.init(Cipher.DECRYPT_MODE, key);
-        //byte[] algo = key.getAlgorithm().getBytes();
         byte[] result = c1.doFinal(encrytedData);
         ijp.setArgs(new Object[] { (Object) result });
         System.err.println("ENCRYPTED DATA : " + new String(rawData));
