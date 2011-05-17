@@ -4,10 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.zip.Adler32;
 import java.util.zip.Checksum;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
@@ -31,12 +27,7 @@ public class IntegrityIntentHandlerClient extends IntentHandler {
 
         ijp.setArgs(new Object[] { (Object) dataBuffer.array() });
 
-        System.err.println("checksum client= " + checksum + " raw data length: " + rawData.length);
-        for (byte b : dataBuffer.array()) {
-            System.err.format("0x%x ", b);
-        }
-        System.err.println();
-        System.err.println("raw data without checksum : " + new String(rawData));
+        System.err.println("checksum client= " + checksum);
         Object ret = ijp.proceed();
         return ret;
     }

@@ -1,17 +1,13 @@
 package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
-
-import edu.emory.mathcs.backport.java.util.Arrays;
 
 
 /**

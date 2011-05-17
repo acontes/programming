@@ -1,7 +1,6 @@
 package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
 
 import java.nio.ByteBuffer;
-import java.util.Scanner;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;

@@ -135,8 +135,7 @@ public interface SCAIntentController {
      *
      * @return The list of all intent handlers associated with any service and reference interfaces.
      */
-    public List<IntentHandler> listAllIntentHandler();
-
+    //    public List<IntentHandler> listAllIntentHandler();
     /**
      * Returns the list of all intent handlers associated with all service and reference interfaces.
      *

@@ -107,10 +107,14 @@ public class TestSCAControllers extends SCAComponentTest {
         SCAIntentController scaicServer = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAIntentController(componentB); //server
 
-        IntentHandler y1 = new IntentHandlerTest("test server");
-        IntentHandler y2 = new IntentHandlerTest("test client");
+        IntentHandler y1 = new IntentHandlerTest("test server1");
+        IntentHandler y2 = new IntentHandlerTest("test client1");
         scaicServer.addIntentHandler(y1);
-        scaicClient.addIntentHandler(y2);
+        scaicClient.addIntentHandler(y2, TestIntentItf2.CLIENT_ITF_NAME);
+        scaicServer.addIntentHandler(new IntentHandlerTest("test server2"));
+        scaicClient.addIntentHandler(new IntentHandlerTest("test client2"), TestIntentItf2.CLIENT_ITF_NAME);
+        scaicServer.addIntentHandler(new IntentHandlerTest("test server3"));
+        scaicClient.addIntentHandler(new IntentHandlerTest("test client3"), TestIntentItf2.CLIENT_ITF_NAME);
 
         scapcClient.setValue("PropertyClient", "client\'s property");
         scapcServer.setValue("PropertyServer", "server\'s property");

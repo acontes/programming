@@ -221,6 +221,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                 try {
                     for (int i = 0; i < methodList.length; i++) {
                         List<IntentHandler> tmp = listOfIntents.get(i);
+
                         for (IntentHandler intentHandler : tmp) {
                             scaic.addIntentHandler(intentHandler, clientItfName, methodList[i].getName());
                         }

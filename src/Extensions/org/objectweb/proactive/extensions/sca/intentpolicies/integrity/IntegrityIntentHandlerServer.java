@@ -21,18 +21,13 @@ public class IntegrityIntentHandlerServer extends IntentHandler {
 
         ByteBuffer dataBuffer = ByteBuffer.wrap(rawData);
 
-        for (byte b : dataBuffer.array()) {
-            System.err.format("0x%x ", b);
-        }
-        System.err.println();
-
         long checksum = dataBuffer.getLong();
         dataBuffer.get(result);
 
         Checksum checksumEngine = new Adler32();
         checksumEngine.update(result, 0, result.length);
-        System.err.println("checksum from client = " + checksum + " checksum from server" +
-            checksumEngine.getValue() + " raw data length: " + rawData.length);
+        System.err.println("checksum from client = " + checksum + " checksum from server " +
+            checksumEngine.getValue());
         if (checksum == checksumEngine.getValue()) {
             checksumEngine.reset();
             ijp.setArgs(new Object[] { (Object) result });
