@@ -1,3 +1,39 @@
+/*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
 package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
 
 import java.nio.ByteBuffer;
@@ -6,18 +42,23 @@ import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
+import org.apache.log4j.Logger;
+import org.objectweb.proactive.core.util.log.Loggers;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 
 /**
  * This class defines the encrytion intent handler which is used to encrypt data 
- * transferation . The secret key is in the first 8 byte of data.
- * @author mug
+ * transfer. The secret key is in the first 8 byte of data.
  *
+ * @author The ProActive Team
  */
 public class EncryptionIntentHandler extends IntentHandler {
-    public Object invoke(IntentJoinPoint ijp) throws Exception {
+    public static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
+
+    public Object invoke(IntentJoinPoint ijp) throws Throwable {
         byte[] RawData = (byte[]) ijp.getArgs()[0];
         KeyGenerator kg = KeyGenerator.getInstance("DES");
         SecretKey key = kg.generateKey();
@@ -28,9 +69,13 @@ public class EncryptionIntentHandler extends IntentHandler {
         ByteBuffer dataBuffer = ByteBuffer.allocate(keyBytes.length + encryptedData.length);
         dataBuffer.put(keyBytes);
         dataBuffer.put(encryptedData);
-        ijp.setArgs(new Object[] { (Object) dataBuffer.array() });
-        System.err.println("RAW DATA : " + new String(RawData));
-        System.err.println("ENCRYPTED DATA : " + new String(dataBuffer.array()));
+        ijp.setArgs(new Object[] { dataBuffer.array() });
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("Raw data: " + new String(RawData));
+            logger.debug("Encrypted data: " + new String(dataBuffer.array()));
+        }
+
         Object ret = ijp.proceed();
         return ret;
     }

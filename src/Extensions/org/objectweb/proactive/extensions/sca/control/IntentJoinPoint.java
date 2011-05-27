@@ -84,12 +84,11 @@ public class IntentJoinPoint {
         return method.invoke(invokeTarget, args);
     }
 
-    public Object[] getArgs() throws Exception {
+    public Object[] getArgs() {
         return args;
     }
 
-    public void setArgs(Object[] args) throws Exception {
+    public void setArgs(Object[] args) {
         this.args = args;
     }
-
 }

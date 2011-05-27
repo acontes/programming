@@ -34,13 +34,11 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
+package org.objectweb.proactive.extensions.sca.intentpolicies.integrity;
 
 import java.nio.ByteBuffer;
-
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
+import java.util.zip.Adler32;
+import java.util.zip.Checksum;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -50,30 +48,28 @@ import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
 
 /**
- * This class defines the decryption intent handler which is used to decrypt data 
- * transfer. The secret key is in the first 8 byte of data.
+ * This class defines the integrity intent handler on the client side which is used to check data 
+ * integration during transfer. It uses a checksum algorithm.
  *
  * @author The ProActive Team
  */
-public class DecryptionIntentHandler extends IntentHandler {
+public class ClientIntegrityIntentHandler extends IntentHandler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
         byte[] rawData = (byte[]) ijp.getArgs()[0];
-        ByteBuffer databuffer = ByteBuffer.wrap(rawData);
-        byte[] keyBytes = new byte[8];
-        byte[] encrytedData = new byte[rawData.length - 8];
-        databuffer.get(keyBytes);
-        databuffer.get(encrytedData);
-        SecretKey key = new SecretKeySpec(keyBytes, "DES");
-        Cipher c1 = Cipher.getInstance("DES/ECB/PKCS5Padding");
-        c1.init(Cipher.DECRYPT_MODE, key);
-        byte[] result = c1.doFinal(encrytedData);
-        ijp.setArgs(new Object[] { result });
+        Checksum checksumEngine = new Adler32();
+        checksumEngine.update(rawData, 0, rawData.length);
+        long checksum = checksumEngine.getValue();
+        checksumEngine.reset();
+        ByteBuffer dataBuffer = ByteBuffer.allocate(rawData.length + 8);
+        dataBuffer.putLong(checksum);
+        dataBuffer.put(rawData);
+
+        ijp.setArgs(new Object[] { dataBuffer.array() });
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Encrypted data: " + new String(rawData));
-            logger.debug("Decrypted data: " + new String(result));
+            logger.debug("Checksum client = " + checksum);
         }
 
         Object ret = ijp.proceed();

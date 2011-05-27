@@ -232,7 +232,7 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     public boolean hasAtleastOneIntentHandler(String itfName) {
-        return ItfExistingIntentHandler(itfName);
+        return itfExistingIntentHandler(itfName);
     }
 
     public boolean hasIntentHandler() {
@@ -257,7 +257,6 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
                 for (int i = 1; i < itftps.length; i++) {
                     List<IntentHandler> tmp = listIntentHandler(itftps[i].getFcItfName());
                     res = intersection(tmp, res);
-
                 }
             } catch (NoSuchInterfaceException nsie) {
                 // Should never happen
@@ -354,13 +353,13 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
         Object obj = owner.getReferenceOnBaseObject();
         if (((ComponentType) owner.getFcType()).getFcInterfaceType(itfName).isFcClientItf()) { // Client interface
             BindingController bc = GCM.getBindingController(owner);
-            Object Itf = bc.lookupFc(itfName);
+            Object itf = bc.lookupFc(itfName);
             List<IntentHandler> res = new ArrayList<IntentHandler>();
             IntentHelper ith = getIntentHelper(itfName, methodName);
             if (ith != null) {
                 res = ith.intentOrderList;
             }
-            if (Itf != null) { // Interface already binded
+            if (itf != null) { // Interface already bound
                 obj = mapOfServerRef.get(itfName);
             } else { // Interface not bound yet, store everything in local hashmap
                 return res;
@@ -380,12 +379,12 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     /*
-     * if in an interface at least one intent is present in one of method.
+     * If in an interface at least one intent is present in one of method.
      *
      * @param itfName The interface name.
      * @return The intents of an interface.
      */
-    private boolean ItfExistingIntentHandler(String itfName) {
+    private boolean itfExistingIntentHandler(String itfName) {
         for (IntentHelper intentHelp : infomationPool) {
             if (intentHelp.itfName.equals(itfName))
                 return true;
@@ -580,9 +579,9 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     private IntentHelper getIntentHelper(String itfName, String methodName) {
-        for (Iterator iterator = infomationPool.iterator(); iterator.hasNext();) {
-            IntentHelper ith = (IntentHelper) iterator.next();
-            if (ith.IDExist(itfName, methodName)) {
+        for (Iterator<IntentHelper> iterator = infomationPool.iterator(); iterator.hasNext();) {
+            IntentHelper ith = iterator.next();
+            if (ith.idExist(itfName, methodName)) {
                 return ith;
             }
         }
@@ -609,31 +608,27 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     }
 
     /**
-     * This class helps to manipulate the presence in an interface and methods 
-     * @author mug
-     *
+     * This class helps to manipulate the presence in an interface and methods.
      */
     private class IntentHelper {
         public String itfName;
         public String methodName;
-        public String ID;
+        public String id;
         public List<IntentHandler> intentOrderList;
 
         public IntentHelper(String itfName, String methodName) {
             this.itfName = itfName;
             this.methodName = methodName;
-            this.ID = itfName + "@" + methodName;
+            this.id = itfName + "@" + methodName;
             intentOrderList = new ArrayList<IntentHandler>();
         }
 
-        public boolean IDExist(String itfName, String methodName) {
-            return this.ID.equals(itfName + "@" + methodName);
+        public boolean idExist(String itfName, String methodName) {
+            return this.id.equals(itfName + "@" + methodName);
         }
 
         public void addIntentIntoList(IntentHandler ith) {
             intentOrderList.add(ith);
         }
-
     }
-
 }

@@ -102,7 +102,6 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
         PAInterface sItf = serverItf;
         try {
             Component ownerLocal = this.getFcItfOwner();
-            // if (Utils.getSCAIntentController(ownerLocal).hasAtleastOneIntentHandler(clientItfName)) {
             try {
                 String sItfSignature = IntentClassGenerator.instance().generateClass(
                         sItf.getClass().getName(), sItf.getClass().getName());
@@ -158,7 +157,6 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                         .error("could not generate intent interceptor for reference (client interface) " +
                             clientItfName + ": " + cgfe.getMessage());
             }
-            //  }
         } catch (NoSuchInterfaceException nsie) {
             // The component does not have an intent controller, nothing to do.
         }

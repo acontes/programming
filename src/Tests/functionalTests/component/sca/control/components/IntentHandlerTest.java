@@ -56,10 +56,8 @@ public class IntentHandlerTest extends IntentHandler {
     }
 
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        //System.err.println("before intent");
         System.err.println(msg);
         Object res = ijp.proceed();
-        //System.err.println("after intent");
         return res;
     }
 }

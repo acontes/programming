@@ -41,5 +41,4 @@ public interface TestIntentItf {
     public static final String SERVER_ITF_NAME = "server";
 
     public byte[] dataTreatment(byte[] data);
-
 }

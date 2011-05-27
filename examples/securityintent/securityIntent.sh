@@ -1,9 +1,9 @@
 #!/bin/sh
 
 echo
-echo --- Security intents example ---------------------------------------------
+echo --- Security intent example ---------------------------------------------
 echo ---
-echo --- This example shows how do data transfer encryption with SCA intent feature
+echo --- This example shows how to do data transfer encryption with SCA intent feature
 echo ---
 
 workingDir=`dirname $0`

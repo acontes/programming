@@ -38,6 +38,7 @@ package org.objectweb.proactive.examples.components.sca.securityintent;
 
 import java.util.Scanner;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
@@ -60,7 +61,7 @@ public class SecurityIntentHandler extends IntentHandler {
             Object ret = ijp.proceed();
             return ret;
         } else {
-            throw new Exception("password false");
+            throw new ProActiveException("Password false");
         }
     }
 }

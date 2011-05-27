@@ -42,7 +42,7 @@ public class CServer implements TestIntentItf {
         for (int i = 0; i < res.length; i++) {
             res[i] = data[data.length - 1 - i];
         }
-        //System.err.println("DEBUGGG "+new String(data)+" " + new String(res));
+
         return res;
     }
 }

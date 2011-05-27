@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.examples.components.sca.timeoutintent;
 
+import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 
@@ -59,7 +60,7 @@ public class TimeOutIntentHandler extends IntentHandler {
         try {
             pt.join(timeout);
             if (pt.isAlive()) {
-                throw new Exception("Service Unavailable Timeout of " + timeout + " ms exceeded");
+                throw new ProActiveException("Service Unavailable Timeout of " + timeout + " ms exceeded");
             }
         } catch (InterruptedException e) {
             System.err.println("call interrupted");
