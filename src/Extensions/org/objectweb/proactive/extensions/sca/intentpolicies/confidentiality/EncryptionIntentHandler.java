@@ -36,11 +36,12 @@
  */
 package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
 
-import java.nio.ByteBuffer;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.X509EncodedKeySpec;
 
 import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -58,25 +59,48 @@ import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 public class EncryptionIntentHandler extends IntentHandler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
+    private Key publicKey;
+
+    public EncryptionIntentHandler(Key key) {
+        //can't pass the instance of key directly
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(key.getEncoded());
+            PublicKey _publicKey = keyFactory.generatePublic(publicKeySpec);
+            this.publicKey = _publicKey;
+        } catch (Exception e) {
+            //should never happen
+            e.printStackTrace();
+        }
+    }
+
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        byte[] RawData = (byte[]) ijp.getArgs()[0];
-        KeyGenerator kg = KeyGenerator.getInstance("DES");
-        SecretKey key = kg.generateKey();
-        Cipher c1 = Cipher.getInstance("DES/ECB/PKCS5Padding");
-        c1.init(Cipher.ENCRYPT_MODE, key);
-        byte[] keyBytes = key.getEncoded();
-        byte[] encryptedData = c1.doFinal(RawData);
-        ByteBuffer dataBuffer = ByteBuffer.allocate(keyBytes.length + encryptedData.length);
-        dataBuffer.put(keyBytes);
-        dataBuffer.put(encryptedData);
-        ijp.setArgs(new Object[] { dataBuffer.array() });
+        byte[] rawData = (byte[]) ijp.getArgs()[0];
+        byte[] result = encrypt(rawData, publicKey);
+        ijp.setArgs(new Object[] { result });
 
         if (logger.isDebugEnabled()) {
-            logger.debug("Raw data: " + new String(RawData));
-            logger.debug("Encrypted data: " + new String(dataBuffer.array()));
+            logger.debug("Raw data: " + new String(rawData));
+            logger.debug("Encrypted data: " + new String(result));
         }
-
         Object ret = ijp.proceed();
         return ret;
     }
+
+    private static byte[] encrypt(byte[] inpBytes, Key key) {
+        try {
+            // get an instance of RSA Cipher
+            Cipher cipher = Cipher.getInstance("RSA");
+            // init the Cipher in ENCRYPT_MODE and aPK
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+            // use doFinal on the byte[] and return the ciphered byte[]
+            return cipher.doFinal(inpBytes);
+        } catch (Exception e) {
+            System.out.println("Encryption error");
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 }

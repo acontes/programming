@@ -36,11 +36,12 @@
  */
 package org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality;
 
-import java.nio.ByteBuffer;
+import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PrivateKey;
+import java.security.spec.PKCS8EncodedKeySpec;
 
 import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.Loggers;
@@ -58,17 +59,23 @@ import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
 public class DecryptionIntentHandler extends IntentHandler {
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
+    private Key privateKey;
+
+    public DecryptionIntentHandler(Key privateKey) {
+        try {
+            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
+            PKCS8EncodedKeySpec privateKeySpec = new PKCS8EncodedKeySpec(privateKey.getEncoded());
+            PrivateKey _privateKey = keyFactory.generatePrivate(privateKeySpec);
+            this.privateKey = _privateKey;
+        } catch (Exception e) {
+            //should never happen
+            e.printStackTrace();
+        }
+    }
+
     public Object invoke(IntentJoinPoint ijp) throws Throwable {
         byte[] rawData = (byte[]) ijp.getArgs()[0];
-        ByteBuffer databuffer = ByteBuffer.wrap(rawData);
-        byte[] keyBytes = new byte[8];
-        byte[] encrytedData = new byte[rawData.length - 8];
-        databuffer.get(keyBytes);
-        databuffer.get(encrytedData);
-        SecretKey key = new SecretKeySpec(keyBytes, "DES");
-        Cipher c1 = Cipher.getInstance("DES/ECB/PKCS5Padding");
-        c1.init(Cipher.DECRYPT_MODE, key);
-        byte[] result = c1.doFinal(encrytedData);
+        byte[] result = decrypt(rawData, privateKey);
         ijp.setArgs(new Object[] { result });
 
         if (logger.isDebugEnabled()) {
@@ -79,4 +86,21 @@ public class DecryptionIntentHandler extends IntentHandler {
         Object ret = ijp.proceed();
         return ret;
     }
+
+    private static byte[] decrypt(byte[] inpBytes, Key key) throws Exception {
+        try {
+            // get an instance of RSA Cipher
+            Cipher cipher = Cipher.getInstance("RSA");
+            // init the Cipher in DECRYPT_MODE and aPK
+            cipher.init(Cipher.DECRYPT_MODE, key);
+            // use doFinal on the byte[] and return the deciphered byte[]
+            return cipher.doFinal(inpBytes);
+        } catch (Exception e) {
+            System.out.println("decryption error");
+            e.printStackTrace();
+            return null;
+        }
+
+    }
+
 }

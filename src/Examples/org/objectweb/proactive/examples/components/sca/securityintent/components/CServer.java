@@ -36,13 +36,26 @@
  */
 package org.objectweb.proactive.examples.components.sca.securityintent.components;
 
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Security;
+
+import org.objectweb.fractal.fraclet.annotations.Requires;
+import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
+import org.osoa.sca.annotations.Authentication;
+import org.osoa.sca.annotations.Property;
+
+
+@Authentication
 public class CServer implements TestIntentItf {
     public byte[] dataTreatment(byte[] data) {
         byte[] res = new byte[data.length];
         for (int i = 0; i < res.length; i++) {
             res[i] = data[data.length - 1 - i];
         }
-
         return res;
     }
 }

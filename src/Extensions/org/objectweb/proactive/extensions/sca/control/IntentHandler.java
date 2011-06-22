@@ -66,8 +66,14 @@ public abstract class IntentHandler implements Serializable {
      */
     public abstract Object invoke(IntentJoinPoint ijp) throws Throwable;
 
+    /**
+     * unique ID of an intentHandler
+     */
     private String uuid = UUID.randomUUID().toString();
 
+    /**
+     * Redefine equal method
+     */
     public boolean equals(Object obj) {
         if (this == obj) {
             return true;

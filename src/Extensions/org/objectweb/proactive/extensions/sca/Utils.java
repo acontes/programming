@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.extensions.sca;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import org.objectweb.fractal.api.Component;
@@ -138,4 +139,37 @@ public class Utils extends org.objectweb.proactive.core.component.Utils {
             throws NoSuchInterfaceException {
         return (SCAPropertyController) component.getFcInterface(Constants.SCA_PROPERTY_CONTROLLER);
     }
+
+    /*
+     * Determines if a class Property annotation.
+     *
+     * @param className Class to introspect.
+     * @return True if the given class contains Authentication annotation.
+     * @throws InstantiationException If the class cannot be found.
+     */
+    public static boolean hasAuthentificationAnnotation(String className) throws InstantiationException {
+        try {
+            Class<?> clazz = Class.forName(className);
+            if (clazz.isAnnotationPresent(org.oasisopen.sca.annotation.Authentication.class) ||
+                clazz.isAnnotationPresent(org.osoa.sca.annotations.Authentication.class)) {// Authentication annotation is presented in class level
+                return true;
+            }
+            Method[] methodes = clazz.getDeclaredMethods();
+            for (int i = 0; i < methodes.length; i++) {
+                // Authentication annotation is presented in method level
+                if (methodes[i].isAnnotationPresent(org.oasisopen.sca.annotation.Authentication.class) ||
+                    methodes[i].isAnnotationPresent(org.osoa.sca.annotations.Authentication.class)) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
+                cnfe.getMessage());
+            ie.initCause(cnfe);
+            throw ie;
+        }
+
+        return false;
+    }
+
 }

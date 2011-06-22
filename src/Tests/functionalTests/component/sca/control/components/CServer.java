@@ -41,7 +41,7 @@ import org.osoa.sca.annotations.Property;
 
 public class CServer implements TestIntentItf, TestIntentItf2 {
     @Property
-    public String PropertyServer;
+    protected String PropertyServer;
 
     public void m() {
     }
@@ -56,5 +56,4 @@ public class CServer implements TestIntentItf, TestIntentItf2 {
     public int n2() {
         return 2;
     }
-
 }

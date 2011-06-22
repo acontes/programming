@@ -84,10 +84,18 @@ public class IntentJoinPoint {
         return method.invoke(invokeTarget, args);
     }
 
+    /**
+     * Get Argument of intent join point, which corresponds to the arguments of invocating object.
+     * @return The argument field
+     */
     public Object[] getArgs() {
         return args;
     }
 
+    /**
+     * Get Argument of intent join point, which corresponds to the arguments of invocating object.
+     * @param args
+     */
     public void setArgs(Object[] args) {
         this.args = args;
     }

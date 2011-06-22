@@ -48,12 +48,15 @@ public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
     public static final String GENERATED_CLASSNAME_SUFFIX = GEN_ESCAPE_CHAR + "SCAClass";
 
     public static String getPropertyClassName(String className) {
-        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "property" +
-            GENERATED_CLASSNAME_SUFFIX;
+        return className + "BusinessClassWithProperty";
     }
 
     public static String getIntentClassName(String className) {
-        return GENERATED_DEFAULT_PREFIX + escapeString(className) + GEN_MIDDLE_SEPARATOR + "intent" +
-            GENERATED_CLASSNAME_SUFFIX;
+        return className + "BusinessClassWithIntents";
     }
+
+    public static String getBusinessClassWithAuthentificationName(String className) {
+        return className + "BusinessClassWithAuthentication";
+    }
+
 }

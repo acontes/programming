@@ -266,8 +266,7 @@ public class Fractive implements PAGenericFactory, Component, Factory {
             String generatedClassName = className;
             if (hasRequiresAnnotation(className)) {
                 try {
-                    generatedClassName = RequiresClassGenerator.instance().generateClass(generatedClassName,
-                            className);
+                    generatedClassName = RequiresClassGenerator.instance().generateClass(className);
                     contentDesc.setClassName(generatedClassName);
                 } catch (InterfaceGenerationFailedException igfe) {
                     InstantiationException ie = new InstantiationException(

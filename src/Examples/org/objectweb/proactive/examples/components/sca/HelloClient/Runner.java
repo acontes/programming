@@ -34,18 +34,8 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.components.sca.securityintent.components;
+package org.objectweb.proactive.examples.components.sca.HelloClient;
 
-import org.objectweb.fractal.fraclet.annotations.Requires;
-import org.osoa.sca.annotations.Authentication;
-
-
-@Authentication
-public class CClient implements TestIntentItf {
-    @Requires(name = TestIntentItf.CLIENT_ITF_NAME)
-    protected TestIntentItf testIntentItf;
-
-    public byte[] dataTreatment(byte[] data) {
-        return testIntentItf.dataTreatment(data);
-    }
+public interface Runner {
+    public void execute() throws Exception;
 }

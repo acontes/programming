@@ -80,41 +80,25 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
      * Generates a subclass from root class. It implements the methods of the {@link BindingController} for the
      * fields where the annotation {@link Requires} is present.
      *
-     * @param classToExtend Name of the class to be set as super class.
-     * @param classToHerit Name of class contains the methods we want to inherit
+     * @param rootClass Name of the class to be set as super class.
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation failed.
      */
-    public String generateClass(String classToExtend, String classToHerit)
-            throws InterfaceGenerationFailedException {
-        String generatedClassName = Utils.getRequiresClassName(classToExtend);
+    public String generateClass(String rootClass) throws InterfaceGenerationFailedException {
+        String generatedClassName = Utils.getRequiresClassName(rootClass);
         try {
             loadClass(generatedClassName);
         } catch (ClassNotFoundException cnfe) {
             try {
-                CtClass generatedCtClass = pool.makeClass(generatedClassName);
-                generatedCtClass.defrost();
-                CtClass superClass = pool.get(classToExtend);
-                generatedCtClass.setSuperclass(superClass);
+                CtClass classToEdit = pool.get(rootClass);
+                classToEdit.defrost();
+                classToEdit.setName(generatedClassName);
 
                 CtClass interfaceToImplement = pool
                         .get("org.objectweb.fractal.api.control.BindingController");
-                generatedCtClass.addInterface(interfaceToImplement);
-
-                CtClass superClassToHerit = pool.get(classToExtend);
-
-                // Add constructors
-                CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
-                generatedCtClass.addConstructor(defaultConstructor);
-
+                classToEdit.addInterface(interfaceToImplement);
                 // Get property fields of superclass
-                List<CtField> fields = new ArrayList<CtField>(Arrays.asList(superClassToHerit
-                        .getDeclaredFields()));
-                do {
-                    superClassToHerit = superClassToHerit.getSuperclass();
-                    List<CtField> asList = Arrays.asList(superClassToHerit.getDeclaredFields());
-                    fields.addAll(asList);
-                } while (!superClassToHerit.getName().equals(Object.class.getName()));
+                List<CtField> fields = new ArrayList<CtField>(Arrays.asList(classToEdit.getDeclaredFields()));
 
                 ArrayList<CtField> requiresFields = new ArrayList<CtField>();
                 ArrayList<CtField> collectionFields = new ArrayList<CtField>();
@@ -148,8 +132,8 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                     "];\n" + keySetTmp + requiresTmp + "return result;\n";
                 // End of the listFCBody construction
                 CtMethod listFC = CtNewMethod.make("public String[] listFc() {" + listFCBody + "}",
-                        generatedCtClass);
-                generatedCtClass.addMethod(listFC);
+                        classToEdit);
+                classToEdit.addMethod(listFC);
 
                 // Begin of the lookupFCBody construction
                 String lookupFcBody = "";
@@ -167,8 +151,8 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 lookupFcBody += "else { return null; }\n";
                 // End of the lookupFCBody construction
                 CtMethod lookupFc = CtNewMethod.make("public Object lookupFc(String clientItfName) {" +
-                    lookupFcBody + "}", generatedCtClass);
-                generatedCtClass.addMethod(lookupFc);
+                    lookupFcBody + "}", classToEdit);
+                classToEdit.addMethod(lookupFc);
 
                 // Begin of the bindFCBody construction
                 String bindFcBody = "";
@@ -186,8 +170,8 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 // End of the bindFCBody construction
                 CtMethod bindFc = CtNewMethod.make(
                         "public void bindFc(String clientItfName, Object serverItf) {" + bindFcBody + "}",
-                        generatedCtClass);
-                generatedCtClass.addMethod(bindFc);
+                        classToEdit);
+                classToEdit.addMethod(bindFc);
 
                 // Begin of the unbindFCBody construction
                 String unbindFcBody = "";
@@ -204,15 +188,15 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 }
                 // End of the unbindFCBody construction
                 CtMethod unbindFc = CtNewMethod.make("public void unbindFc(String clientItfName) {" +
-                    unbindFcBody + "}", generatedCtClass);
-                generatedCtClass.addMethod(unbindFc);
+                    unbindFcBody + "}", classToEdit);
+                classToEdit.addMethod(unbindFc);
 
-                //				generatedCtClass.stopPruning(true);
-                //				generatedCtClass.writeFile("generated/");
-                //				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                //                				classToEdit.stopPruning(true);
+                //                				classToEdit.writeFile("generated/");
+                //                				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // Generate and add to cache the generated class
-                byte[] bytecode = generatedCtClass.toBytecode();
+                byte[] bytecode = classToEdit.toBytecode();
                 ClassDataCache.instance().addClassData(generatedClassName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassName + " to cache");
@@ -221,9 +205,9 @@ public class RequiresClassGenerator extends AbstractInterfaceClassGenerator {
                 Utils.defineClass(generatedClassName, bytecode);
 
                 // Defrost the generated class
-                generatedCtClass.defrost();
+                classToEdit.defrost();
             } catch (Exception e) {
-                throw new InterfaceGenerationFailedException("Cannot generate subClass of [" + classToExtend +
+                throw new InterfaceGenerationFailedException("Cannot generate subClass of [" + rootClass +
                     "] with javassist", e);
             }
 

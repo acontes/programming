@@ -76,29 +76,22 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
      * Generates a subclass from root class, if it contains Property annotation. It adds to the subclass the
      * getter/setter corresponding to the properties.
      *
-     * @param classToExtend Name of the class to be set as super class.
-     * @param classToHerit Name of class contains the methods we want to inherit
+     * @param rootClass Name of the class to be set as super class.
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation failed.
      */
-    public String generateClass(String classToExtend, String classToHerit)
-            throws ClassGenerationFailedException {
-        String generatedClassName = Utils.getPropertyClassName(classToExtend);
+    public String generateClass(String rootClass) throws ClassGenerationFailedException {
+        String generatedClassName = Utils.getPropertyClassName(rootClass);
         try {
             loadClass(generatedClassName);
         } catch (ClassNotFoundException cnfe) {
             try {
-                CtClass generatedCtClass = pool.makeClass(generatedClassName);
-                generatedCtClass.defrost();
-
-                // Set super class
-                CtClass superClass = pool.get(classToExtend);
-                generatedCtClass.setSuperclass(superClass);
-
-                CtClass superClassToHerit = pool.get(classToHerit);
+                CtClass classToEdit = pool.get(rootClass);
+                classToEdit.defrost();
+                classToEdit.setName(generatedClassName);
 
                 // Get property fields of superclass
-                CtField[] fields = superClassToHerit.getDeclaredFields();
+                CtField[] fields = classToEdit.getDeclaredFields();
                 ArrayList<CtField> propertyFields = new ArrayList<CtField>();
                 for (int i = 0; i < fields.length; i++) {
                     if (fields[i].hasAnnotation(org.oasisopen.sca.annotation.Property.class) ||
@@ -107,27 +100,23 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                     }
                 }
 
-                // Add default constructor
-                CtConstructor constructorNoParam = CtNewConstructor.defaultConstructor(generatedCtClass);
-                generatedCtClass.addConstructor(constructorNoParam);
-
                 // Add getter and setter for property fields
                 for (int i = 0; i < propertyFields.size(); i++) {
-                    CtField propertyField = new CtField(propertyFields.get(i), generatedCtClass);
+                    CtField propertyField = new CtField(propertyFields.get(i), classToEdit);
                     CtMethod getter = CtNewMethod.getter("get" + nameUp(propertyField.getName()),
                             propertyField);
-                    generatedCtClass.addMethod(getter);
+                    classToEdit.addMethod(getter);
                     CtMethod setter = CtNewMethod.setter("set" + nameUp(propertyField.getName()),
                             propertyField);
-                    generatedCtClass.addMethod(setter);
+                    classToEdit.addMethod(setter);
                 }
 
-                //                                generatedCtClass.stopPruning(true);
-                //                                generatedCtClass.writeFile("generated/");
-                //                                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                //				classToEdit.stopPruning(true);
+                //				classToEdit.writeFile("generated/");
+                //				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // Generate and add to cache the generated class
-                byte[] bytecode = generatedCtClass.toBytecode();
+                byte[] bytecode = classToEdit.toBytecode();
                 ClassDataCache.instance().addClassData(generatedClassName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassName + " to cache");
@@ -136,9 +125,9 @@ public class PropertyClassGenerator extends AbstractInterfaceClassGenerator {
                 Utils.defineClass(generatedClassName, bytecode);
 
                 // Defrost the generated class
-                generatedCtClass.defrost();
+                classToEdit.defrost();
             } catch (Exception e) {
-                throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
+                throw new ClassGenerationFailedException("Cannot generate subClass of [" + rootClass +
                     "] with javassist", e);
             }
         }

@@ -36,8 +36,11 @@
  */
 package org.objectweb.proactive.extensions.sca.gen;
 
+import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javassist.CannotCompileException;
 import javassist.CtClass;
@@ -46,6 +49,7 @@ import javassist.CtField;
 import javassist.CtMethod;
 import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
+import javassist.Modifier;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.proactive.core.component.PAInterface;
@@ -77,68 +81,64 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator {
     /**
      * Generates a subclass from root class to manage intents positioned on service interface of a component.
      *
-     * @param classToExtend Name of the class to be set as super class.
-     * @param classToHerit Name of class contains the methods we want to inherit
+     * @param rootClass Name of the class to be set as super class.
      * @return The generated class name.
      * @throws ClassGenerationFailedException If the generation failed.
      */
-    public String generateClass(String classToExtend, String classToHerit)
-            throws ClassGenerationFailedException {
-        String generatedClassName = Utils.getIntentClassName(classToExtend);
+    public String generateClass(String rootClass) throws ClassGenerationFailedException {
+        String generatedClassName = Utils.getIntentClassName(rootClass);
         try {
             loadClass(generatedClassName);
         } catch (ClassNotFoundException cnfe) {
             try {
-                CtClass generatedCtClass = pool.makeClass(generatedClassName);
-                generatedCtClass.defrost();
-                CtClass superClass = pool.get(classToExtend);
-                generatedCtClass.setSuperclass(superClass);
+                CtClass classToEdit = pool.get(rootClass);
+                classToEdit.defrost();
+                classToEdit.setName(generatedClassName);
 
-                CtClass superClassToHerit = pool.get(classToHerit);
-
-                // Add constructors
-                CtConstructor defaultConstructor = CtNewConstructor.defaultConstructor(generatedCtClass);
-                generatedCtClass.addConstructor(defaultConstructor);
-
-                CtMethod[] methods = superClassToHerit.getDeclaredMethods();
+                CtMethod[] methods = classToEdit.getDeclaredMethods();
                 List<CtMethod> extentedMethodes = new ArrayList<CtMethod>();
                 for (CtMethod ctMethod : methods) {
-                    extentedMethodes.add(ctMethod);
+                    //System.err.println("DEBUG =============== "+ ctMethod.getLongName());
+                    if (ctMethod.getModifiers() != Modifier.PRIVATE)
+                        extentedMethodes.add(ctMethod);
                 }
                 // Add intent managements
                 for (CtMethod ctExtentedMethod : extentedMethodes) {
                     CtField intentHandlerArray = CtField.make("private java.util.List intentArray" +
-                        ctExtentedMethod.getName() + "= new java.util.ArrayList();", generatedCtClass);
-                    generatedCtClass.addField(intentHandlerArray);
+                        ctExtentedMethod.getName() + "= new java.util.ArrayList();", classToEdit);
+                    classToEdit.addField(intentHandlerArray);
                     String intentArrayName = intentHandlerArray.getName();
 
                     CtField intentHandlerCounter = CtField.make("private int counter" +
-                        ctExtentedMethod.getName() + "= -1;", generatedCtClass);
-                    generatedCtClass.addField(intentHandlerCounter);
+                        ctExtentedMethod.getName() + "= -1;", classToEdit);
+                    classToEdit.addField(intentHandlerCounter);
                     String intentCounterName = intentHandlerCounter.getName();
 
-                    CtMethod newMethod = CtNewMethod.delegator(ctExtentedMethod, generatedCtClass);
-                    newMethod.setBody("{\n" + intentCounterName + "++;\n" + "if(" + intentCounterName +
+                    CtMethod newMethod = CtNewMethod.copy(ctExtentedMethod, classToEdit, null);
+                    String WorkerMethodName = ctExtentedMethod.getName() +
+                        new BigInteger(130, new SecureRandom()).toString();
+                    newMethod.setName(WorkerMethodName);
+                    classToEdit.addMethod(newMethod);
+
+                    ctExtentedMethod.setBody("{\n" + intentCounterName + "++;\n" + "if(" + intentCounterName +
                         " < " + intentArrayName + ".size()){" +
                         "return ($r)((org.objectweb.proactive.extensions.sca.control.IntentHandler)" +
                         intentHandlerArray.getName() + ".get(" + intentHandlerCounter.getName() +
                         ")).invoke(new org.objectweb.proactive.extensions.sca.control." +
-                        "IntentJoinPoint(this, \"" + newMethod.getName() + "\", $sig, $args));\n" + "}\n" +
-                        "else{" + intentCounterName + "= -1;\n" + "return ($r)super." +
-                        ctExtentedMethod.getName() + "($$);\n" + "}\n" + "}\n");
+                        "IntentJoinPoint(this, \"" + ctExtentedMethod.getName() + "\", $sig, $args));\n" +
+                        "}\n" + "else{" + intentCounterName + "= -1;\n" + "return ($r)this." +
+                        WorkerMethodName + "($$);\n" + "}\n" + "}\n");
 
-                    generatedCtClass.addMethod(newMethod);
-
-                    generateHelperMethods(intentHandlerArray, generatedCtClass);
+                    generateHelperMethods(intentHandlerArray, classToEdit);
 
                 }
 
-                //				generatedCtClass.stopPruning(true);
-                //				generatedCtClass.writeFile("generated/");
-                //				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                //                				classToEdit.stopPruning(true);
+                //                				classToEdit.writeFile("generated/");
+                //                				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
 
                 // Generate and add to cache the generated class
-                byte[] bytecode = generatedCtClass.toBytecode();
+                byte[] bytecode = classToEdit.toBytecode();
                 ClassDataCache.instance().addClassData(generatedClassName, bytecode);
                 if (logger.isDebugEnabled()) {
                     logger.debug("added " + generatedClassName + " to cache");
@@ -147,9 +147,10 @@ public class IntentClassGenerator extends AbstractInterfaceClassGenerator {
                 Utils.defineClass(generatedClassName, bytecode);
 
                 // Defrost the generated class
-                generatedCtClass.defrost();
+                classToEdit.defrost();
             } catch (Exception e) {
-                throw new ClassGenerationFailedException("Cannot generate subClass of [" + classToExtend +
+                e.printStackTrace();
+                throw new ClassGenerationFailedException("Cannot generate subClass of [" + rootClass +
                     "] with javassist", e);
             }
 

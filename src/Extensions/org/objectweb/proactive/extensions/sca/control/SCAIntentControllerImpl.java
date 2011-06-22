@@ -41,6 +41,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
@@ -75,17 +76,15 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_CONTROLLERS);
 
     /*
-     * This HashMap offers the relationship between a given IntentHandler and component's
-     * interfaces. First string key contains the name of IntentHandler, if the value corresponds to
-     * null, it means this IntentHandler is applied to all interfaces. Else we have a list of valid
-     * interfaces. Each interface information is put in a hashMap. The key corresponds to the name
-     * of the interface, if the value of list is null, then the intentHandler is applied to
-     * all methods of the interface, else the list of String contains the names of the methods which
-     * are applied to the IntentHandler.
+     * Each of intentHelper in the list contains all the intentHandlers which belong to a certain  
+     * method of an interface, the list represent all the intentHelper of the component. If the list
+     * is empty , then there isn't any intent handler in the component.
      */
-
     private List<IntentHelper> infomationPool;
 
+    /**
+     * This HashMap contains all the server proxy object.
+     */
     private HashMap<String, PAInterface> mapOfServerRef;
 
     public SCAIntentControllerImpl(Component owner) {
@@ -142,9 +141,9 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     public void addIntentHandler(IntentHandler intentHandler, String itfName, String methodName)
             throws NoSuchInterfaceException, NoSuchMethodException, IllegalLifeCycleException {
         LifeCycleController lcc = GCM.getGCMLifeCycleController(owner);
-        if (lcc.getFcState().equals(LifeCycleController.STARTED)) {
-            throw new IllegalLifeCycleException("Component is started, cannot add an intent handler");
-        }
+        //        if (lcc.getFcState().equals(LifeCycleController.STARTED)) {
+        //            throw new IllegalLifeCycleException("Component is started, cannot add an intent handler");
+        //        }
 
         String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(itfName)
                 .getFcItfSignature();
@@ -246,6 +245,35 @@ public class SCAIntentControllerImpl extends AbstractPAController implements SCA
     public boolean hasIntentHandler(String itfName, String methodName) throws NoSuchInterfaceException,
             NoSuchMethodException {
         return !listIntentHandler(itfName, methodName).isEmpty();
+    }
+
+    public List<IntentHandler> listAllIntentHandler() {
+        HashSet<IntentHandler> hashSet = new HashSet<IntentHandler>();
+        InterfaceType[] itftps = ((ComponentType) owner.getFcItfType()).getFcInterfaceTypes();
+        if (itftps.length > 0) {
+            try {
+                for (int i = 0; i < itftps.length; i++) {
+                    String tmp_itfname = itftps[i].getFcItfName();
+                    String itfSignature = ((ComponentType) owner.getFcType()).getFcInterfaceType(tmp_itfname)
+                            .getFcItfSignature();
+                    Method[] methodList = Class.forName(itfSignature).getMethods();
+                    for (int j = 0; j < methodList.length; j++) {
+                        String tmp_methodname = methodList[j].getName();
+                        hashSet.addAll(listIntentHandler(tmp_itfname, tmp_methodname));
+                    }
+                }
+            } catch (NoSuchInterfaceException nsie) {
+                // Should never happen
+            } catch (SecurityException e) {
+                // Should never happen
+            } catch (ClassNotFoundException e) {
+                //Should never happen
+            } catch (NoSuchMethodException e) {
+                //Should never happen
+            }
+        }
+        List<IntentHandler> res = new ArrayList<IntentHandler>(hashSet);
+        return res;
     }
 
     public List<IntentHandler> listIntentHandler() {

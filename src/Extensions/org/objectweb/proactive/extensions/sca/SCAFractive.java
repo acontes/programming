@@ -37,6 +37,7 @@
 package org.objectweb.proactive.extensions.sca;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import org.apache.log4j.Logger;
 import org.objectweb.fractal.api.Component;
@@ -52,6 +53,7 @@ import org.objectweb.proactive.core.util.log.Loggers;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
+import org.objectweb.proactive.extensions.sca.gen.BusinessClassWithAuthentificationGenerator;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
 
@@ -106,7 +108,7 @@ public class SCAFractive extends Fractive {
 
             String generatedClassName = className;
             try {
-                generatedClassName = IntentClassGenerator.instance().generateClass(className, className);
+                generatedClassName = IntentClassGenerator.instance().generateClass(className);
                 contentDesc.setClassName(generatedClassName);
             } catch (ClassGenerationFailedException cgfe) {
                 InstantiationException ie = new InstantiationException(
@@ -115,11 +117,24 @@ public class SCAFractive extends Fractive {
                 throw ie;
             }
 
-            // Test whether the component class has a property annotation
-            if (hasPropertyAnnotation(className)) {
+            if (Utils.hasAuthentificationAnnotation(generatedClassName)) {
                 try {
-                    generatedClassName = PropertyClassGenerator.instance().generateClass(generatedClassName,
-                            className);
+                    generatedClassName = BusinessClassWithAuthentificationGenerator.instance().generateClass(
+                            generatedClassName);
+                    contentDesc.setClassName(generatedClassName);
+                } catch (ClassGenerationFailedException cgfe) {
+                    InstantiationException ie = new InstantiationException(
+                        "Cannot generate BusinessClassWithAuthentification class for " + className + " : " +
+                            cgfe.getMessage());
+                    ie.initCause(cgfe);
+                    throw ie;
+                }
+            }
+
+            // Test whether the component class has a property annotation
+            if (hasPropertyAnnotation(generatedClassName)) {
+                try {
+                    generatedClassName = PropertyClassGenerator.instance().generateClass(generatedClassName);
                     contentDesc.setClassName(generatedClassName);
                 } catch (ClassGenerationFailedException cgfe) {
                     InstantiationException ie = new InstantiationException(
@@ -158,4 +173,5 @@ public class SCAFractive extends Fractive {
 
         return false;
     }
+
 }

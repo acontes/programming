@@ -95,7 +95,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     private Map<String, Method> propertyMethods;
 
     /** Name of all initialized properties. */
-    private List<String> initilizedProperties;
+    private List<String> initializedProperties;
 
     /** Current type of properties. */
     private Map<String, Class<?>> propertyTypes;
@@ -111,7 +111,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         declaredPropertyNames = new ArrayList<String>();
         declaredPropertyTypes = new HashMap<String, Class<?>>();
         propertyMethods = new HashMap<String, Method>();
-        initilizedProperties = new ArrayList<String>();
+        initializedProperties = new ArrayList<String>();
         propertyTypes = new HashMap<String, Class<?>>();
     }
 
@@ -186,11 +186,11 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
     }
 
     public boolean containsPropertyName(String name) {
-        return initilizedProperties.contains(name);
+        return initializedProperties.contains(name);
     }
 
     public String[] getPropertyNames() {
-        return initilizedProperties.toArray(new String[] {});
+        return initializedProperties.toArray(new String[] {});
     }
 
     public Class<?> getType(String name) throws NoSuchPropertyException {
@@ -210,7 +210,8 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
 
     public Object getValue(String name) throws NoSuchPropertyException {
         assertPropertyExist(name);
-        if (containsPropertyName(name)) {
+        //if (containsPropertyName(name)) {
+        if (containsDeclaredPropertyName(name)) {
             Object contentClass = owner.getReferenceOnBaseObject();
             Method getter = propertyMethods.get(getGetterName(name));
             try {
@@ -262,7 +263,7 @@ public class SCAPropertyControllerImpl extends AbstractPAController implements S
         } catch (InvocationTargetException ite) {
             throw propertyValueError(name, false, ite);
         }
-        initilizedProperties.add(name);
+        initializedProperties.add(name);
     }
 
     /*

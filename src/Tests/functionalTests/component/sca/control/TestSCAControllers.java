@@ -98,6 +98,15 @@ public class TestSCAControllers extends SCAComponentTest {
 
     @org.junit.Test
     public void action() throws Exception {
+
+        GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
+        GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
+                componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
+
+        GCM.getGCMLifeCycleController(componentB).startFc();
+        GCM.getGCMLifeCycleController(componentA).startFc();
+
         SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils
                 .getSCAPropertyController(componentA);
         SCAPropertyController scapcServer = org.objectweb.proactive.extensions.sca.Utils
@@ -119,13 +128,6 @@ public class TestSCAControllers extends SCAComponentTest {
         scapcClient.setValue("PropertyClient", "client\'s property");
         scapcServer.setValue("PropertyServer", "server\'s property");
 
-        GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
-                componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
-        GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,
-                componentB.getFcInterface(TestIntentItf2.SERVER_ITF_NAME));
-
-        GCM.getGCMLifeCycleController(componentB).startFc();
-        GCM.getGCMLifeCycleController(componentA).startFc();
         TestIntentItf i = (TestIntentItf) componentA.getFcInterface(TestIntentItf.SERVER_ITF_NAME); //here the get interface is from server side 
         TestIntentItf2 i2 = (TestIntentItf2) componentA.getFcInterface(TestIntentItf2.SERVER_ITF_NAME);
         ExecuteItf i3 = ((ExecuteItf) componentA.getFcInterface("run"));

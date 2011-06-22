@@ -44,8 +44,10 @@ import java.util.List;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.Interface;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.control.IllegalBindingException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.fractal.api.factory.InstantiationException;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.fractal.api.type.InterfaceType;
 import org.objectweb.proactive.core.ProActiveRuntimeException;
@@ -56,6 +58,7 @@ import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
+import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
 
 
 /**
@@ -64,6 +67,7 @@ import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
  * @author The ProActive Team
  */
 public class SCAPABindingControllerImpl extends PABindingControllerImpl {
+
     public SCAPABindingControllerImpl(Component owner) {
         super(owner);
     }
@@ -104,7 +108,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             Component ownerLocal = this.getFcItfOwner();
             try {
                 String sItfSignature = IntentClassGenerator.instance().generateClass(
-                        sItf.getClass().getName(), sItf.getClass().getName());
+                        sItf.getClass().getName());
                 try {
                     PAInterfaceImpl reference = (PAInterfaceImpl) Class.forName(sItfSignature)
                             .getConstructor().newInstance();
@@ -136,7 +140,7 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
                         "Cannot invoke constructor of class " + sItfSignature + ": " + iae.getMessage());
                     pare.initCause(iae);
                     throw pare;
-                } catch (InstantiationException ie) {
+                } catch (java.lang.InstantiationException ie) {
                     ProActiveRuntimeException pare = new ProActiveRuntimeException(
                         "Cannot invoke constructor of class " + sItfSignature + ": " + ie.getMessage());
                     pare.initCause(ie);
@@ -239,10 +243,31 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
 
     }
 
+    /**
+     * implementation of the interface BindingController see
+     * {@link BindingController#bindFc(java.lang.String, java.lang.Object)}
+     */
+    public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
+            IllegalBindingException, IllegalLifeCycleException {
+        super.bindFc(clientItfName, serverItf);
+        try {
+            if (Utils.hasAuthentificationAnnotation(owner.getReferenceOnBaseObject().getClass().getName())) {
+                //System.err.println("DEBUG===============================");
+                PAInterface serverItfPA = (PAInterface) serverItf;
+                super.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA.getFcItfOwner().getFcInterface(
+                        AuthentificationItf.SERVER_ITF_NAME));
+            }
+        } catch (InstantiationException e) {
+            // should never happen
+            e.printStackTrace();
+        }
+    }
+
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
             IllegalLifeCycleException {
         super.unbindFc(clientItfName);
         ((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(owner)).getFcItfImpl())
                 .notifyUnbinding(clientItfName);
     }
+
 }
