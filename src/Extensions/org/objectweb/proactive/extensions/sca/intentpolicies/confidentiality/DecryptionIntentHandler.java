@@ -82,7 +82,8 @@ public class DecryptionIntentHandler extends IntentHandler {
             logger.debug("Encrypted data: " + new String(rawData));
             logger.debug("Decrypted data: " + new String(result));
         }
-
+        System.err.println("Encrypted data: " + new String(rawData));
+        System.err.println("Decrypted data: " + new String(result));
         Object ret = ijp.proceed();
         return ret;
     }

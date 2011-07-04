@@ -12,7 +12,7 @@ import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.sca.Utils;
 
 
-public class Main2 {
+public class Main {
 
     private static final String HelloURL = "http://localhost:9000/HelloService";
 

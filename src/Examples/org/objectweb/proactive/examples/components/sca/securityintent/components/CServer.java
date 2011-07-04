@@ -36,17 +36,7 @@
  */
 package org.objectweb.proactive.examples.components.sca.securityintent.components;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.NoSuchAlgorithmException;
-import java.security.PrivateKey;
-import java.security.PublicKey;
-import java.security.Security;
-
-import org.objectweb.fractal.fraclet.annotations.Requires;
-import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
 import org.osoa.sca.annotations.Authentication;
-import org.osoa.sca.annotations.Property;
 
 
 @Authentication

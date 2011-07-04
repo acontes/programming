@@ -37,12 +37,19 @@
 package org.objectweb.proactive.extensions.sca;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 import org.apache.log4j.Logger;
+import org.etsi.uri.gcm.api.type.GCMTypeFactory;
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.Type;
 import org.objectweb.fractal.api.factory.InstantiationException;
+import org.objectweb.fractal.api.type.ComponentType;
+import org.objectweb.fractal.api.type.InterfaceType;
+import org.objectweb.fractal.api.type.TypeFactory;
 import org.objectweb.proactive.annotation.PublicAPI;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription;
@@ -56,6 +63,7 @@ import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedEx
 import org.objectweb.proactive.extensions.sca.gen.BusinessClassWithAuthentificationGenerator;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
+import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
 
 
 /**
@@ -116,18 +124,33 @@ public class SCAFractive extends Fractive {
                 ie.initCause(cgfe);
                 throw ie;
             }
-
             if (Utils.hasAuthentificationAnnotation(generatedClassName)) {
                 try {
                     generatedClassName = BusinessClassWithAuthentificationGenerator.instance().generateClass(
                             generatedClassName);
                     contentDesc.setClassName(generatedClassName);
+                    Component boot = Utils.getBootstrapComponent();
+                    GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
+                    ComponentType cType = (ComponentType) type;
+                    InterfaceType[] itfTypes = cType.getFcInterfaceTypes();
+                    ArrayList<InterfaceType> itfTypesArray = new ArrayList<InterfaceType>(Arrays
+                            .asList(itfTypes));
+                    itfTypesArray.add(type_factory.createFcItfType(AuthentificationItf.SERVER_ITF_NAME,
+                            AuthentificationItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
+                            TypeFactory.SINGLE));
+                    itfTypesArray.add(type_factory.createFcItfType(AuthentificationItf.CLIENT_ITF_NAME,
+                            AuthentificationItf.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
+                            TypeFactory.SINGLE));
+                    type = type_factory.createFcType(itfTypesArray.toArray(itfTypes));
                 } catch (ClassGenerationFailedException cgfe) {
                     InstantiationException ie = new InstantiationException(
                         "Cannot generate BusinessClassWithAuthentification class for " + className + " : " +
                             cgfe.getMessage());
                     ie.initCause(cgfe);
                     throw ie;
+                } catch (NoSuchInterfaceException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
 

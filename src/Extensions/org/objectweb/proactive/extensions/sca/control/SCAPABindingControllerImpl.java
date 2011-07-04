@@ -254,12 +254,23 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             if (Utils.hasAuthentificationAnnotation(owner.getReferenceOnBaseObject().getClass().getName())) {
                 //System.err.println("DEBUG===============================");
                 PAInterface serverItfPA = (PAInterface) serverItf;
-                super.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA.getFcItfOwner().getFcInterface(
-                        AuthentificationItf.SERVER_ITF_NAME));
+                try {
+                    //if(lookupFc(AuthentificationItf.CLIENT_ITF_NAME) == null){
+                    super.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA.getFcItfOwner()
+                            .getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
+                    //}	
+                    BindingController user_binding_controller = Utils.getPABindingController(serverItfPA
+                            .getFcItfOwner());
+                    //if(user_binding_controller.lookupFc(AuthentificationItf.CLIENT_ITF_NAME) == null){
+                    user_binding_controller.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA
+                            .getFcItfOwner().getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
+                    //}
+                } catch (IllegalBindingException e) {
+                    //System.err.println("binding error");
+                }
             }
         } catch (InstantiationException e) {
             // should never happen
-            e.printStackTrace();
         }
     }
 

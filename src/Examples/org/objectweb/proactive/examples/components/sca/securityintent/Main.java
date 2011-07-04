@@ -79,39 +79,25 @@ public class Main {
                             TypeFactory.SINGLE),
                     type_factory.createFcItfType(TestIntentItf.CLIENT_ITF_NAME,
                             TestIntentItf.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE),
-
-                    type_factory.createFcItfType(AuthentificationItf.SERVER_ITF_NAME,
-                            AuthentificationItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE),
-                    type_factory.createFcItfType(AuthentificationItf.CLIENT_ITF_NAME,
-                            AuthentificationItf.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
                             TypeFactory.SINGLE) }), Constants.PRIMITIVE, new ContentDescription(CClient.class
                     .getName(), new Object[] {}));
 
-            componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
-                    type_factory.createFcItfType(TestIntentItf.SERVER_ITF_NAME,
-                            TestIntentItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE),
-                    type_factory.createFcItfType(AuthentificationItf.SERVER_ITF_NAME,
-                            AuthentificationItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE) }), Constants.PRIMITIVE, new ContentDescription(CServer.class
-                    .getName(), new Object[] {}));
+            componentB = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] { type_factory
+                    .createFcItfType(TestIntentItf.SERVER_ITF_NAME, TestIntentItf.class.getName(),
+                            TypeFactory.SERVER, TypeFactory.MANDATORY, TypeFactory.SINGLE) }),
+                    Constants.PRIMITIVE, new ContentDescription(CServer.class.getName(), new Object[] {}));
 
             // component assembling
             GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                     componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
-            //            GCM.getBindingController(componentA).bindFc(AuthentificationItf.CLIENT_ITF_NAME,
-            //                    componentB.getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
-
             GCM.getGCMLifeCycleController(componentA).startFc();
             GCM.getGCMLifeCycleController(componentB).startFc();
 
             PublicKey pubKey = ((AuthentificationItf) componentA
                     .getFcInterface(AuthentificationItf.SERVER_ITF_NAME)).getPublicKeyFromServer();
             PrivateKey sKey = (PrivateKey) Utils.getSCAPropertyController(componentB).getValue("privateKey");
-            //System.err.println("public key :" + pubKey);
-            //System.err.println("private key :" + sKey);
+            System.err.println("public key :" + pubKey);
+            System.err.println("private key :" + sKey);
 
             //add encryption intent on the client side 
             SCAIntentController scaiClient = Utils.getSCAIntentController(componentA);
