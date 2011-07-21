@@ -36,9 +36,13 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.multiactivenpb.cg.*;
 import org.objectweb.proactive.multiactivity.MultiActiveService;
 
-@DefineGroups({ @Group(name = "runtime", selfCompatible = false),
-		@Group(name = "work", selfCompatible = true) })
-@DefineRules({ @Compatible(value = { "runtime", "work" }) })
+@DefineGroups({ 
+		@Group(name = "runtime", selfCompatible = false),
+		@Group(name = "work", selfCompatible = true) 
+})
+@DefineRules({ 
+		@Compatible(value = { "runtime", "work" }) 
+})
 
 public class CG extends CGBase implements RunActive {
 
