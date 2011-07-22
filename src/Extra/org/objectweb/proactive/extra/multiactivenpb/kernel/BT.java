@@ -99,6 +99,8 @@ public class BT extends BTBase implements RunActive {
 			e.printStackTrace();
 		}
 		bt.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {

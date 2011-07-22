@@ -87,6 +87,8 @@ public class CG extends CGBase implements RunActive {
 			e.printStackTrace();
 		}
 		cg.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {

@@ -90,6 +90,8 @@ public class LU extends LUBase implements RunActive {
 			e.printStackTrace();
 		}
 		lu.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {

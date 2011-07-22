@@ -87,6 +87,8 @@ public class IS extends ISBase implements RunActive {
 			e.printStackTrace();
 		}
 		is.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {

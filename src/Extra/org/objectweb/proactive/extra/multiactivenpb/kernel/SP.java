@@ -87,6 +87,8 @@ public class SP extends SPBase implements RunActive{
 			e.printStackTrace();
 		}
 		sp.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {

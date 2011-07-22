@@ -86,6 +86,8 @@ public class FT extends FTBase implements RunActive {
 			e.printStackTrace();
 		}
 		ft.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {

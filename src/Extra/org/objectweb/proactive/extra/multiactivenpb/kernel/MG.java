@@ -92,6 +92,8 @@ public class MG extends MGBase implements RunActive {
 			e.printStackTrace();
 		}
 		activeInstance.runBenchMark();
+		
+		System.exit(0);
 	}
 
 	public void run() {
