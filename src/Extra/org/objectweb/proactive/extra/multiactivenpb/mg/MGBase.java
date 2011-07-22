@@ -200,19 +200,19 @@ public class MGBase extends Thread{
     for(int i=0;i<num_threads;i++){
       interp[i]=new Interp(mg);
       interp[i].id=i;
-      interp[i].start();
+      //interp[i].start();
       
       psinv[i]=new Psinv(mg);
       psinv[i].id=i;
-      psinv[i].start();
+      //psinv[i].start();
 
       rprj[i]=new Rprj(mg);
       rprj[i].id=i;
-      rprj[i].start();
+      //rprj[i].start();
 
       resid[i]=new Resid(mg);
       resid[i].id=i;
-      resid[i].start();
+      //resid[i].start();
     } 
   }
     public void checksum(int arr[], String name, boolean stop){
