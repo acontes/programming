@@ -16,15 +16,52 @@
 
 package org.objectweb.proactive.extra.multiactivenpb.kernel;
 
+import org.objectweb.proactive.ActiveObjectCreationException;
+import org.objectweb.proactive.Body;
+import org.objectweb.proactive.RunActive;
+import org.objectweb.proactive.annotation.multiactivity.Compatible;
+import org.objectweb.proactive.annotation.multiactivity.DefineGroups;
+import org.objectweb.proactive.annotation.multiactivity.DefineRules;
+import org.objectweb.proactive.annotation.multiactivity.Group;
+import org.objectweb.proactive.annotation.multiactivity.MemberOf;
+import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.node.NodeException;
+import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.multiactivenpb.lu.*;
+import org.objectweb.proactive.multiactivity.MultiActiveService;
+
 import NPB3_0_JAV.BMInOut.*;
 import java.io.*;
 import java.text.*;
+import java.util.LinkedList;
 
-public class LU extends LUBase {
+@DefineGroups({ 
+	@Group(name = "runtime", selfCompatible = false),
+	@Group(name = "adder", selfCompatible = true),
+	@Group(name = "lowerjac", selfCompatible = true),
+	@Group(name = "rhscomp", selfCompatible = true),
+	@Group(name = "scale", selfCompatible = true),
+	@Group(name = "upperjac", selfCompatible = true)
+})
+@DefineRules({ 
+	@Compatible(value = { "runtime", "adder" }),
+	@Compatible(value = { "runtime", "lowerjac" }),
+	@Compatible(value = { "runtime", "upperjac" }),
+	@Compatible(value = { "runtime", "rhscomp" }),
+	@Compatible(value = { "runtime", "scale" })
+})
+
+public class LU extends LUBase implements RunActive {
+	
+	static LU activeInstance;
+	
 	public int bid = -1;
 	public BMResults results;
 	boolean serial = false;
+	
+	public LU() {
+		// for PA
+	}
 
 	public LU(char clss, int np, boolean ser) {
 		super(clss, np);
@@ -40,9 +77,17 @@ public class LU extends LUBase {
 		boolean serial = BMArgs.serial;
 		try {
 			lu = new LU(CLSS, np, serial);
+			
+			activeInstance = PAActiveObject.turnActive(lu);
 		} catch (OutOfMemoryError e) {
 			BMArgs.outOfMemoryMessage();
 			System.exit(0);
+		} catch (ActiveObjectCreationException e) {
+			// TOD Auto-generated catch block
+			e.printStackTrace();
+		} catch (NodeException e) {
+			// TOD Auto-generated catch block
+			e.printStackTrace();
 		}
 		lu.runBenchMark();
 	}
@@ -94,7 +139,7 @@ public class LU extends LUBase {
 		if (serial)
 			tm = sssor();
 		else
-			tm = ssor();
+			tm = activeInstance.ssor();
 
 		// ---------------------------------------------------------------------
 		// compute the solution error
@@ -3610,6 +3655,7 @@ public class LU extends LUBase {
 		}
 	}
 
+	@MemberOf("runtime")
 	public double ssor() {
 		int i, j, k, m, n;
 		int istep;
@@ -3663,7 +3709,7 @@ public class LU extends LUBase {
 			// ---------------------------------------------------------------------
 			// perform SSOR iteration
 			// ---------------------------------------------------------------------
-			synchronized (this) {
+/*			synchronized (this) {
 				for (m = 0; m < num_threads; m++)
 					synchronized (scaler[m]) {
 						scaler[m].done = false;
@@ -3677,14 +3723,15 @@ public class LU extends LUBase {
 						}
 						notifyAll();
 					}
-			}
+			}*/
+			doScale();
 			// ---------------------------------------------------------------------
 			// form the lower triangular part of the jacobian matrix
 			// ---------------------------------------------------------------------
 			if (timeron)
 				timer.start(t_jacld);
 
-			synchronized (this) {
+			/*synchronized (this) {
 				for (m = 0; m < num_threads; m++)
 					synchronized (lowerjac[m]) {
 						lowerjac[m].done = false;
@@ -3698,13 +3745,15 @@ public class LU extends LUBase {
 					}
 					notifyAll();
 				}
-			}
+			}*/
+			doLowerJac();
+			
 			if (timeron)
 				timer.stop(t_jacld);
 			// ---------------------------------------------------------------------
 			// form the strictly upper triangular part of the jacobian matrix
 			// ---------------------------------------------------------------------
-			if (timeron)
+			/*if (timeron)
 				timer.start(t_jacu);
 			synchronized (this) {
 				for (m = 0; m < num_threads; m++)
@@ -3720,7 +3769,9 @@ public class LU extends LUBase {
 					}
 					notifyAll();
 				}
-			}
+			}*/
+			doUpperJac();
+			
 			if (timeron)
 				timer.stop(t_jacu);
 			// ---------------------------------------------------------------------
@@ -3731,7 +3782,7 @@ public class LU extends LUBase {
 			// ---------------------------------------------------------------------
 			if (timeron)
 				timer.start(t_add);
-			synchronized (this) {
+			/*synchronized (this) {
 				for (m = 0; m < num_threads; m++)
 					synchronized (adder[m]) {
 						adder[m].done = false;
@@ -3745,7 +3796,9 @@ public class LU extends LUBase {
 						}
 						notifyAll();
 					}
-			}
+			}*/
+			doAdd();
+			
 			if (timeron)
 				timer.stop(t_add);
 			// ---------------------------------------------------------------------
@@ -3813,8 +3866,8 @@ public class LU extends LUBase {
 		return timer.readTimer(1);
 	}
 
-	synchronized void doRHSiteration() {
-		int m;
+	/*synchronized*/ void doRHSiteration() {
+		/*int m;
 		for (m = 0; m < num_threads; m++)
 			synchronized (rhscomputer[m]) {
 				rhscomputer[m].done = false;
@@ -3827,9 +3880,96 @@ public class LU extends LUBase {
 				} catch (InterruptedException e) {
 				}
 				notifyAll();
-			}
+			}*/
+		
+		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+		for (int m = 0; m < num_threads; m++) {
+			result.add(activeInstance.doRHSIteration(m));
+		}
+		
+		for (int m = 0; m < num_threads; m++) {
+			if (result.get(m).equals(new IntWrapper(99))) {}
+		}
+	}
+	
+	@MemberOf("rhscomp")
+	public IntWrapper doRHSIteration(int m) {
+		rhscomputer[m].runOnce();
+		return new IntWrapper(0);
+	}
+	
+	void doScale() {
+		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+		for (int m = 0; m < num_threads; m++) {
+			result.add(activeInstance.doScale(m));
+		}
+		
+		for (int m = 0; m < num_threads; m++) {
+			if (result.get(m).equals(new IntWrapper(99))) {}
+		}
+	}
+	
+	@MemberOf("scale")
+	public IntWrapper doScale(int m) {
+		scaler[m].runOnce();
+		return new IntWrapper(0);
+	}
+	
+	void doAdd() {
+		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+		for (int m = 0; m < num_threads; m++) {
+			result.add(activeInstance.doAdd(m));
+		}
+		
+		for (int m = 0; m < num_threads; m++) {
+			if (result.get(m).equals(new IntWrapper(99))) {}
+		}
 	}
 
+	@MemberOf("adder")
+	public IntWrapper doAdd(int m) {
+		adder[m].runOnce();
+		return new IntWrapper(0);
+	}
+
+	
+	void doUpperJac() {
+		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+		for (int m = 0; m < num_threads; m++) {
+			result.add(activeInstance.doUpperJac(m));
+		}
+		
+		for (int m = 0; m < num_threads; m++) {
+			if (result.get(m).equals(new IntWrapper(99))) {}
+		}
+	}
+
+	@MemberOf("upperjac")
+	public IntWrapper doUpperJac(int m) {
+		upperjac[m].runOnce();
+		return new IntWrapper(0);
+	}
+
+	
+	void doLowerJac() {
+		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+		for (int m = 0; m < num_threads; m++) {
+			result.add(activeInstance.doLowerJac(m));
+		}
+		
+		for (int m = 0; m < num_threads; m++) {
+			if (result.get(m).equals(new IntWrapper(99))) {}
+		}
+	}
+
+	@MemberOf("lowerjac")
+	public IntWrapper doLowerJac(int m) {
+		lowerjac[m].runOnce();
+		return new IntWrapper(0);
+	}
+
+
+	
 	public double sssor() {
 		int i, j, k, m, n;
 		int istep;
@@ -4281,5 +4421,10 @@ public class LU extends LUBase {
 	public void finalize() throws Throwable {
 		System.out.println("LU: is about to be garbage collected");
 		super.finalize();
+	}
+
+	@Override
+	public void runActivity(Body body) {
+		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
 	}
 }

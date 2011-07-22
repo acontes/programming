@@ -54,6 +54,10 @@ public class IS extends ISBase implements RunActive {
 	Random rng;
 	protected static final double amult = 1220703125.0;
 
+	public IS() {
+		// for PA
+	}
+	
 	public IS(char clss, int np, boolean ser) {
 		super(clss, np, ser);
 		serial = ser;
@@ -90,7 +94,7 @@ public class IS extends ISBase implements RunActive {
 	}
 
 	@MemberOf("runtime")
-	public void runBenchMark() {
+	public boolean runBenchMark() {
 		BMArgs.Banner(BMName, CLASS, serial, num_threads);
 
 		System.out.println(" Size:  " + TOTAL_KEYS + " Iterations:   "
@@ -160,6 +164,8 @@ public class IS extends ISBase implements RunActive {
 				MAX_ITERATIONS, tm, getMOPS(tm, MAX_ITERATIONS, TOTAL_KEYS),
 				"keys ranked", verified, serial, num_threads, bid);
 		res.print();
+		
+		return true;
 	}
 
 	public double getMOPS(double total_time, int niter, int num_keys) {
@@ -328,6 +334,6 @@ public class IS extends ISBase implements RunActive {
 
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing();
+		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
 	}
 }

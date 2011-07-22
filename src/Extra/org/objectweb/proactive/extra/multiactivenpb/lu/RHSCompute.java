@@ -131,7 +131,7 @@ public class RHSCompute extends LUBase {
 		ttotal = lu.ttotal;
 	}
 
-	public void run() {
+/*	public void run() {
 		for (;;) {
 			synchronized (this) {
 				while (done == true) {
@@ -150,6 +150,10 @@ public class RHSCompute extends LUBase {
 				}
 			}
 		}
+	}*/
+	
+	public void runOnce() {
+		step();
 	}
 
 	public void step() {
