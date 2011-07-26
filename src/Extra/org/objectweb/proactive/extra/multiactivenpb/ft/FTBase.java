@@ -20,7 +20,7 @@ import org.objectweb.proactive.extra.multiactivenpb.kernel.FT;
 import NPB3_0_JAV.Random;
 import NPB3_0_JAV.Timer;
 
-public class FTBase {//extends Thread {
+public class FTBase {// extends Thread {
 
 	public static final String BMName = "FT";
 	public char CLASS = 'S';
@@ -101,13 +101,13 @@ public class FTBase {//extends Thread {
 	}
 
 	// thread variables
-	//protected Thread master = null;
+	// protected Thread master = null;
 	protected int num_threads;
 	protected FFTThread doFFT[];
 	protected EvolveThread doEvolve[];
 
 	public void setupThreads(FT ft) {
-		//master = ft;
+		// master = ft;
 		if (num_threads > nz)
 			num_threads = nz;
 		if (num_threads > nx)
@@ -131,12 +131,12 @@ public class FTBase {//extends Thread {
 			doFFT[ii] = new FFTThread(ft, partition1[ii][0], partition1[ii][1],
 					partition2[ii][0], partition2[ii][1]);
 			doFFT[ii].id = ii;
-			//doFFT[ii].start();
+			// doFFT[ii].start();
 
 			doEvolve[ii] = new EvolveThread(ft, partition2[ii][0],
 					partition2[ii][1]);
 			doEvolve[ii].id = ii;
-			//doEvolve[ii].start();
+			// doEvolve[ii].start();
 		}
 	}
 
