@@ -15,10 +15,8 @@
  */
 package org.objectweb.proactive.extra.multiactivenpb.ft;
 
-import org.objectweb.proactive.extra.multiactivenpb.kernel.FT;
+import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
-import NPB3_0_JAV.Random;
-import NPB3_0_JAV.Timer;
 
 public class FTBase {// extends Thread {
 

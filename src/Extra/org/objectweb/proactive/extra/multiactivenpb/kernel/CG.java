@@ -16,8 +16,6 @@
 
 package org.objectweb.proactive.extra.multiactivenpb.kernel;
 
-import NPB3_0_JAV.Random;
-import NPB3_0_JAV.BMInOut.*;
 import java.io.*;
 import java.text.*;
 import java.util.LinkedList;

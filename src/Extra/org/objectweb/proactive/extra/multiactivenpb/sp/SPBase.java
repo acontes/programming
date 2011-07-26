@@ -17,8 +17,6 @@ package org.objectweb.proactive.extra.multiactivenpb.sp;
 
 import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
-import NPB3_0_JAV.Timer;
-
 public class SPBase extends Thread {
 
 	public static final String BMName = "SP";

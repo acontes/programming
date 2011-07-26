@@ -17,8 +17,6 @@ package org.objectweb.proactive.extra.multiactivenpb.is;
 
 import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
-import NPB3_0_JAV.Timer;
-
 public class ISBase extends Thread {
 	public static final String BMName = "IS";
 	public char CLASS = 'S';

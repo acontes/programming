@@ -17,10 +17,6 @@ package org.objectweb.proactive.extra.multiactivenpb.kernel;
 
 import java.util.LinkedList;
 
-import NPB3_0_JAV.Random;
-import NPB3_0_JAV.Timer;
-import NPB3_0_JAV.BMInOut.*;
-
 import org.objectweb.proactive.ActiveObjectCreationException;
 import org.objectweb.proactive.Body;
 import org.objectweb.proactive.RunActive;

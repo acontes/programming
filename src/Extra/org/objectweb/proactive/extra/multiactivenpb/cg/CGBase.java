@@ -18,8 +18,6 @@ package org.objectweb.proactive.extra.multiactivenpb.cg;
 
 import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
-import NPB3_0_JAV.Timer;
-
 public class CGBase extends Thread{
   public static final String BMName="CG";
   public static final int cgitmax=25;

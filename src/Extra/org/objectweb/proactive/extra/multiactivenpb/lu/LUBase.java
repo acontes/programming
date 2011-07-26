@@ -17,8 +17,6 @@ package org.objectweb.proactive.extra.multiactivenpb.lu;
 
 import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
-import NPB3_0_JAV.Timer;
-
 public class LUBase extends Thread {
 
 	public static final String BMName = "LU";

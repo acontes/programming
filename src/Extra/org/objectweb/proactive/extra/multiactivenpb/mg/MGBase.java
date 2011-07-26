@@ -17,8 +17,6 @@ package org.objectweb.proactive.extra.multiactivenpb.mg;
 
 import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
-import NPB3_0_JAV.Timer;
-
 public class MGBase extends Thread{
   public static final String BMName="MG";
   public char CLASS = 'S';

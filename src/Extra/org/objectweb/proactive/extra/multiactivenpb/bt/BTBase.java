@@ -15,8 +15,7 @@
  */
 package org.objectweb.proactive.extra.multiactivenpb.bt;
 
-import NPB3_0_JAV.Timer;
-import org.objectweb.proactive.extra.multiactivenpb.kernel.BT;
+import org.objectweb.proactive.extra.multiactivenpb.kernel.*;
 
 public class BTBase extends Thread {
 

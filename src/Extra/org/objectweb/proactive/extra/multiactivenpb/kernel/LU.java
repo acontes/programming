@@ -30,7 +30,6 @@ import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.multiactivenpb.lu.*;
 import org.objectweb.proactive.multiactivity.MultiActiveService;
 
-import NPB3_0_JAV.BMInOut.*;
 import java.io.*;
 import java.text.*;
 import java.util.LinkedList;
