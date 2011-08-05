@@ -49,55 +49,46 @@ import org.objectweb.fractal.adl.bindings.TypeBindingLoader;
 import org.objectweb.fractal.adl.bindings.UnboundInterfaceDetectorLoader;
 import org.objectweb.fractal.adl.implementations.ImplementationLoader;
 import org.objectweb.fractal.adl.interfaces.InterfaceLoader;
+import org.objectweb.fractal.adl.types.TypeLoader;
 import org.objectweb.fractal.adl.xml.XMLLoader;
+import org.objectweb.fractal.adl.xml.XMLNodeFactory;
 import org.objectweb.proactive.extensions.sca.adl.xml.SCAXMLLoader;
 
 
 public class FactoryFactory {
 
-    private static Factory newGetFactory() {
-        System.err.println("use SCA factory");
-        BasicFactory bf = (BasicFactory) org.objectweb.fractal.adl.FactoryFactory.getFactory();
-//
-//        final NodeMerger nm = new NodeMergerImpl();
-//        final XMLNodeFactory nFact = new XMLNodeFactoryImpl();
-//        final XMLLoader xmll = new XMLLoader();
-//        final ArgumentLoader argl = new ArgumentLoader();
-//        final ArgumentComponentLoader compl = new ArgumentComponentLoader();
-//        final InterfaceLoader itfl = new InterfaceLoader();
-//        final TypeLoader typl = new TypeLoader();
-//        final AttributeLoader attrl = new AttributeLoader();
-//        final ImplementationLoader impll = new ImplementationLoader();
-//        final TypeBindingLoader bindl = new TypeBindingLoader();
-//        // necessary to check inherited/overriden attributes
-//        final UnboundInterfaceDetectorLoader uidl = new UnboundInterfaceDetectorLoader();
-//        
+    public final static String PROACTIVE_SCA_FACTORY = "org.objectweb.proactive.extensions.sca.adl.SCAPAFactory";
+    public final static String PROACTIVE_SCA_BACKEND = "org.objectweb.proactive.extensions.sca.adl.SCAPACompiler";
+
+    public static Factory getFactory(final String factory, final String backend,
+            final Map<Object, Object> context) throws ADLException {
+        final Factory f = org.objectweb.fractal.adl.FactoryFactory.getFactory();
+        context.put(org.objectweb.fractal.adl.FactoryFactory.BACKEND_PROPERTY_NAME, backend);
+        final Map<?, ?> c = (Map<?, ?>) f.newComponent(factory, context);
+        BasicFactory bf = (BasicFactory) c.get("factory");
+
         UnboundInterfaceDetectorLoader uidl = (UnboundInterfaceDetectorLoader) bf
                 .lookupFc(BasicFactory.LOADER_BINDING);
         bf.unbindFc(BasicFactory.LOADER_BINDING);
         TypeBindingLoader bindl = (TypeBindingLoader) uidl.clientLoader;
         ImplementationLoader impll = (ImplementationLoader) bindl.clientLoader;
         AttributeLoader attrl = (AttributeLoader) impll.clientLoader;
-        InterfaceLoader itfl = (InterfaceLoader) attrl.clientLoader;
+        TypeLoader typl = (TypeLoader) attrl.clientLoader;
+        InterfaceLoader itfl = (InterfaceLoader) typl.clientLoader;
         ArgumentComponentLoader compl = (ArgumentComponentLoader) itfl.clientLoader;
         ArgumentLoader argl = (ArgumentLoader) compl.clientLoader;
-        argl.clientLoader = new SCAXMLLoader();
+        XMLLoader xmll = (XMLLoader) argl.clientLoader;
+        XMLNodeFactory nFac = xmll.nodeFactoryItf;
+
+        SCAXMLLoader scaxmll = new SCAXMLLoader(); // here use customized XMLLoader
+        scaxmll.nodeFactoryItf = nFac;
+        argl.clientLoader = scaxmll;
         bf.bindFc(BasicFactory.LOADER_BINDING, uidl);
         return bf;
     }
 
-    public static Factory getFactory(final String factory, final String backend,
-            final Map<Object, Object> context) throws ADLException {
-        final Factory f = newGetFactory();
-        context.put(org.objectweb.fractal.adl.FactoryFactory.BACKEND_PROPERTY_NAME, backend);
-        final Map<?, ?> c = (Map<?, ?>) f.newComponent(factory, context);
-        return (Factory) c.get("factory");
-    }
-
     public static Factory getFactory() throws ADLException {
-        System.err.println("use SCA factory");
-        return getFactory(org.objectweb.proactive.core.component.adl.FactoryFactory.PROACTIVE_FACTORY,
-                org.objectweb.proactive.core.component.adl.FactoryFactory.PROACTIVE_BACKEND, new HashMap());
+        return getFactory(PROACTIVE_SCA_FACTORY, PROACTIVE_SCA_BACKEND, new HashMap());
     }
 
     public static Factory getNFFactory() throws ADLException {
