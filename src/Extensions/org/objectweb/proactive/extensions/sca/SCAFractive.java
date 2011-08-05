@@ -110,6 +110,7 @@ public class SCAFractive extends Fractive {
      */
     public Component newFcInstance(Type type, ControllerDescription controllerDesc,
             ContentDescription contentDesc, Node node) throws InstantiationException {
+        controllerDesc = new ControllerDescription(controllerDesc.getName(), controllerDesc.getHierarchicalType(), DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION);
         if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
             controllerDesc.getControllersSignatures().containsKey(SCAPropertyController.class.getName())) {
             String className = contentDesc.getClassName();
