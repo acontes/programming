@@ -170,7 +170,7 @@ public class BusinessClassWithAuthentificationGenerator extends AbstractInterfac
 
                 // Add constructors
                 CtConstructor constructorNoParam = classToEdit.getDeclaredConstructor(null);
-                constructorNoParam.insertAfter("{generateKeys();}");
+                constructorNoParam.insertAfter("generateKeys();}");
 
                 //				classToEdit.stopPruning(true);
                 //				classToEdit.writeFile("generated/");

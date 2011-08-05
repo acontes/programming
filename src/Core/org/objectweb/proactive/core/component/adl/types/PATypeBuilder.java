@@ -80,6 +80,7 @@ public class PATypeBuilder extends FractalTypeBuilder {
         if (bootstrap == null) {
             Map ctxt = ContextMap.instance(); // new HashMap();
             ctxt.put("classloader", loader);
+            System.err.println("used wrong compiler");
             bootstrap = Utils.getBootstrapComponent(ctxt);
         }
         InterfaceType[] types = new InterfaceType[interfaceTypes.length];

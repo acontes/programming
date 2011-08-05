@@ -72,7 +72,9 @@ public class TestSCAControllers extends SCAComponentTest {
     @Before
     public void initTest() throws Exception {
         Component boot = Utils.getBootstrapComponent();
+        //System.err.println("first");
         GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
+        //System.err.println("second");
         GenericFactory cf = GCM.getGenericFactory(boot);
 
         componentA = cf.newFcInstance(type_factory.createFcType(new InterfaceType[] {
@@ -98,7 +100,6 @@ public class TestSCAControllers extends SCAComponentTest {
 
     @org.junit.Test
     public void action() throws Exception {
-
         GCM.getBindingController(componentA).bindFc(TestIntentItf.CLIENT_ITF_NAME,
                 componentB.getFcInterface(TestIntentItf.SERVER_ITF_NAME));
         GCM.getBindingController(componentA).bindFc(TestIntentItf2.CLIENT_ITF_NAME,

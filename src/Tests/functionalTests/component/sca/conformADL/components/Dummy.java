@@ -34,29 +34,30 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca;
+package functionalTests.component.sca.conformADL.components;
 
-import org.junit.BeforeClass;
-import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
-
-import functionalTests.ComponentTest;
-import org.apache.html.dom.NameNodeListImpl;
-import org.objectweb.proactive.core.config.CentralPAPropertyRepository;
+import functionalTests.component.conformADL.components.*;
+import org.oasisopen.sca.annotation.Property;
 
 
-public abstract class SCAComponentTest extends ComponentTest {
-    public SCAComponentTest() {
-        super();
+/**
+ * @author The ProActive Team
+ *
+ */
+public class Dummy implements Action {
+    @Property
+    String info;
+
+    public Dummy() {
     }
 
-    public SCAComponentTest(String name, String description) {
-        super(name, description);
+    /*
+     * (non-Javadoc)
+     * 
+     * @see functionalTests.component.conformADL.components.Action#doSomething()
+     */
+    public String doSomething() {
+        return ("This component is storing the info : " + info);
     }
 
-    @BeforeClass
-    public static void componentPreConditions() throws Exception {
-        //-Dsca.provider=org.objectweb.proactive.extensions.sca.SCAFractive
-        SCAPAPropertyRepository.SCA_PROVIDER.setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
-        //CentralPAPropertyRepository.GCM_PROVIDER.setValue("org.objectweb.proactive.extensions.sca.SCAFractive");
-    }
 }
