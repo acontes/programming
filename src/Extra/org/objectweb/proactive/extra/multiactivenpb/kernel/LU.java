@@ -25,6 +25,7 @@ import org.objectweb.proactive.annotation.multiactivity.DefineRules;
 import org.objectweb.proactive.annotation.multiactivity.Group;
 import org.objectweb.proactive.annotation.multiactivity.MemberOf;
 import org.objectweb.proactive.api.PAActiveObject;
+import org.objectweb.proactive.core.body.future.FutureProxy;
 import org.objectweb.proactive.core.node.NodeException;
 import org.objectweb.proactive.core.util.wrapper.IntWrapper;
 import org.objectweb.proactive.extra.multiactivenpb.lu.*;
@@ -96,8 +97,12 @@ public class LU extends LUBase implements RunActive {
 	public void run() {
 		runBenchMark();
 	}
+	
+	public static LU lock;
 
 	public void runBenchMark() {
+		lock = this;
+		
 		BMArgs.Banner(BMName, CLASS, serial, num_threads);
 
 		int numTimers = t_last + 1;
@@ -140,7 +145,7 @@ public class LU extends LUBase implements RunActive {
 		if (serial)
 			tm = sssor();
 		else
-			tm = activeInstance.ssor();
+			tm = ssor();
 
 		// ---------------------------------------------------------------------
 		// compute the solution error
@@ -3656,7 +3661,7 @@ public class LU extends LUBase implements RunActive {
 		}
 	}
 
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public double ssor() {
 		int i, j, k, m, n;
 		int istep;
@@ -3935,16 +3940,28 @@ public class LU extends LUBase implements RunActive {
 
 	
 	void doUpperJac() {
-		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
-		for (int m = 0; m < num_threads; m++) {
-			result.add(activeInstance.doUpperJac(m));
-		}
+		synchronized (lock) {
 		
-		for (int m = 0; m < num_threads; m++) {
-			if (result.get(m).equals(new IntWrapper(99))) {}
+			LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+			for (int m = 0; m < num_threads; m++) {
+				result.add(activeInstance.doUpperJac(m));
+			}
+			
+			lock.notifyAll();
+		
+			while (!upperjac[num_threads - 1].done) {
+				try {
+					lock.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				lock.notifyAll();
+			}
 		}
 	}
 
+	
 	@MemberOf("upperjac")
 	public IntWrapper doUpperJac(int m) {
 		upperjac[m].runOnce();
@@ -3953,13 +3970,23 @@ public class LU extends LUBase implements RunActive {
 
 	
 	void doLowerJac() {
-		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
-		for (int m = 0; m < num_threads; m++) {
-			result.add(activeInstance.doLowerJac(m));
-		}
+		synchronized (lock) {
+			LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
+			for (int m = 0; m < num_threads; m++) {
+				result.add(activeInstance.doLowerJac(m));
+			}
+			
+			lock.notifyAll();
 		
-		for (int m = 0; m < num_threads; m++) {
-			if (result.get(m).equals(new IntWrapper(99))) {}
+			while (!lowerjac[num_threads - 1].done) {
+				try {
+					lock.wait();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				lock.notifyAll();
+			}
 		}
 	}
 
@@ -4426,6 +4453,6 @@ public class LU extends LUBase implements RunActive {
 
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
+		new MultiActiveService(body).multiActiveServing(num_threads);
 	}
 }

@@ -176,7 +176,7 @@ public class SP extends SPBase implements RunActive{
 			timer.stop(t_add);
 	}
 
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public boolean adi() {
 		if (timeron)
 			timer.start(t_rhs);
@@ -3241,6 +3241,6 @@ public class SP extends SPBase implements RunActive{
 	
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
+		new MultiActiveService(body).multiActiveServing(num_threads);
 	}
 }

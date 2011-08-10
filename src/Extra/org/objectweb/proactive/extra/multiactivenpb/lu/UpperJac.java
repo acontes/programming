@@ -186,7 +186,7 @@ public class UpperJac extends LUBase {
 	
 	public void runOnce() {
 		int k;
-		
+		synchronized (this) {
 		for (k = nz - 2; k >= 1; k--) {
 			step(k);
 			if (id > 0) {
@@ -208,13 +208,18 @@ public class UpperJac extends LUBase {
 					neighbor[id + 1].notify();
 				}
 		}
-		done = true;
+		
 		if (id == num_threads - 1) {
-			// empty
+			synchronized (master) {
+				done = true;
+				master.notify();
+			}
 		} else
 			synchronized (neighbor[id + 1]) {
+				done = true;
 				neighbor[id + 1].notify();
 			}
+		}
 	}
 
 	public void step(int k) {

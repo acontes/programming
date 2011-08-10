@@ -91,7 +91,7 @@ public class IS extends ISBase implements RunActive {
 		runBenchMark();
 	}
 
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public boolean runBenchMark() {
 		BMArgs.Banner(BMName, CLASS, serial, num_threads);
 
@@ -332,6 +332,6 @@ public class IS extends ISBase implements RunActive {
 
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
+		new MultiActiveService(body).multiActiveServing(num_threads);
 	}
 }

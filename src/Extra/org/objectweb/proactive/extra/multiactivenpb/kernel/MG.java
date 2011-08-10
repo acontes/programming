@@ -89,7 +89,7 @@ public class MG extends MGBase implements RunActive {
 			// TOD Auto-generated catch block
 			e.printStackTrace();
 		}
-		activeInstance.runBenchMark();
+		mg.runBenchMark();
 		
 		System.exit(0);
 	}
@@ -98,7 +98,7 @@ public class MG extends MGBase implements RunActive {
 		runBenchMark();
 	}
 
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public boolean runBenchMark() {
 		BMArgs.Banner(BMName, CLASS, serial, num_threads);
 
@@ -1323,6 +1323,6 @@ public class MG extends MGBase implements RunActive {
 	
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
+		new MultiActiveService(body).multiActiveServing(num_threads);
 	}
 }

@@ -127,7 +127,7 @@ public class BT extends BTBase implements RunActive {
 		if (serial)
 			adi_serial();
 		else
-			activeInstance.adi();
+			adi();
 		initialize();
 
 		timer.resetAllTimers();
@@ -140,7 +140,7 @@ public class BT extends BTBase implements RunActive {
 			if (serial)
 				adi_serial();
 			else
-				activeInstance.adi();
+				adi();
 		}
 
 		timer.stop(t_total);
@@ -174,7 +174,7 @@ public class BT extends BTBase implements RunActive {
 		add();
 	}
 
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public boolean adi() {
 		if (timeron)
 			timer.start(t_rhs);
@@ -3543,6 +3543,6 @@ public class BT extends BTBase implements RunActive {
 	
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing();
+		new MultiActiveService(body).multiActiveServing(num_threads);
 	}
 }

@@ -189,7 +189,7 @@ public class FT extends FTBase implements RunActive {
 		}
 	}
 	
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public boolean appft() {
 
 		if (timeron)
@@ -680,6 +680,6 @@ public class FT extends FTBase implements RunActive {
 
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing();
+		new MultiActiveService(body).multiActiveServing(num_threads);
 	}
 }

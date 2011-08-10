@@ -93,7 +93,7 @@ public class CG extends CGBase implements RunActive {
 		runBenchMark();
 	}
 
-	@MemberOf("runtime")
+	//@MemberOf("runtime")
 	public void runBenchMark() {
 		int i, j, k, it;
 		double zeta;
@@ -720,13 +720,26 @@ public class CG extends CGBase implements RunActive {
 	}
 
 	private/* synchronized */void ExecuteTask(int OrderNum) {
-		/*
-		 * for (int m = 0; m < num_threads; m++) { synchronized (worker[m]) {
-		 * worker[m].TaskOrder = OrderNum; worker[m].done = false;
-		 * worker[m].alpha = alpha; worker[m].beta = beta; worker[m].notify(); }
-		 * } for (int m = 0; m < num_threads; m++) { while (!worker[m].done) {
-		 * try { wait(); } catch (InterruptedException e) { } notifyAll(); } }
-		 */
+		
+	/*	for (int m = 0; m < num_threads; m++) {
+			synchronized (worker[m]) {
+				worker[m].TaskOrder = OrderNum;
+				worker[m].done = false;
+				worker[m].alpha = alpha;
+				worker[m].beta = beta;
+				worker[m].notify();
+			}
+		}
+		for (int m = 0; m < num_threads; m++) {
+			while (!worker[m].done) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+				}
+				notifyAll();
+			}
+		}*/
+		 
 
 		LinkedList<IntWrapper> result = new LinkedList<IntWrapper>();
 		for (int m = 0; m < num_threads; m++) {
@@ -756,7 +769,7 @@ public class CG extends CGBase implements RunActive {
 
 	@Override
 	public void runActivity(Body body) {
-		new MultiActiveService(body).multiActiveServing(num_threads+1, true, false);
+		new MultiActiveService(body).multiActiveServing(num_threads);
 		
 	}
 }
