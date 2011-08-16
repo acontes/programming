@@ -387,7 +387,7 @@ public class SP extends SPBase implements RunActive{
 		}
 	}
 	
-	@MemberOf("xsolve")
+	@MemberOf("xsolver")
 	public IntWrapper doXSolve(int m) {
 		xsolver[m].runOnce();
 		
@@ -420,7 +420,7 @@ public class SP extends SPBase implements RunActive{
 		}
 	}
 	
-	@MemberOf("ysolve")
+	@MemberOf("ysolver")
 	public IntWrapper doYSolve(int m) {
 		ysolver[m].runOnce();
 		
@@ -454,7 +454,7 @@ public class SP extends SPBase implements RunActive{
 		}
 	}
 	
-	@MemberOf("zsolve")
+	@MemberOf("zsolver")
 	public IntWrapper doZSolve(int m) {
 		zsolver[m].runOnce();
 		
