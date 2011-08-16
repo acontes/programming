@@ -38,16 +38,13 @@ package org.objectweb.proactive.extensions.sca.adl.types;
 
 import java.util.Map;
 
-import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.adl.ContextMap;
-import org.objectweb.fractal.adl.types.FractalTypeBuilder;
 import org.objectweb.fractal.adl.util.ClassLoaderHelper;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.type.InterfaceType; //import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.core.component.adl.types.PATypeBuilder;
 import org.objectweb.proactive.extensions.sca.Utils;
-import org.objectweb.proactive.core.component.type.PAGCMTypeFactoryImpl;
 
 
 /**

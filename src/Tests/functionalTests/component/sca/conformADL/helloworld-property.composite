@@ -3,10 +3,10 @@
 <composite xmlns="http://www.osoa.org/xmlns/sca/1.0"
   name="functionalTests.component.sca.conformADL.helloworld-property">
 
-  <service name="action" promote="functionalTests.component.conformADL.components.Action"/>
+  <service name="action" promote="client/Action"/>
   
   <component name="client">
-    <property name="prop">foo</property>
+    <property name="info">hello world</property>
     <implementation.java class="functionalTests.component.sca.conformADL.components.Dummy"/>
   </component>
  

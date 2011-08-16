@@ -4,6 +4,8 @@
 <definition name="functionalTests.component.sca.conformADL.dummy" arguments="message">
 	<interface signature="functionalTests.component.conformADL.components.Action" role="server" name="action"/>
     <content class="functionalTests.component.sca.conformADL.components.Dummy"/>
-  
+  <attributes signature="functionalTests.component.conformADL.components.Info">
+    <attribute name="info" value="${message}"/>
+    </attributes>
   <controller desc="primitive"/>
 </definition>

@@ -12,13 +12,8 @@ import org.junit.Assert;
 import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 
-import functionalTests.ComponentTest;
 import functionalTests.component.conformADL.components.Action;
 import functionalTests.component.sca.SCAComponentTest;
-import org.objectweb.proactive.core.component.Fractive;
-import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
-import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
-import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 
 
 /**
@@ -48,13 +43,10 @@ public class TestSimpleSCAComponent extends SCAComponentTest {
         dummy = (Component) f.newComponent("functionalTests.component.sca.conformADL.helloworld-property",
                 context);
         GCM.getGCMLifeCycleController(dummy).startFc();
-        SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils
-                .getSCAPropertyController(dummy);
-        scapcClient.setValue("info", "testtest");
-        System.err.println("the result : " + ((Action) dummy.getFcInterface("action")).doSomething());
 
-        //        Assert.assertEquals("This component is storing the info : hello world", ((Action) dummy
-        //                .getFcInterface("action")).doSomething());
+        //System.err.println("the result : " + ((Action) dummy.getFcInterface("action")).doSomething());
+
+        Assert.assertEquals("This component is storing the info : hello world", ((Action) dummy.getFcInterface("action")).doSomething());
     }
 
 }

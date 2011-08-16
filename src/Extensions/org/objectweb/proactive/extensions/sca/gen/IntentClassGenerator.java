@@ -40,14 +40,11 @@ import java.math.BigInteger;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import javassist.CannotCompileException;
 import javassist.CtClass;
-import javassist.CtConstructor;
 import javassist.CtField;
 import javassist.CtMethod;
-import javassist.CtNewConstructor;
 import javassist.CtNewMethod;
 import javassist.Modifier;
 

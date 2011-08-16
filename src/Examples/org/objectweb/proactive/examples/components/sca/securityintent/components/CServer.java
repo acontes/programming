@@ -36,11 +36,13 @@
  */
 package org.objectweb.proactive.examples.components.sca.securityintent.components;
 
+import org.oasisopen.sca.annotation.Confidentiality;
 import org.osoa.sca.annotations.Authentication;
 
 
 @Authentication
 public class CServer implements TestIntentItf {
+    @Confidentiality(value = "server")
     public byte[] dataTreatment(byte[] data) {
         byte[] res = new byte[data.length];
         for (int i = 0; i < res.length; i++) {

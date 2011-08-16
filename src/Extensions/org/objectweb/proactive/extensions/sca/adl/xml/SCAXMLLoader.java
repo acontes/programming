@@ -42,8 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.objectweb.fractal.adl.xml.XMLLoader;
 import org.objectweb.fractal.adl.ADLErrors;
 import org.objectweb.fractal.adl.ADLException;
@@ -63,6 +61,7 @@ public class SCAXMLLoader extends XMLLoader {
 
     private boolean validate = true;
     private Parser parser;
+    private Map propertiesValues;
 
     public SCAXMLLoader() {
         super();
@@ -72,6 +71,10 @@ public class SCAXMLLoader extends XMLLoader {
         super(validate);
     }
 
+    public Map getPropertiesValues() {
+        return propertiesValues;
+    }
+    
     // --------------------------------------------------------------------------
     // RE - Implementation of the Loader interface
     // --------------------------------------------------------------------------
@@ -92,14 +95,16 @@ public class SCAXMLLoader extends XMLLoader {
         InputStream inStream = null;
         try {
             if (url == null) {
-                System.out.println(new ADLException(ADLErrors.ADL_NOT_FOUND, file));
+                System.out.println(new ADLException(ADLErrors.ADL_NOT_FOUND, file) + "\ngoing to look for "+fileSca);
                 url = cl.getResource(fileSca);
                 if (url == null) {
                     throw new ADLException(ADLErrors.ADL_NOT_FOUND, file);
                 } else {
                     inStream = url.openStream();
-                    String xml = new SCAXMLConverter(inStream).ConvertSCAXMLToFractal();
-                    System.err.print(xml);
+                    SCAXMLConverter scaConv = new SCAXMLConverter(inStream);
+                    propertiesValues = scaConv.getPropertiesValues();
+                    String xml = scaConv.ConvertSCAXMLToFractal();
+                    //System.err.print(xml);
                     inStream = new ByteArrayInputStream(xml.getBytes());
                 }
             } else {

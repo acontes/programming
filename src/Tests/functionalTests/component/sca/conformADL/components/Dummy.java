@@ -44,7 +44,7 @@ import org.oasisopen.sca.annotation.Property;
  * @author The ProActive Team
  *
  */
-public class Dummy implements Action {
+public class Dummy implements Action{
     @Property
     String info;
 

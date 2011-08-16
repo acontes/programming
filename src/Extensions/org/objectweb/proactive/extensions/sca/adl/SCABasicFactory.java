@@ -38,45 +38,42 @@ package org.objectweb.proactive.extensions.sca.adl;
 
 import java.util.HashMap;
 import java.util.Map;
-
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.adl.BasicFactory;
-import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.adl.arguments.ArgumentComponentLoader;
 import org.objectweb.fractal.adl.arguments.ArgumentLoader;
 import org.objectweb.fractal.adl.attributes.AttributeLoader;
 import org.objectweb.fractal.adl.bindings.TypeBindingLoader;
 import org.objectweb.fractal.adl.bindings.UnboundInterfaceDetectorLoader;
-import org.objectweb.fractal.adl.components.ComponentCompiler;
 import org.objectweb.fractal.adl.implementations.ImplementationLoader;
 import org.objectweb.fractal.adl.interfaces.InterfaceLoader;
 import org.objectweb.fractal.adl.types.TypeLoader;
 import org.objectweb.fractal.adl.xml.XMLLoader;
 import org.objectweb.fractal.adl.xml.XMLNodeFactory;
-import org.objectweb.fractal.task.core.BasicScheduler;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.proactive.extensions.sca.adl.xml.SCAXMLLoader;
+import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
+import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
+import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
 
-
-public class FactoryFactory {
-
-    public final static String PROACTIVE_SCA_FACTORY = "org.objectweb.proactive.extensions.sca.adl.SCAPAFactory";
-    public final static String PROACTIVE_SCA_BACKEND = "org.objectweb.proactive.extensions.sca.adl.SCAPACompiler";
-
-    public static Factory getFactory(final String factory, final String backend,
-            final Map<Object, Object> context) throws ADLException {
-        final Factory f = org.objectweb.fractal.adl.FactoryFactory.getFactory();
-        context.put(org.objectweb.fractal.adl.FactoryFactory.BACKEND_PROPERTY_NAME, backend);
-        Map c = (Map) f.newComponent(factory, context);
-        BasicFactory bf = (BasicFactory) c.get("factory");
+/**
+ *
+ * A SCA featured Factory, the only change is the method to create a new component
+ */
+public class SCABasicFactory extends BasicFactory {
+    
+    protected Map propertiesValues;
+    
+    public SCABasicFactory() {
+        propertiesValues = new HashMap();
+    }
+    
+    public Map getPropertiesValues() {
+        UnboundInterfaceDetectorLoader uidl = (UnboundInterfaceDetectorLoader) lookupFc(BasicFactory.LOADER_BINDING);        
         
-        SCABasicFactory scaBf = new SCABasicFactory(); //create new scaBf
-        //get all old binding
-        UnboundInterfaceDetectorLoader uidl = (UnboundInterfaceDetectorLoader) bf
-                .lookupFc(BasicFactory.LOADER_BINDING); 
-        ComponentCompiler allc = (ComponentCompiler) bf.lookupFc(BasicFactory.COMPILER_BINDING);
-        BasicScheduler s = (BasicScheduler) bf.lookupFc(BasicFactory.SCHEDULER_BINDING);
-        
-        bf.unbindFc(BasicFactory.LOADER_BINDING);
         TypeBindingLoader bindl = (TypeBindingLoader) uidl.clientLoader;
         ImplementationLoader impll = (ImplementationLoader) bindl.clientLoader;
         AttributeLoader attrl = (AttributeLoader) impll.clientLoader;
@@ -86,27 +83,34 @@ public class FactoryFactory {
         ArgumentLoader argl = (ArgumentLoader) compl.clientLoader;
         XMLLoader xmll = (XMLLoader) argl.clientLoader;
         XMLNodeFactory nFac = xmll.nodeFactoryItf;
-
-        SCAXMLLoader scaxmll = new SCAXMLLoader(); // here use customized XMLLoader
-        scaxmll.nodeFactoryItf = nFac;
-        argl.clientLoader = scaxmll;
-        bf.bindFc(BasicFactory.LOADER_BINDING, uidl);
         
-        scaBf.bindFc(BasicFactory.LOADER_BINDING, uidl);
-        scaBf.bindFc(BasicFactory.COMPILER_BINDING, allc);
-        scaBf.bindFc(BasicFactory.SCHEDULER_BINDING, s);
-        
-        c.put("factory", scaBf);
-        
-        return scaBf;
+        SCAXMLLoader scaxmll = (SCAXMLLoader) argl.clientLoader;
+        return scaxmll.getPropertiesValues();
     }
 
-    public static Factory getFactory() throws ADLException {
-        return getFactory(PROACTIVE_SCA_FACTORY, PROACTIVE_SCA_BACKEND, new HashMap());
-    }
-
-    public static Factory getNFFactory() throws ADLException {
-        return getFactory(org.objectweb.proactive.core.component.adl.FactoryFactory.PROACTIVE_NFFACTORY,
-                org.objectweb.proactive.core.component.adl.FactoryFactory.PROACTIVE_NFBACKEND, new HashMap());
+    // Suppress unchecked warning to avoid to change Factory interface
+    @SuppressWarnings("unchecked")
+    public Object newComponent(final String name, final Map context)
+            throws ADLException {
+        //System.err.println("use the right factory");
+        Component rtr = (Component) super.newComponent(name, context);
+        Map<String, String> tmp = getPropertiesValues();
+        if(tmp==null){
+            return rtr;
+        }
+        for (String key : tmp.keySet()) {
+            try {
+                //System.err.println("DEBUGGG === Key: " + key + ", Value: " + tmp.get(key));
+                SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils.getSCAPropertyController(rtr);
+                scapcClient.setValue(key, tmp.get(key));
+            } catch (NoSuchPropertyException ex) {
+                Logger.getLogger(SCABasicFactory.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IncompatiblePropertyTypeException ex) {
+                Logger.getLogger(SCABasicFactory.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (NoSuchInterfaceException ex) {
+                Logger.getLogger(SCABasicFactory.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return rtr;
     }
 }

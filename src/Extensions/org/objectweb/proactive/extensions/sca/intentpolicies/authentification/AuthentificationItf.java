@@ -1,6 +1,7 @@
 package org.objectweb.proactive.extensions.sca.intentpolicies.authentification;
 
 import java.security.PublicKey;
+import javax.crypto.SecretKey;
 
 
 /**
@@ -24,5 +25,17 @@ public interface AuthentificationItf {
      * @return
      */
     public PublicKey getPublicKeyFromServer();
+    
+    /**
+     * return the secret key of the client component, as a service
+     * @return
+     */
+    public byte[] sendEncryptedSecretKey();
+
+    /**
+     * return the secret key of the server component
+     * @return
+     */
+    public SecretKey getSecretKeyFromServer();
 
 }

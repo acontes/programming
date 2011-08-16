@@ -39,6 +39,7 @@ package org.objectweb.proactive.extensions.sca.adl.xml;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.objectweb.fractal.adl.util.ClassLoaderHelper;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.Attributes;
@@ -66,7 +68,6 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.LocatorImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-
 /**
  *
  * This class define how to convert a SCA composite file into Fractal file
@@ -74,16 +75,23 @@ import org.xml.sax.helpers.XMLReaderFactory;
 public class SCAXMLConverter extends DefaultHandler {
 
     private InputStream in;
-
     private Locator locator;
-
     private FractalXMLObject xmlComponent;
+    private String currentPropertyName;
+    private String currentPCDATA;
+    private boolean constructingService = false;
+    private boolean constructingComponent = false;
+    private boolean constructingProperty = false;
 
     public SCAXMLConverter(InputStream in) {
         super();
         this.in = in;
         locator = new LocatorImpl();
         xmlComponent = new FractalXMLObject();
+    }
+
+    public Map getPropertiesValues() {
+        return xmlComponent.attributes;
     }
 
     /**
@@ -95,7 +103,7 @@ public class SCAXMLConverter extends DefaultHandler {
             XMLReader saxReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
             saxReader.setContentHandler(this);
             saxReader.parse(new InputSource(in));
-            System.out.println(xmlComponent);
+            //System.out.println(xmlComponent);
         } catch (IOException ex) {
             Logger.getLogger(SCAXMLConverter.class.getName()).log(Level.SEVERE, null, ex);
 
@@ -110,7 +118,7 @@ public class SCAXMLConverter extends DefaultHandler {
             SAXParserFactory spf = SAXParserFactory.newInstance();
             SAXParser sp = spf.newSAXParser();
             sp.parse(file, this);
-            System.out.println(xmlComponent);
+            //System.out.println(xmlComponent);
         } catch (IOException ex) {
             Logger.getLogger(SCAXMLConverter.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ParserConfigurationException ex) {
@@ -122,79 +130,35 @@ public class SCAXMLConverter extends DefaultHandler {
     }
 
     /**
-     * Definition du locator qui permet a tout moment pendant l'analyse, de localiser
-     * le traitement dans le flux. Le locator par defaut indique, par exemple, le numero
-     * de ligne et le numero de caractere sur la ligne.
-     * @author smeric
-     * @param value le locator a utiliser.
-     * @see org.xml.sax.ContentHandler#setDocumentLocator(org.xml.sax.Locator)
+     * set Document locator
+     * @param value 
      */
     public void setDocumentLocator(Locator value) {
         locator = value;
     }
 
     /**
-     * Evenement envoye au demarrage du parse du flux xml.
-     * @throws SAXException en cas de probleme quelquonque ne permettant pas de
-     * se lancer dans l'analyse du document.
-     * @see org.xml.sax.ContentHandler#startDocument()
-     */
-    public void startDocument() throws SAXException {
-        System.out.println("Debut de l'analyse du document");
-    }
-
-    /**
-     * Evenement envoye a la fin de l'analyse du flux xml.
-     * @throws SAXException en cas de probleme quelquonque ne permettant pas de
-     * considerer l'analyse du document comme etant complete.
-     * @see org.xml.sax.ContentHandler#endDocument()
-     */
-    public void endDocument() throws SAXException {
-        System.out.println("Fin de l'analyse du document");
-    }
-
-    /**
-     * Debut de traitement dans un espace de nommage.
-     * @param prefixe utilise pour cet espace de nommage dans cette partie de l'arborescence.
-     * @param URI de l'espace de nommage.
-     * @see org.xml.sax.ContentHandler#startPrefixMapping(java.lang.String, java.lang.String)
-     */
-    public void startPrefixMapping(String prefix, String URI) throws SAXException {
-        System.out.println("Traitement de l'espace de nommage : " + URI + ", prefixe choisi : " + prefix);
-    }
-
-    /**
-     * Fin de traitement de l'espace de nommage.
-     * @param prefixe le prefixe choisi a l'ouverture du traitement de l'espace nommage.
-     * @see org.xml.sax.ContentHandler#endPrefixMapping(java.lang.String)
-     */
-    public void endPrefixMapping(String prefix) throws SAXException {
-        System.out.println("Fin de traitement de l'espace de nommage : " + prefix);
-    }
-
-    /**
-     * Evenement recu a chaque fois que l'analyseur rencontre une balise xml ouvrante.
-     * @param nameSpaceURI l'url de l'espace de nommage.
-     * @param localName le nom local de la balise.
-     * @param rawName nom de la balise en version 1.0 <code>nameSpaceURI + ":" + localName</code>
-     * @throws SAXException si la balise ne correspond pas a ce qui est attendu,
-     * comme par exemple non respect d'une dtd.
-     * @see org.xml.sax.ContentHandler#startElement(java.lang.String, java.lang.String, java.lang.String, org.xml.sax.Attributes)
+     * Treatment of XML elements, construct FractalXMLObject from this
+     * @throws SAXException 
      */
     public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributs)
             throws SAXException {
-        System.out.println("Ouverture de la balise : " + localName);
-
-        if (!"".equals(nameSpaceURI)) { // espace de nommage particulier
-            System.out.println("  appartenant a l'espace de nom : " + nameSpaceURI);
+        if (localName.equalsIgnoreCase("service")) {
+            constructingService = true;
         }
-
-        System.out.println("  Attributs de la balise : ");
-
-        for (int index = 0; index < attributs.getLength(); index++) { // on parcourt la liste des attributs
-            System.out.println("     - " + attributs.getLocalName(index) + " = " + attributs.getValue(index));
-        }
+//        System.out.println("Open element : " + localName);
+//
+//        if (!"".equals(nameSpaceURI)) { // espace de nommage particulier
+//            System.out.println(" element is from namespace : " + nameSpaceURI);
+//        }
+//
+//        System.out.println("  Attributs of the element : ");
+//
+//        for (int index = 0; index < attributs.getLength(); index++) { // on parcourt la liste des attributs
+//            System.out.println("     - " + attributs.getLocalName(index) + " = " + attributs.getValue(index));
+//        }
         analyseTagsAndAtrributes(localName, attributs);
+
     }
 
     /**
@@ -202,39 +166,24 @@ public class SCAXMLConverter extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
      */
     public void endElement(String nameSpaceURI, String localName, String rawName) throws SAXException {
-        System.out.print("Fermeture de la balise : " + localName);
-
-        if (!"".equals(nameSpaceURI)) { // name space non null
-            System.out.print("appartenant a l'espace de nommage : " + localName);
+//        System.out.print("Fermeture de la balise : " + localName);
+//
+//        if (!"".equals(nameSpaceURI)) { // name space non null
+//            System.out.print("appartenant a l'espace de nommage : " + localName);
+//        }
+        //analyseTagsAndAtrributes(currentLocalName, currentAttributs);
+        //System.err.println("DEBUGGGGGGG ================= " + currentPCDATA +  currentAttributs.getValue("name"));
+        if (localName.equalsIgnoreCase("property")) {
+            xmlComponent.attributes.put(currentPropertyName, currentPCDATA);
         }
-
-        System.out.println();
     }
 
     /**
-     * Evenement recu a chaque fois que l'analyseur rencontre des caracteres (entre
-     * deux balises).
-     * @param ch les caracteres proprement dits.
-     * @param start le rang du premier caractere a traiter effectivement.
-     * @param end le rang du dernier caractere a traiter effectivement
-     * @see org.xml.sax.ContentHandler#characters(char[], int, int)
+     * Treatment of data between element tag
      */
     public void characters(char[] ch, int start, int end) throws SAXException {
-        System.out.println("#PCDATA : " + new String(ch, start, end));
-    }
-
-    /**
-     * Recu chaque fois que des caracteres d'espacement peuvent etre ignores au sens de
-     * XML. C'est a dire que cet evenement est envoye pour plusieurs espaces se succedant,
-     * les tabulations, et les retours chariot se succedants ainsi que toute combinaison de ces
-     * trois types d'occurrence.
-     * @param ch les caracteres proprement dits.
-     * @param start le rang du premier caractere a traiter effectivement.
-     * @param end le rang du dernier caractere a traiter effectivement
-     * @see org.xml.sax.ContentHandler#ignorableWhitespace(char[], int, int)
-     */
-    public void ignorableWhitespace(char[] ch, int start, int end) throws SAXException {
-        System.out.println("espaces inutiles rencontres : ..." + new String(ch, start, end) + "...");
+        //System.out.println("#PCDATA : " + new String(ch, start, end));
+        currentPCDATA = new String(ch, start, end);
     }
 
     /**
@@ -245,66 +194,176 @@ public class SCAXMLConverter extends DefaultHandler {
      * @see org.xml.sax.ContentHandler#processingInstruction(java.lang.String, java.lang.String)
      */
     public void processingInstruction(String target, String data) throws SAXException {
-        System.out.println("Instruction de fonctionnement : " + target);
-        System.out.println("  dont les arguments sont : " + data);
+//        System.out.println("Instruction de fonctionnement : " + target);
+//        System.out.println("  dont les arguments sont : " + data);
     }
 
-    /**
-     * Recu a chaque fois qu'une balise est evitee dans le traitement a cause d'un
-     * probleme non bloque par le parser. Pour ma part je ne pense pas que vous
-     * en ayez besoin dans vos traitements.
-     * @see org.xml.sax.ContentHandler#skippedEntity(java.lang.String)
-     */
-    public void skippedEntity(String arg0) throws SAXException {
-        // Je ne fais rien, ce qui se passe n'est pas franchement normal.
-        // Pour eviter cet evenement, le mieux est quand meme de specifier une dtd pour vos
-        // documents xml et de les faire valider par votre parser.              
-    }
-
-    private void analyseTagsAndAtrributes(String tag, Attributes atts) {
+    protected void parseCompositeTag(String tag, Attributes atts) {
         if (tag.equalsIgnoreCase("composite")) {
             //Composite tage at the begining of file
             xmlComponent.name = atts.getValue("name");
-        } else {
-            if (tag.equalsIgnoreCase("implementation.java")) {
-                xmlComponent.contentClassName = atts.getValue("class");
+            return;
+        }
+    }
+
+    protected void parseComponentTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("component")) {
+            constructingComponent = true;
+            Component tmp = new Component();
+            xmlComponent.components.add(tmp);
+            xmlComponent.getLastComponent().name = atts.getValue("name");
+            return;
+        }
+    }
+
+    protected void parseImplementation_javaTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("implementation.java")) {
+            xmlComponent.contentClassName = atts.getValue("class");
+            if (constructingComponent) {
+                xmlComponent.getLastComponent().contentClassName = atts.getValue("class");
             } else {
-                if (tag.equalsIgnoreCase("service")) {
-                    String[] tmp = new String[3];
-                    tmp[0] = atts.getValue("promote");
-                    tmp[1] = "server";
-                    tmp[2] = atts.getValue("name");
-                    xmlComponent.interfaceNamesAndRoles.add(tmp);
+                System.err.println("tag implementation.java can't be parsed outside component tag context");
+            }
+            return;
+        }
+    }
+
+    protected void parseServiceTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("service")) {
+            constructingService = true;
+            Service tmpService = null;
+            tmpService = new Service(atts.getValue("name"), "server", "", "");
+            String promote = atts.getValue("promote");
+            String requires = atts.getValue("requires");
+            if (promote != null) {
+                if (promote.contains("/")) {
+                    tmpService.softLink = promote;
                 } else {
-                    if (tag.equalsIgnoreCase("reference")) {
-                        String[] tmp = new String[3];
-                        tmp[0] = atts.getValue("promote");
-                        tmp[1] = "client";
-                        tmp[2] = atts.getValue("name");
-                        xmlComponent.interfaceNamesAndRoles.add(tmp);
-                    } else {
-                        if (tag.equalsIgnoreCase("property")) {
-                            System.out.println("no treatment yet");
-                        }
-                    }
+                    tmpService.softLink = "";
+                    tmpService.implementation = promote;
                 }
+            } else {
+                if (requires != null) {
+                    System.err.println("construct intent here : " + requires + System.getenv(tag));
+                    String requiresName = requires.replace('.', '/') + ".composite";
+                    System.err.println("DEBUGGG============" + requiresName);
+                    ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
+                    final URL url = cl.getResource(requiresName);
+                    //String requiresName = requires+".composite";
+
+                    byte[] bytes = new byte[4000];
+                    try {
+                        url.openStream().read(bytes);
+                        XMLReader intentReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+                        intentFileHandler tmp = new intentFileHandler();
+                        intentReader.setContentHandler(tmp);
+                        intentReader.parse(new InputSource(url.openStream()));
+                        System.err.println(tmp.implementedClass.toUpperCase());
+
+                    } catch (Exception ex) {
+                        Logger.getLogger(SCAXMLConverter.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    System.err.println(new String(bytes));
+                }
+            }
+            if (constructingComponent) {
+                xmlComponent.getLastComponent().services.add(tmpService);
+            } else {
+                xmlComponent.services.add(tmpService);
+            }
+
+            String[] tmp = new String[3];
+            tmp[0] = atts.getValue("promote");
+            tmp[1] = "server";
+            tmp[2] = atts.getValue("name");
+            xmlComponent.interfaceNamesAndRoles.add(tmp);
+            return;
+        }
+
+    }
+
+    protected void parseInterface_javaTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("interface.java")) {
+            Service tmpService = null;
+            if (constructingComponent) {
+                tmpService = xmlComponent.getLastComponent().getLastService();
+            } else {
+                tmpService = xmlComponent.getLastService();
+            }
+            if (constructingService) {
+                tmpService.implementation = atts.getValue("interface");
+            } else {
+                System.err.println("tag interface.java can't be parsed outside service tag context");
+            }
+            return;
+        }
+    }
+
+    protected void parseReferenceTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("reference")) {
+            String[] tmp = new String[3];
+            tmp[0] = atts.getValue("promote");
+            tmp[1] = "client";
+            tmp[2] = atts.getValue("name");
+            xmlComponent.interfaceNamesAndRoles.add(tmp);
+            return;
+        }
+    }
+
+    protected void parsePropertyTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("property")) {
+            if (constructingComponent) {
+                constructingProperty = true;
+//                            System.err.println("not implemented yet!");
+//                            //xmlComponent.attributes.put(atts.getValue("name"), currentPCDATA);
+//                            System.err.println(atts.getValue("name") +  currentPCDATA);
+                currentPropertyName = atts.getValue("name");
+                return;
+            } else {
+                System.err.println("tag property can't be parsed outside component tag context");
             }
         }
 
     }
 
+    protected void analyseTagsAndAtrributes(String tag, Attributes atts) {
+        parseCompositeTag(tag, atts);
+        parseComponentTag(tag, atts);
+        parseImplementation_javaTag(tag, atts);
+        parseServiceTag(tag, atts);
+        parseInterface_javaTag(tag, atts);
+        parseReferenceTag(tag, atts);
+        parsePropertyTag(tag, atts);
+    }
+
+    /**
+     * A fractal Object which correspond to SCA xml compisite file
+     */
     private class FractalXMLObject {
 
         protected String name;
         public final String GCMHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> \n"
-            + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
+                + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
+        private Document outPutdocument;
+        protected List<Service> services;
+        protected List<Component> components;
         protected List<String[]> interfaceNamesAndRoles;
         protected String contentClassName;
         protected HashMap<String, String> attributes;
-        private Document outPutdocument;
+
+        public Component getLastComponent() {
+            return components.get(components.size() - 1);
+        }
+
+        public Service getLastService() {
+            return services.get(services.size() - 1);
+        }
 
         public FractalXMLObject() {
+            services = new ArrayList<Service>();
+            components = new ArrayList<Component>();
             interfaceNamesAndRoles = new ArrayList<String[]>();
+            attributes = new HashMap<String, String>();
             initDocument();
         }
 
@@ -351,12 +410,16 @@ public class SCAXMLConverter extends DefaultHandler {
             String tmp = "name of component: " + name;
             tmp += "\ncontentClassName: " + contentClassName;
             for (String[] strings : interfaceNamesAndRoles) {
-                tmp += "\ninterface signature: " + strings[0] + "\ninterface role: " + strings[1] +
-                    "\ninterface name: " + strings[2];
+                tmp += "\ninterface signature: " + strings[0] + "\ninterface role: " + strings[1]
+                        + "\ninterface name: " + strings[2];
             }
             return tmp;
         }
 
+        /**
+         * Get Fractal XML output
+         * @return Fractal XML output
+         */
         public String toXml() {
             Element rootEle = outPutdocument.createElement("definition");
             rootEle.setAttribute("name", name);
@@ -375,6 +438,60 @@ public class SCAXMLConverter extends DefaultHandler {
             prim.setAttribute("desc", "primitive");
             rootEle.appendChild(prim);
             return GCMHeader + getOutPutDoc();
+        }
+    }
+
+    private class Component {
+
+        String name;
+        String contentClassName;
+        List<Service> services;
+        HashMap<String, String> attributes;
+
+        public Component() {
+            services = new ArrayList<Service>();
+            attributes = new HashMap<String, String>();
+        }
+
+        public Service getLastService() {
+            return services.get(services.size() - 1);
+        }
+    }
+
+    private class Service {
+
+        String name;
+        String role;
+        String softLink;
+        String implementation;
+
+        public Service(String name, String role, String softLink, String implementation) {
+            this.name = name;
+            this.role = role;
+            this.softLink = softLink;
+            this.implementation = implementation;
+        }
+    }
+
+    private class Intent {
+
+        String name;
+        String implementation;
+        String applicatedInterface;
+    }
+
+    private class intentFileHandler extends DefaultHandler {
+
+        private String implementedClass;
+
+        public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributs)
+                throws SAXException {
+            if (localName.equalsIgnoreCase("implementation.java")) {
+                implementedClass = attributs.getValue("class");
+            }
+        }
+
+        public void endElement(String nameSpaceURI, String localName, String rawName) throws SAXException {
         }
     }
 }
