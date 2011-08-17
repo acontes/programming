@@ -36,7 +36,6 @@
  */
 package functionalTests.component.sca.conformADL.components;
 
-import functionalTests.component.conformADL.components.*;
 import org.oasisopen.sca.annotation.Property;
 
 

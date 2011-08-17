@@ -1,4 +1,41 @@
 /*
+ * ################################################################
+ *
+ * ProActive Parallel Suite(TM): The Java(TM) library for
+ *    Parallel, Distributed, Multi-Core Computing for
+ *    Enterprise Grids & Clouds
+ *
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
+ * Contact: proactive@ow2.org or contact@activeeon.com
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Affero General Public License
+ * as published by the Free Software Foundation; version 3 of
+ * the License.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
+ *
+ *  Initial developer(s):               The ProActive Team
+ *                        http://proactive.inria.fr/team_members.htm
+ *  Contributor(s):
+ *
+ * ################################################################
+ * $$PROACTIVE_INITIAL_DEV$$
+ */
+
+/*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -25,58 +62,64 @@ import org.w3c.dom.Element;
  * A fractal Object which correspond to SCA xml compisite file
  */
 public class SCACompositeXMLObject {
+    // GCMHeader of proactive fractal XML
 
-    public final String GCMHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> \n"
+    public final String GCMHEADER = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> \n"
             + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
     protected String compositeName;
     protected List<ServiceTag> services;
     protected List<ComponentTag> components;
-    protected List<String[]> properties;
     protected List<String[]> wired;
+    protected List<IntentComposite> intents;
     protected Document outPutdocument;
 
-    public ComponentTag getLastComponent() {
-        return components.get(components.size() - 1);
+    /**
+     * Get the componentTag object out of the list of component with its name
+     */
+    private ComponentTag getComponentByName(String name) {
+        for (ComponentTag componentTag : components) {
+            if (componentTag.ComponentName.equals(name)) {
+                return componentTag;
+            }
+        }
+        return null;
     }
 
-    public ServiceTag getLastService() {
-        return services.get(services.size() - 1);
+    /**
+     * Get the serviceTag object out of the list of component with its name
+     */
+    private ServiceTag getServiceByName(String name) {
+        for (ServiceTag serviceTag : services) {
+            if (serviceTag.serviceName.equals(name)) {
+                return serviceTag;
+            }
+        }
+        return null;
     }
 
     public SCACompositeXMLObject() {
         initDocument();
         services = new ArrayList<ServiceTag>();
         components = new ArrayList<ComponentTag>();
-        properties = new ArrayList<String[]>();
         wired = new ArrayList<String[]>();
+        intents = new ArrayList<IntentComposite>();
     }
-    // revisit service tag out of component tag
 
+    // revisit service tag out of component tag
     protected void revistServicesTags() {
         for (ServiceTag serviceTag : services) {
             String softLink = serviceTag.getSoftLink(); // Parse promote;
             String[] tmp = softLink.split("/");
-            ComponentTag linkedComponent = null;
-            for (ComponentTag componentTag : components) {
-                if (componentTag.getComponentName().equals(tmp[0])) {
-                    linkedComponent = componentTag;
-                    break;
-                }
-            }
+            ComponentTag linkedComponent = getComponentByName(tmp[0]);
             if (linkedComponent != null) { // found corresponded component
-                ServiceTag linkedService = null;
-                for (ServiceTag serviceTag1 : linkedComponent.getServices()) {
-                    if (serviceTag1.getServiceName().equalsIgnoreCase(tmp[1])) {
-                        linkedService = serviceTag1;
-                        break;
-                    }
-                }
+                ServiceTag linkedService = linkedComponent.getServiceByName(tmp[1]);
                 if (linkedService != null) { // found corresponded Service
                     serviceTag.setImplementation(linkedService.getImplementation()); // set them as the same interface implementation
                     serviceTag.setReferenceComponentName(linkedService.getReferenceComponentName());
                 } else {
                     try {
                         // need to look into content class of component if there's a interface which correspond
+                        // hmm can use @service to find out as well!
                         Class contentClass = Class.forName(linkedComponent.getContentClassName());
                         List<Class> superInterfaces = new ArrayList<Class>();
                         Class tmpClass = contentClass;
@@ -111,6 +154,7 @@ public class SCACompositeXMLObject {
             }
         }
     }
+    // revisit service tag out of Wired tag
 
     protected void revisitWiredTag() {
         // parse service tags in composite, to add bindings
@@ -121,6 +165,7 @@ public class SCACompositeXMLObject {
             wired.add(tmp);
         }
     }
+    // revisit XML object to finalize the object construction
 
     public void revisitConstructedObject() {
         // revisit service tag out of component tag
@@ -133,33 +178,31 @@ public class SCACompositeXMLObject {
      * @return Fractal XML output
      */
     public String toXml() {
-        String res = "";
-        Element rootEle = outPutdocument.createElement("definition");
-        rootEle.setAttribute("name", compositeName);
+        Element rootEle = outPutdocument.createElement(FRACTAL_DEFINITION_TAG);
+        rootEle.setAttribute(FRACTAL_NAME_ATTRIBUTE_OF_DEFINITION_TAG, compositeName);
         outPutdocument.appendChild(rootEle);
         for (ServiceTag service : services) {
             rootEle.appendChild(service.toXmlElement(outPutdocument));
         }
         for (ComponentTag component : components) {
-            properties.addAll(component.getProperties());
             rootEle.appendChild(component.toXmlElement(outPutdocument));
         }
         for (String[] binding : wired) {
-            Element tmp = outPutdocument.createElement("binding");
-            tmp.setAttribute("client", binding[0]);
-            tmp.setAttribute("server", binding[1]);
+            Element tmp = outPutdocument.createElement(FRACTAL_BINDING_TAG);
+            tmp.setAttribute(FRACTAL_CLIENT_ATTRIBUTE_OF_BINDING_TAG, binding[0]);
+            tmp.setAttribute(FRACTAL_SERVER_ATTRIBUTE_OF_BINDING_TAG, binding[1]);
             rootEle.appendChild(tmp);
         }
-        Element prim = outPutdocument.createElement("controller");
-        prim.setAttribute("desc", "composite");
+        Element prim = outPutdocument.createElement(ComponentTag.FRACTAL_CONTROLLER_TAG);
+        prim.setAttribute(ComponentTag.FRACTAL_DESC_ATTRIBUTE_OF_CONTROLLER_TAG, "composite");
         rootEle.appendChild(prim);
-        return GCMHeader + getOutPutDoc();
+        return GCMHEADER + getOutPutDoc();
     }
 
     /**
-     * init output document
+     * initialize output document
      */
-    protected void initDocument() {
+    private void initDocument() {
         try {
             DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
             DocumentBuilder docBuilder = dbfac.newDocumentBuilder();
@@ -189,10 +232,49 @@ public class SCACompositeXMLObject {
             trans.transform(source, result);
             xmlString = sw.toString();
         } catch (Exception ex) {
-            //
             Logger.getLogger(SCACompositeXMLObject.class.getName()).log(Level.SEVERE, null, ex);
         }
         return xmlString;
+    }
+
+    /**
+     * Get the intents values in the the SCA composite file 
+     */
+    public List<String[]> getIntents() {
+        List<String[]> res = new ArrayList<String[]>();
+        for (IntentComposite intentComposite : intents) {
+            String[] tmp = new String[3];
+            tmp[0] = intentComposite.applicatedComponentName;
+            tmp[1] = intentComposite.applicatedServiceName;
+            tmp[2] = intentComposite.implementation;
+            res.add(tmp);
+        }
+        return res;
+    }
+
+    /**
+     * Get the properties values in the the SCA composite file 
+     */
+    public List<String[]> getProperties() {
+        List<String[]> properties = new ArrayList<String[]>();
+        for (ComponentTag component : components) {
+            properties.addAll(component.getProperties());
+        }
+        return properties;
+    }
+    /**
+     * Get the last Component of the list of component
+     * @return 
+     */
+    public ComponentTag getLastComponent() {
+        return components.get(components.size() - 1);
+    }
+    /**
+     * Get the last serviceTag of the list of ServiceTag
+     * @return 
+     */
+    public ServiceTag getLastService() {
+        return services.get(services.size() - 1);
     }
 
     /*******************************************************************************
@@ -222,14 +304,6 @@ public class SCACompositeXMLObject {
         this.outPutdocument = outPutdocument;
     }
 
-    public List<String[]> getProperties() {
-        return properties;
-    }
-
-    public void setProperties(List<String[]> properties) {
-        this.properties = properties;
-    }
-
     public List<ServiceTag> getServices() {
         return services;
     }
@@ -245,4 +319,10 @@ public class SCACompositeXMLObject {
     public void setWired(List<String[]> wired) {
         this.wired = wired;
     }
+    //Fractal tag and attribute name Constants
+    public static final String FRACTAL_DEFINITION_TAG = "definition";
+    public static final String FRACTAL_NAME_ATTRIBUTE_OF_DEFINITION_TAG = "name";
+    public static final String FRACTAL_BINDING_TAG = "binding";
+    public static final String FRACTAL_CLIENT_ATTRIBUTE_OF_BINDING_TAG = "client";
+    public static final String FRACTAL_SERVER_ATTRIBUTE_OF_BINDING_TAG = "server";
 }

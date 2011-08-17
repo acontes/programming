@@ -34,30 +34,12 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.control.components;
+package functionalTests.component.sca.conformADL.components;
 
-import org.objectweb.proactive.extensions.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
-
-
-public class IntentHandlerTest extends IntentHandler {
-    private String msg = "DEFAULT TEST VALUE";
-
-    public IntentHandlerTest() {
-
-    }
-
-    public IntentHandlerTest(String msg) {
-        this.msg = msg;
-    }
-
-    public String toString() {
-        return msg;
-    }
-
-    public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        System.err.println(msg);
-        Object res = ijp.proceed();
-        return res;
-    }
+/**
+ * @author The ProActive Team
+ *
+ */
+public interface Action {
+    public String doSomething();
 }

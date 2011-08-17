@@ -41,6 +41,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.List;
 import java.util.Map;
 import org.objectweb.fractal.adl.xml.XMLLoader;
 import org.objectweb.fractal.adl.ADLErrors;
@@ -56,13 +57,17 @@ import org.objectweb.fractal.adl.xml.XMLErrors;
 import org.objectweb.fractal.adl.xml.XMLParser;
 import org.xml.sax.SAXParseException;
 
-
+/**
+ * The custom XML loader , the class override load method of XMLLoader
+ * @author mug
+ */
 public class SCAXMLLoader extends XMLLoader {
 
     private boolean validate = true;
     private Parser parser;
-    private Map propertiesValues;
-
+    
+    public SCAXMLConverter scaXMLConverter;
+  
     public SCAXMLLoader() {
         super();
     }
@@ -70,9 +75,17 @@ public class SCAXMLLoader extends XMLLoader {
     public SCAXMLLoader(final boolean validate) {
         super(validate);
     }
-
-    public Map getPropertiesValues() {
-        return propertiesValues;
+    /**
+     * Get the properties values in the the SCA composite file 
+     */
+    public List<String[]> getPropertiesValues() {
+        return scaXMLConverter.getXmlComponent().getProperties();
+    }
+    /**
+     * Get the intents values in the the SCA composite file 
+     */
+    public List<String[]> getIntents(){
+        return scaXMLConverter.getXmlComponent().getIntents();
     }
     
     // --------------------------------------------------------------------------
@@ -101,10 +114,8 @@ public class SCAXMLLoader extends XMLLoader {
                     throw new ADLException(ADLErrors.ADL_NOT_FOUND, file);
                 } else {
                     inStream = url.openStream();
-                    SCAXMLConverter scaConv = new SCAXMLConverter(inStream);
-                    propertiesValues = scaConv.getPropertiesValues();
-                    String xml = scaConv.ConvertSCAXMLToFractal();
-                    //System.err.print(xml);
+                    scaXMLConverter = new SCAXMLConverter(inStream);
+                    String xml = scaXMLConverter.getXmlComponent().toXml();
                     inStream = new ByteArrayInputStream(xml.getBytes());
                 }
             } else {

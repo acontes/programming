@@ -36,23 +36,15 @@
  */
 package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 import org.objectweb.fractal.adl.util.ClassLoaderHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
-import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
-import org.xml.sax.helpers.LocatorImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
 /**
@@ -61,30 +53,15 @@ import org.xml.sax.helpers.XMLReaderFactory;
  */
 public class SCAXMLConverterHandler extends DefaultHandler {
 
-    private Locator locator;
     private SCACompositeXMLObject xmlComponent;
     private String currentPropertyName;
     private String currentPCDATA;
     private boolean constructingService = false;
     private boolean constructingComponent = false;
-    private boolean constructingProperty = false;
-
+    
     public SCAXMLConverterHandler() {
         super();
-        locator = new LocatorImpl();
         xmlComponent = new SCACompositeXMLObject();
-    }
-
-    public List<String[]> getPropertiesValues() {
-        return xmlComponent.getProperties();
-    }
-
-    /**
-     * set Document locator
-     * @param value 
-     */
-    public void setDocumentLocator(Locator value) {
-        locator = value;
     }
 
     /**
@@ -97,9 +74,9 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     }
 
     /**
-     * Evenement recu a chaque fermeture de balise.
-     * @see org.xml.sax.ContentHandler#endElement(java.lang.String, java.lang.String, java.lang.String)
+     * Operation while closing a tag
      */
+    @Override
     public void endElement(String nameSpaceURI, String localName, String rawName) throws SAXException {
         if (localName.equalsIgnoreCase("component")) {
             constructingComponent = false;
@@ -109,12 +86,13 @@ public class SCAXMLConverterHandler extends DefaultHandler {
             constructingService = false;
         }
         if (localName.equalsIgnoreCase("property")) {
-            String[] tmp = new String[3];
-            tmp[0] = "";
-            tmp[1] = currentPropertyName;
-            tmp[2] = currentPCDATA;
-            xmlComponent.getLastComponent().getProperties().add(tmp);
-            constructingProperty = false;
+            if (constructingComponent) {
+                String[] tmp = new String[3];
+                tmp[0] = xmlComponent.getLastComponent().getComponentName();
+                tmp[1] = currentPropertyName;
+                tmp[2] = currentPCDATA;
+                xmlComponent.getLastComponent().getProperties().add(tmp);
+            }
         }
     }
 
@@ -128,73 +106,79 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Treatment of data between element tag
      */
+    @Override
     public void characters(char[] ch, int start, int end) throws SAXException {
-        //System.out.println("#PCDATA : " + new String(ch, start, end));
         currentPCDATA = new String(ch, start, end);
     }
 
+    /**
+     * Rules to parse a sca composite tag
+     */
     protected void parseCompositeTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("composite")) {
+        if (tag.equalsIgnoreCase(SCA_COMPOSITE_TAG)) {
             //Composite tage at the begining of file
-            xmlComponent.setCompositeName(atts.getValue("name"));
-            return;
+            xmlComponent.setCompositeName(atts.getValue(SCA_NAME_ATTRIBUTE_OF_COMPOSITE_TAG));
         }
     }
 
+    /**
+     * Rules to parse a sca component tag
+     */
     protected void parseComponentTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("component")) {
+        if (tag.equalsIgnoreCase(SCA_COMPONENT_TAG)) {
             constructingComponent = true;
             ComponentTag tmp = new ComponentTag();
-            tmp.setComponentName(atts.getValue("name"));
+            tmp.setComponentName(atts.getValue(SCA_NAME_ATTRIBUTE_OF_COMPONENT_TAG));
             xmlComponent.getComponents().add(tmp);
-            return;
         }
     }
 
+    /**
+     * Rules to parse a sca Implementation.java tag
+     */
     protected void parseImplementation_javaTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("implementation.java")) {
+        if (tag.equalsIgnoreCase(SCA_IMPLEMENTATION_JAVA_TAG)) {
             if (constructingComponent) {
-                xmlComponent.getLastComponent().setContentClassName(atts.getValue("class"));
+                xmlComponent.getLastComponent().setContentClassName(atts.getValue(SCA_CLASS_ATTRIBUTE_OF_IMPLEMENTATION_JAVA_TAG));
             } else {
                 System.err.println("tag implementation.java can't be parsed outside component tag context");
             }
-            return;
         }
     }
-
+    /**
+     * Rules to parse a sca Service tag
+     */
     protected void parseServiceTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("service")) {
+        if (tag.equalsIgnoreCase(SCA_SERVICE_TAG)) {
             constructingService = true;
-            ServiceTag tmpService = new ServiceTag(atts.getValue("name"), "server", "", "");
-            String promote = atts.getValue("promote");
-            String requires = atts.getValue("requires");
+            String serviceName = atts.getValue(SCA_NAME_ATTRIBUTE_OF_SERVICE_TAG);
+            String promote = atts.getValue(SCA_PROMOTE_ATTRIBUTE_OF_SERVICE_TAG);
+            String requires = atts.getValue(SCA_REQUIRES_ATTRIBUTE_OF_SERVICE_TAG);
+            ServiceTag tmpService = new ServiceTag(serviceName, "server", "", "");
             if (promote != null) { // must be in composite service construction
-                if(!constructingComponent)
+                if (!constructingComponent) {
                     tmpService.setSoftLink(promote);
-                else
+                } else {
                     System.err.println("attribute promote can't be parsed inside component's service tag context");
+                }
             }
             if (requires != null) {
-                System.err.println("construct intent here : " + requires + System.getenv(tag));
                 String requiresName = requires.replace('.', '/') + ".composite";
-                System.err.println("DEBUGGG============" + requiresName);
                 ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
                 final URL url = cl.getResource(requiresName);
-                //String requiresName = requires+".composite";
-
-                byte[] bytes = new byte[4000];
                 try {
-                    url.openStream().read(bytes);
                     XMLReader intentReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
                     IntentFileHandler tmp = new IntentFileHandler();
                     intentReader.setContentHandler(tmp);
                     intentReader.parse(new InputSource(url.openStream()));
-                    System.err.println(tmp.getImplementedClass().toUpperCase());
-
+                    String implementedClass = tmp.implementedClass;
+                    IntentComposite intComp = new IntentComposite(tmp.name,
+                            xmlComponent.getLastComponent().getComponentName(),
+                            serviceName,implementedClass);
+                    xmlComponent.intents.add(intComp);
                 } catch (Exception ex) {
                     Logger.getLogger(SCAXMLConverterHandler.class.getName()).log(Level.SEVERE, null, ex);
                 }
-                System.err.println(new String(bytes));
             }
 
             if (constructingComponent) {
@@ -203,12 +187,13 @@ public class SCAXMLConverterHandler extends DefaultHandler {
             } else {
                 xmlComponent.getServices().add(tmpService);
             }
-            return;
         }
     }
-
+    /**
+     * Rules to parse a sca interface.java tag
+     */
     protected void parseInterface_javaTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("interface.java")) {
+        if (tag.equalsIgnoreCase(SCA_INTERFACE_JAVA_TAG)) {
             ServiceTag tmpService = null;
             if (constructingComponent) {
                 tmpService = xmlComponent.getLastComponent().getLastService();
@@ -217,35 +202,42 @@ public class SCAXMLConverterHandler extends DefaultHandler {
                 tmpService = xmlComponent.getLastService();
             }
             if (constructingService) {
-                tmpService.setImplementation(atts.getValue("interface"));
+                tmpService.setImplementation(atts.getValue(SCA_INTERFACE_ATTRIBUTE_OF_INTERFACE_JAVA_TAG));
             } else {
                 System.err.println("tag interface.java can't be parsed outside service tag context");
             }
-            return;
         }
     }
-
+    /**
+     * Rules to parse a sca Reference tag
+     */
     protected void parseReferenceTag(String tag, Attributes atts) {
         if (tag.equalsIgnoreCase("reference")) {
             System.err.println("tag reference's parsing procedure is not implemented yet!");
-            return;
         }
     }
-
+    
+    /**
+     * Rules to parse a sca Wired tag
+     */
+    protected void parseWiredTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase("wired")) {
+            System.err.println("tag reference's parsing procedure is not implemented yet!");
+        }
+    }
+    
+    /**
+     * Rules to parse a sca Property tag
+     */
     protected void parsePropertyTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("property")) {
+        if (tag.equalsIgnoreCase(SCA_PROPERTY_TAG)) {
             if (constructingComponent) {
-                constructingProperty = true;
-//                            System.err.println("not implemented yet!");
-//                            //xmlComponent.attributes.put(atts.getValue("name"), currentPCDATA);
-//                            System.err.println(atts.getValue("name") +  currentPCDATA);
-                currentPropertyName = atts.getValue("name");
+                currentPropertyName = atts.getValue(SCA_NAME_ATTRIBUTE_OF_PROPERTY_TAG);
                 return;
             } else {
                 System.err.println("tag property can't be parsed outside component tag context");
             }
         }
-
     }
 
     protected void analyseTagsAndAtrributes(String tag, Attributes atts) {
@@ -255,6 +247,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
         parseServiceTag(tag, atts);
         parseInterface_javaTag(tag, atts);
         parseReferenceTag(tag, atts);
+        parseWiredTag(tag, atts);
         parsePropertyTag(tag, atts);
     }
 
@@ -265,11 +258,24 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     public void setXmlComponent(SCACompositeXMLObject xmlComponent) {
         this.xmlComponent = xmlComponent;
     }
-
-    private class Intent {
-
-        String name;
-        String implementation;
-        String applicatedInterface;
-    }
+    //SCA tags name and their attributes name constants
+    public static final String SCA_COMPOSITE_TAG = "composite";
+    public static final String SCA_NAME_ATTRIBUTE_OF_COMPOSITE_TAG = "name";
+    
+    public static final String SCA_COMPONENT_TAG = "component";
+    public static final String SCA_NAME_ATTRIBUTE_OF_COMPONENT_TAG = "name";
+    
+    public static final String SCA_IMPLEMENTATION_JAVA_TAG = "implementation.java";
+    public static final String SCA_CLASS_ATTRIBUTE_OF_IMPLEMENTATION_JAVA_TAG = "class";
+    
+    public static final String SCA_SERVICE_TAG = "service";
+    public static final String SCA_NAME_ATTRIBUTE_OF_SERVICE_TAG = "name";
+    public static final String SCA_PROMOTE_ATTRIBUTE_OF_SERVICE_TAG = "promote";
+    public static final String SCA_REQUIRES_ATTRIBUTE_OF_SERVICE_TAG = "requires";
+    
+    public static final String SCA_INTERFACE_JAVA_TAG = "interface.java";
+    public static final String SCA_INTERFACE_ATTRIBUTE_OF_INTERFACE_JAVA_TAG = "interface";
+    
+    public static final String SCA_PROPERTY_TAG = "property";
+    public static final String SCA_NAME_ATTRIBUTE_OF_PROPERTY_TAG = "name";
 }

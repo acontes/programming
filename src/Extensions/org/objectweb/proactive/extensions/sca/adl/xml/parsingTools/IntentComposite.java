@@ -34,30 +34,28 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package functionalTests.component.sca.control.components;
 
-import org.objectweb.proactive.extensions.sca.control.IntentHandler;
-import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 
+public class IntentComposite {
+    
+    protected String name;
+    protected String applicatedComponentName;
+    protected String applicatedServiceName;
+    protected String implementation;
 
-public class IntentHandlerTest extends IntentHandler {
-    private String msg = "DEFAULT TEST VALUE";
-
-    public IntentHandlerTest() {
-
+    public IntentComposite(String name, String applicatedComponentName, String applicatedServiceName, String implementation) {
+        this.name = name;
+        this.applicatedComponentName = applicatedComponentName;
+        this.applicatedServiceName = applicatedServiceName;
+        this.implementation = implementation;
     }
 
-    public IntentHandlerTest(String msg) {
-        this.msg = msg;
+    public IntentComposite() {
     }
-
-    public String toString() {
-        return msg;
-    }
-
-    public Object invoke(IntentJoinPoint ijp) throws Throwable {
-        System.err.println(msg);
-        Object res = ijp.proceed();
-        return res;
-    }
+    
 }

@@ -18,16 +18,13 @@
 <!--                                                                                -->
 <!--  Contact: frascati@ow2.org                                                     -->
 <!--                                                                                -->
-<!--  Author: Philippe Merle                                                        -->
+<!--  Author: Mahmoud Ben Hassine                                                   -->
 <!--                                                                                -->
-<!--  Contributor(s):                                                               -->
+<!--  Contributor(s): Philippe Merle                                                -->
 <!--                                                                                -->
-<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="availability-test">
-  <service name="Service" promote="ImplementationComponent/Service"/>
-  <component name="ImplementationComponent">
-    <implementation.java class="org.ow2.frascati.intent.availability.test.Implementation"/>
-    <service name="Service" requires="functionalTests/component/sca/conformADL/availability">
-      <interface.java interface="org.ow2.frascati.intent.availability.test.ServiceInterface"/>
-    </service>
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="availability">
+  <service name="intent" promote="availabilityComponent/IntentHandler"/>
+  <component name="availabilityComponent">
+    <implementation.java class="functionalTests.component.sca.control.components.IntentHandlerTest"/>
   </component>
 </composite>

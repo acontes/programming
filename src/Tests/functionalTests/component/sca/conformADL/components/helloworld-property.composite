@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <composite xmlns="http://www.osoa.org/xmlns/sca/1.0"
-  name="functionalTests.component.sca.conformADL.helloworld-property">
+  name="functionalTests.component.sca.conformADL.components.helloworld-property">
 
   <service name="action" promote="client/Action"/>
   

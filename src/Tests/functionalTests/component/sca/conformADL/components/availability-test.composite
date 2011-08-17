@@ -18,13 +18,17 @@
 <!--                                                                                -->
 <!--  Contact: frascati@ow2.org                                                     -->
 <!--                                                                                -->
-<!--  Author: Mahmoud Ben Hassine                                                   -->
+<!--  Author: Philippe Merle                                                        -->
 <!--                                                                                -->
-<!--  Contributor(s): Philippe Merle                                                -->
+<!--  Contributor(s):                                                               -->
 <!--                                                                                -->
-<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="availability">
-  <service name="intent" promote="availabilityComponent/IntentHandler"/>
-  <component name="availabilityComponent">
-    <implementation.java class="org.ow2.frascati.intent.availability.AvailabilityIntentHandler"/>
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.availability-test">
+  <service name="Service" promote="ImplementationComponent/Service"/>
+  <component name="ImplementationComponent">
+    <property name="info">hello world</property>
+    <implementation.java class="functionalTests.component.sca.conformADL.components.Dummy"/>
+    <service name="Service" requires="functionalTests/component/sca/conformADL/components/availability">
+      <interface.java interface="functionalTests.component.sca.conformADL.components.Action"/>
+    </service>
   </component>
 </composite>
