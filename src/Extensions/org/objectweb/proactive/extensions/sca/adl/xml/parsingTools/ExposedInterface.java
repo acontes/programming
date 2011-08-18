@@ -48,16 +48,16 @@ import org.w3c.dom.Element;
  * The Object which correspond to the content of Service tag 
  * @author mug
  */
-public class ServiceTag {
+public class ExposedInterface {
     
-    protected String serviceName;
+    protected String exposedInterfaceName;
     protected String role;
     protected String softLink;
     protected String implementation;
     protected String referenceComponentName;
 
-    public ServiceTag(String name, String role, String softLink, String implementation) {
-        this.serviceName = name;
+    public ExposedInterface(String name, String role, String softLink, String implementation) {
+        this.exposedInterfaceName = name;
         this.role = role;
         this.softLink = softLink;
         this.implementation = implementation;
@@ -71,7 +71,7 @@ public class ServiceTag {
         Element rootEle = doc.createElement(FRACTAL_INTERFACE_TAG);
         rootEle.setAttribute(FRACTAL_SIGNATURE_ATTRIBUTE_OF_INTERFACE_TAG, implementation);
         rootEle.setAttribute(FRACTAL_ROLE_ATTRIBUTE_OF_INTERFACE_TAG, role);
-        rootEle.setAttribute(FRACTAL_NAME_ATTRIBUTE_OF_INTERFACE_TAG, serviceName);
+        rootEle.setAttribute(FRACTAL_NAME_ATTRIBUTE_OF_INTERFACE_TAG, exposedInterfaceName);
         return rootEle;
     }
 
@@ -87,12 +87,12 @@ public class ServiceTag {
         this.implementation = implementation;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public String getExposedInterfaceName() {
+        return exposedInterfaceName;
     }
 
-    public void setServiceName(String name) {
-        this.serviceName = name;
+    public void setExposedInterfaceName(String name) {
+        this.exposedInterfaceName = name;
     }
 
     public String getRole() {

@@ -41,6 +41,7 @@
  */
 package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 
+import com.sun.servicetag.ServiceTag;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.StringWriter;
 import java.util.ArrayList;
@@ -67,8 +68,9 @@ public class SCACompositeXMLObject {
     public final String GCMHEADER = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> \n"
             + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
     protected String compositeName;
-    protected List<ServiceTag> services;
+    protected List<ExposedInterface> exposedInterfaces;
     protected List<ComponentTag> components;
+    protected List<WireTag> wires;
     protected List<String[]> wired;
     protected List<IntentComposite> intents;
     protected Document outPutdocument;
@@ -85,92 +87,162 @@ public class SCACompositeXMLObject {
         return null;
     }
 
-    /**
-     * Get the serviceTag object out of the list of component with its name
-     */
-    private ServiceTag getServiceByName(String name) {
-        for (ServiceTag serviceTag : services) {
-            if (serviceTag.serviceName.equals(name)) {
-                return serviceTag;
-            }
-        }
-        return null;
-    }
-
     public SCACompositeXMLObject() {
         initDocument();
-        services = new ArrayList<ServiceTag>();
+        exposedInterfaces = new ArrayList<ExposedInterface>();
         components = new ArrayList<ComponentTag>();
+        wires = new ArrayList<WireTag>();
         wired = new ArrayList<String[]>();
         intents = new ArrayList<IntentComposite>();
     }
 
     // revisit service tag out of component tag
-    protected void revistServicesTags() {
-        for (ServiceTag serviceTag : services) {
-            String softLink = serviceTag.getSoftLink(); // Parse promote;
+    protected void revistExposedInterfaces() {
+        for (ExposedInterface exposedInterface : exposedInterfaces) {
+            String softLink = exposedInterface.getSoftLink(); // Parse promote;
             String[] tmp = softLink.split("/");
             ComponentTag linkedComponent = getComponentByName(tmp[0]);
             if (linkedComponent != null) { // found corresponded component
-                ServiceTag linkedService = linkedComponent.getServiceByName(tmp[1]);
+                ExposedInterface linkedService = linkedComponent.getExposedInterfaceByName(tmp[1]);
                 if (linkedService != null) { // found corresponded Service
-                    serviceTag.setImplementation(linkedService.getImplementation()); // set them as the same interface implementation
-                    serviceTag.setReferenceComponentName(linkedService.getReferenceComponentName());
+                    exposedInterface.setImplementation(linkedService.getImplementation()); // set them as the same interface implementation
+                    exposedInterface.setReferenceComponentName(linkedService.getReferenceComponentName());
                 } else {
-                    try {
-                        // need to look into content class of component if there's a interface which correspond
-                        // hmm can use @service to find out as well!
-                        Class contentClass = Class.forName(linkedComponent.getContentClassName());
-                        List<Class> superInterfaces = new ArrayList<Class>();
-                        Class tmpClass = contentClass;
-                        while (!tmpClass.getName().equals(Object.class.getName())) {
-                            superInterfaces.addAll(new ArrayList<Class>(Arrays.asList(tmpClass.getInterfaces())));
-                            tmpClass = tmpClass.getSuperclass();
-                        }
-                        Class linkedItf = null;
-                        for (Class itf : superInterfaces) {
-                            if (itf.getSimpleName().equals(tmp[1])) { // correponded interface found!
-                                linkedItf = itf;
-                                break;
-                            }
-                        }
-                        if (linkedItf != null) {
-                            serviceTag.setImplementation(linkedItf.getName());
-                            serviceTag.setReferenceComponentName(linkedComponent.getComponentName());
-                            // add new service on the component
-                            linkedComponent.getServices().add(new ServiceTag(serviceTag.getServiceName(),
-                                    serviceTag.getRole(), "", linkedItf.getName()));
-                        } else { // nothing can be found , must be some error in XML
-                            System.err.println("Nothing corresponding can't be found with service tag : " + serviceTag.getServiceName() + ""
-                                    + "there must be some error with composite XML");
-                        }
-                    } catch (ClassNotFoundException ex) {
-                        Logger.getLogger(SCACompositeXMLObject.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    findServiceTagImplementation(linkedComponent.ComponentName, tmp[1], exposedInterface);
+                    linkedComponent.getExposedInterface().add(new ExposedInterface(
+                            exposedInterface.getExposedInterfaceName(), exposedInterface.getRole(),
+                            "", exposedInterface.implementation));
                 }
             } else {
-                System.err.println("The service : " + serviceTag.getServiceName() + " can not find correspond subComponent"
+                System.err.println("The service : " + exposedInterface.getExposedInterfaceName() + " can not find correspond subComponent"
                         + ": " + tmp[0]);
             }
         }
     }
     // revisit service tag out of Wired tag
 
-    protected void revisitWiredTag() {
+    protected void revisitWireTag() {
         // parse service tags in composite, to add bindings
-        for (ServiceTag serviceTag : services) {
+        for (ExposedInterface ExposedInterface : exposedInterfaces) {
             String[] tmp = new String[2];
-            tmp[0] = "this." + serviceTag.getServiceName();
-            tmp[1] = serviceTag.getReferenceComponentName() + "." + serviceTag.getServiceName();
+            tmp[0] = "this." + ExposedInterface.getExposedInterfaceName();
+            tmp[1] = ExposedInterface.getReferenceComponentName() + "." + ExposedInterface.getExposedInterfaceName();
             wired.add(tmp);
         }
+        for (WireTag wireTag : wires) {
+            String source = wireTag.source;
+            String target = wireTag.target;
+            boolean serviceTagCompleted = exposedItfCompleted(target, "server");
+            boolean referenceTagCompleted=false;
+            if (serviceTagCompleted) {
+                referenceTagCompleted = exposedItfCompleted(source, "client");
+                if (!referenceTagCompleted) {
+                    String[] tmp1 = target.split("/");
+                    String[] tmp2 = source.split("/");
+                    ExposedInterface stag = getComponentByName(tmp1[0]).getExposedInterfaceByName(tmp1[1]);
+                    ExposedInterface rtag = getComponentByName(tmp2[0]).getExposedInterfaceByName(tmp2[1]);
+                    rtag.implementation = stag.implementation;
+                    referenceTagCompleted = true;
+                }
+            }
+            if(serviceTagCompleted && referenceTagCompleted)
+            {
+                String[] tmp = new String[2];
+                tmp[0] = source.replace("/", ".");
+                tmp[1] = target.replace("/", ".");
+                wired.add(tmp);
+            }
+        }
     }
-    // revisit XML object to finalize the object construction
 
+    private void findServiceTagImplementation(String componentName, String serviceName, ExposedInterface exposedInterface) {
+        ComponentTag comptag = getComponentByName(componentName);
+        try {
+            // need to look into content class of component if there's a interface which correspond
+            // hmm can use @service to find out as well!
+            Class contentClass = Class.forName(comptag.getContentClassName());
+            List<Class> superInterfaces = new ArrayList<Class>();
+            Class tmpClass = contentClass;
+            while (!tmpClass.getName().equals(Object.class.getName())) {
+                superInterfaces.addAll(new ArrayList<Class>(Arrays.asList(tmpClass.getInterfaces())));
+                tmpClass = tmpClass.getSuperclass();
+            }
+            Class linkedItf = null;
+            for (Class itf : superInterfaces) {
+                if (itf.getSimpleName().equals(serviceName)) { // correponded interface found!
+                    linkedItf = itf;
+                    break;
+                }
+            }
+            if (linkedItf != null) {
+                exposedInterface.setImplementation(linkedItf.getName());
+                exposedInterface.setReferenceComponentName(componentName);
+            } else { // nothing can be found , must be some error in XML
+                System.err.println("Nothing corresponding can't be found with service tag : " + exposedInterface.getExposedInterfaceName() + ""
+                        + "there must be some error with composite XML");
+            }
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(SCACompositeXMLObject.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    /**
+     * Get Fractal binding tag value from sca wire tag
+     */
+    private boolean exposedItfCompleted(String sourceOrTarget, String role) {
+        String[] itfSplit = sourceOrTarget.split("/");
+        boolean exposedItfGenerated = false;
+        ComponentTag linkedTargetComponent = getComponentByName(itfSplit[0]);
+        if (linkedTargetComponent != null) {
+            ExposedInterface linkedService = linkedTargetComponent.getExposedInterfaceByName(itfSplit[1]);
+            if (linkedService == null) {  // create Service or reference
+                ExposedInterface exItf = new ExposedInterface(itfSplit[1], role, "", "");
+                if (role.equals("server")) // look for service annotation in server implementation or implemented itf
+                {
+                    findServiceTagImplementation(itfSplit[0], itfSplit[1], exItf);
+                    exposedItfGenerated = true;
+                }
+                linkedTargetComponent.exposedInterfaces.add(exItf);
+            } else { // found corresponded Service
+                exposedItfGenerated = true;
+            }
+        }
+        return exposedItfGenerated;
+    }
+
+    /**
+     * Get Fractal binding tag value from sca wire tag
+     */
+    private String getBindingValue(String sourceOrTarget, String role) {
+        String[] itfSplit = sourceOrTarget.split("/");
+        String binding = null;
+        ComponentTag linkedTargetComponent = getComponentByName(itfSplit[0]);
+        if (linkedTargetComponent != null) {
+            ExposedInterface linkedService = linkedTargetComponent.getExposedInterfaceByName(itfSplit[1]);
+            if (linkedService != null) { // found corresponded Service
+                binding = linkedTargetComponent.ComponentName + "." + linkedService.exposedInterfaceName;
+            } else { // create Service or reference
+                ExposedInterface exItf = new ExposedInterface(itfSplit[1], role, "", "");
+                if (role.equals("server")) // look for service annotation in server implementation or implemented itf
+                {
+                    findServiceTagImplementation(itfSplit[0], itfSplit[1], exItf);
+                    binding = linkedTargetComponent.ComponentName + "." + exItf.exposedInterfaceName;
+                }
+                if (role.equals("client")) // look for reference annotation in client implementation field or or existing field 
+                {
+                    System.err.println("sortie ici!");
+                }
+                linkedTargetComponent.exposedInterfaces.add(exItf);
+            }
+        }
+        return binding;
+    }
+
+    // revisit XML object to finalize the object construction
     public void revisitConstructedObject() {
         // revisit service tag out of component tag
-        revistServicesTags();
-        revisitWiredTag();
+        revistExposedInterfaces();
+        revisitWireTag();
     }
 
     /**
@@ -181,7 +253,7 @@ public class SCACompositeXMLObject {
         Element rootEle = outPutdocument.createElement(FRACTAL_DEFINITION_TAG);
         rootEle.setAttribute(FRACTAL_NAME_ATTRIBUTE_OF_DEFINITION_TAG, compositeName);
         outPutdocument.appendChild(rootEle);
-        for (ServiceTag service : services) {
+        for (ExposedInterface service : exposedInterfaces) {
             rootEle.appendChild(service.toXmlElement(outPutdocument));
         }
         for (ComponentTag component : components) {
@@ -262,6 +334,7 @@ public class SCACompositeXMLObject {
         }
         return properties;
     }
+
     /**
      * Get the last Component of the list of component
      * @return 
@@ -269,12 +342,13 @@ public class SCACompositeXMLObject {
     public ComponentTag getLastComponent() {
         return components.get(components.size() - 1);
     }
+
     /**
-     * Get the last serviceTag of the list of ServiceTag
+     * Get the last ExposedInterface of the list of ExposedInterface
      * @return 
      */
-    public ServiceTag getLastService() {
-        return services.get(services.size() - 1);
+    public ExposedInterface getLastExposedInterface() {
+        return exposedInterfaces.get(exposedInterfaces.size() - 1);
     }
 
     /*******************************************************************************
@@ -304,12 +378,12 @@ public class SCACompositeXMLObject {
         this.outPutdocument = outPutdocument;
     }
 
-    public List<ServiceTag> getServices() {
-        return services;
+    public List<ExposedInterface> getExposedInterface() {
+        return exposedInterfaces;
     }
 
-    public void setServices(List<ServiceTag> services) {
-        this.services = services;
+    public void setExposedInterface(List<ExposedInterface> services) {
+        this.exposedInterfaces = services;
     }
 
     public List<String[]> getWired() {

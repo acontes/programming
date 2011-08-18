@@ -50,19 +50,19 @@ public class ComponentTag {
     
     protected String ComponentName;
     protected String contentClassName;
-    protected List<ServiceTag> services;
+    protected List<ExposedInterface> exposedInterfaces;
     protected List<String[]> properties;
 
     public ComponentTag() {
-        services = new ArrayList<ServiceTag>();
+        exposedInterfaces = new ArrayList<ExposedInterface>();
         properties = new ArrayList<String[]>();
     }
     /**
-     * Get the last serviceTag of the list of ServiceTag
+     * Get the last ExposedInterface of the list of ExposedInterface
      * @return 
      */
-    public ServiceTag getLastService() {
-        return services.get(services.size() - 1);
+    public ExposedInterface getLastExposedInterface() {
+        return exposedInterfaces.get(exposedInterfaces.size() - 1);
     }
 
     /**
@@ -72,7 +72,7 @@ public class ComponentTag {
 
         Element rootEle = doc.createElement(FRACTAL_COMPONENT_TAG);
         rootEle.setAttribute(FRACTAL_NAME_ATTRIBUTE_OF_COMPONENT_TAG, ComponentName);
-        for (ServiceTag service : services) {
+        for (ExposedInterface service : exposedInterfaces) {
             Element tmp = service.toXmlElement(doc);
             if (tmp != null) {
                 rootEle.appendChild(tmp);
@@ -88,14 +88,14 @@ public class ComponentTag {
     }
     
     /**
-     * Get the ServiceTag in the list of ServiceTags with the name 
+     * Get the ExposedInterface in the list of ExposedInterfaces with the name 
       */
-    public ServiceTag getServiceByName(String name)
+    public ExposedInterface getExposedInterfaceByName(String name)
     {
-        for (ServiceTag serviceTag : services) {
-            if(serviceTag.serviceName.equals(name))
+        for (ExposedInterface ExposedInterface : exposedInterfaces) {
+            if(ExposedInterface.exposedInterfaceName.equals(name))
             {
-                return serviceTag;
+                return ExposedInterface;
             }
         }
         return null;
@@ -128,12 +128,12 @@ public class ComponentTag {
         this.properties = properties;
     }
 
-    public List<ServiceTag> getServices() {
-        return services;
+    public List<ExposedInterface> getExposedInterface() {
+        return exposedInterfaces;
     }
 
-    public void setServices(List<ServiceTag> services) {
-        this.services = services;
+    public void setExposedInterface(List<ExposedInterface> services) {
+        this.exposedInterfaces = services;
     }
     
     //Fractal tag and attribute name Constants

@@ -58,7 +58,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     private String currentPCDATA;
     private boolean constructingService = false;
     private boolean constructingComponent = false;
-    
+
     public SCAXMLConverterHandler() {
         super();
         xmlComponent = new SCACompositeXMLObject();
@@ -68,6 +68,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
      * Treatment of XML elements, construct FractalXMLObject from this
      * @throws SAXException 
      */
+    @Override
     public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributs)
             throws SAXException {
         analyseTagsAndAtrributes(localName, attributs);
@@ -99,6 +100,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * End of parsing procedure, revisit everything
      */
+    @Override
     public void endDocument() {
         xmlComponent.revisitConstructedObject();
     }
@@ -145,61 +147,63 @@ public class SCAXMLConverterHandler extends DefaultHandler {
             }
         }
     }
+
     /**
      * Rules to parse a sca Service tag
      */
-    protected void parseServiceTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase(SCA_SERVICE_TAG)) {
-            constructingService = true;
-            String serviceName = atts.getValue(SCA_NAME_ATTRIBUTE_OF_SERVICE_TAG);
-            String promote = atts.getValue(SCA_PROMOTE_ATTRIBUTE_OF_SERVICE_TAG);
-            String requires = atts.getValue(SCA_REQUIRES_ATTRIBUTE_OF_SERVICE_TAG);
-            ServiceTag tmpService = new ServiceTag(serviceName, "server", "", "");
-            if (promote != null) { // must be in composite service construction
-                if (!constructingComponent) {
-                    tmpService.setSoftLink(promote);
-                } else {
-                    System.err.println("attribute promote can't be parsed inside component's service tag context");
-                }
-            }
-            if (requires != null) {
-                String requiresName = requires.replace('.', '/') + ".composite";
-                ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
-                final URL url = cl.getResource(requiresName);
-                try {
-                    XMLReader intentReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
-                    IntentFileHandler tmp = new IntentFileHandler();
-                    intentReader.setContentHandler(tmp);
-                    intentReader.parse(new InputSource(url.openStream()));
-                    String implementedClass = tmp.implementedClass;
-                    IntentComposite intComp = new IntentComposite(tmp.name,
-                            xmlComponent.getLastComponent().getComponentName(),
-                            serviceName,implementedClass);
-                    xmlComponent.intents.add(intComp);
-                } catch (Exception ex) {
-                    Logger.getLogger(SCAXMLConverterHandler.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            }
+    private void parseExposedInterface(String tag, Attributes atts, String role) {
 
-            if (constructingComponent) {
-                tmpService.setReferenceComponentName(xmlComponent.getLastComponent().getComponentName());
-                xmlComponent.getLastComponent().getServices().add(tmpService);
+        constructingService = true;
+        String serviceName = atts.getValue(SCA_NAME_ATTRIBUTE_OF_EXPOSED_INTERFACE);
+        String promote = atts.getValue(SCA_PROMOTE_ATTRIBUTE_OF_EXPOSED_INTERFACE);
+        String requires = atts.getValue(SCA_REQUIRES_ATTRIBUTE_OF_EXPOSED_INTERFACE);
+        ExposedInterface tmpService = new ExposedInterface(serviceName, role, "", "");
+        if (promote != null) { // must be in composite service construction
+            if (!constructingComponent) {
+                tmpService.setSoftLink(promote);
             } else {
-                xmlComponent.getServices().add(tmpService);
+                System.err.println("attribute promote can't be parsed inside component's service tag context");
             }
         }
+        if (requires != null) {
+            String requiresName = requires.replace('.', '/') + ".composite";
+            ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
+            final URL url = cl.getResource(requiresName);
+            try {
+                XMLReader intentReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+                IntentFileHandler tmp = new IntentFileHandler();
+                intentReader.setContentHandler(tmp);
+                intentReader.parse(new InputSource(url.openStream()));
+                String implementedClass = tmp.implementedClass;
+                IntentComposite intComp = new IntentComposite(tmp.name,
+                        xmlComponent.getLastComponent().getComponentName(),
+                        serviceName, implementedClass);
+                xmlComponent.intents.add(intComp);
+            } catch (Exception ex) {
+                Logger.getLogger(SCAXMLConverterHandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        if (constructingComponent) {
+            tmpService.setReferenceComponentName(xmlComponent.getLastComponent().getComponentName());
+            xmlComponent.getLastComponent().getExposedInterface().add(tmpService);
+        } else {
+            xmlComponent.getExposedInterface().add(tmpService);
+        }
+
     }
+
     /**
      * Rules to parse a sca interface.java tag
      */
     protected void parseInterface_javaTag(String tag, Attributes atts) {
         if (tag.equalsIgnoreCase(SCA_INTERFACE_JAVA_TAG)) {
-            ServiceTag tmpService = null;
+            ExposedInterface tmpService = null;
             if (constructingComponent) {
-                tmpService = xmlComponent.getLastComponent().getLastService();
+                tmpService = xmlComponent.getLastComponent().getLastExposedInterface();
             } else {
                 System.err.println("tag interface.java shouldn't be used in composite context");
-                tmpService = xmlComponent.getLastService();
+                tmpService = xmlComponent.getLastExposedInterface();
             }
             if (constructingService) {
                 tmpService.setImplementation(atts.getValue(SCA_INTERFACE_ATTRIBUTE_OF_INTERFACE_JAVA_TAG));
@@ -208,24 +212,36 @@ public class SCAXMLConverterHandler extends DefaultHandler {
             }
         }
     }
+
     /**
      * Rules to parse a sca Reference tag
      */
     protected void parseReferenceTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("reference")) {
-            System.err.println("tag reference's parsing procedure is not implemented yet!");
+        if (tag.equalsIgnoreCase(SCA_REFERENCE_TAG)) {
+            parseExposedInterface(tag, atts, "client");
         }
     }
-    
+
+    /**
+     * Rules to parse a sca Service tag
+     */
+    protected void parseServiceTag(String tag, Attributes atts) {
+        if (tag.equalsIgnoreCase(SCA_SERVICE_TAG)) {
+            parseExposedInterface(tag, atts, "server");
+        }
+    }
+
     /**
      * Rules to parse a sca Wired tag
      */
     protected void parseWiredTag(String tag, Attributes atts) {
-        if (tag.equalsIgnoreCase("wired")) {
-            System.err.println("tag reference's parsing procedure is not implemented yet!");
+        if (tag.equalsIgnoreCase(SCA_WIRE_TAG)) {
+            WireTag wireTag = new WireTag(atts.getValue(SCA_SOURCE_ATTRIBUTE_OF_WIRE_TAG),
+                    atts.getValue(SCA_TARGET_ATTRIBUTE_OF_WIRE_TAG));
+            xmlComponent.wires.add(wireTag);
         }
     }
-    
+
     /**
      * Rules to parse a sca Property tag
      */
@@ -245,6 +261,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
         parseComponentTag(tag, atts);
         parseImplementation_javaTag(tag, atts);
         parseServiceTag(tag, atts);
+        parseReferenceTag(tag, atts);
         parseInterface_javaTag(tag, atts);
         parseReferenceTag(tag, atts);
         parseWiredTag(tag, atts);
@@ -261,21 +278,26 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     //SCA tags name and their attributes name constants
     public static final String SCA_COMPOSITE_TAG = "composite";
     public static final String SCA_NAME_ATTRIBUTE_OF_COMPOSITE_TAG = "name";
-    
+    /**************************************************************************/
     public static final String SCA_COMPONENT_TAG = "component";
     public static final String SCA_NAME_ATTRIBUTE_OF_COMPONENT_TAG = "name";
-    
+    /**************************************************************************/
     public static final String SCA_IMPLEMENTATION_JAVA_TAG = "implementation.java";
     public static final String SCA_CLASS_ATTRIBUTE_OF_IMPLEMENTATION_JAVA_TAG = "class";
-    
+    /**************************************************************************/
     public static final String SCA_SERVICE_TAG = "service";
-    public static final String SCA_NAME_ATTRIBUTE_OF_SERVICE_TAG = "name";
-    public static final String SCA_PROMOTE_ATTRIBUTE_OF_SERVICE_TAG = "promote";
-    public static final String SCA_REQUIRES_ATTRIBUTE_OF_SERVICE_TAG = "requires";
-    
+    public static final String SCA_REFERENCE_TAG = "reference";
+    public static final String SCA_NAME_ATTRIBUTE_OF_EXPOSED_INTERFACE = "name";
+    public static final String SCA_PROMOTE_ATTRIBUTE_OF_EXPOSED_INTERFACE = "promote";
+    public static final String SCA_REQUIRES_ATTRIBUTE_OF_EXPOSED_INTERFACE = "requires";
+    /**************************************************************************/
     public static final String SCA_INTERFACE_JAVA_TAG = "interface.java";
     public static final String SCA_INTERFACE_ATTRIBUTE_OF_INTERFACE_JAVA_TAG = "interface";
-    
+    /**************************************************************************/
     public static final String SCA_PROPERTY_TAG = "property";
     public static final String SCA_NAME_ATTRIBUTE_OF_PROPERTY_TAG = "name";
+    /**************************************************************************/
+    public static final String SCA_WIRE_TAG = "wire";
+    public static final String SCA_SOURCE_ATTRIBUTE_OF_WIRE_TAG = "source";
+    public static final String SCA_TARGET_ATTRIBUTE_OF_WIRE_TAG = "target";
 }

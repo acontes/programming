@@ -79,12 +79,18 @@ public class SCAXMLLoader extends XMLLoader {
      * Get the properties values in the the SCA composite file 
      */
     public List<String[]> getPropertiesValues() {
+        if(scaXMLConverter == null ){ // if it's not a sca composite file
+            return null;
+        }
         return scaXMLConverter.getXmlComponent().getProperties();
     }
     /**
      * Get the intents values in the the SCA composite file 
      */
     public List<String[]> getIntents(){
+         if(scaXMLConverter == null ){ // if it's not a sca composite file
+            return null;
+        }
         return scaXMLConverter.getXmlComponent().getIntents();
     }
     

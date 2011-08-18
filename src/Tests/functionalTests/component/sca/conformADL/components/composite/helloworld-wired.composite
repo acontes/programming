@@ -1,0 +1,14 @@
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.composite.helloworld-wired">
+  <service name="r" promote="client/Runnable"/>
+  
+  <component name="client">
+    <implementation.java class="functionalTests.component.sca.conformADL.components.composite.Client"/>
+  </component>
+  
+  <component name="server">
+    <implementation.java class="functionalTests.component.sca.conformADL.components.composite.Server"/>
+  </component>
+  
+  <wire source="client/s" target="server/PrintService"/>
+  
+</composite>

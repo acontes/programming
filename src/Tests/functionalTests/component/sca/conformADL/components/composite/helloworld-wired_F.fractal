@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?> 
+<!DOCTYPE definition PUBLIC "-//objectweb.org//DTD Fractal ADL 2.0//EN" "classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd">
+
+<definition name="functionalTests.component.sca.conformADL.components.composite.helloworld-wired">
+    <interface name="r" role="server" signature="java.lang.Runnable"/>
+
+    <component name="client">
+        <interface name="r" role="server" signature="java.lang.Runnable"/>
+        <interface name="s" role="client" signature="functionalTests.component.sca.conformADL.components.composite.PrintService"/>
+        <content class="functionalTests.component.sca.conformADL.components.composite.Client"/>
+        <controller desc="primitive"/>
+    </component>
+
+    <component name="server">
+        <interface name="s" role="server" signature="functionalTests.component.sca.conformADL.components.composite.PrintService"/>
+        <content class="functionalTests.component.sca.conformADL.components.composite.Server"/>
+        <controller desc="primitive"/>
+    </component>
+
+    <binding client="this.r" server="client.r"/>
+    <binding client="client.s" server="server.s"/>
+    <controller desc="composite"/>
+</definition>
