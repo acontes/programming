@@ -1,0 +1,21 @@
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_intents">
+  <service name="r" promote="client/r"/>
+  
+  <component name="client">
+    <service name="r" requires="functionalTests/component/sca/conformADL/components/testIntent">
+      <interface.java interface="java.lang.Runnable"/>
+    </service>
+    <implementation.java class="functionalTests.component.sca.conformADL.components.composite.Client"/>
+  </component>
+  
+  <component name="server">
+    <service name="PrintService" requires="functionalTests/component/sca/conformADL/components/testIntent">
+      <interface.java interface="functionalTests.component.sca.conformADL.components.composite.PrintService"/>
+    </service>
+    <property name="header"> == </property>
+    <implementation.java class="functionalTests.component.sca.conformADL.components.composite.ServerWithProperties"/>
+  </component>
+  
+  <wire source="client/s" target="server/PrintService"/>
+  
+</composite>

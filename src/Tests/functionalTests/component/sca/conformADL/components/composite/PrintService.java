@@ -38,6 +38,7 @@ package functionalTests.component.sca.conformADL.components.composite;
 
 import org.osoa.sca.annotations.Service;
 
+
 /**
  * A basic service used to print messages. 
  */

@@ -39,154 +39,43 @@ package org.objectweb.proactive.extensions.sca.adl.implementations;
 import org.objectweb.proactive.core.component.adl.implementations.*;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.objectweb.fractal.adl.ADLException;
 import org.objectweb.fractal.api.Component;
-import org.objectweb.fractal.api.control.BindingController;
 import org.objectweb.fractal.api.type.ComponentType;
 import org.objectweb.proactive.core.component.ContentDescription;
 import org.objectweb.proactive.core.component.ControllerDescription; //import org.objectweb.proactive.core.component.Utils;
 import org.objectweb.proactive.extensions.sca.Utils;
-import org.objectweb.proactive.core.component.adl.RegistryManager;
 import org.objectweb.proactive.core.component.adl.nodes.ADLNodeProvider;
 import org.objectweb.proactive.core.component.adl.nodes.VirtualNode;
-import org.objectweb.proactive.core.component.adl.vnexportation.ExportedVirtualNodesList;
-import org.objectweb.proactive.core.component.adl.vnexportation.LinkedVirtualNode;
 import org.objectweb.proactive.core.component.factory.PAGenericFactory;
-import org.objectweb.proactive.core.descriptor.data.ProActiveDescriptor;
-import org.objectweb.proactive.core.util.log.Loggers;
-import org.objectweb.proactive.core.util.log.ProActiveLogger;
-import org.objectweb.proactive.gcmdeployment.GCMApplication;
-import org.objectweb.proactive.gcmdeployment.GCMVirtualNode;
 
 
 /**
  * @author The ProActive Team
  */
-public class SCAPAImplementationBuilderImpl implements PAImplementationBuilder, BindingController {
-    protected static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS_ADL);
-    public final static String REGISTRY_BINDING = "registry";
-    public RegistryManager registry;
-
-    //  --------------------------------------------------------------------------
-    // Implementation of the Implementation Builder and PAImplementationBuilder interfaces
-    // --------------------------------------------------------------------------
-    public Object createComponent(Object arg0, String arg1, String arg2, Object arg3, Object arg4, Object arg5)
-            throws Exception {
-        return null;
-    }
-
-    public Object createComponent(Object type, String name, String definition,
-            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
-            Map<Object, Object> context) throws Exception {
-        ObjectsContainer obj = commonCreation(type, name, definition, contentDesc, adlVN, context);
-        return createFComponent(type, obj, controllerDesc, contentDesc, adlVN, obj.getBootstrapComponent());
-    }
+public class SCAPAImplementationBuilderImpl extends PAImplementationBuilderImpl {
 
     protected ObjectsContainer commonCreation(Object type, String name, String definition,
             ContentDescription contentDesc, VirtualNode adlVN, Map<Object, Object> context) throws Exception {
+        ObjectsContainer res = super.commonCreation(type, name, definition, contentDesc, adlVN, context);
+        SCAObjectsContainer newRes = new SCAObjectsContainer(res.getNodesContainer(), res
+                .getBootstrapComponent());
         Component bootstrap = null;
-        ObjectsContainer result = null;
-
         if (context != null) {
-            bootstrap = (Component) context.get("bootstrap");
+            newRes.bootstrap = (Component) context.get("bootstrap");
         }
         if (bootstrap == null) {
-            bootstrap = Utils.getBootstrapComponent();
+            newRes.bootstrap = Utils.getBootstrapComponent();
         }
+        return newRes;
 
-        if ((adlVN != null) && (context != null)) {
-            // consider exported virtual nodes
-            LinkedVirtualNode exported = ExportedVirtualNodesList.instance().getNode(name, adlVN.getName(),
-                    false);
-            if (exported != null) {
-                adlVN.setName(exported.getExportedVirtualNodeNameAfterComposition());
-                adlVN.setCardinality(exported.isMultiple() ? VirtualNode.MULTIPLE : VirtualNode.SINGLE);
-            } else {
-                // 	TODO add self exported virtual node ?
-                // for the moment, just add a leaf to the linked vns
-                ExportedVirtualNodesList.instance().addLeafVirtualNode(name, adlVN.getName(),
-                        adlVN.getCardinality()); // TODO check this
-            }
-
-            Object deploymentDescriptor = context.get("deployment-descriptor");
-            if (deploymentDescriptor != null) {
-                if (deploymentDescriptor instanceof GCMApplication) {
-                    //
-                    // New deployment
-                    //
-                    GCMApplication gcmApplication = (GCMApplication) deploymentDescriptor;
-                    GCMVirtualNode gcmVn = gcmApplication.getVirtualNode(adlVN.getName());
-                    result = new ObjectsContainer(gcmVn, bootstrap);
-                } else if (deploymentDescriptor instanceof ProActiveDescriptor) {
-                    //
-                    // Old deployment
-                    //
-                    org.objectweb.proactive.core.descriptor.data.VirtualNodeInternal deploymentVN = null;
-                    ProActiveDescriptor proactiveDecriptor = (ProActiveDescriptor) deploymentDescriptor;
-                    org.objectweb.proactive.core.descriptor.data.VirtualNode vn = proactiveDecriptor
-                            .getVirtualNode(adlVN.getName());
-                    if (vn != null) {
-                        deploymentVN = vn.getVirtualNodeInternal();
-                    }
-                    if (deploymentVN == null) {
-                        if (adlVN.getName().equals("null")) {
-                            logger
-                                    .info(name +
-                                        " will be instantiated in the current virtual machine (\"null\" was specified as the virtual node name)");
-                        } else {
-                            throw new ADLException(PAImplementationErrors.VIRTUAL_NODE_NOT_FOUND, adlVN
-                                    .getName());
-                        }
-                    }
-                    result = new ObjectsContainer(deploymentVN, bootstrap);
-                }
-            } else {
-                GCMVirtualNode gcmVn = (GCMVirtualNode) context.get(adlVN.getName());
-                if (gcmVn != null) {
-                    result = new ObjectsContainer(gcmVn, bootstrap);
-                } else {
-                    logger
-                            .info(name +
-                                " specifies a virtual node name but neither a deployment descriptor nor the GCM virtual node has been set in the context");
-                }
-            }
-        }
-        if (result == null) { // (adlVN == null) || ((deploymentDescriptor == null) && (gcmVN == null))
-            if (context != null) {
-                result = new ObjectsContainer(context.get(ADLNodeProvider.NODES_ID), bootstrap);
-            } else {
-                result = new ObjectsContainer(null, bootstrap);
-            }
-        }
-
-        return result;
     }
 
-    private Component createFComponent(Object type, ObjectsContainer objectContainer,
-            ControllerDescription controllerDesc, ContentDescription contentDesc, VirtualNode adlVN,
-            Component bootstrap) throws Exception {
-        Component result = objectContainer.createFComponent((ComponentType) type, controllerDesc,
-                contentDesc, adlVN);
-        //        registry.addComponent(result);
-        return result;
-    }
-
-    protected class ObjectsContainer {
+    protected class SCAObjectsContainer extends PAImplementationBuilderImpl.ObjectsContainer {
         private Object nodesContainer;
         protected Component bootstrap;
 
-        public ObjectsContainer(Object nodesProvider, Component bootstrap) {
-            this.nodesContainer = nodesProvider;
-            this.bootstrap = bootstrap;
-        }
-
-        public Object getNodesContainer() {
-            return nodesContainer;
-        }
-
-        public Component getBootstrapComponent() {
-            return bootstrap;
+        public SCAObjectsContainer(Object nodesProvider, Component bootstrap) {
+            super(nodesProvider, bootstrap);
         }
 
         public Component createFComponent(ComponentType type, ControllerDescription controllerDesc,
@@ -197,30 +86,6 @@ public class SCAPAImplementationBuilderImpl implements PAImplementationBuilder, 
             return result;
         }
     }
-
     // --------------------------------------------------------------------------
-    // Implementation of the BindingController interface
-    // --------------------------------------------------------------------------
-    public String[] listFc() {
-        return new String[] { REGISTRY_BINDING };
-    }
 
-    public Object lookupFc(final String itf) {
-        if (itf.equals(REGISTRY_BINDING)) {
-            return registry;
-        }
-        return null;
-    }
-
-    public void bindFc(final String itf, final Object value) {
-        if (itf.equals(REGISTRY_BINDING)) {
-            registry = (RegistryManager) value;
-        }
-    }
-
-    public void unbindFc(final String itf) {
-        if (itf.equals(REGISTRY_BINDING)) {
-            registry = null;
-        }
-    }
 }

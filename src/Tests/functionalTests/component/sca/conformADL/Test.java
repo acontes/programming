@@ -42,12 +42,13 @@ import java.net.URL;
 import org.objectweb.fractal.adl.util.ClassLoaderHelper;
 import org.objectweb.proactive.extensions.sca.adl.xml.SCAXMLConverter;
 
+
 public class Test {
 
     public void test() throws IOException {
         ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
         //String name = "functionalTests.component.sca.conformADL.components.availability-test";
-        String name = "functionalTests.component.sca.conformADL.components.composite.helloworld-wired";
+        String name = "functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_intents";
         //String name = "functionalTests.component.sca.conformADL.helloworld-property";
         final String file = name.replace('.', '/') + ".composite";
         System.err.println("DEBUGGG============" + file);
@@ -61,6 +62,6 @@ public class Test {
     public static void main(String[] args) throws Exception {
 
         new Test().test();
-        
+
     }
 }

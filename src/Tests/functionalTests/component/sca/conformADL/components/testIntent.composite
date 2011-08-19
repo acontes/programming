@@ -1,4 +1,4 @@
-<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="availability">
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="testIntent">
   <service name="intent" promote="availabilityComponent/IntentHandler"/>
   <component name="availabilityComponent">
     <implementation.java class="functionalTests.component.sca.control.components.IntentHandlerTest"/>

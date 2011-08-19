@@ -50,18 +50,17 @@ import org.objectweb.fractal.adl.Factory;
 import org.objectweb.fractal.api.Component;
 
 import functionalTests.component.sca.SCAComponentTest;
-import functionalTests.component.sca.conformADL.components.Action;
 
 
 /**
  *
  * @author mug
  */
-public class TestPrimitiveSCAComponent extends SCAComponentTest {
+public class TestCompositeSCAComponentWithProperties extends SCAComponentTest {
 
     Component dummy;
 
-    public TestPrimitiveSCAComponent() {
+    public TestCompositeSCAComponentWithProperties() {
         super("Configuration with ADL arguments and AttributeController",
                 "Configuration with ADL arguments and AttributeController");
     }
@@ -75,13 +74,16 @@ public class TestPrimitiveSCAComponent extends SCAComponentTest {
     @SuppressWarnings("unchecked")
     public void action() throws Exception {
         Factory f = org.objectweb.proactive.extensions.sca.adl.FactoryFactory.getFactory();
+        //Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         context.put("message", "hello world");
-        dummy = (Component) f.newComponent(
-                "functionalTests.component.sca.conformADL.components.helloworld-primitive", context);
+        dummy = (Component) f
+                .newComponent(
+                        "functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_properties",
+                        context);
         GCM.getGCMLifeCycleController(dummy).startFc();
-        Assert.assertEquals("This component is storing the info : null", ((Action) dummy
-                .getFcInterface("Service")).doSomething());
+        ((Runnable) dummy.getFcInterface("r")).run();
+        //Assert.assertEquals("This component is storing the info : hello world", );
     }
 
 }

@@ -78,8 +78,8 @@ public class TestCompositeSCAComponent extends SCAComponentTest {
         //Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         context.put("message", "hello world");
-        dummy = (Component) f.newComponent("functionalTests.component.sca.conformADL.components.composite.helloworld-wired",
-                context);
+        dummy = (Component) f.newComponent(
+                "functionalTests.component.sca.conformADL.components.composite.helloworld-wired", context);
         GCM.getGCMLifeCycleController(dummy).startFc();
         ((Runnable) dummy.getFcInterface("r")).run();
         //Assert.assertEquals("This component is storing the info : hello world", );

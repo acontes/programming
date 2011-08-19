@@ -57,6 +57,7 @@ import org.objectweb.fractal.adl.xml.XMLErrors;
 import org.objectweb.fractal.adl.xml.XMLParser;
 import org.xml.sax.SAXParseException;
 
+
 /**
  * The custom XML loader , the class override load method of XMLLoader
  * @author mug
@@ -65,9 +66,9 @@ public class SCAXMLLoader extends XMLLoader {
 
     private boolean validate = true;
     private Parser parser;
-    
+
     public SCAXMLConverter scaXMLConverter;
-  
+
     public SCAXMLLoader() {
         super();
     }
@@ -75,25 +76,27 @@ public class SCAXMLLoader extends XMLLoader {
     public SCAXMLLoader(final boolean validate) {
         super(validate);
     }
+
     /**
      * Get the properties values in the the SCA composite file 
      */
     public List<String[]> getPropertiesValues() {
-        if(scaXMLConverter == null ){ // if it's not a sca composite file
+        if (scaXMLConverter == null) { // if it's not a sca composite file
             return null;
         }
         return scaXMLConverter.getXmlComponent().getProperties();
     }
+
     /**
      * Get the intents values in the the SCA composite file 
      */
-    public List<String[]> getIntents(){
-         if(scaXMLConverter == null ){ // if it's not a sca composite file
+    public List<String[]> getIntents() {
+        if (scaXMLConverter == null) { // if it's not a sca composite file
             return null;
         }
         return scaXMLConverter.getXmlComponent().getIntents();
     }
-    
+
     // --------------------------------------------------------------------------
     // RE - Implementation of the Loader interface
     // --------------------------------------------------------------------------
@@ -114,7 +117,8 @@ public class SCAXMLLoader extends XMLLoader {
         InputStream inStream = null;
         try {
             if (url == null) {
-                System.out.println(new ADLException(ADLErrors.ADL_NOT_FOUND, file) + "\ngoing to look for "+fileSca);
+                System.out.println(new ADLException(ADLErrors.ADL_NOT_FOUND, file) + "\ngoing to look for " +
+                    fileSca);
                 url = cl.getResource(fileSca);
                 if (url == null) {
                     throw new ADLException(ADLErrors.ADL_NOT_FOUND, file);

@@ -45,10 +45,11 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+
 public class IntentFileHandler extends DefaultHandler {
 
-    protected  String name;
-    protected  String implementedClass;
+    protected String name;
+    protected String implementedClass;
 
     public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributs)
             throws SAXException {

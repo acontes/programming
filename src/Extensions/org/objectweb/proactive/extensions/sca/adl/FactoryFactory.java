@@ -68,14 +68,14 @@ public class FactoryFactory {
         context.put(org.objectweb.fractal.adl.FactoryFactory.BACKEND_PROPERTY_NAME, backend);
         Map c = (Map) f.newComponent(factory, context);
         BasicFactory bf = (BasicFactory) c.get("factory");
-        
+
         SCABasicFactory scaBf = new SCABasicFactory(); //create new scaBf
         //get all old binding
         UnboundInterfaceDetectorLoader uidl = (UnboundInterfaceDetectorLoader) bf
-                .lookupFc(BasicFactory.LOADER_BINDING); 
+                .lookupFc(BasicFactory.LOADER_BINDING);
         ComponentCompiler allc = (ComponentCompiler) bf.lookupFc(BasicFactory.COMPILER_BINDING);
         BasicScheduler s = (BasicScheduler) bf.lookupFc(BasicFactory.SCHEDULER_BINDING);
-        
+
         bf.unbindFc(BasicFactory.LOADER_BINDING);
         TypeBindingLoader bindl = (TypeBindingLoader) uidl.clientLoader;
         ImplementationLoader impll = (ImplementationLoader) bindl.clientLoader;
@@ -91,13 +91,13 @@ public class FactoryFactory {
         scaxmll.nodeFactoryItf = nFac;
         argl.clientLoader = scaxmll;
         bf.bindFc(BasicFactory.LOADER_BINDING, uidl);
-        
+
         scaBf.bindFc(BasicFactory.LOADER_BINDING, uidl);
         scaBf.bindFc(BasicFactory.COMPILER_BINDING, allc);
         scaBf.bindFc(BasicFactory.SCHEDULER_BINDING, s);
-        
+
         c.put("factory", scaBf);
-        
+
         return scaBf;
     }
 

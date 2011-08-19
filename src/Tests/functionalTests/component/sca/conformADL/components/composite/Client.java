@@ -40,21 +40,20 @@ import org.objectweb.fractal.fraclet.annotations.Requires;
 import org.osoa.sca.annotations.Reference;
 import org.osoa.sca.annotations.Service;
 
+
 /** A print service client. */
 @Service(Runnable.class)
-public class Client
-  implements Runnable
-{
-    
+public class Client implements Runnable {
+
     @Reference(required = true)
     @Requires(name = "s")
     private PrintService s;
-    
+
     /** Default constructor. */
     public Client() {
         System.out.println("CLIENT created.");
     }
-    
+
     /** Run the client. */
     public final void run() {
         s.print("Hello World!");

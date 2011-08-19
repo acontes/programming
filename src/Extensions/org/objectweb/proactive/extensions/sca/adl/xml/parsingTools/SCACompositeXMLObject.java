@@ -41,13 +41,13 @@
  */
 package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 
-import com.sun.servicetag.ServiceTag;
 import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.sound.midi.SysexMessage;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -59,6 +59,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
  * A fractal Object which correspond to SCA xml compisite file
  */
@@ -66,7 +67,7 @@ public class SCACompositeXMLObject {
     // GCMHeader of proactive fractal XML
 
     public final String GCMHEADER = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> \n"
-            + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
+        + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
     protected String compositeName;
     protected List<ExposedInterface> exposedInterfaces;
     protected List<ComponentTag> components;
@@ -109,16 +110,17 @@ public class SCACompositeXMLObject {
                     exposedInterface.setReferenceComponentName(linkedService.getReferenceComponentName());
                 } else {
                     findServiceTagImplementation(linkedComponent.ComponentName, tmp[1], exposedInterface);
-                    linkedComponent.getExposedInterface().add(new ExposedInterface(
-                            exposedInterface.getExposedInterfaceName(), exposedInterface.getRole(),
-                            "", exposedInterface.implementation));
+                    linkedComponent.getExposedInterface().add(
+                            new ExposedInterface(exposedInterface.getExposedInterfaceName(), exposedInterface
+                                    .getRole(), "", exposedInterface.implementation));
                 }
             } else {
-                System.err.println("The service : " + exposedInterface.getExposedInterfaceName() + " can not find correspond subComponent"
-                        + ": " + tmp[0]);
+                System.err.println("The service : " + exposedInterface.getExposedInterfaceName() +
+                    " can not find correspond subComponent" + ": " + tmp[0]);
             }
         }
     }
+
     // revisit service tag out of Wired tag
 
     protected void revisitWireTag() {
@@ -126,14 +128,15 @@ public class SCACompositeXMLObject {
         for (ExposedInterface ExposedInterface : exposedInterfaces) {
             String[] tmp = new String[2];
             tmp[0] = "this." + ExposedInterface.getExposedInterfaceName();
-            tmp[1] = ExposedInterface.getReferenceComponentName() + "." + ExposedInterface.getExposedInterfaceName();
+            tmp[1] = ExposedInterface.getReferenceComponentName() + "." +
+                ExposedInterface.getExposedInterfaceName();
             wired.add(tmp);
         }
         for (WireTag wireTag : wires) {
             String source = wireTag.source;
             String target = wireTag.target;
             boolean serviceTagCompleted = exposedItfCompleted(target, "server");
-            boolean referenceTagCompleted=false;
+            boolean referenceTagCompleted = false;
             if (serviceTagCompleted) {
                 referenceTagCompleted = exposedItfCompleted(source, "client");
                 if (!referenceTagCompleted) {
@@ -145,8 +148,7 @@ public class SCACompositeXMLObject {
                     referenceTagCompleted = true;
                 }
             }
-            if(serviceTagCompleted && referenceTagCompleted)
-            {
+            if (serviceTagCompleted && referenceTagCompleted) {
                 String[] tmp = new String[2];
                 tmp[0] = source.replace("/", ".");
                 tmp[1] = target.replace("/", ".");
@@ -155,7 +157,8 @@ public class SCACompositeXMLObject {
         }
     }
 
-    private void findServiceTagImplementation(String componentName, String serviceName, ExposedInterface exposedInterface) {
+    private void findServiceTagImplementation(String componentName, String serviceName,
+            ExposedInterface exposedInterface) {
         ComponentTag comptag = getComponentByName(componentName);
         try {
             // need to look into content class of component if there's a interface which correspond
@@ -178,8 +181,9 @@ public class SCACompositeXMLObject {
                 exposedInterface.setImplementation(linkedItf.getName());
                 exposedInterface.setReferenceComponentName(componentName);
             } else { // nothing can be found , must be some error in XML
-                System.err.println("Nothing corresponding can't be found with service tag : " + exposedInterface.getExposedInterfaceName() + ""
-                        + "there must be some error with composite XML");
+                System.err.println("Nothing corresponding can't be found with service tag : " +
+                    exposedInterface.getExposedInterfaceName() + "" +
+                    "there must be some error with composite XML");
             }
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(SCACompositeXMLObject.class.getName()).log(Level.SEVERE, null, ex);
@@ -195,7 +199,8 @@ public class SCACompositeXMLObject {
         ComponentTag linkedTargetComponent = getComponentByName(itfSplit[0]);
         if (linkedTargetComponent != null) {
             ExposedInterface linkedService = linkedTargetComponent.getExposedInterfaceByName(itfSplit[1]);
-            if (linkedService == null) {  // create Service or reference
+            if (linkedService == null) { // create Service or reference
+                //System.err.println("DEBIGGG ======= "+sourceOrTarget);
                 ExposedInterface exItf = new ExposedInterface(itfSplit[1], role, "", "");
                 if (role.equals("server")) // look for service annotation in server implementation or implemented itf
                 {
@@ -393,6 +398,7 @@ public class SCACompositeXMLObject {
     public void setWired(List<String[]> wired) {
         this.wired = wired;
     }
+
     //Fractal tag and attribute name Constants
     public static final String FRACTAL_DEFINITION_TAG = "definition";
     public static final String FRACTAL_NAME_ATTRIBUTE_OF_DEFINITION_TAG = "name";

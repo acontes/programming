@@ -42,12 +42,13 @@ import java.util.List;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
  * The Object which correspond to the content of component tag 
  * @author mug
  */
 public class ComponentTag {
-    
+
     protected String ComponentName;
     protected String contentClassName;
     protected List<ExposedInterface> exposedInterfaces;
@@ -57,6 +58,7 @@ public class ComponentTag {
         exposedInterfaces = new ArrayList<ExposedInterface>();
         properties = new ArrayList<String[]>();
     }
+
     /**
      * Get the last ExposedInterface of the list of ExposedInterface
      * @return 
@@ -86,15 +88,13 @@ public class ComponentTag {
         rootEle.appendChild(controller);
         return rootEle;
     }
-    
+
     /**
      * Get the ExposedInterface in the list of ExposedInterfaces with the name 
       */
-    public ExposedInterface getExposedInterfaceByName(String name)
-    {
+    public ExposedInterface getExposedInterfaceByName(String name) {
         for (ExposedInterface ExposedInterface : exposedInterfaces) {
-            if(ExposedInterface.exposedInterfaceName.equals(name))
-            {
+            if (ExposedInterface.exposedInterfaceName.equals(name)) {
                 return ExposedInterface;
             }
         }
@@ -135,15 +135,15 @@ public class ComponentTag {
     public void setExposedInterface(List<ExposedInterface> services) {
         this.exposedInterfaces = services;
     }
-    
+
     //Fractal tag and attribute name Constants
     public static final String FRACTAL_COMPONENT_TAG = "component";
     public static final String FRACTAL_NAME_ATTRIBUTE_OF_COMPONENT_TAG = "name";
-    
+
     public static final String FRACTAL_CONTENT_TAG = "content";
     public static final String CLASS_ATTRIBUTE_OF_CONTENT_TAG = "class";
-    
+
     public static final String FRACTAL_CONTROLLER_TAG = "controller";
     public static final String FRACTAL_DESC_ATTRIBUTE_OF_CONTROLLER_TAG = "desc";
-    
+
 }

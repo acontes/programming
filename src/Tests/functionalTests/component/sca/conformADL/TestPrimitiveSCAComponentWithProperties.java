@@ -34,7 +34,6 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -57,11 +56,11 @@ import functionalTests.component.sca.conformADL.components.Action;
  *
  * @author mug
  */
-public class TestPrimitiveSCAComponent extends SCAComponentTest {
+public class TestPrimitiveSCAComponentWithProperties extends SCAComponentTest {
 
     Component dummy;
 
-    public TestPrimitiveSCAComponent() {
+    public TestPrimitiveSCAComponentWithProperties() {
         super("Configuration with ADL arguments and AttributeController",
                 "Configuration with ADL arguments and AttributeController");
     }
@@ -78,10 +77,11 @@ public class TestPrimitiveSCAComponent extends SCAComponentTest {
         Map context = new HashMap();
         context.put("message", "hello world");
         dummy = (Component) f.newComponent(
-                "functionalTests.component.sca.conformADL.components.helloworld-primitive", context);
+                "functionalTests.component.sca.conformADL.components.helloworld-primitive_with_properties",
+                context);
         GCM.getGCMLifeCycleController(dummy).startFc();
-        Assert.assertEquals("This component is storing the info : null", ((Action) dummy
+        //System.err.println("the result : " + ((Action) dummy.getFcInterface("Action")).doSomething());
+        Assert.assertEquals("This component is storing the info : hello world", ((Action) dummy
                 .getFcInterface("Service")).doSomething());
     }
-
 }

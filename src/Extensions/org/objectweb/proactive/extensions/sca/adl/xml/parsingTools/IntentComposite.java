@@ -42,13 +42,14 @@
 package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 
 public class IntentComposite {
-    
+
     protected String name;
     protected String applicatedComponentName;
     protected String applicatedServiceName;
     protected String implementation;
 
-    public IntentComposite(String name, String applicatedComponentName, String applicatedServiceName, String implementation) {
+    public IntentComposite(String name, String applicatedComponentName, String applicatedServiceName,
+            String implementation) {
         this.name = name;
         this.applicatedComponentName = applicatedComponentName;
         this.applicatedServiceName = applicatedServiceName;
@@ -57,5 +58,5 @@ public class IntentComposite {
 
     public IntentComposite() {
     }
-    
+
 }

@@ -103,7 +103,7 @@ public class BusinessClassWithAuthentificationGenerator extends AbstractInterfac
                 CtClass privateKeyClass = pool.get(PrivateKey.class.getName());
 
                 CtClass publicKeyClass = pool.get(PublicKey.class.getName());
-                
+
                 CtClass secretKeyClass = pool.get(SecretKey.class.getName());
 
                 CtClass authItf = pool.get(AuthentificationItf.class.getName());
@@ -127,7 +127,7 @@ public class BusinessClassWithAuthentificationGenerator extends AbstractInterfac
                 PrKey.setModifiers(Modifier.PROTECTED);
                 PrKey.getFieldInfo().addAttribute(attributeProperty);
                 classToEdit.addField(PrKey);
-                
+
                 CtField sKey = new CtField(secretKeyClass, "secretKey", classToEdit);
                 sKey.setModifiers(Modifier.PROTECTED);
                 sKey.getFieldInfo().addAttribute(attributeProperty);
@@ -160,31 +160,29 @@ public class BusinessClassWithAuthentificationGenerator extends AbstractInterfac
                         "public java.security.PublicKey getPublicKeyFromServer() {" +
                             getPublicKeyFromServerBody + "}", classToEdit);
                 classToEdit.addMethod(getPublicKeyFromServer);
-                
-                
-//                String sendEncryptedSecretKeyBody = ""
-//                        + "try {"
-//                        + "javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(\"RSA\");"
-//                        + "cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, this.privateKey);"
-//                        + "return cipher.doFinal(secretKey.getEncoded());"
-//                        + "} catch (Exception e) {"
-//                        + "System.out.println(\"Encryption of secret key error\");"
-//                        + "e.printStackTrace();"
-//                        + "return null;"
-//                        + "}";
-//
-//                CtMethod sendEncryptedSecretKey = CtNewMethod.make("public byte[] sendSecretKey() {" +
-//                    sendEncryptedSecretKeyBody + "}", classToEdit);
-//                classToEdit.addMethod(sendEncryptedSecretKey);
-//
-//                String getSecretKeyFromServerBody = "getPublicKeyFromServer();\n"
-//                        + "byte[] encryptedKey = auth.sendEncryptedSecretKey();"
-//                        + "";
-//                CtMethod getSecretKeyFromServer = CtNewMethod.make(
-//                        "public java.security.PublicKey getSecretKeyFromServer() {" +
-//                            getSecretKeyFromServerBody + "}", classToEdit);
-//                classToEdit.addMethod(getSecretKeyFromServer);
 
+                //                String sendEncryptedSecretKeyBody = ""
+                //                        + "try {"
+                //                        + "javax.crypto.Cipher cipher = javax.crypto.Cipher.getInstance(\"RSA\");"
+                //                        + "cipher.init(javax.crypto.Cipher.ENCRYPT_MODE, this.privateKey);"
+                //                        + "return cipher.doFinal(secretKey.getEncoded());"
+                //                        + "} catch (Exception e) {"
+                //                        + "System.out.println(\"Encryption of secret key error\");"
+                //                        + "e.printStackTrace();"
+                //                        + "return null;"
+                //                        + "}";
+                //
+                //                CtMethod sendEncryptedSecretKey = CtNewMethod.make("public byte[] sendSecretKey() {" +
+                //                    sendEncryptedSecretKeyBody + "}", classToEdit);
+                //                classToEdit.addMethod(sendEncryptedSecretKey);
+                //
+                //                String getSecretKeyFromServerBody = "getPublicKeyFromServer();\n"
+                //                        + "byte[] encryptedKey = auth.sendEncryptedSecretKey();"
+                //                        + "";
+                //                CtMethod getSecretKeyFromServer = CtNewMethod.make(
+                //                        "public java.security.PublicKey getSecretKeyFromServer() {" +
+                //                            getSecretKeyFromServerBody + "}", classToEdit);
+                //                classToEdit.addMethod(getSecretKeyFromServer);
 
                 String generateKeyBody = ""
                     + "java.security.Security.addProvider(new com.sun.crypto.provider.SunJCE());"
@@ -193,8 +191,7 @@ public class BusinessClassWithAuthentificationGenerator extends AbstractInterfac
                     + "kpg = java.security.KeyPairGenerator.getInstance(\"RSA\");"
                     + "} catch (java.security.NoSuchAlgorithmException e) {" + "}" + "kpg.initialize(1024);"
                     + "java.security.KeyPair kp = kpg.genKeyPair();" + "publicKey = kp.getPublic();"
-                    + "privateKey = kp.getPrivate();"
-                    + "javax.crypto.KeyGenerator generator;"
+                    + "privateKey = kp.getPrivate();" + "javax.crypto.KeyGenerator generator;"
                     + "generator = javax.crypto.KeyGenerator.getInstance(\"DES\");"
                     + "generator.init(new java.security.SecureRandom());"
                     + "secretKey = generator.generateKey();";
@@ -207,9 +204,9 @@ public class BusinessClassWithAuthentificationGenerator extends AbstractInterfac
                 CtConstructor constructorNoParam = classToEdit.getDeclaredConstructor(null);
                 constructorNoParam.insertAfter("generateKeys();");
 
-                				classToEdit.stopPruning(true);
-                				classToEdit.writeFile("generated/");
-                				System.out.println("[JAVASSIST] generated class: " + generatedClassName);
+                classToEdit.stopPruning(true);
+                classToEdit.writeFile("generated/");
+                System.out.println("[JAVASSIST] generated class: " + generatedClassName);
                 byte[] bytecode = classToEdit.toBytecode();
                 Utils.defineClass(generatedClassName, bytecode);
                 classToEdit.defrost();

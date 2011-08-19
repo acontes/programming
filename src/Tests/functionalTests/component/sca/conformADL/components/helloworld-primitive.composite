@@ -1,9 +1,8 @@
-<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.availability-test">
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.helloworld-primitive">
   <service name="Service" promote="ImplementationComponent/Service"/>
   <component name="ImplementationComponent">
-    <property name="info">hello world</property>
     <implementation.java class="functionalTests.component.sca.conformADL.components.Dummy"/>
-    <service name="Service" requires="functionalTests/component/sca/conformADL/components/availability">
+    <service name="Service">
       <interface.java interface="functionalTests.component.sca.conformADL.components.Action"/>
     </service>
   </component>

@@ -57,9 +57,9 @@ import org.objectweb.proactive.extensions.sca.control.IntentJoinPoint;
  * @author The ProActive Team
  */
 public class EncryptionIntentHandler extends IntentHandler {
-    
-    public final String IntentName = this.getClass().getName(); 
-    
+
+    public final String IntentName = this.getClass().getName();
+
     public static final Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
 
     private Key publicKey;

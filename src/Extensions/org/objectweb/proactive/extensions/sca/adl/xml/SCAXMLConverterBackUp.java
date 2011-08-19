@@ -68,6 +68,7 @@ import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.LocatorImpl;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+
 /**
  *
  * This class define how to convert a SCA composite file into Fractal file
@@ -82,6 +83,7 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
     private boolean constructingService = false;
     private boolean constructingComponent = false;
     private boolean constructingProperty = false;
+
     //private boolean constructingIntent = false;
 
     public SCAXMLConverterBackUp(InputStream in) {
@@ -147,17 +149,17 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
         if (localName.equalsIgnoreCase("service")) {
             constructingService = true;
         }
-//        System.out.println("Open element : " + localName);
-//
-//        if (!"".equals(nameSpaceURI)) { // espace de nommage particulier
-//            System.out.println(" element is from namespace : " + nameSpaceURI);
-//        }
-//
-//        System.out.println("  Attributs of the element : ");
-//
-//        for (int index = 0; index < attributs.getLength(); index++) { // on parcourt la liste des attributs
-//            System.out.println("     - " + attributs.getLocalName(index) + " = " + attributs.getValue(index));
-//        }
+        //        System.out.println("Open element : " + localName);
+        //
+        //        if (!"".equals(nameSpaceURI)) { // espace de nommage particulier
+        //            System.out.println(" element is from namespace : " + nameSpaceURI);
+        //        }
+        //
+        //        System.out.println("  Attributs of the element : ");
+        //
+        //        for (int index = 0; index < attributs.getLength(); index++) { // on parcourt la liste des attributs
+        //            System.out.println("     - " + attributs.getLocalName(index) + " = " + attributs.getValue(index));
+        //        }
         analyseTagsAndAtrributes(localName, attributs);
 
     }
@@ -226,7 +228,7 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
                 }
             } else {
                 if (requires != null) {
-                    
+
                     String requiresName = requires.replace('.', '/') + ".composite";
 
                     ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
@@ -235,11 +237,12 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
                     byte[] bytes = new byte[4000];
                     try {
                         url.openStream().read(bytes);
-                        XMLReader intentReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
+                        XMLReader intentReader = XMLReaderFactory
+                                .createXMLReader("org.apache.xerces.parsers.SAXParser");
                         intentFileHandler tmp = new intentFileHandler();
                         intentReader.setContentHandler(tmp);
                         intentReader.parse(new InputSource(url.openStream()));
-                        
+
                         System.err.println(tmp.implementedClass.toUpperCase());
 
                     } catch (Exception ex) {
@@ -296,9 +299,9 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
         if (tag.equalsIgnoreCase("property")) {
             if (constructingComponent) {
                 constructingProperty = true;
-//                            System.err.println("not implemented yet!");
-//                            //xmlComponent.attributes.put(atts.getValue("name"), currentPCDATA);
-//                            System.err.println(atts.getValue("name") +  currentPCDATA);
+                //                            System.err.println("not implemented yet!");
+                //                            //xmlComponent.attributes.put(atts.getValue("name"), currentPCDATA);
+                //                            System.err.println(atts.getValue("name") +  currentPCDATA);
                 currentPropertyName = atts.getValue("name");
                 return;
             } else {
@@ -325,7 +328,7 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
 
         protected String name;
         public final String GCMHeader = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?> \n"
-                + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
+            + "<!DOCTYPE definition PUBLIC \"-//objectweb.org//DTD Fractal ADL 2.0//EN\" \"classpath://org/objectweb/proactive/core/component/adl/xml/proactive.dtd\">\n";
         private Document outPutdocument;
         protected List<Service> services;
         protected List<Component> components;
@@ -392,8 +395,8 @@ public class SCAXMLConverterBackUp extends DefaultHandler {
             String tmp = "name of component: " + name;
             tmp += "\ncontentClassName: " + contentClassName;
             for (String[] strings : interfaceNamesAndRoles) {
-                tmp += "\ninterface signature: " + strings[0] + "\ninterface role: " + strings[1]
-                        + "\ninterface name: " + strings[2];
+                tmp += "\ninterface signature: " + strings[0] + "\ninterface role: " + strings[1] +
+                    "\ninterface name: " + strings[2];
             }
             return tmp;
         }

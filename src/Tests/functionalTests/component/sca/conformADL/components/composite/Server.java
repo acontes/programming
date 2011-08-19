@@ -36,29 +36,18 @@
  */
 package functionalTests.component.sca.conformADL.components.composite;
 
-import org.osoa.sca.annotations.Property;
-
 /** The print service implementation. */
-public class Server
-  implements PrintService
-{    
-    @Property
-    private String header = "->";
-    
-    private int count = 1;
-    
+public class Server implements PrintService {
+
     /** Default constructor. */
     public Server() {
         System.out.println("SERVER created.");
     }
-    
+
     /** PrintService implementation. */
     public final void print(final String msg) {
         System.out.println("SERVER: begin printing...");
-        for (int i = 0; i < count; ++i) {
-            System.out.println(header + msg);
-        }
+        System.out.println(msg);
         System.out.println("SERVER: print done.");
     }
-
 }

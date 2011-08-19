@@ -36,7 +36,6 @@
  */
 package org.objectweb.proactive.extensions.sca.adl;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -53,8 +52,6 @@ import org.objectweb.fractal.adl.bindings.UnboundInterfaceDetectorLoader;
 import org.objectweb.fractal.adl.implementations.ImplementationLoader;
 import org.objectweb.fractal.adl.interfaces.InterfaceLoader;
 import org.objectweb.fractal.adl.types.TypeLoader;
-import org.objectweb.fractal.adl.xml.XMLLoader;
-import org.objectweb.fractal.adl.xml.XMLNodeFactory;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
 import org.objectweb.proactive.core.component.control.PAContentController;
@@ -64,6 +61,7 @@ import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
 import org.objectweb.proactive.extensions.sca.control.SCAPropertyController;
 import org.objectweb.proactive.extensions.sca.exceptions.IncompatiblePropertyTypeException;
 import org.objectweb.proactive.extensions.sca.exceptions.NoSuchPropertyException;
+
 
 /**
  *
@@ -113,7 +111,8 @@ public class SCABasicFactory extends BasicFactory {
     private Component getSubComponentByName(Component comp, String name) {
         Component subComp = null;
         try {
-            PAContentController conttr = org.objectweb.proactive.core.component.Utils.getPAContentController(comp);
+            PAContentController conttr = org.objectweb.proactive.core.component.Utils
+                    .getPAContentController(comp);
             Component[] subComps = conttr.getFcSubComponents();
 
             for (Component component : subComps) {
@@ -139,10 +138,12 @@ public class SCABasicFactory extends BasicFactory {
                 for (String[] strings : properties) {
                     Component subComp = getSubComponentByName(comp, strings[0]);
                     if (subComp != null) {
-                        SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils.getSCAPropertyController(subComp);
+                        SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils
+                                .getSCAPropertyController(subComp);
                         scapcClient.setValue(strings[1], strings[2]);
                     } else {
-                        System.err.println("problem on initialize property, sub-component :" + strings[0] + " doesn't exist!");
+                        System.err.println("problem on initialize property, sub-component :" + strings[0] +
+                            " doesn't exist!");
                     }
 
                 }
@@ -166,7 +167,8 @@ public class SCABasicFactory extends BasicFactory {
                 for (String[] strings : intents) {
                     Component subComp = getSubComponentByName(comp, strings[0]);
                     if (subComp != null) {
-                        SCAIntentController scaIntCtr = org.objectweb.proactive.extensions.sca.Utils.getSCAIntentController(subComp);
+                        SCAIntentController scaIntCtr = org.objectweb.proactive.extensions.sca.Utils
+                                .getSCAIntentController(subComp);
                         try {
                             Class contentClass = Class.forName(strings[2]);
                             IntentHandler ih = (IntentHandler) contentClass.newInstance();
@@ -181,7 +183,8 @@ public class SCABasicFactory extends BasicFactory {
                             Logger.getLogger(SCABasicFactory.class.getName()).log(Level.SEVERE, null, e);
                         }
                     } else {
-                        System.err.println("problem on initialize intents, sub-component :" + strings[0] + " doesn't exist!");
+                        System.err.println("problem on initialize intents, sub-component :" + strings[0] +
+                            " doesn't exist!");
                     }
                 }
             } catch (NoSuchInterfaceException ex) {
@@ -193,8 +196,7 @@ public class SCABasicFactory extends BasicFactory {
     // Suppress unchecked warning to avoid to change Factory interface
     @SuppressWarnings("unchecked")
     @Override
-    public Object newComponent(final String name, final Map context)
-            throws ADLException {
+    public Object newComponent(final String name, final Map context) throws ADLException {
         //System.err.println("use the right factory");
         Component comp = (Component) super.newComponent(name, context);
         addPropertiesIntoComponent(comp);

@@ -44,12 +44,13 @@ package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+
 /**
  * The Object which correspond to the content of Service tag 
  * @author mug
  */
 public class ExposedInterface {
-    
+
     protected String exposedInterfaceName;
     protected String role;
     protected String softLink;
@@ -78,7 +79,7 @@ public class ExposedInterface {
     /*******************************************************************************
      *          Generated getters and setters
      *******************************************************************************/
-    
+
     public String getImplementation() {
         return implementation;
     }
@@ -118,11 +119,11 @@ public class ExposedInterface {
     public void setReferenceComponentName(String referenceComponentName) {
         this.referenceComponentName = referenceComponentName;
     }
-    
-     //Fractal tag and attribute name Constants
+
+    //Fractal tag and attribute name Constants
     public static final String FRACTAL_INTERFACE_TAG = "interface";
     public static final String FRACTAL_SIGNATURE_ATTRIBUTE_OF_INTERFACE_TAG = "signature";
     public static final String FRACTAL_ROLE_ATTRIBUTE_OF_INTERFACE_TAG = "role";
     public static final String FRACTAL_NAME_ATTRIBUTE_OF_INTERFACE_TAG = "name";
-    
+
 }

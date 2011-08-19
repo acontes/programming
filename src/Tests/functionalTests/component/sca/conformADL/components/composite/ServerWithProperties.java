@@ -34,22 +34,30 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
-package org.objectweb.proactive.examples.components.sca.securityintent.components;
+package functionalTests.component.sca.conformADL.components.composite;
 
-import org.oasisopen.sca.annotation.Confidentiality;
-import org.oasisopen.sca.annotation.Intent;
-import org.objectweb.fractal.fraclet.annotations.Requires;
-import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.EncryptionIntentHandler;
-import org.osoa.sca.annotations.Authentication;
+import org.osoa.sca.annotations.Property;
 
 
-@Authentication
-public class CClient implements TestIntentItf {
-    @Requires(name = TestIntentItf.CLIENT_ITF_NAME)
-    protected TestIntentItf testIntentItf;
+/** The print service implementation. */
+public class ServerWithProperties implements PrintService {
+    @Property
+    private String header = "->";
 
-    public byte[] dataTreatment(byte[] data) {
+    private int count = 1;
 
-        return testIntentItf.dataTreatment(data);
+    /** Default constructor. */
+    public ServerWithProperties() {
+        System.out.println("SERVER created.");
     }
+
+    /** PrintService implementation. */
+    public final void print(final String msg) {
+        System.err.println("SERVER: begin printing...");
+        for (int i = 0; i < count; ++i) {
+            System.err.println(header + msg);
+        }
+        System.err.println("SERVER: print done.");
+    }
+
 }

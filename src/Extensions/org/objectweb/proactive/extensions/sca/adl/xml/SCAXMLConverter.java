@@ -47,6 +47,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.XMLReaderFactory;
 
+
 /**
  *
  * This class define how to convert a SCA composite file into Fractal file
@@ -87,5 +88,5 @@ public class SCAXMLConverter {
 
     public void setXmlComponent(SCACompositeXMLObject xmlComponent) {
         this.xmlComponent = xmlComponent;
-    }   
+    }
 }

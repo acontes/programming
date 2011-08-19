@@ -25,7 +25,7 @@ public interface AuthentificationItf {
      * @return
      */
     public PublicKey getPublicKeyFromServer();
-    
+
     /**
      * return the secret key of the client component, as a service
      * @return

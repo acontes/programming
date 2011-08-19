@@ -1,0 +1,9 @@
+<composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.helloworld-primitive_with_properties">
+  <service name="Action" promote="ImplementationComponent/Action"/>
+
+  <component name="ImplementationComponent">
+    <property name="info">hello world</property>
+    <implementation.java class="functionalTests.component.sca.conformADL.components.Dummy"/>
+  </component>
+
+</composite>
