@@ -48,7 +48,6 @@ import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.helpers.XMLReaderFactory;
 
-
 /**
  *
  * This class define how to convert a SCA composite file into Fractal file
@@ -108,7 +107,11 @@ public class SCAXMLConverterHandler extends DefaultHandler {
      */
     @Override
     public void endDocument() {
-        xmlComponent.revisitConstructedObject();
+        try {
+            xmlComponent.revisitConstructedObject();
+        } catch (SCAXMLException ex) {
+            Logger.getLogger(SCAXMLConverterHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -151,7 +154,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
                         atts.getValue(SCA_CLASS_ATTRIBUTE_OF_IMPLEMENTATION_JAVA_TAG));
             } else {
                 throw new SCAXMLException(
-                    "tag implementation.java can't be parsed outside component tag context");
+                        "tag implementation.java can't be parsed outside component tag context");
                 //System.err.println("tag implementation.java can't be parsed outside component tag context");
             }
         }
@@ -172,7 +175,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
                 tmpService.setSoftLink(promote);
             } else {
                 throw new SCAXMLException(
-                    "attribute promote can't be parsed inside component's service tag context");
+                        "attribute promote can't be parsed inside component's service tag context");
             }
         }
         if (requires != null) {
@@ -180,14 +183,12 @@ public class SCAXMLConverterHandler extends DefaultHandler {
             ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
             final URL url = cl.getResource(requiresName);
             try {
-                XMLReader intentReader = XMLReaderFactory
-                        .createXMLReader("org.apache.xerces.parsers.SAXParser");
+                XMLReader intentReader = XMLReaderFactory.createXMLReader("org.apache.xerces.parsers.SAXParser");
                 IntentFileHandler tmp = new IntentFileHandler();
                 intentReader.setContentHandler(tmp);
                 intentReader.parse(new InputSource(url.openStream()));
                 String implementedClass = tmp.implementedClass;
-                IntentComposite intComp = new IntentComposite(tmp.name, xmlComponent.getLastComponent()
-                        .getComponentName(), serviceName, implementedClass);
+                IntentComposite intComp = new IntentComposite(tmp.name, xmlComponent.getLastComponent().getComponentName(), serviceName, implementedClass);
                 xmlComponent.intents.add(intComp);
             } catch (Exception ex) {
                 Logger.getLogger(SCAXMLConverterHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -245,8 +246,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
      */
     protected void parseWiredTag(String tag, Attributes atts) {
         if (tag.equalsIgnoreCase(SCA_WIRE_TAG)) {
-            WireTag wireTag = new WireTag(atts.getValue(SCA_SOURCE_ATTRIBUTE_OF_WIRE_TAG), atts
-                    .getValue(SCA_TARGET_ATTRIBUTE_OF_WIRE_TAG));
+            WireTag wireTag = new WireTag(atts.getValue(SCA_SOURCE_ATTRIBUTE_OF_WIRE_TAG), atts.getValue(SCA_TARGET_ATTRIBUTE_OF_WIRE_TAG));
             xmlComponent.wires.add(wireTag);
         }
     }
@@ -284,7 +284,6 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     public void setXmlComponent(SCACompositeXMLObject xmlComponent) {
         this.xmlComponent = xmlComponent;
     }
-
     //SCA tags name and their attributes name constants
     public static final String SCA_COMPOSITE_TAG = "composite";
     public static final String SCA_NAME_ATTRIBUTE_OF_COMPOSITE_TAG = "name";
