@@ -78,8 +78,7 @@ public class TestArgumentsAndAttributes extends ComponentTest {
         Factory f = org.objectweb.proactive.core.component.adl.FactoryFactory.getFactory();
         Map context = new HashMap();
         context.put("message", "hello world");
-        dummy = (Component) f
-                .newComponent("functionalTests.component.conformADL.components.dummy_1", context);
+        dummy = (Component) f.newComponent("functionalTests.component.conformADL.components.dummy", context);
         GCM.getGCMLifeCycleController(dummy).startFc();
 
         Assert.assertEquals("This component is storing the info : hello world", ((Action) dummy

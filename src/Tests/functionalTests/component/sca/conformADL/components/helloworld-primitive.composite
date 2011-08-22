@@ -1,9 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
 <composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.helloworld-primitive">
-  <service name="Service" promote="ImplementationComponent/Service"/>
+  <service name="Service" promote="ImplementationComponent/Action"/>
   <component name="ImplementationComponent">
     <implementation.java class="functionalTests.component.sca.conformADL.components.Dummy"/>
-    <service name="Service">
-      <interface.java interface="functionalTests.component.sca.conformADL.components.Action"/>
-    </service>
+   
   </component>
 </composite>

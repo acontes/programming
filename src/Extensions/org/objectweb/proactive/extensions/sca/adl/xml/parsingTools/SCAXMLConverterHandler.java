@@ -40,6 +40,7 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.objectweb.fractal.adl.util.ClassLoaderHelper;
+import org.objectweb.proactive.extensions.sca.exceptions.SCAXMLException;
 import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -72,7 +73,11 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     @Override
     public void startElement(String nameSpaceURI, String localName, String rawName, Attributes attributs)
             throws SAXException {
-        analyseTagsAndAtrributes(localName, attributs);
+        try {
+            analyseTagsAndAtrributes(localName, attributs);
+        } catch (SCAXMLException ex) {
+            Logger.getLogger(SCAXMLConverterHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -139,13 +144,15 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Rules to parse a sca Implementation.java tag
      */
-    protected void parseImplementation_javaTag(String tag, Attributes atts) {
+    protected void parseImplementation_javaTag(String tag, Attributes atts) throws SCAXMLException {
         if (tag.equalsIgnoreCase(SCA_IMPLEMENTATION_JAVA_TAG)) {
             if (constructingComponent) {
                 xmlComponent.getLastComponent().setContentClassName(
                         atts.getValue(SCA_CLASS_ATTRIBUTE_OF_IMPLEMENTATION_JAVA_TAG));
             } else {
-                System.err.println("tag implementation.java can't be parsed outside component tag context");
+                throw new SCAXMLException(
+                    "tag implementation.java can't be parsed outside component tag context");
+                //System.err.println("tag implementation.java can't be parsed outside component tag context");
             }
         }
     }
@@ -153,7 +160,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Rules to parse a sca Service tag
      */
-    private void parseExposedInterface(String tag, Attributes atts, String role) {
+    private void parseExposedInterface(String tag, Attributes atts, String role) throws SCAXMLException {
 
         constructingService = true;
         String serviceName = atts.getValue(SCA_NAME_ATTRIBUTE_OF_EXPOSED_INTERFACE);
@@ -164,8 +171,8 @@ public class SCAXMLConverterHandler extends DefaultHandler {
             if (!constructingComponent) {
                 tmpService.setSoftLink(promote);
             } else {
-                System.err
-                        .println("attribute promote can't be parsed inside component's service tag context");
+                throw new SCAXMLException(
+                    "attribute promote can't be parsed inside component's service tag context");
             }
         }
         if (requires != null) {
@@ -199,19 +206,18 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Rules to parse a sca interface.java tag
      */
-    protected void parseInterface_javaTag(String tag, Attributes atts) {
+    protected void parseInterface_javaTag(String tag, Attributes atts) throws SCAXMLException {
         if (tag.equalsIgnoreCase(SCA_INTERFACE_JAVA_TAG)) {
             ExposedInterface tmpService = null;
             if (constructingComponent) {
                 tmpService = xmlComponent.getLastComponent().getLastExposedInterface();
             } else {
-                System.err.println("tag interface.java shouldn't be used in composite context");
                 tmpService = xmlComponent.getLastExposedInterface();
             }
             if (constructingService) {
                 tmpService.setImplementation(atts.getValue(SCA_INTERFACE_ATTRIBUTE_OF_INTERFACE_JAVA_TAG));
             } else {
-                System.err.println("tag interface.java can't be parsed outside service tag context");
+                throw new SCAXMLException("tag interface.java can't be parsed outside service tag context");
             }
         }
     }
@@ -219,7 +225,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Rules to parse a sca Reference tag
      */
-    protected void parseReferenceTag(String tag, Attributes atts) {
+    protected void parseReferenceTag(String tag, Attributes atts) throws SCAXMLException {
         if (tag.equalsIgnoreCase(SCA_REFERENCE_TAG)) {
             parseExposedInterface(tag, atts, "client");
         }
@@ -228,7 +234,7 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Rules to parse a sca Service tag
      */
-    protected void parseServiceTag(String tag, Attributes atts) {
+    protected void parseServiceTag(String tag, Attributes atts) throws SCAXMLException {
         if (tag.equalsIgnoreCase(SCA_SERVICE_TAG)) {
             parseExposedInterface(tag, atts, "server");
         }
@@ -248,18 +254,18 @@ public class SCAXMLConverterHandler extends DefaultHandler {
     /**
      * Rules to parse a sca Property tag
      */
-    protected void parsePropertyTag(String tag, Attributes atts) {
+    protected void parsePropertyTag(String tag, Attributes atts) throws SCAXMLException {
         if (tag.equalsIgnoreCase(SCA_PROPERTY_TAG)) {
             if (constructingComponent) {
                 currentPropertyName = atts.getValue(SCA_NAME_ATTRIBUTE_OF_PROPERTY_TAG);
                 return;
             } else {
-                System.err.println("tag property can't be parsed outside component tag context");
+                throw new SCAXMLException("tag property can't be parsed outside component tag context");
             }
         }
     }
 
-    protected void analyseTagsAndAtrributes(String tag, Attributes atts) {
+    protected void analyseTagsAndAtrributes(String tag, Attributes atts) throws SCAXMLException {
         parseCompositeTag(tag, atts);
         parseComponentTag(tag, atts);
         parseImplementation_javaTag(tag, atts);

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="ISO-8859-15"?>
 <composite xmlns="http://www.osoa.org/xmlns/sca/1.0" name="functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_intents">
   <service name="r" promote="client/r"/>
   

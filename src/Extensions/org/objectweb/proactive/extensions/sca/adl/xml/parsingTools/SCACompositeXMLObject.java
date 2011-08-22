@@ -47,7 +47,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.sound.midi.SysexMessage;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -56,6 +55,7 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.objectweb.proactive.extensions.sca.exceptions.SCAXMLException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -98,7 +98,7 @@ public class SCACompositeXMLObject {
     }
 
     // revisit service tag out of component tag
-    protected void revistExposedInterfaces() {
+    protected void revistExposedInterfaces() throws SCAXMLException {
         for (ExposedInterface exposedInterface : exposedInterfaces) {
             String softLink = exposedInterface.getSoftLink(); // Parse promote;
             String[] tmp = softLink.split("/");
@@ -115,7 +115,7 @@ public class SCACompositeXMLObject {
                                     .getRole(), "", exposedInterface.implementation));
                 }
             } else {
-                System.err.println("The service : " + exposedInterface.getExposedInterfaceName() +
+                throw new SCAXMLException("The service : " + exposedInterface.getExposedInterfaceName() +
                     " can not find correspond subComponent" + ": " + tmp[0]);
             }
         }
@@ -123,7 +123,7 @@ public class SCACompositeXMLObject {
 
     // revisit service tag out of Wired tag
 
-    protected void revisitWireTag() {
+    protected void revisitWireTag() throws SCAXMLException {
         // parse service tags in composite, to add bindings
         for (ExposedInterface ExposedInterface : exposedInterfaces) {
             String[] tmp = new String[2];
@@ -158,7 +158,7 @@ public class SCACompositeXMLObject {
     }
 
     private void findServiceTagImplementation(String componentName, String serviceName,
-            ExposedInterface exposedInterface) {
+            ExposedInterface exposedInterface) throws SCAXMLException {
         ComponentTag comptag = getComponentByName(componentName);
         try {
             // need to look into content class of component if there's a interface which correspond
@@ -181,7 +181,7 @@ public class SCACompositeXMLObject {
                 exposedInterface.setImplementation(linkedItf.getName());
                 exposedInterface.setReferenceComponentName(componentName);
             } else { // nothing can be found , must be some error in XML
-                System.err.println("Nothing corresponding can't be found with service tag : " +
+                throw new SCAXMLException("Nothing corresponding can't be found with service tag : " +
                     exposedInterface.getExposedInterfaceName() + "" +
                     "there must be some error with composite XML");
             }
@@ -193,7 +193,7 @@ public class SCACompositeXMLObject {
     /**
      * Get Fractal binding tag value from sca wire tag
      */
-    private boolean exposedItfCompleted(String sourceOrTarget, String role) {
+    private boolean exposedItfCompleted(String sourceOrTarget, String role) throws SCAXMLException {
         String[] itfSplit = sourceOrTarget.split("/");
         boolean exposedItfGenerated = false;
         ComponentTag linkedTargetComponent = getComponentByName(itfSplit[0]);
@@ -218,7 +218,7 @@ public class SCACompositeXMLObject {
     /**
      * Get Fractal binding tag value from sca wire tag
      */
-    private String getBindingValue(String sourceOrTarget, String role) {
+    private String getBindingValue(String sourceOrTarget, String role) throws SCAXMLException {
         String[] itfSplit = sourceOrTarget.split("/");
         String binding = null;
         ComponentTag linkedTargetComponent = getComponentByName(itfSplit[0]);
@@ -244,7 +244,7 @@ public class SCACompositeXMLObject {
     }
 
     // revisit XML object to finalize the object construction
-    public void revisitConstructedObject() {
+    public void revisitConstructedObject() throws SCAXMLException {
         // revisit service tag out of component tag
         revistExposedInterfaces();
         revisitWireTag();

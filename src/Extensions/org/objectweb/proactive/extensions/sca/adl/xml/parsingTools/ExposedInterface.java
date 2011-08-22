@@ -76,6 +76,11 @@ public class ExposedInterface {
         return rootEle;
     }
 
+    public String toString() {
+        return "Service Name : " + exposedInterfaceName + "SoftLink : " + softLink + "role : " + role +
+            "implementation : " + implementation;
+    }
+
     /*******************************************************************************
      *          Generated getters and setters
      *******************************************************************************/

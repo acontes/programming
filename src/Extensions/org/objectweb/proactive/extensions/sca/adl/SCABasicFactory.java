@@ -172,7 +172,7 @@ public class SCABasicFactory extends BasicFactory {
                         try {
                             Class contentClass = Class.forName(strings[2]);
                             IntentHandler ih = (IntentHandler) contentClass.newInstance();
-                            scaIntCtr.addIntentHandler(ih);
+                            scaIntCtr.addIntentHandler(ih, strings[1]);
                         } catch (IllegalLifeCycleException ex) {
                             Logger.getLogger(SCABasicFactory.class.getName()).log(Level.SEVERE, null, ex);
                         } catch (InstantiationException ex) {

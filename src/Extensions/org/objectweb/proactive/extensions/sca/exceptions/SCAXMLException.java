@@ -34,34 +34,28 @@
  * ################################################################
  * $$PROACTIVE_INITIAL_DEV$$
  */
+package org.objectweb.proactive.extensions.sca.exceptions;
 
-package functionalTests.component.sca.conformADL;
+/**
+ *
+ * @author mug
+ */
+public class SCAXMLException extends Exception {
 
-import java.io.IOException;
-import java.net.URL;
-import org.objectweb.fractal.adl.util.ClassLoaderHelper;
-import org.objectweb.proactive.extensions.sca.adl.xml.SCAXMLConverter;
-
-
-public class Test {
-
-    public void test() throws IOException {
-        ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
-        //String name = "functionalTests.component.sca.conformADL.components.helloworld-primitive";
-        String name = "functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_intents";
-        //String name = "functionalTests.component.sca.conformADL.helloworld-property";
-        final String file = name.replace('.', '/') + ".composite";
-        System.err.println("DEBUGGG============" + file);
-        final URL url = cl.getResource(file);
-        //System.ou
-        //SCAXMLConverter tmp = new SCAXMLConverter(url.openStream());
-        SCAXMLConverter tmp = new SCAXMLConverter(url.openStream());
-        System.err.println(tmp.getXmlComponent().toXml());
+    public SCAXMLException() {
+        super();
     }
 
-    public static void main(String[] args) throws Exception {
-
-        new Test().test();
-
+    public SCAXMLException(Throwable thrwbl) {
+        super(thrwbl);
     }
+
+    public SCAXMLException(String string) {
+        super(string);
+    }
+
+    public SCAXMLException(String string, Throwable thrwbl) {
+        super(string, thrwbl);
+    }
+
 }

@@ -54,6 +54,7 @@ import org.objectweb.proactive.core.component.factory.PAGenericFactory;
  */
 public class SCAPAImplementationBuilderImpl extends PAImplementationBuilderImpl {
 
+    @Override
     protected ObjectsContainer commonCreation(Object type, String name, String definition,
             ContentDescription contentDesc, VirtualNode adlVN, Map<Object, Object> context) throws Exception {
         ObjectsContainer res = super.commonCreation(type, name, definition, contentDesc, adlVN, context);
@@ -61,28 +62,31 @@ public class SCAPAImplementationBuilderImpl extends PAImplementationBuilderImpl 
                 .getBootstrapComponent());
         Component bootstrap = null;
         if (context != null) {
-            newRes.bootstrap = (Component) context.get("bootstrap");
+            newRes.setBootstrap((Component) context.get("bootstrap"));
         }
         if (bootstrap == null) {
-            newRes.bootstrap = Utils.getBootstrapComponent();
+            newRes.setBootstrap(Utils.getBootstrapComponent());
         }
         return newRes;
 
     }
 
     protected class SCAObjectsContainer extends PAImplementationBuilderImpl.ObjectsContainer {
-        private Object nodesContainer;
-        protected Component bootstrap;
 
         public SCAObjectsContainer(Object nodesProvider, Component bootstrap) {
             super(nodesProvider, bootstrap);
         }
 
+        public void setBootstrap(Component bootstrap) {
+            this.bootstrap = bootstrap;
+        }
+
+        @Override
         public Component createFComponent(ComponentType type, ControllerDescription controllerDesc,
                 ContentDescription contentDesc, VirtualNode adlVN) throws Exception {
             PAGenericFactory gf = Utils.getPAGenericFactory(bootstrap);
             Component result = gf.newFcInstance(type, controllerDesc, contentDesc, ADLNodeProvider
-                    .getNode(nodesContainer));
+                    .getNode(getNodesContainer()));
             return result;
         }
     }
