@@ -47,8 +47,8 @@ public class Test {
 
     public void test() throws IOException {
         ClassLoader cl = ClassLoaderHelper.getClassLoader(this);
-        //String name = "functionalTests.component.sca.conformADL.components.helloworld-primitive";
-        String name = "functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_intents";
+        String name = "functionalTests.component.sca.conformADL.components.helloworld-primitive_with_properties";
+        //String name = "functionalTests.component.sca.conformADL.components.composite.helloworld-wired_with_intents";
         //String name = "functionalTests.component.sca.conformADL.helloworld-property";
         final String file = name.replace('.', '/') + ".composite";
         System.err.println("DEBUGGG============" + file);

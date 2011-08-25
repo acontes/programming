@@ -41,6 +41,7 @@ import org.osoa.sca.annotations.Authentication;
 
 
 @Authentication
+@Confidentiality
 public class CServer implements TestIntentItf {
     @Confidentiality(value = "server")
     public byte[] dataTreatment(byte[] data) {

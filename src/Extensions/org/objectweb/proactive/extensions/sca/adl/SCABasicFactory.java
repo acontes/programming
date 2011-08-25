@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.bcel.classfile.Constant;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.adl.ADLException;
@@ -54,7 +55,9 @@ import org.objectweb.fractal.adl.interfaces.InterfaceLoader;
 import org.objectweb.fractal.adl.types.TypeLoader;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
 import org.objectweb.fractal.api.control.IllegalLifeCycleException;
+import org.objectweb.proactive.core.component.Constants;
 import org.objectweb.proactive.core.component.control.PAContentController;
+import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.extensions.sca.adl.xml.SCAXMLLoader;
 import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
@@ -134,9 +137,19 @@ public class SCABasicFactory extends BasicFactory {
     protected void addPropertiesIntoComponent(Component comp) {
         List<String[]> properties = getPropertiesValues();
         if (properties != null) {
+            boolean isPrimitive = false;
+            Component subComp = null;
+            if (((PAComponent) comp).getComponentParameters().getControllerDescription()
+                    .getHierarchicalType().equals(Constants.PRIMITIVE)) {
+                isPrimitive = true;
+            }
             try {
                 for (String[] strings : properties) {
-                    Component subComp = getSubComponentByName(comp, strings[0]);
+                    if (isPrimitive) {
+                        subComp = comp;
+                    } else {
+                        subComp = getSubComponentByName(comp, strings[0]);
+                    }
                     if (subComp != null) {
                         SCAPropertyController scapcClient = org.objectweb.proactive.extensions.sca.Utils
                                 .getSCAPropertyController(subComp);
@@ -145,7 +158,6 @@ public class SCABasicFactory extends BasicFactory {
                         System.err.println("problem on initialize property, sub-component :" + strings[0] +
                             " doesn't exist!");
                     }
-
                 }
             } catch (NoSuchPropertyException ex) {
                 Logger.getLogger(SCABasicFactory.class.getName()).log(Level.SEVERE, null, ex);
@@ -163,9 +175,19 @@ public class SCABasicFactory extends BasicFactory {
     protected void addIntentsIntoComponent(Component comp) {
         List<String[]> intents = getIntents();
         if (intents != null) {
+            boolean isPrimitive = false;
+            Component subComp = null;
+            if (((PAComponent) comp).getComponentParameters().getControllerDescription()
+                    .getHierarchicalType().equals(Constants.PRIMITIVE)) {
+                isPrimitive = true;
+            }
             try {
                 for (String[] strings : intents) {
-                    Component subComp = getSubComponentByName(comp, strings[0]);
+                    if (isPrimitive) {
+                        subComp = comp;
+                    } else {
+                        subComp = getSubComponentByName(comp, strings[0]);
+                    }
                     if (subComp != null) {
                         SCAIntentController scaIntCtr = org.objectweb.proactive.extensions.sca.Utils
                                 .getSCAIntentController(subComp);

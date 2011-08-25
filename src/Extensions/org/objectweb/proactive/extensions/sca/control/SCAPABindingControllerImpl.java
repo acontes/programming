@@ -38,6 +38,7 @@ package org.objectweb.proactive.extensions.sca.control;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.security.PublicKey;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,8 +59,12 @@ import org.objectweb.proactive.core.component.control.PABindingControllerImpl;
 import org.objectweb.proactive.extensions.sca.Utils;
 import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedException;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
-import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
+import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationIntentHandler;
+import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.DecryptionIntentHandler;
+import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.EncryptionIntentHandler;
 
+
+//import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
 
 /**
  * Extension of the {@link PABindingController} interface to take care of SCA intents.
@@ -78,8 +83,9 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             List<List<IntentHandler>> tmpList = getIntentsOfEveryMethod(clientItfName);
             super.primitiveBindFc(clientItfName, handleIntentManagement(clientItfName, serverItf));
             addIntentsToEveryMethod(clientItfName, tmpList);
-        } else
+        } else {
             super.primitiveBindFc(clientItfName, handleIntentManagement(clientItfName, serverItf));
+        }
 
     }
 
@@ -90,9 +96,10 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
             super.compositeBindFc(clientItfName, clientItfType, handleIntentManagement(clientItfName,
                     (PAInterface) serverItf));
             addIntentsToEveryMethod(clientItfName, tmpList);
-        } else
+        } else {
             super.compositeBindFc(clientItfName, clientItfType, handleIntentManagement(clientItfName,
                     (PAInterface) serverItf));
+        }
     }
 
     /*
@@ -250,28 +257,54 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
     public void bindFc(String clientItfName, Object serverItf) throws NoSuchInterfaceException,
             IllegalBindingException, IllegalLifeCycleException {
         super.bindFc(clientItfName, serverItf);
+        PAInterface serverItfPA = (PAInterface) serverItf;
+        Component serverComp = serverItfPA.getFcItfOwner();
         try {
             if (Utils.hasAuthentificationAnnotation(owner.getReferenceOnBaseObject().getClass().getName())) {
-                //System.err.println("DEBUG===============================");
-                PAInterface serverItfPA = (PAInterface) serverItf;
-                try {
-                    //if(lookupFc(AuthentificationItf.CLIENT_ITF_NAME) == null){
-                    super.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA.getFcItfOwner()
-                            .getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
-                    //}	
-                    BindingController user_binding_controller = Utils.getPABindingController(serverItfPA
-                            .getFcItfOwner());
-                    //if(user_binding_controller.lookupFc(AuthentificationItf.CLIENT_ITF_NAME) == null){
-                    user_binding_controller.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA
-                            .getFcItfOwner().getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
-                    //}
-                } catch (IllegalBindingException e) {
-                    //System.err.println("binding error");
+                System.err.println("HAS AUTH!");
+                System.err.println(serverItfPA.getFcItfName());
+
+                String serverItfName = serverItfPA.getFcItfName();
+                SCAIntentController scaiClient = Utils.getSCAIntentController(owner);
+                scaiClient.addIntentHandler(new AuthentificationIntentHandler(), clientItfName);
+
+                //add decryption intent on the server side 
+                SCAIntentController scaiServer = Utils.getSCAIntentController(serverComp);
+                scaiServer.addIntentHandler(new AuthentificationIntentHandler(), serverItfPA.getFcItfName());
+
+                AuthentificationIntentHandler ithls = (AuthentificationIntentHandler) scaiServer
+                        .listIntentHandler(serverItfName).get(0);
+                PublicKey Spk = ithls.getPublicKey();
+                //PrivateKey Sprk = ithls.selfPrk;
+
+                AuthentificationIntentHandler ithlc = (AuthentificationIntentHandler) scaiClient
+                        .listIntentHandler(clientItfName).get(0);
+                ithlc.setServerPublicKey(Spk);
+
+                if (Utils.hasConfidentialityAnnotation(owner.getReferenceOnBaseObject().getClass().getName())) {
+                    scaiClient.addIntentHandler(new EncryptionIntentHandler(Spk), clientItfName);
+                    scaiServer.addIntentHandler(new DecryptionIntentHandler(ithls.selfPrk), serverItfName);
                 }
+                //PAInterface serverItfPA = (PAInterface) serverItf;
+                //                try {
+                //                    //if(lookupFc(AuthentificationItf.CLIENT_ITF_NAME) == null){
+                //                    super.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA.getFcItfOwner()
+                //                            .getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
+                //                    //}	
+                //                    BindingController user_binding_controller = Utils.getPABindingController(serverItfPA
+                //                            .getFcItfOwner());
+                //                    //if(user_binding_controller.lookupFc(AuthentificationItf.CLIENT_ITF_NAME) == null){
+                //                    user_binding_controller.bindFc(AuthentificationItf.CLIENT_ITF_NAME, serverItfPA
+                //                            .getFcItfOwner().getFcInterface(AuthentificationItf.SERVER_ITF_NAME));
+                //                    //}
+                //                } catch (IllegalBindingException e) {
+                //                    //System.err.println("binding error");
+                //                }
             }
         } catch (InstantiationException e) {
             // should never happen
         }
+
     }
 
     public void unbindFc(String clientItfName) throws NoSuchInterfaceException, IllegalBindingException,
@@ -280,5 +313,4 @@ public class SCAPABindingControllerImpl extends PABindingControllerImpl {
         ((SCAIntentControllerImpl) ((PAInterface) Utils.getSCAIntentController(owner)).getFcItfImpl())
                 .notifyUnbinding(clientItfName);
     }
-
 }

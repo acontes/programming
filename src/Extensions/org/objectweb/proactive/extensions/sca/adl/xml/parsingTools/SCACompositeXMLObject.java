@@ -43,6 +43,7 @@ package org.objectweb.proactive.extensions.sca.adl.xml.parsingTools;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 import java.io.StringWriter;
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -58,6 +59,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.objectweb.proactive.extensions.sca.exceptions.SCAXMLException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -122,7 +124,6 @@ public class SCACompositeXMLObject {
     }
 
     // revisit service tag out of Wired tag
-
     protected void revisitWireTag() throws SCAXMLException {
         // parse service tags in composite, to add bindings
         for (ExposedInterface ExposedInterface : exposedInterfaces) {
@@ -164,6 +165,12 @@ public class SCACompositeXMLObject {
             // need to look into content class of component if there's a interface which correspond
             // hmm can use @service to find out as well!
             Class contentClass = Class.forName(comptag.getContentClassName());
+            //            org.osoa.sca.annotations.Service anno = (org.osoa.sca.annotations.Service) contentClass.getAnnotation(org.osoa.sca.annotations.Service.class);
+            //            Class cls = anno.value();
+            //            System.err.println("debugggg=============== "+cls.getName());
+            ////            for (Class class1 : cls) {
+            ////                System.err.println("debugggg=============== "+class1.getName());
+            ////            }
             List<Class> superInterfaces = new ArrayList<Class>();
             Class tmpClass = contentClass;
             while (!tmpClass.getName().equals(Object.class.getName())) {
@@ -215,34 +222,6 @@ public class SCACompositeXMLObject {
         return exposedItfGenerated;
     }
 
-    /**
-     * Get Fractal binding tag value from sca wire tag
-     */
-    private String getBindingValue(String sourceOrTarget, String role) throws SCAXMLException {
-        String[] itfSplit = sourceOrTarget.split("/");
-        String binding = null;
-        ComponentTag linkedTargetComponent = getComponentByName(itfSplit[0]);
-        if (linkedTargetComponent != null) {
-            ExposedInterface linkedService = linkedTargetComponent.getExposedInterfaceByName(itfSplit[1]);
-            if (linkedService != null) { // found corresponded Service
-                binding = linkedTargetComponent.ComponentName + "." + linkedService.exposedInterfaceName;
-            } else { // create Service or reference
-                ExposedInterface exItf = new ExposedInterface(itfSplit[1], role, "", "");
-                if (role.equals("server")) // look for service annotation in server implementation or implemented itf
-                {
-                    findServiceTagImplementation(itfSplit[0], itfSplit[1], exItf);
-                    binding = linkedTargetComponent.ComponentName + "." + exItf.exposedInterfaceName;
-                }
-                if (role.equals("client")) // look for reference annotation in client implementation field or or existing field 
-                {
-                    System.err.println("sortie ici!");
-                }
-                linkedTargetComponent.exposedInterfaces.add(exItf);
-            }
-        }
-        return binding;
-    }
-
     // revisit XML object to finalize the object construction
     public void revisitConstructedObject() throws SCAXMLException {
         // revisit service tag out of component tag
@@ -258,21 +237,37 @@ public class SCACompositeXMLObject {
         Element rootEle = outPutdocument.createElement(FRACTAL_DEFINITION_TAG);
         rootEle.setAttribute(FRACTAL_NAME_ATTRIBUTE_OF_DEFINITION_TAG, compositeName);
         outPutdocument.appendChild(rootEle);
-        for (ExposedInterface service : exposedInterfaces) {
-            rootEle.appendChild(service.toXmlElement(outPutdocument));
+        if (components.size() == 1) { // primitive
+            ComponentTag comp = components.get(0);
+            for (ExposedInterface service : exposedInterfaces) {
+                Element tmp = service.toXmlElement(outPutdocument);
+                if (tmp != null) {
+                    rootEle.appendChild(tmp);
+                }
+            }
+            Element content = outPutdocument.createElement(ComponentTag.FRACTAL_CONTENT_TAG);
+            content.setAttribute(ComponentTag.CLASS_ATTRIBUTE_OF_CONTENT_TAG, comp.contentClassName);
+            Element controller = outPutdocument.createElement(ComponentTag.FRACTAL_CONTROLLER_TAG);
+            controller.setAttribute(ComponentTag.FRACTAL_DESC_ATTRIBUTE_OF_CONTROLLER_TAG, "primitive");
+            rootEle.appendChild(content);
+            rootEle.appendChild(controller);
+        } else { // composite
+            for (ExposedInterface service : exposedInterfaces) {
+                rootEle.appendChild(service.toXmlElement(outPutdocument));
+            }
+            for (ComponentTag component : components) {
+                rootEle.appendChild(component.toXmlElement(outPutdocument));
+            }
+            for (String[] binding : wired) {
+                Element tmp = outPutdocument.createElement(FRACTAL_BINDING_TAG);
+                tmp.setAttribute(FRACTAL_CLIENT_ATTRIBUTE_OF_BINDING_TAG, binding[0]);
+                tmp.setAttribute(FRACTAL_SERVER_ATTRIBUTE_OF_BINDING_TAG, binding[1]);
+                rootEle.appendChild(tmp);
+            }
+            Element prim = outPutdocument.createElement(ComponentTag.FRACTAL_CONTROLLER_TAG);
+            prim.setAttribute(ComponentTag.FRACTAL_DESC_ATTRIBUTE_OF_CONTROLLER_TAG, "composite");
+            rootEle.appendChild(prim);
         }
-        for (ComponentTag component : components) {
-            rootEle.appendChild(component.toXmlElement(outPutdocument));
-        }
-        for (String[] binding : wired) {
-            Element tmp = outPutdocument.createElement(FRACTAL_BINDING_TAG);
-            tmp.setAttribute(FRACTAL_CLIENT_ATTRIBUTE_OF_BINDING_TAG, binding[0]);
-            tmp.setAttribute(FRACTAL_SERVER_ATTRIBUTE_OF_BINDING_TAG, binding[1]);
-            rootEle.appendChild(tmp);
-        }
-        Element prim = outPutdocument.createElement(ComponentTag.FRACTAL_CONTROLLER_TAG);
-        prim.setAttribute(ComponentTag.FRACTAL_DESC_ATTRIBUTE_OF_CONTROLLER_TAG, "composite");
-        rootEle.appendChild(prim);
         return GCMHEADER + getOutPutDoc();
     }
 

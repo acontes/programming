@@ -39,6 +39,7 @@ package org.objectweb.proactive.examples.components.sca.securityintent;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 
+import java.util.List;
 import org.etsi.uri.gcm.api.type.GCMTypeFactory;
 import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
@@ -53,7 +54,9 @@ import org.objectweb.proactive.examples.components.sca.securityintent.components
 import org.objectweb.proactive.examples.components.sca.securityintent.components.TestIntentItf;
 import org.objectweb.proactive.extensions.sca.SCAPAPropertyRepository;
 import org.objectweb.proactive.extensions.sca.Utils;
+import org.objectweb.proactive.extensions.sca.control.IntentHandler;
 import org.objectweb.proactive.extensions.sca.control.SCAIntentController;
+import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationIntentHandler;
 import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
 import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.DecryptionIntentHandler;
 import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.EncryptionIntentHandler;
@@ -93,21 +96,34 @@ public class Main {
             GCM.getGCMLifeCycleController(componentA).startFc();
             GCM.getGCMLifeCycleController(componentB).startFc();
 
-            PublicKey pubKey = ((AuthentificationItf) componentA
-                    .getFcInterface(AuthentificationItf.SERVER_ITF_NAME)).getPublicKeyFromServer();
-            PrivateKey sKey = (PrivateKey) Utils.getSCAPropertyController(componentB).getValue("privateKey");
-            System.err.println("public key :" + pubKey);
-            System.err.println("private key :" + sKey);
+            //            PublicKey pubKey = ((AuthentificationItf) componentA
+            //                    .getFcInterface(AuthentificationItf.SERVER_ITF_NAME)).getPublicKeyFromServer();
+            //            PrivateKey sKey = (PrivateKey) Utils.getSCAPropertyController(componentB).getValue("privateKey");
+            //            System.err.println("public key :" + pubKey);
+            //            System.err.println("private key :" + sKey);
+            //
+            //            //add encryption intent on the client side 
+            //            SCAIntentController scaiClient = Utils.getSCAIntentController(componentA);
+            //            scaiClient.addIntentHandler(new EncryptionIntentHandler(pubKey), TestIntentItf.CLIENT_ITF_NAME);
+            //            scaiClient.addIntentHandler(new ClientIntegrityIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
+            //
+            //            //add decryption intent on the server side 
+            //            SCAIntentController scaiServer = Utils.getSCAIntentController(componentB);
+            //            scaiServer.addIntentHandler(new ServerIntegrityIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
+            //            scaiServer.addIntentHandler(new DecryptionIntentHandler(sKey), TestIntentItf.SERVER_ITF_NAME);
 
             //add encryption intent on the client side 
             SCAIntentController scaiClient = Utils.getSCAIntentController(componentA);
-            scaiClient.addIntentHandler(new EncryptionIntentHandler(pubKey), TestIntentItf.CLIENT_ITF_NAME);
-            scaiClient.addIntentHandler(new ClientIntegrityIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
+            //scaiClient.addIntentHandler(new AuthentificationIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
 
             //add decryption intent on the server side 
             SCAIntentController scaiServer = Utils.getSCAIntentController(componentB);
-            scaiServer.addIntentHandler(new ServerIntegrityIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
-            scaiServer.addIntentHandler(new DecryptionIntentHandler(sKey), TestIntentItf.SERVER_ITF_NAME);
+            //scaiServer.addIntentHandler(new AuthentificationIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
+
+            //           
+            //            scaiClient.addIntentHandler(new ClientIntegrityIntentHandler(), TestIntentItf.CLIENT_ITF_NAME);
+            //            
+            //            scaiServer.addIntentHandler(new ServerIntegrityIntentHandler(), TestIntentItf.SERVER_ITF_NAME);
 
             TestIntentItf itf = (TestIntentItf) componentA.getFcInterface(TestIntentItf.SERVER_ITF_NAME);
 

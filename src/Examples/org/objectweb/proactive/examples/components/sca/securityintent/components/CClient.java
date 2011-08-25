@@ -37,13 +37,12 @@
 package org.objectweb.proactive.examples.components.sca.securityintent.components;
 
 import org.oasisopen.sca.annotation.Confidentiality;
-import org.oasisopen.sca.annotation.Intent;
 import org.objectweb.fractal.fraclet.annotations.Requires;
-import org.objectweb.proactive.extensions.sca.intentpolicies.confidentiality.EncryptionIntentHandler;
 import org.osoa.sca.annotations.Authentication;
 
 
 @Authentication
+@Confidentiality
 public class CClient implements TestIntentItf {
     @Requires(name = TestIntentItf.CLIENT_ITF_NAME)
     protected TestIntentItf testIntentItf;

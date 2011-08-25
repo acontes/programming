@@ -77,6 +77,7 @@ import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.Au
  */
 @PublicAPI
 public class SCAFractive extends Fractive {
+
     private static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
     public static final String DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION = "/org/objectweb/proactive/extensions/sca/config/default-component-config.xml";
 
@@ -112,10 +113,10 @@ public class SCAFractive extends Fractive {
             ContentDescription contentDesc, Node node) throws InstantiationException {
         controllerDesc = new ControllerDescription(controllerDesc.getName(), controllerDesc
                 .getHierarchicalType(), DEFAULT_SCACOMPONENT_CONFIG_FILE_LOCATION);
+        String className = contentDesc.getClassName();
         if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE) &&
             controllerDesc.getControllersSignatures().containsKey(SCAPropertyController.class.getName())) {
-            String className = contentDesc.getClassName();
-
+            //String className = contentDesc.getClassName();
             String generatedClassName = className;
             try {
                 generatedClassName = IntentClassGenerator.instance().generateClass(className);
@@ -126,36 +127,6 @@ public class SCAFractive extends Fractive {
                 ie.initCause(cgfe);
                 throw ie;
             }
-            if (Utils.hasAuthentificationAnnotation(generatedClassName)) {
-                try {
-                    generatedClassName = BusinessClassWithAuthentificationGenerator.instance().generateClass(
-                            generatedClassName);
-                    contentDesc.setClassName(generatedClassName);
-                    Component boot = Utils.getBootstrapComponent();
-                    GCMTypeFactory type_factory = GCM.getGCMTypeFactory(boot);
-                    ComponentType cType = (ComponentType) type;
-                    InterfaceType[] itfTypes = cType.getFcInterfaceTypes();
-                    ArrayList<InterfaceType> itfTypesArray = new ArrayList<InterfaceType>(Arrays
-                            .asList(itfTypes));
-                    itfTypesArray.add(type_factory.createFcItfType(AuthentificationItf.SERVER_ITF_NAME,
-                            AuthentificationItf.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE));
-                    itfTypesArray.add(type_factory.createFcItfType(AuthentificationItf.CLIENT_ITF_NAME,
-                            AuthentificationItf.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY,
-                            TypeFactory.SINGLE));
-                    type = type_factory.createFcType(itfTypesArray.toArray(itfTypes));
-                } catch (ClassGenerationFailedException cgfe) {
-                    InstantiationException ie = new InstantiationException(
-                        "Cannot generate BusinessClassWithAuthentification class for " + className + " : " +
-                            cgfe.getMessage());
-                    ie.initCause(cgfe);
-                    throw ie;
-                } catch (NoSuchInterfaceException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-
             // Test whether the component class has a property annotation
             if (hasPropertyAnnotation(generatedClassName)) {
                 try {
@@ -169,7 +140,13 @@ public class SCAFractive extends Fractive {
                 }
             }
         }
-        return super.newFcInstance(type, controllerDesc, contentDesc, node);
+        Component res = super.newFcInstance(type, controllerDesc, contentDesc, node);
+        //        if (controllerDesc.getHierarchicalType().equals(Constants.PRIMITIVE)) {
+        //            if (Utils.hasAuthentificationAnnotation(className)) {
+        //                System.err.println("HAS AUTH:!");
+        //            }
+        //        }
+        return res;
     }
 
     /*
@@ -198,5 +175,4 @@ public class SCAFractive extends Fractive {
 
         return false;
     }
-
 }

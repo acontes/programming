@@ -82,6 +82,6 @@ public class TestPrimitiveSCAComponentWithProperties extends SCAComponentTest {
         GCM.getGCMLifeCycleController(dummy).startFc();
         //System.err.println("the result : " + ((Action) dummy.getFcInterface("Action")).doSomething());
         Assert.assertEquals("This component is storing the info : hello world", ((Action) dummy
-                .getFcInterface("Service")).doSomething());
+                .getFcInterface("Action")).doSomething());
     }
 }

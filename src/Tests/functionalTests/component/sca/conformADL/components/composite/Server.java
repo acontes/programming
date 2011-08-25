@@ -36,7 +36,11 @@
  */
 package functionalTests.component.sca.conformADL.components.composite;
 
+import org.osoa.sca.annotations.Service;
+
+
 /** The print service implementation. */
+@Service(PrintService.class)
 public class Server implements PrintService {
 
     /** Default constructor. */

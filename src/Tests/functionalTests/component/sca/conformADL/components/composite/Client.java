@@ -42,7 +42,7 @@ import org.osoa.sca.annotations.Service;
 
 
 /** A print service client. */
-@Service(Runnable.class)
+@Service(interfaces = { Runnable.class, PrintService.class })
 public class Client implements Runnable {
 
     @Reference(required = true)
