@@ -45,6 +45,7 @@ import java.util.Calendar;
  * @author The ProActive Team
  */
 public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
+
     public static final String GENERATED_CLASSNAME_SUFFIX = GEN_ESCAPE_CHAR + "SCAClass";
 
     public static String getPropertyClassName(String className) {
@@ -59,4 +60,7 @@ public class Utils extends org.objectweb.proactive.core.component.gen.Utils {
         return className + "BusinessClassWithAuthentication";
     }
 
+    public static String getReferenceClassName(String className) {
+        return className + "BusinessClassWithReferences";
+    }
 }

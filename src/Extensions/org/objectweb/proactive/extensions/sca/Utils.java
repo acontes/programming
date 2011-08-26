@@ -36,6 +36,7 @@
  */
 package org.objectweb.proactive.extensions.sca;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -191,6 +192,38 @@ public class Utils extends org.objectweb.proactive.core.component.Utils {
                 // Authentication annotation is presented in method level
                 if (methodes[i].isAnnotationPresent(org.oasisopen.sca.annotation.Confidentiality.class) ||
                     methodes[i].isAnnotationPresent(org.osoa.sca.annotations.Confidentiality.class)) {
+                    return true;
+                }
+            }
+        } catch (ClassNotFoundException cnfe) {
+            InstantiationException ie = new InstantiationException("Cannot find classe " + className + " : " +
+                cnfe.getMessage());
+            ie.initCause(cnfe);
+            throw ie;
+        }
+
+        return false;
+    }
+
+    /*
+     * Determines if a class Property annotation.
+     *
+     * @param className Class to introspect.
+     * @return True if the given class contains Authentication annotation.
+     * @throws InstantiationException If the class cannot be found.
+     */
+    public static boolean hasReferencenAnnotation(String className) throws InstantiationException {
+        try {
+            Class<?> clazz = Class.forName(className);
+            if (clazz.isAnnotationPresent(org.oasisopen.sca.annotation.Reference.class) ||
+                clazz.isAnnotationPresent(org.osoa.sca.annotations.Reference.class)) {// Authentication annotation is presented in class level
+                return true;
+            }
+            Field[] fields = clazz.getDeclaredFields();
+            for (int i = 0; i < fields.length; i++) {
+                // Authentication annotation is presented in method level
+                if (fields[i].isAnnotationPresent(org.oasisopen.sca.annotation.Reference.class) ||
+                    fields[i].isAnnotationPresent(org.osoa.sca.annotations.Reference.class)) {
                     return true;
                 }
             }

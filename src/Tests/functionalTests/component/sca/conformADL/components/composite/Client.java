@@ -36,7 +36,6 @@
  */
 package functionalTests.component.sca.conformADL.components.composite;
 
-import org.objectweb.fractal.fraclet.annotations.Requires;
 import org.osoa.sca.annotations.Reference;
 import org.osoa.sca.annotations.Service;
 
@@ -46,7 +45,6 @@ import org.osoa.sca.annotations.Service;
 public class Client implements Runnable {
 
     @Reference(required = true)
-    @Requires(name = "s")
     private PrintService s;
 
     /** Default constructor. */

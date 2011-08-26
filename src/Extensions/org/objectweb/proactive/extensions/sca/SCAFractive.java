@@ -63,6 +63,7 @@ import org.objectweb.proactive.extensions.sca.exceptions.ClassGenerationFailedEx
 import org.objectweb.proactive.extensions.sca.gen.BusinessClassWithAuthentificationGenerator;
 import org.objectweb.proactive.extensions.sca.gen.IntentClassGenerator;
 import org.objectweb.proactive.extensions.sca.gen.PropertyClassGenerator;
+import org.objectweb.proactive.extensions.sca.gen.SCAReferenceGenerator;
 import org.objectweb.proactive.extensions.sca.intentpolicies.authentification.AuthentificationItf;
 
 
@@ -135,6 +136,17 @@ public class SCAFractive extends Fractive {
                 } catch (ClassGenerationFailedException cgfe) {
                     InstantiationException ie = new InstantiationException(
                         "Cannot generate SCA Property class for " + className + " : " + cgfe.getMessage());
+                    ie.initCause(cgfe);
+                    throw ie;
+                }
+            }
+            if (Utils.hasReferencenAnnotation(className)) {
+                try {
+                    generatedClassName = SCAReferenceGenerator.instance().generateClass(generatedClassName);
+                    contentDesc.setClassName(generatedClassName);
+                } catch (ClassGenerationFailedException cgfe) {
+                    InstantiationException ie = new InstantiationException(
+                        "Cannot generate SCA Reference class for " + className + " : " + cgfe.getMessage());
                     ie.initCause(cgfe);
                     throw ie;
                 }

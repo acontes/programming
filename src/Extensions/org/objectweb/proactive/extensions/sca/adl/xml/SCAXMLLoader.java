@@ -123,12 +123,14 @@ public class SCAXMLLoader extends XMLLoader {
                 if (url == null) {
                     throw new ADLException(ADLErrors.ADL_NOT_FOUND, file);
                 } else {
+                    String oldPath = System.getProperty("user.dir");
                     String path = url.getPath().substring(0, url.getPath().lastIndexOf("/"));
                     System.setProperty("user.dir", path);
                     inStream = url.openStream();
                     scaXMLConverter = new SCAXMLConverter(inStream);
                     String xml = scaXMLConverter.getXmlComponent().toXml();
                     inStream = new ByteArrayInputStream(xml.getBytes());
+                    System.setProperty("user.dir", oldPath);
                 }
             } else {
                 inStream = url.openStream();
