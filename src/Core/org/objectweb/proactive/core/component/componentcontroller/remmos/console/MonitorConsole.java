@@ -622,7 +622,14 @@ public class MonitorConsole {
 							System.out.println("Missing a component ... ");
 							continue;							
 						}
+						// Get the Reconfiguration Controller
 						PAReconfigurationController parc = (PAReconfigurationController) source.getFcInterface(Constants.RECONFIGURATION_CONTROLLER);
+						// and execute something
+						//String command = "unbind($this)";
+						String command = "$this/interface::*;"; 
+						System.out.println("Executing: "+ command);
+						Object r = parc.execute(command);
+						System.out.println("... done! ... result is an "+ r.getClass().getName());
 						
 					}
 					else {
@@ -701,7 +708,7 @@ public class MonitorConsole {
 	private void printBanner() {
 		System.out.println();
 		System.out.println("+-------------------------------------------------------------------------+");
-		System.out.println("|   Monitoring and Management Console (but for now it's only monitoring)  |");
+		System.out.println("|     REconfigurable Monitoring and Management of Services -- Console     |");
 		System.out.println("+-------------------------------------------------------------------------+");
 		System.out.println();
 	}

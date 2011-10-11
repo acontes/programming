@@ -2,9 +2,13 @@ package org.objectweb.proactive.core.component.componentcontroller.reconfigurati
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.HashSet;
 import java.util.Set;
 
+import org.etsi.uri.gcm.util.GCM;
 import org.objectweb.fractal.api.Component;
+import org.objectweb.fractal.api.NoSuchInterfaceException;
+import org.objectweb.fractal.api.control.NameController;
 import org.objectweb.fractal.fscript.FScript;
 import org.objectweb.fractal.fscript.FScriptEngine;
 import org.objectweb.fractal.fscript.FScriptException;
@@ -15,6 +19,7 @@ import org.objectweb.proactive.core.component.identity.PAComponent;
 import org.objectweb.proactive.extra.component.fscript.PAGCMScript;
 import org.objectweb.proactive.extra.component.fscript.control.PAReconfigurationController;
 import org.objectweb.proactive.extra.component.fscript.exceptions.ReconfigurationException;
+import org.objectweb.proactive.extra.component.fscript.model.GCMComponentNode;
 import org.objectweb.proactive.extra.component.fscript.model.GCMNodeFactory;
 
 /**
@@ -43,6 +48,7 @@ public class ReconfigurationImpl extends AbstractPAComponentController implement
      * @throws ReconfigurationException If an error occurred during the instantiation.
      */
 	public void setNewEngineFromADL() throws ReconfigurationException {
+		System.out.println("Initializing with "+ PAGCMScript.PAGCM_SCRIPT_ADL);
 		setNewEngineFromADL(PAGCMScript.PAGCM_SCRIPT_ADL);		
 	}
 
@@ -128,7 +134,35 @@ public class ReconfigurationImpl extends AbstractPAComponentController implement
     public Object execute(String source) throws ReconfigurationException {
         checkInitialized();
         try {
-            return engine.execute(source);
+        	System.out.println("Executing source: "+ source);
+        	NameController nc = null;
+        	try {
+				nc = GCM.getNameController(hostComponent);
+			} catch (NoSuchInterfaceException e) {
+				e.printStackTrace();
+			}
+			System.out.println("Name controller found!");
+			String name = nc.getFcName();
+			System.out.println("Name is "+ name);
+        	
+        	Object result = engine.execute(source);
+        	System.out.println("Result is of type: "+ result.getClass().getName());
+        	HashSet hs = new HashSet();
+        	System.out.println("Size: "+ hs.size());
+        	for(Object i : hs) {
+        		System.out.println("   ---> ("+ i.getClass().getName() + ") " + i);
+        	}
+        	Set<String> globals = getGlobals();
+        	System.out.println("Size: "+ globals.size());
+        	for(String s : globals) {
+        		System.out.println("   ---> "+ s );
+        	}
+        	//Object result2 = engine.execute("name($this);");
+        	//System.out.println("Result is of type: "+ result2.getClass().getName() + " and name is "+ result2 );
+        	result = engine.execute("$this/interface;");
+        	System.out.println("Result is of type: "+ result.getClass().getName());
+        	
+        	return new String("PAGCMScript executed!");
         } catch (FScriptException fse) {
             throw new ReconfigurationException("Unable to execute the procedure", fse);
         }
