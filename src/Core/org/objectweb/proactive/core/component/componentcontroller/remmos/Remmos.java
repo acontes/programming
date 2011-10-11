@@ -137,7 +137,7 @@ public class Remmos {
 			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.SLA_CONTROLLER, SLAService.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			// TODO missing a "decision" interface
 			// reconfiguration interface
-			typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.RECONFIGURATION_CONTROLLER, PAReconfigurationController.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
+			//typeList.add((PAGCMInterfaceType) pagcmTf.createGCMItfType(Constants.RECONFIGURATION_CONTROLLER, PAReconfigurationController.class.getName(), TypeFactory.SERVER, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY));
 			
 			// external client Monitoring interfaces
 			// add one client Monitoring interface for each client F interface
