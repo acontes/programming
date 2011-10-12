@@ -3,29 +3,29 @@
  *
  * ProActive Parallel Suite(TM): The Java(TM) library for
  *    Parallel, Distributed, Multi-Core Computing for
- *    Enterprise Grids & Clouds 
+ *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -735,14 +735,14 @@ public abstract class BodyImpl extends AbstractBody implements java.io.Serializa
                         this.retrySendReplyWithException(reply, e1, request.getSender());
                     } catch (Exception retryException1) {
                         // the stacktraced exception must be the first one
-                        sendReplyExceptionsLogger.error(e1.getMessage(), e1);
+                        sendReplyExceptionsLogger.error("Failed to send reply to " + request, e1);
                     }
                 } catch (ProActiveRuntimeException e2) {
                     try {
                         this.retrySendReplyWithException(reply, e2, request.getSender());
                     } catch (Exception retryException2) {
                         // the stacktraced exception must be the first one
-                        sendReplyExceptionsLogger.error(e2.getMessage(), e2);
+                        sendReplyExceptionsLogger.error("Failted to send reply to " + request, e2);
                     }
                 }
             }

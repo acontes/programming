@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -395,17 +395,13 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /**
-     * Registers a reference on a component with a name
+     * Registers a reference on a component with a name.
      *
-     * @param ref
-     *            a reference on a component (it should be an instance of
-     *            PAComponentRepresentative)
-     * @param name
-     *            the name of the component
-     * @return
-     *            The URI at which the component is bound
-     * @throws ProActiveException
-     *             if the component cannot be registered
+     * @param ref a reference on a component (it should be an instance of
+     *            PAComponentRepresentative).
+     * @param name the name of the component.
+     * @return The URI at which the component is bound.
+     * @throws ProActiveException if the component cannot be registered.
      */
     public static String registerByName(Component ref, String name) throws ProActiveException {
         if (!(ref instanceof PAComponentRepresentative)) {
@@ -415,14 +411,24 @@ public class Fractive implements PAGenericFactory, Component, Factory {
     }
 
     /**
+     * Unregisters a component previously registered into a registry.
+     * 
+     * @param url the url under which the component is registered.
+     * @throws IOException if the remote component cannot be removed from the registry.
+     */
+    public static void unregister(String url) throws IOException {
+        PAActiveObject.unregister(url);
+    }
+
+    /**
      * Returns a reference on a component (a component representative) for the
      * component associated with the specified name.<br>
      *
-     * @param url the registered location of the component
-     * @return a reference on the component corresponding to the given name
-     * @throws IOException if there is a communication problem with the registry
+     * @param url the registered location of the component.
+     * @return a reference on the component corresponding to the given name.
+     * @throws IOException if there is a communication problem with the registry.
      * @throws NamingException if a reference on a component could not be found at the
-     *             specified URL
+     *             specified URL.
      */
     public static PAComponentRepresentative lookup(String url) throws IOException, NamingException {
         UniversalBody b = null;

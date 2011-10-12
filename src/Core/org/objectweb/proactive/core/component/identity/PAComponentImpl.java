@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -162,18 +162,13 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
         for (Interface itf : controlItfs.values()) {
             // TODO Check with component controller
-        	//System.out.print("Control interface "+ itf.getFcItfName() + " is a PAController? " + ((  ((PAInterfaceImpl) itf).getFcItfImpl() instanceof PAController)?"true":"false") );
-        	/* cruz
-        	if( ((PAInterfaceImpl) itf).getFcItfImpl() != null) System.out.println(" Class: "+ ((PAInterfaceImpl) itf).getFcItfImpl().getClass().getName() );
-        	else System.out.println(" Class: null");
-        	  --cruz */
-        	// cruz: IF aggregated. A multicast client interface has an implementation (so, it's != null), but it is not a PAController
-        	if( ((PAInterfaceImpl) itf).getFcItfImpl() instanceof PAController) {
-        		PAController itfImpl = (PAController) ((PAInterfaceImpl) itf).getFcItfImpl();
-        		if (itfImpl != null) { // due to non-functional interface implemented using component
-        			itfImpl.initController();
-        		}
-        	}
+            // A multicast client interface has an implementation (so, it's != null), but it is not a PAController
+            if (((PAInterfaceImpl) itf).getFcItfImpl() instanceof PAController) {
+                PAController itfImpl = (PAController) ((PAInterfaceImpl) itf).getFcItfImpl();
+                if (itfImpl != null) { // due to non-functional interface implemented using component
+                    itfImpl.initController();
+                }
+            }
         }
 
         // put all in a table
@@ -692,12 +687,12 @@ public class PAComponentImpl implements PAComponent, Serializable {
 
             PAGCMInterfaceType itf_type = (PAGCMInterfaceType) itf_ref.getFcItfType();
             Class<?> interfaceClass = Class.forName(itf_type.getFcItfSignature());
-            if (interfaceClass.isAssignableFrom(controllerClass)) { //Check that the class implements the specified interface
+            if (interfaceClass.isAssignableFrom(controllerClass)) { // Check that the class implements the specified interface
                 PAInterface controller = createController(itf_type, controllerClass);
 
                 if (itf_ref.getFcItfImpl() != null) { // Dealing with first initialization
-                    if (itf_ref.getFcItfImpl() instanceof AbstractPAController) { //In this case, itf_ref is implemented by a controller object
-                        if (controller.getFcItfImpl() instanceof ControllerStateDuplication) { //Duplicate the state of the existing controller
+                    if (itf_ref.getFcItfImpl() instanceof AbstractPAController) { // In this case, itf_ref is implemented by a controller object
+                        if (controller.getFcItfImpl() instanceof ControllerStateDuplication) { // Duplicate the state of the existing controller
                             Object ob = itf_ref.getFcItfImpl();
                             if (ob instanceof ControllerStateDuplication) {
                                 ((ControllerStateDuplication) controller.getFcItfImpl())
@@ -705,7 +700,7 @@ public class PAComponentImpl implements PAComponent, Serializable {
                                                 .getStateObject());
                             }
                         }
-                    } else { //In this case, the object controller will replace an interface of a non-functional component
+                    } else { // In this case, the object controller will replace an interface of a non-functional component
                         if (controller.getFcItfImpl() instanceof ControllerStateDuplication) {
                             try {
                                 Component theOwner = ((PAInterface) itf_ref.getFcItfImpl()).getFcItfOwner();
@@ -716,19 +711,18 @@ public class PAComponentImpl implements PAComponent, Serializable {
                                 ((ControllerStateDuplication) controller.getFcItfImpl())
                                         .duplicateController(cs.getStateObject());
                             } catch (NoSuchInterfaceException e) {
-                                //Here nothing to do, if the component controller doesnt have a ControllerDuplication, then no duplication can be done
+                                // Here nothing to do, if the component controller doesnt have a ControllerDuplication, then no duplication can be done
                             }
                         }
                     }
+                } else {
+                    // Here, the controller has not been initialized (f.e., the Multicast and Gathercast controllers, when added manually)
+                    // The Multicast Controller (just like the Gathercast Controller), needs to execute "initController".
+                    // In PAComponentImpl constructor, when the NFType has been specified, the controllers that have not been assigned 
+                    //    (f.e. the controllers created in this method) are not initialized, so it must be done here.
+                    ((PAController) (controller.getFcItfImpl())).initController();
                 }
-            	// cruz: here, the controller has not been initialized (f.e., the Multicast and Gathercast controllers, when added manually)
-    			// The Multicast Controller (just like the Gathercast Controller), needs to execute "initController".
-    			// In PAComponentImpl constructor, when the NFType has been specified, the controllers that have not been assigned 
-    			//    (f.e. the controllers created in this method) are not initialized, so it must be done here.
-                else {
-                	((PAController)(controller.getFcItfImpl())).initController();	
-                }
-            	//--cruz
+
                 controlItfs.put(controller.getFcItfName(), controller);
             } else { /* The controller class does not implement the specified interface */
                 throw new IllegalBindingException("The class " + classToCreate + " does not implement the " +

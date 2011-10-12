@@ -85,7 +85,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
  */
 public class PAMembraneControllerImpl extends AbstractPAController implements PAMembraneController,
         Serializable, ControllerStateDuplication {
-    private static final long serialVersionUID = 500L;
     private Map<String, Component> nfcomponents;
     private String membraneState;
     protected static Logger logger = ProActiveLogger.getLogger(Loggers.COMPONENTS);
@@ -236,7 +235,7 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
     }
 
     private void bindNfServerWithNfClient(String clItf, PAInterface srItf) throws IllegalBindingException,
-            NoSuchInterfaceException {
+            NoSuchInterfaceException, IllegalLifeCycleException {
         PAInterface cl = null;
         try {
             cl = (PAInterface) owner.getFcInterface(clItf);
@@ -251,13 +250,18 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
         if (!tryToBindMulticastInterface(cl, srItf)) {
             cl.setFcItfImpl(srItf);
-        }
 
             nfBindings.addNormalBinding(new NFBinding(cl, clItf, srItf, "membrane", "membrane"));
+
+            if (Utils.isGCMGathercastItf(srItf)) {
+                GCM.getGathercastController(srItf.getFcItfOwner()).notifyAddedGCMBinding(
+                        srItf.getFcItfName(), owner.getRepresentativeOnThis(), clItf);
+            }
+        }
     }
 
     private void bindNfServerWithNfCServer(String clItf, PAInterface srItf) throws IllegalBindingException,
-            NoSuchInterfaceException {
+            NoSuchInterfaceException, IllegalLifeCycleException {
         PAInterface cl = null;
         Component srOwner = srItf.getFcItfOwner();
 
@@ -300,7 +304,6 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
         if (!tryToBindMulticastInterface(cl, srItf)) {
             cl.setFcItfImpl(srItf);
-        }
 
             try {
                 nfBindings.addServerAliasBinding(new NFBinding(cl, clItf, srItf, "membrane", Fractal
@@ -308,10 +311,16 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             } catch (NoSuchInterfaceException e) {
                 logger.warn("Could not add a binding : the component does not not have a Name Controller");
             }
+
+            if (Utils.isGCMGathercastItf(srItf)) {
+                GCM.getGathercastController(srItf.getFcItfOwner()).notifyAddedGCMBinding(
+                        srItf.getFcItfName(), owner.getRepresentativeOnThis(), clItf);
+            }
+        }
     }
 
     private void bindNfClientWithFCServer(String clItf, PAInterface srItf) throws IllegalBindingException,
-            NoSuchInterfaceException {
+            NoSuchInterfaceException, IllegalLifeCycleException {
 
         PAInterface cl = null;
         Component srOwner = null;
@@ -337,7 +346,6 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
 
         if (!tryToBindMulticastInterface(cl, srItf)) {
             cl.setFcItfImpl(srItf);
-        }
 
             try {
                 nfBindings.addNormalBinding(new NFBinding(cl, clItf, srItf, "membrane", Fractal
@@ -345,10 +353,16 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
             } catch (NoSuchInterfaceException e) {
                 e.printStackTrace();
             }
+
+            if (Utils.isGCMGathercastItf(srItf)) {
+                GCM.getGathercastController(srItf.getFcItfOwner()).notifyAddedGCMBinding(
+                        srItf.getFcItfName(), owner.getRepresentativeOnThis(), clItf);
+            }
+        }
     }
 
     private void bindClientNFWithInternalServerNF(String clItf, PAInterface srItf)
-            throws IllegalBindingException, NoSuchInterfaceException {
+            throws IllegalBindingException, NoSuchInterfaceException, IllegalLifeCycleException {
         bindNfServerWithNfClient(clItf, srItf);
     }
 
@@ -522,16 +536,27 @@ public class PAMembraneControllerImpl extends AbstractPAController implements PA
                 PAInterface cl = (PAInterface) owner.getFcInterface(clientItf);
                 cl.setFcItfImpl(serverItf);
                 nfBindings.addNormalBinding(new NFBinding(clItf, clientItf, srItf, "membrane", null));
+
+                if (Utils.isGCMGathercastItf(srItf)) {
+                    GCM.getGathercastController(srItf.getFcItfOwner()).notifyAddedGCMBinding(
+                            srItf.getFcItfName(), owner.getRepresentativeOnThis(), clientItf);
+                }
             }
         }
 
     }
 
     private boolean tryToBindMulticastInterface(PAInterface clientItf, PAInterface serverItf)
-            throws NoSuchInterfaceException {
+            throws NoSuchInterfaceException, IllegalBindingException, IllegalLifeCycleException {
         if (((GCMInterfaceType) clientItf.getFcItfType()).isGCMMulticastItf()) {
-            ((PAMulticastControllerImpl) ((PAInterface) GCM.getMulticastController(clientItf.getFcItfOwner())).getFcItfImpl())
-                    .bindFc(clientItf.getFcItfName(), PAFuture.getFutureValue(serverItf));
+            ((PAMulticastControllerImpl) ((PAInterface) GCM.getMulticastController(clientItf.getFcItfOwner()))
+                    .getFcItfImpl()).bindFc(clientItf.getFcItfName(), PAFuture.getFutureValue(serverItf));
+
+            if (Utils.isGCMGathercastItf(serverItf)) {
+                GCM.getGathercastController(serverItf.getFcItfOwner()).notifyAddedGCMBinding(
+                        serverItf.getFcItfName(), owner.getRepresentativeOnThis(), clientItf.getFcItfName());
+            }
+
             return true;
         } else {
             return false;

@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -104,7 +104,16 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
     @Override
     public void initController() {
         // this method is called once the component is fully instantiated with all its interfaces created
-        InterfaceType[] itfTypes = ((ComponentType) owner.getFcType()).getFcInterfaceTypes();
+        InterfaceType[] fItfFcTypes = owner.getComponentParameters().getComponentType().getFcInterfaceTypes();
+        InterfaceType[] nfItfFcTypes = new InterfaceType[0];
+        ComponentType nfComponentType = owner.getComponentParameters().getComponentNFType();
+        if (nfComponentType != null) {
+            nfItfFcTypes = nfComponentType.getFcInterfaceTypes();
+        }
+        InterfaceType[] itfTypes = new InterfaceType[fItfFcTypes.length + nfItfFcTypes.length];
+        System.arraycopy(fItfFcTypes, 0, itfTypes, 0, fItfFcTypes.length);
+        System.arraycopy(nfItfFcTypes, 0, itfTypes, fItfFcTypes.length, nfItfFcTypes.length);
+
         for (int i = 0; i < itfTypes.length; i++) {
             PAGCMInterfaceType type = (PAGCMInterfaceType) itfTypes[i];
             if (type.isGCMMulticastItf()) {
@@ -116,46 +125,13 @@ public class PAMulticastControllerImpl extends AbstractCollectiveInterfaceContro
                 }
             }
         }
-        
-        // cruz: hack for considering NF interfaces
-        InterfaceType[] itfNFTypes = null;
-        ComponentType compNFType = (ComponentType) owner.getComponentParameters().getComponentNFType();
-        if(compNFType != null) {
-        	itfNFTypes = compNFType.getFcInterfaceTypes();
-        	for(InterfaceType itfType : itfNFTypes) {
-        		PAGCMInterfaceType type = (PAGCMInterfaceType) itfType;
-        		if(type.isGCMMulticastItf()) {
-        			try {
-                        addClientSideProxy(type.getFcItfName(), (PAInterface) owner.getFcInterface(type
-                                .getFcItfName()));
-                    } catch (NoSuchInterfaceException e) {
-                        throw new ProActiveRuntimeException(e);
-                    }	
-        		}
-        	}
-        }
-        //--cruz
-        
-        List<InterfaceType> interfaceTypes = Arrays.asList(((ComponentType) owner.getFcType())
-                .getFcInterfaceTypes());
-        
-        //cruz
-        List<InterfaceType> interfaceNFTypes = Arrays.asList(((ComponentType) owner.getComponentParameters().getComponentNFType()).getFcInterfaceTypes());
-        //--cruz
-        
-        // Here it's repeating a very similar iteration as before ... (the method addManagedInterface only works with GCMMulticast interfaces)
-        // it should be optimized
+        List<InterfaceType> interfaceTypes = Arrays.asList(itfTypes);
         Iterator<InterfaceType> it = interfaceTypes.iterator();
+
         while (it.hasNext()) {
             // keep ref on interfaces of cardinality multicast
             addManagedInterface((PAGCMInterfaceType) it.next());
         }
-        
-        //cruz
-        for(InterfaceType itf : interfaceNFTypes) {
-        	addManagedInterface((PAGCMInterfaceType)itf);
-        }
-        //--cruz
     }
 
     /**

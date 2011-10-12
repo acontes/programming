@@ -5,27 +5,27 @@
  *    Parallel, Distributed, Multi-Core Computing for
  *    Enterprise Grids & Clouds
  *
- * Copyright (C) 1997-2010 INRIA/University of 
- * 				Nice-Sophia Antipolis/ActiveEon
+ * Copyright (C) 1997-2011 INRIA/University of
+ *                 Nice-Sophia Antipolis/ActiveEon
  * Contact: proactive@ow2.org or contact@activeeon.com
  *
  * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
+ * modify it under the terms of the GNU Affero General Public License
  * as published by the Free Software Foundation; version 3 of
  * the License.
  *
  * This library is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * General Public License for more details.
+ * Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU Affero General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- * If needed, contact us to obtain a release under GPL Version 2 
- * or a different license than the GPL.
+ * If needed, contact us to obtain a release under GPL Version 2 or 3
+ * or a different license than the AGPL.
  *
  *  Initial developer(s):               The ProActive Team
  *                        http://proactive.inria.fr/team_members.htm
@@ -81,6 +81,16 @@ public class WSInfo implements Serializable {
      * Full name of the class calling web services using CXF.
      */
     public static final String CXFWSCALLER_CLASSNAME = CXFWSCaller.class.getName();
+
+    /**
+     * Shortcut ID to specify that CXF configured for JAX-WS must be used to call the web service.
+     */
+    public static final String JAXWSCXFWSCALLER_ID = "JaxWsCXF";
+
+    /**
+     * Full name of the class calling web services using CXF configured for JAX-WS.
+     */
+    public static final String JAXWSCXFWSCALLER_CLASSNAME = JaxWsCXFWSCaller.class.getName();
 
     /**
      * Shortcut ID to specify that CXF configured for an Aegis data binding must be used to call the web service.
@@ -211,6 +221,8 @@ public class WSInfo implements Serializable {
                 return AXIS2WSCALLER_CLASSNAME;
             } else if (wsInfo[1].equalsIgnoreCase(CXFWSCALLER_ID)) {
                 return CXFWSCALLER_CLASSNAME;
+            } else if (wsInfo[1].equalsIgnoreCase(JAXWSCXFWSCALLER_ID)) {
+                return JAXWSCXFWSCALLER_CLASSNAME;
             } else if (wsInfo[1].equalsIgnoreCase(CXFAEGISWSCALLER_ID)) {
                 return CXFAEGISWSCALLER_CLASSNAME;
             } else if (wsInfo[1].equalsIgnoreCase(DYNAMICCXFWSCALLER_ID)) {
