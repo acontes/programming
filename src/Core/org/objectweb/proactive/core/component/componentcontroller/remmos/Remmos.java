@@ -285,19 +285,19 @@ public class Remmos {
 		
 		
 		// add components to the membrane
-		membrane.addNFSubComponent(eventListener);
-		membrane.addNFSubComponent(recordStore);
-		membrane.addNFSubComponent(monitorService);
-		membrane.addNFSubComponent(metricsStore);
+		membrane.nfAddFcSubComponent(eventListener);
+		membrane.nfAddFcSubComponent(recordStore);
+		membrane.nfAddFcSubComponent(monitorService);
+		membrane.nfAddFcSubComponent(metricsStore);
 		// bindings between NF components
-		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+EVENT_CONTROL_ITF, EVENT_LISTENER_COMP+"."+EVENT_CONTROL_ITF);
-		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
-		membrane.bindNFc(MONITOR_SERVICE_COMP+"."+METRICS_STORE_ITF, METRICS_STORE_COMP+"."+METRICS_STORE_ITF);
-		membrane.bindNFc(EVENT_LISTENER_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
-		membrane.bindNFc(EVENT_LISTENER_COMP+"."+METRICS_NOTIF_ITF, METRICS_STORE_COMP+"."+METRICS_NOTIF_ITF);
-		membrane.bindNFc(METRICS_STORE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
+		membrane.nfBindFc(MONITOR_SERVICE_COMP+"."+EVENT_CONTROL_ITF, EVENT_LISTENER_COMP+"."+EVENT_CONTROL_ITF);
+		membrane.nfBindFc(MONITOR_SERVICE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
+		membrane.nfBindFc(MONITOR_SERVICE_COMP+"."+METRICS_STORE_ITF, METRICS_STORE_COMP+"."+METRICS_STORE_ITF);
+		membrane.nfBindFc(EVENT_LISTENER_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
+		membrane.nfBindFc(EVENT_LISTENER_COMP+"."+METRICS_NOTIF_ITF, METRICS_STORE_COMP+"."+METRICS_NOTIF_ITF);
+		membrane.nfBindFc(METRICS_STORE_COMP+"."+RECORD_STORE_ITF, RECORD_STORE_COMP+"."+RECORD_STORE_ITF);
 		// binding between the NF Monitoring Interface of the host component, and the Monitor Component
-		membrane.bindNFc(Constants.MONITOR_CONTROLLER, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
+		membrane.nfBindFc(Constants.MONITOR_CONTROLLER, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
 		// bindings between the Monitor Component and the external client NF monitoring interfaces
 		// one binding from MONITOR_SERVICE_COMP for each client binding (maybe optional or mandatory)
 		// collective and multicast/gathercast interfaces not supported (yet)
@@ -311,7 +311,7 @@ public class Remmos {
 				itfName = itfType.getFcItfName();
 				clientItfName = itfName+"-external-"+MONITOR_SERVICE_ITF;
 				serverItfName = itfName+"-external-"+Constants.MONITOR_CONTROLLER;
-				membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
+				membrane.nfBindFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
 			}
 			// client-multicast
 			if(itfType.isFcClientItf() && ((PAGCMInterfaceType)itfType).isGCMMulticastItf() ) {
@@ -319,7 +319,7 @@ public class Remmos {
 				clientItfName = itfName+"-external-"+MONITOR_SERVICE_ITF;
 				serverItfName = itfName+"-external-"+Constants.MONITOR_CONTROLLER;
 				logger.debug("   MULTICAST. Binding ["+MONITOR_SERVICE_COMP+"."+clientItfName+"] to ["+serverItfName+"]");
-				membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
+				membrane.nfBindFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
 			}
 		}
 		// the composites need additional bindings with their internal monitoring interfaces
@@ -333,13 +333,13 @@ public class Remmos {
 					itfName = itfType.getFcItfName();
 					clientItfName = itfName+"-internal-"+MONITOR_SERVICE_ITF;
 					serverItfName = itfName+"-internal-"+Constants.MONITOR_CONTROLLER;
-					membrane.bindNFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
+					membrane.nfBindFc(MONITOR_SERVICE_COMP+"."+clientItfName, serverItfName);
 				}
 			}
 			// and the binding from the internal server monitor interface, back to the NF Monitor Component
 			clientItfName = "internal-server-"+Constants.MONITOR_CONTROLLER;
 			serverItfName = MONITOR_SERVICE_ITF;
-			membrane.bindNFc(clientItfName, MONITOR_SERVICE_COMP+"."+serverItfName);
+			membrane.nfBindFc(clientItfName, MONITOR_SERVICE_COMP+"."+serverItfName);
 		}
 		
 		
@@ -397,13 +397,13 @@ public class Remmos {
 		lifeCycle.stopFc();
 		
 		// add components to the membrane
-		membrane.addNFSubComponent(slaService);
-		membrane.addNFSubComponent(sloStore);
+		membrane.nfAddFcSubComponent(slaService);
+		membrane.nfAddFcSubComponent(sloStore);
 		// bindings between NF components
-		membrane.bindNFc(SLA_SERVICE_COMP+"."+SLO_STORE_ITF, SLO_STORE_COMP+"."+SLO_STORE_ITF);
-		membrane.bindNFc(SLO_STORE_COMP+"."+MONITOR_SERVICE_ITF, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
+		membrane.nfBindFc(SLA_SERVICE_COMP+"."+SLO_STORE_ITF, SLO_STORE_COMP+"."+SLO_STORE_ITF);
+		membrane.nfBindFc(SLO_STORE_COMP+"."+MONITOR_SERVICE_ITF, MONITOR_SERVICE_COMP+"."+MONITOR_SERVICE_ITF);
 		// binding between the NF SLA Interface of the host component, and the SLA Component
-		membrane.bindNFc(Constants.SLA_CONTROLLER, SLA_SERVICE_COMP+"."+SLA_SERVICE_ITF);
+		membrane.nfBindFc(Constants.SLA_CONTROLLER, SLA_SERVICE_COMP+"."+SLA_SERVICE_ITF);
 		
 		// restore membrane and component lifecycle after having made changes
 		if(membraneOldState.equals(PAMembraneController.MEMBRANE_STARTED)) {
@@ -462,9 +462,9 @@ public class Remmos {
 		lifeCycle.stopFc();
 		
 		// add components to the membrane
-		membrane.addNFSubComponent(reconfiguration);
+		membrane.nfAddFcSubComponent(reconfiguration);
 		// binding between the NF Reconfiguration interface of the host component, and the Reconfiguration Component
-		membrane.bindNFc(Constants.RECONFIGURATION_CONTROLLER, RECONFIGURATION_SERVICE_COMP+"."+ACTIONS_ITF);
+		membrane.nfBindFc(Constants.RECONFIGURATION_CONTROLLER, RECONFIGURATION_SERVICE_COMP+"."+ACTIONS_ITF);
 		
 		// restore membrane and component lifecycle after having made changes
 		if(membraneOldState.equals(PAMembraneController.MEMBRANE_STARTED)) {
@@ -496,7 +496,7 @@ public class Remmos {
 					patf.createGCMItfType(METRICS_NOTIF_ITF, RemmosEventListener.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			eventListenerType = patf.createFcType(eventListenerItfType);
-			eventListener = pagf.newNFcInstance(eventListenerType,
+			eventListener = pagf.newNfFcInstance(eventListenerType,
 					new ControllerDescription(EVENT_LISTENER_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"),
 					new ContentDescription(eventListenerClass),
 					node
@@ -526,7 +526,7 @@ public class Remmos {
 					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			recordStoreType = patf.createFcType(recordStoreItfType);
-			recordStore = pagf.newNFcInstance(recordStoreType, 
+			recordStore = pagf.newNfFcInstance(recordStoreType, 
 					new ControllerDescription(RECORD_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
 					new ContentDescription(recordStoreClass),
 					node
@@ -559,7 +559,7 @@ public class Remmos {
 					patf.createGCMItfType(RECORD_STORE_ITF, RecordStore.class.getName(), TypeFactory.CLIENT, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			metricsStoreType = patf.createFcType(metricsStoreItfType);
-			metricsStore = pagf.newNFcInstance(metricsStoreType, 
+			metricsStore = pagf.newNfFcInstance(metricsStoreType, 
 					new ControllerDescription(METRICS_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
 					new ContentDescription(metricsStoreClass),
 					node
@@ -642,7 +642,7 @@ public class Remmos {
 		monitorServiceItfType = monitorServiceItfTypeList.toArray(new InterfaceType[monitorServiceItfTypeList.size()]);
 		try {
 			monitorServiceType = patf.createFcType(monitorServiceItfType);
-			monitorService = pagf.newNFcInstance(monitorServiceType,
+			monitorService = pagf.newNfFcInstance(monitorServiceType,
 					new ControllerDescription(MONITOR_SERVICE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"),
 					new ContentDescription(monitorServiceClass),
 					node
@@ -667,7 +667,7 @@ public class Remmos {
 					patf.createGCMItfType(SLA_SERVICE_ITF, SLAService.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			slaServiceType = patf.createFcType(slaServiceItfType);
-			slaService = pagf.newNFcInstance(slaServiceType, 
+			slaService = pagf.newNfFcInstance(slaServiceType, 
 					new ControllerDescription(SLA_SERVICE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
 					new ContentDescription(slaServiceClass),
 					node
@@ -693,7 +693,7 @@ public class Remmos {
 					patf.createGCMItfType(SLA_ALARM_ITF, SLANotifier.class.getName(), TypeFactory.CLIENT, TypeFactory.OPTIONAL, PAGCMTypeFactory.SINGLETON_CARDINALITY)
 			};
 			sloStoreType = patf.createFcType(sloStoreItfType);
-			sloStore = pagf.newNFcInstance(sloStoreType, 
+			sloStore = pagf.newNfFcInstance(sloStoreType, 
 					new ControllerDescription(SLO_STORE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
 					new ContentDescription(sloStoreClass),
 					node
@@ -716,7 +716,7 @@ public class Remmos {
 					patf.createGCMItfType(ACTIONS_ITF, PAReconfigurationController.class.getName(), TypeFactory.SERVER, TypeFactory.MANDATORY, PAGCMTypeFactory.SINGLETON_CARDINALITY),
 			};
 			reconfigurationType = patf.createFcType(reconfigurationItfType);
-			reconfiguration = pagf.newNFcInstance(reconfigurationType, 
+			reconfiguration = pagf.newNfFcInstance(reconfigurationType, 
 					new ControllerDescription(RECONFIGURATION_SERVICE_COMP, Constants.PRIMITIVE, "/org/objectweb/proactive/core/component/componentcontroller/config/default-component-controller-config-basic.xml"), 
 					new ContentDescription(reconfigurationClass),
 					node
@@ -818,7 +818,7 @@ public class Remmos {
 						internalMonitor = ((MonitorControl)componentDest.getFcInterface(Constants.MONITOR_CONTROLLER));
 						logger.debug("   Binding ["+componentName+"."+itfName+"-internal-"+Constants.MONITOR_CONTROLLER+"] to ["+ componentDestName+"."+Constants.MONITOR_CONTROLLER+"]");
 						membrane.stopMembrane();
-						membrane.bindNFc(itfName+"-internal-"+Constants.MONITOR_CONTROLLER, internalMonitor);
+						membrane.nfBindFc(itfName+"-internal-"+Constants.MONITOR_CONTROLLER, internalMonitor);
 						membrane.startMembrane();
 					} catch (NoSuchInterfaceException e) {
 						e.printStackTrace();
@@ -896,7 +896,7 @@ public class Remmos {
 								}
 								// do the NF binding
 								membrane.stopMembrane();
-								membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
+								membrane.nfBindFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
 								membrane.startMembrane();
 							} catch (NoSuchInterfaceException e) {
 								e.printStackTrace();
@@ -944,7 +944,7 @@ public class Remmos {
 							}
 							// do the NF binding
 							membrane.stopMembrane();
-							membrane.bindNFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
+							membrane.nfBindFc(itfName+"-external-"+Constants.MONITOR_CONTROLLER, externalMonitor);
 							membrane.startMembrane();
 						} catch (NoSuchInterfaceException e) {
 							e.printStackTrace();

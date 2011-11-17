@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.objectweb.fractal.api.Component;
 import org.objectweb.fractal.api.NoSuchInterfaceException;
@@ -19,6 +18,7 @@ import org.objectweb.proactive.core.component.componentcontroller.monitoring.Pat
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.RequestPath;
 import org.objectweb.proactive.core.component.componentcontroller.monitoring.IncomingRequestRecord;
 import org.objectweb.proactive.core.component.identity.PAComponent;
+import org.objectweb.proactive.core.component.type.PAComponentType;
 import org.objectweb.proactive.core.component.type.PAGCMInterfaceType;
 
 public class RemmosUtils {
@@ -46,7 +46,8 @@ public class RemmosUtils {
 		}
 
 		System.out.println();
-		InterfaceType[] itfNFTypes = pacomp.getComponentParameters().getComponentNFType().getFcInterfaceTypes();
+		//InterfaceType[] itfNFTypes = pacomp.getComponentParameters().getComponentNFType().getFcInterfaceTypes();
+		InterfaceType[] itfNFTypes = ((PAComponentType) pacomp.getComponentParameters().getComponentType()).getNfFcInterfaceTypes();
 		for(int i=0; i<itfNFTypes.length; i++) {
 			System.out.println("  Interface (NF): " + (((PAGCMInterfaceType)itfNFTypes[i]).isFcClientItf() ? " client ":" server ")
 					+ (((PAGCMInterfaceType)itfNFTypes[i]).isFcOptionalItf() ? " optional  ":" mandatory ")
