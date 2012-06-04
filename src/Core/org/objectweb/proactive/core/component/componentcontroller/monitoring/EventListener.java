@@ -332,7 +332,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	IncomingRequestRecord rs;
     	boolean newRecord = false;
     	// checks if the request data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).getBooleanValue()) {
     		// if the key was already there, it has to modify it to add the arrival time
     		//rs = (RequestRecord) logHandler.fetch(current, RecordType.RequestRecord);
     		rs = recordStore.fetchIncomingRequestRecord(current);
