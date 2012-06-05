@@ -431,7 +431,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	IncomingRequestRecord rs;
     	boolean newRecord = false;
     	// checks if the request data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).getBooleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
     		rs = recordStore.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
@@ -485,7 +485,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	OutgoingRequestRecord cs;
     	boolean newRecord = true;
     	// checks if the call data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).getBooleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.setSentTime(notification.getTimeStamp());
@@ -536,7 +536,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	OutgoingRequestRecord cs;
     	boolean newRecord = false;
     	// checks if the call data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).getBooleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.setReplyReceptionTime(notification.getTimeStamp());
@@ -585,7 +585,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	OutgoingRequestRecord cs;
     	boolean newRecord = false;
     	// checks if the call data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).getBooleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.addWbnStartTime(data.getSequenceNumber(), notification.getTimeStamp());
@@ -635,7 +635,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	IncomingRequestRecord rs;
     	boolean newRecord = false;
     	// checks if the request data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).getBooleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
     		rs = recordStore.fetchIncomingRequestRecord(current);
     		rs.setReplyTime(notification.getTimeStamp());
@@ -686,7 +686,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	OutgoingRequestRecord cs;
     	boolean newRecord = false;
     	// checks if the call data has already been entered in the map
-    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.OutgoingRequestRecord).getBooleanValue()) {
     		//cs = (CallRecord) logStore.fetch(current, RecordType.CallRecord);
     		cs = recordStore.fetchOutgoingRequestRecord(current);
     		cs.addWbnStopTime(data.getSequenceNumber(), notification.getTimeStamp());
