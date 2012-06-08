@@ -62,8 +62,6 @@ public class CXFRESTfulServiceCaller implements PAWSCaller {
     private Object restService;
 
     public void setup(Class<?> serviceClass, String wsUrl) {
-    	System.out.println("URL:   "+ wsUrl);
-    	System.out.println("Class: "+ serviceClass.getName());
         this.restServiceUrl = wsUrl;
         this.restService = JAXRSClientFactory.create(wsUrl, serviceClass);
     }
@@ -75,7 +73,6 @@ public class CXFRESTfulServiceCaller implements PAWSCaller {
                 parameterTypes[i] = args[i].getClass();
             }
             Method method = restService.getClass().getDeclaredMethod(methodName, parameterTypes);
-            System.out.println("Found method "+ method.getName());
             return method.invoke(restService, args);
         } catch (SecurityException se) {
             logger.error("[CXFRESTfulServiceCaller] Failed to invoke RESTful service: " + restServiceUrl, se);

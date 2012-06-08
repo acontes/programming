@@ -363,7 +363,7 @@ public class LinuxProcessBuilder implements OSProcessBuilder {
         delegatedPB.environment().remove(ENV_VAR_USER_KEY_CONTENT);
     }
 
-	protected String[] wrapCommand() {
+    protected String[] wrapCommand() {
         String uname = (user() == null) ? "" : user().getUserName();
         String cpart = (cores() == null) ? "" : cores().toString();
         String wpath = (directory() == null) ? "" : directory().getAbsolutePath();
