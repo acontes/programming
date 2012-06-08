@@ -418,7 +418,7 @@ public class EventListener extends AbstractPAComponentController implements Noti
     	IncomingRequestRecord rs;
     	boolean newRecord = false;
     	// checks if the request data has already been entered in the map (should exist already)
-    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).booleanValue()) {
+    	if(recordStore.exists(current, RecordType.IncomingRequestRecord).getBooleanValue()) {
     		//rs = (RequestRecord) logStore.fetch(current, RecordType.RequestRecord);
     		rs = recordStore.fetchIncomingRequestRecord(current);	
     		rs.setServingStartTime(notification.getTimeStamp());
