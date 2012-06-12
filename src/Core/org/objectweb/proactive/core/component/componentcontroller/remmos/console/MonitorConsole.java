@@ -224,7 +224,7 @@ public class MonitorConsole {
 			// list components
 			else if(command.equals(COM_LIST)) {
 				for(String name : managedComponents.keySet()) {
-					System.out.println("   "+ name);
+					System.out.println("   "+ name + " ... " + ((PAComponent)managedComponents.get(name)).getID() );
 				}
 			}
 			// set current component

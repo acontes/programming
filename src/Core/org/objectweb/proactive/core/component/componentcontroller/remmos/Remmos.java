@@ -304,23 +304,29 @@ public class Remmos {
 		
 		
 		// creates the components used for monitoring
+		logger.debug("Creating NF monitoring components");
 		Component eventListener = createBasicEventListener(patf, pagf, EventListener.class.getName(), parentNode);
 		Component recordStore = createBasicRecordStore(patf, pagf, RecordStoreImpl.class.getName(), parentNode);
 		Component monitorService = createMonitorService(patf, pagf, MonitorControlImpl.class.getName(), component, parentNode);
 		Component metricsStore = createBasicMetricsStore(patf, pagf, MetricsStoreImpl.class.getName(), parentNode);
 
+		
 		// performs the NF assembly
+		logger.debug("Changing the membrane state in order to inserting monitoring components");
 		PAMembraneController membrane = Utils.getPAMembraneController(component);
 		PAGCMLifeCycleController lifeCycle = Utils.getPAGCMLifeCycleController(component);
 		// stop the membrane and component lifecycle before making changes
 		String membraneOldState = membrane.getMembraneState();
 		String componentOldState = lifeCycle.getFcState();
-		membrane.stopMembrane();
+		logger.debug("Stopping LifeCycle");
 		lifeCycle.stopFc();
+		logger.debug("State. Membrane: "+ membraneOldState+ " - LifeCycle: "+ componentOldState);
+		membrane.stopMembrane();
 		
 		
 		
 		// add components to the membrane
+		logger.debug("Inserting components in the membrane");
 		membrane.nfAddFcSubComponent(eventListener);
 		membrane.nfAddFcSubComponent(recordStore);
 		membrane.nfAddFcSubComponent(monitorService);
@@ -429,8 +435,9 @@ public class Remmos {
 		// stop the membrane and component lifecycle before making changes
 		String membraneOldState = membrane.getMembraneState();
 		String componentOldState = lifeCycle.getFcState();
-		membrane.stopMembrane();
 		lifeCycle.stopFc();
+		membrane.stopMembrane();
+		
 		
 		// add components to the membrane
 		membrane.nfAddFcSubComponent(slaService);
@@ -494,8 +501,9 @@ public class Remmos {
 		// stop the membrane and component lifecycle before making changes
 		String membraneOldState = membrane.getMembraneState();
 		String componentOldState = lifeCycle.getFcState();
-		membrane.stopMembrane();
 		lifeCycle.stopFc();
+		membrane.stopMembrane();
+		
 		
 		// add components to the membrane
 		membrane.nfAddFcSubComponent(reconfiguration);
