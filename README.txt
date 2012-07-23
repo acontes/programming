@@ -62,3 +62,4 @@ If you want only to compile all sources (and not the jar files):
 If you have any problems or questions when using ProActive feel free to contact us at proactive@ow2.org
 
 Enjoy ProActive !
+foo
