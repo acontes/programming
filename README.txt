@@ -1,4 +1,4 @@
-Thanks for your interest in ProActive.
+Thanks for your interest in ProActive Programming.
 
 ProActive x.x.x 
 
