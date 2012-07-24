@@ -1,3 +1,5 @@
+FOO
+
 Thanks for your interest in ProActive.
 
 ProActive $Id$
