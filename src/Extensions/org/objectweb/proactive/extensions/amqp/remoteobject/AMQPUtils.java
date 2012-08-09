@@ -39,7 +39,9 @@ package org.objectweb.proactive.extensions.amqp.remoteobject;
 import java.io.IOException;
 import java.net.URI;
 
+import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.URIBuilder;
+import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.amqp.AMQPConfig;
 
 import com.rabbitmq.client.Channel;
@@ -51,6 +53,9 @@ import com.rabbitmq.client.Channel;
  *
  */
 public class AMQPUtils {
+
+    final static private Logger channelLogger = ProActiveLogger
+            .getLogger(AMQPConfig.Loggers.AMQP_CHANNEL_FACTORY);
 
     /**
      *
@@ -74,6 +79,14 @@ public class AMQPUtils {
             java.util.UUID.randomUUID().toString();
     }
 
+    public static void closeChannel(Channel channel) {
+        try {
+            channel.close();
+        } catch (Exception e) {
+            channelLogger.warn("Failed to close channel", e);
+        }
+    }
+
     public static Channel getChannelToBroker(URI uri) throws IOException {
 
         String host = URIBuilder.getHostNameFromUrl(uri);
@@ -90,7 +103,7 @@ public class AMQPUtils {
             }
         }
 
-        Channel channel = ConnectionAndChannelFactory.getInstance().getChannel(host, port, false);
+        Channel channel = ConnectionAndChannelFactory.getInstance().getChannel(host, port);
 
         return channel;
     }

@@ -37,8 +37,8 @@
 package org.objectweb.proactive.extensions.amqp.remoteobject;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.WeakHashMap;
 
 import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.util.log.ProActiveLogger;
@@ -62,17 +62,12 @@ public class ConnectionAndChannelFactory {
 
     final static private Logger logger = ProActiveLogger.getLogger(AMQPConfig.Loggers.AMQP_CHANNEL_FACTORY);
 
-    static private ConnectionAndChannelFactory instance;
+    private static final ConnectionAndChannelFactory instance = new ConnectionAndChannelFactory();
 
-    Map<String, Connection> cachedConnections = new WeakHashMap<String, Connection>();
-    Map<String, Channel> cachedChannels = new WeakHashMap<String, Channel>();
+    private final Map<String, Connection> cachedConnections = new HashMap<String, Connection>();
 
-    public synchronized static ConnectionAndChannelFactory getInstance() {
-        if (instance == null) {
-            instance = new ConnectionAndChannelFactory();
-        }
+    public static ConnectionAndChannelFactory getInstance() {
         return instance;
-
     }
 
     /**
@@ -83,26 +78,32 @@ public class ConnectionAndChannelFactory {
      * @throws IOException is the broker cannot be contacted
      */
     public synchronized Connection getConnection(String hostname, int port) throws IOException {
-
         String key = generateKey(hostname, port);
-        Connection c = cachedConnections.get(key);
+        Connection connection = cachedConnections.get(key);
 
-        if ((c != null) && (c.isOpen())) {
-            return c;
+        if (connection != null) {
+            if (connection.isOpen()) {
+                return connection;
+            } else {
+                cachedConnections.remove(key);
+            }
         }
+
         logger.debug(String.format("requested connection to %s is close, creating a new one", key));
 
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(hostname);
         factory.setPort(port);
 
-        c = factory.newConnection();
+        connection = factory.newConnection();
+        connection.addShutdownListener(new AMQPShutDownListener(connection.toString()));
 
-        c.addShutdownListener(new AMQPShutDownListener(c.toString()));
+        logger.debug(String.format("checking new connection to %s, isOpen() %s", connection.toString(),
+                connection.isOpen()));
 
-        logger.debug(String.format("checking new connection to %s, isOpen() %s", c.toString(), c.isOpen()));
-        cachedConnections.put(key, c);
-        return c;
+        cachedConnections.put(key, connection);
+
+        return connection;
     }
 
     /**
@@ -113,36 +114,16 @@ public class ConnectionAndChannelFactory {
      * @return a channel  
      * @throws IOException if something went wrong
      */
-    public synchronized Channel getChannel(String hostname, int port, boolean reuse) throws IOException {
-        Channel chan;
-        String key = null;
-        if (reuse) {
-            key = generateKey(hostname, port);
+    public Channel getChannel(String hostname, int port) throws IOException {
+        Channel channel;
 
-            chan = cachedChannels.get(key);
+        Connection connection = getConnection(hostname, port);
+        channel = connection.createChannel();
 
-            if ((chan != null) && (chan.isOpen())) {
-                return chan;
-            }
-
-            logger.debug(String.format("requested channel to %s is close, creating a new one", key));
-        }
-
-        Connection c = getConnection(hostname, port);
-        chan = c.createChannel();
-
-        //	chan.addShutdownListener(new AMQPShutDownListener(chan.toString()));
-
-        logger.debug(String
-                .format("checking new channel to %s, isOpen() %s ", chan.toString(), chan.isOpen()));
-
-        if (reuse) {
-            cachedChannels.put(key, chan);
-        }
-        return chan;
+        return channel;
     }
 
-    private String generateKey(String hostname, int port) {
+    private static String generateKey(String hostname, int port) {
         return hostname + port;
     }
 

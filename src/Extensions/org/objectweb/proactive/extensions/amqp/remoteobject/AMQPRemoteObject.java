@@ -45,7 +45,6 @@ import org.apache.log4j.Logger;
 import org.objectweb.proactive.core.ProActiveException;
 import org.objectweb.proactive.core.body.reply.Reply;
 import org.objectweb.proactive.core.body.request.Request;
-import org.objectweb.proactive.core.remoteobject.InternalRemoteRemoteObject;
 import org.objectweb.proactive.core.remoteobject.RemoteRemoteObject;
 import org.objectweb.proactive.core.util.URIBuilder;
 import org.objectweb.proactive.core.util.converter.ByteToObjectConverter;
@@ -54,8 +53,6 @@ import org.objectweb.proactive.core.util.log.ProActiveLogger;
 import org.objectweb.proactive.extensions.amqp.AMQPConfig;
 import org.objectweb.proactive.utils.Sleeper;
 
-import com.rabbitmq.client.AMQP.Exchange.DeclareOk;
-import com.rabbitmq.client.AMQP.Queue.BindOk;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.RpcClient;
 import com.rabbitmq.client.ShutdownSignalException;
@@ -71,33 +68,16 @@ import com.rabbitmq.client.ShutdownSignalException;
 public class AMQPRemoteObject implements RemoteRemoteObject, Serializable {
     final static private Logger logger = ProActiveLogger.getLogger(AMQPConfig.Loggers.AMQP_REMOTE_OBJECT);
 
-    /** The URL of the RemoteObject */
-    private URI remoteObjectURL;
+    private static final String exchangeName = AMQPConfig.PA_AMQP_RPC_EXCHANGE_NAME.getValue();
 
-    // private transient Channel channel;
-    private String queueName = null;
-    // private transient String replyQueueName;
-    private transient String exchangeName;
-    // private transient QueueingConsumer rPCconsumer;
-    private transient AMQPRemoteObjectServer amqpros;
-    // private transient RpcClient rpc;
-    private boolean connected = false;
+    private final URI remoteObjectURL;
+
+    private final String queueName;
 
     public AMQPRemoteObject(URI remoteObjectURL) throws ProActiveException, IOException {
         this.remoteObjectURL = remoteObjectURL;
-        // connect();
-    }
-
-    public AMQPRemoteObject(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL)
-            throws ProActiveException, IOException {
-        this.remoteObjectURL = remoteObjectURL;
-        // connect();
-    }
-
-    public AMQPRemoteObject(InternalRemoteRemoteObject remoteObject, URI remoteObjectURL,
-            AMQPRemoteObjectServer amqpros) throws ProActiveException, IOException {
-        this(remoteObjectURL);
-        this.amqpros = amqpros;
+        String name = URIBuilder.getNameFromURI(remoteObjectURL);
+        queueName = AMQPUtils.computeQueueNameFromName(name);
     }
 
     public Reply receiveMessage(Request message) throws IOException, ProActiveException {
@@ -106,8 +86,10 @@ public class AMQPRemoteObject implements RemoteRemoteObject, Serializable {
 
         Reply response = null;
 
-        logger.debug(String.format("AMQP RO sending %s to %s, on exchange %s, queue %s", message
-                .getMethodName(), remoteObjectURL, exchangeName, queueName));
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format("AMQP RO sending %s to %s, on exchange %s, queue %s", message
+                    .getMethodName(), remoteObjectURL, exchangeName, queueName));
+        }
 
         byte[] syncReply;
         try {
@@ -123,119 +105,45 @@ public class AMQPRemoteObject implements RemoteRemoteObject, Serializable {
                     message.getMethodName(), remoteObjectURL, exchangeName, queueName), e);
         } finally {
             try {
-                String exchangeName = rpc.getExchange();
-                Channel c = rpc.getChannel();
-
                 rpc.close();
-                c.exchangeDelete(exchangeName);
+                rpc.getChannel().close();
             } catch (IOException e) {
                 ProActiveLogger.logEatedException(logger, e);
             }
         }
 
-        logger.debug(String.format("AMQP RO received response of message %s to %s, on exchange %s, queue %s",
-                message.getMethodName(), remoteObjectURL, exchangeName, queueName));
+        if (logger.isDebugEnabled()) {
+            logger.debug(String.format(
+                    "AMQP RO received response of message %s to %s, on exchange %s, queue %s", message
+                            .getMethodName(), remoteObjectURL, exchangeName, queueName));
+        }
 
         return response;
 
     }
 
-    public void setURI(URI url) {
-        this.remoteObjectURL = url;
-    }
-
-    public URI getURI() {
-        return this.remoteObjectURL;
-    }
-
     private RpcClient connect(int retries) throws IOException {
-
-        Channel channel = null;
-        String name = URIBuilder.getNameFromURI(remoteObjectURL);
-        queueName = AMQPUtils.computeQueueNameFromName(name);
-        exchangeName = AMQPUtils.generateNewExchange(name);
-
-        channel = AMQPUtils.getChannelToBroker(remoteObjectURL);
-
-        boolean durable = false;
-        boolean autoDelete = true;
-        boolean internal = false;
-        DeclareOk channelDeclare = null;
-
-        java.util.Map<java.lang.String, java.lang.Object> arguments = null;
+        Channel channel = AMQPUtils.getChannelToBroker(remoteObjectURL);
         try {
-
-            channelDeclare = channel.exchangeDeclare(exchangeName, "direct", durable, autoDelete, internal,
-                    arguments);
-
-        } catch (IOException ex) {
-            logger.warn(ex);
-            throw ex;
-        }
-
-        // strict routing
-        String routingKey = queueName;
-        BindOk queueBind = null;
-        try {
-            queueBind = channel.queueBind(queueName, exchangeName, routingKey);
-
-            return new RpcClient(channel, exchangeName, routingKey);
+            return new RpcClient(channel, exchangeName, queueName);
         } catch (IOException e) {
             if (!channel.isOpen() && (retries > 0)) {
                 new Sleeper(1000).sleep();
                 return connect(retries - 1);
             }
 
-            if (queueBind != null) {
-                channel.queueUnbind(queueName, exchangeName, routingKey);
+            if (channel != null) {
+                AMQPUtils.closeChannel(channel);
             }
 
-            if (channelDeclare != null) {
-                channel.exchangeDelete(exchangeName);
-            }
-
-            logger
-                    .debug(String
-                            .format(
-                                    "to=%s, name=%s,queueName=%s,exhangeName=%s, caught IO channel %s isOpen %s,reason is %s",
-                                    remoteObjectURL, name, queueName, exchangeName, channel.toString(),
-                                    (channel != null ? channel.isOpen() : ""), ProActiveLogger
-                                            .getStackTraceAsString(e)));
+            logger.debug(String.format(
+                    "to=%s, queueName=%s,exhangeName=%s, caught IO channel %s isOpen %s,reason is %s",
+                    remoteObjectURL, queueName, exchangeName, channel.toString(), (channel != null ? channel
+                            .isOpen() : ""), ProActiveLogger.getStackTraceAsString(e)));
 
             throw e;
 
         }
     }
 
-    // @Override
-    // protected void finalize() throws Throwable {
-    //
-    //
-    // try {
-    // if (rpc != null) {
-    // rpc.close();
-    // }
-    // } catch (Throwable e) {
-    // e.printStackTrace();
-    // }
-    // try {
-    // if (channel != null) {
-    // if ( channel.getConnection().isOpen()) {
-    // channel.getConnection().close() ;
-    // }
-    // if ( channel.isOpen() ) {
-    // channel.close();
-    // }
-    // }
-    // } catch (Throwable e) {
-    // e.printStackTrace();
-    // }
-    // super.finalize();
-    // }
-
-    private void readObject(java.io.ObjectInputStream in) throws java.io.IOException, ClassNotFoundException {
-        in.defaultReadObject();
-        connected = false;
-        // connect();
-    }
 }
